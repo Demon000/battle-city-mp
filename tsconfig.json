@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "outDir": "build",
+    "target": "esnext",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "importHelpers": true,
+    "experimentalDecorators": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "types": [
+      "node",
+      "webpack-env"
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ],
+      "tslib": ["node_modules/tslib"],
+    },
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost"
+    ]
+  },
+  "include": [
+    "client/shims",
+    "**/*.ts",
+    "**/*.vue"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
