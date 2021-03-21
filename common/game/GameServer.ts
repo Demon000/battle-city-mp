@@ -181,12 +181,12 @@ export default class GameServer {
     }
 
     onPlayerDisconnected(playerId: string): void {
+        this.playerService.despawnPlayerTank(playerId);
         this.playerService.removePlayer(playerId);
     }
 
     onPlayerRemoved(playerId: string): void {
-        this.playerService.despawnPlayerTank(playerId);
-        this.emitter.emit(GameEvent.PLAYER_REMOVED);
+        this.emitter.emit(GameEvent.PLAYER_REMOVED, playerId);
     }
 
     onPlayerSpawnTankRequested(playerId: string): void {
