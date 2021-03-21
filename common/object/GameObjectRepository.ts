@@ -11,7 +11,7 @@ export default class GameObjectRepository {
     getMultiple(objectIds: number[]): GameObject[] {
         const objects = new Array<GameObject>();
         for (const objectId of objectIds) {
-            objects.push(this.map.getRight(objectId))
+            objects.push(this.map.getRight(objectId));
         }
         return objects;
     }

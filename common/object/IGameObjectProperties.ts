@@ -1,7 +1,7 @@
 export enum SpriteWrapMode {
     SCALE = 'scale',
     SPAN_MULTIPLE = 'span-multiple',
-};
+}
 
 export interface ISprite {
     filename: string;

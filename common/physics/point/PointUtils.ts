@@ -17,7 +17,7 @@ export default class PointUtils {
         return { x, y };
     }
 
-    static is(value: Record<string, any>): boolean {
+    static is(value: Record<string, never>): boolean {
         return 'x' in value && 'y' in value;
     }
 }

@@ -1,4 +1,3 @@
-import GameObject from '@/common/object/GameObject';
 import { GameObjectType } from '@/common/object/GameObjectProperties';
 import Point from '../point/Point';
 
@@ -24,7 +23,7 @@ export type CollisionRuleResultFunction = (
     movingObjectId: number,
     newPosition: Point,
     staticObjectId: number,
-    ) => ICollisionResult;
+) => ICollisionResult;
 
 export default interface ICollisionRule {
     movingTypes: GameObjectType[];

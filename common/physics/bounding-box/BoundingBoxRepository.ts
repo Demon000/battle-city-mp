@@ -23,7 +23,9 @@ export default class BoundingBoxRepository {
             const node = this.map.getLeft(value);
             this.tree.removeNode(node);
             this.map.removeLeft(node);
-        } catch (err) {}
+        } catch (err) {
+            // do nothing
+        }
     }
 
     updateBoxValue(value: number, box: BoundingBox): void {

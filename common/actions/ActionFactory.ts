@@ -6,7 +6,7 @@ export default class ActionFactory {
         if (options.type === ActionType.BUTTON_PRESS) {
             return new ButtonPressAction(options as ButtonPressActionOptions);
         } else {
-            throw new Error('Action options type is invalid')
+            throw new Error('Action options type is invalid');
         }
     }
 }

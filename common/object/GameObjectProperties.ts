@@ -51,7 +51,7 @@ const properties: IGameObjectProperties[] = [
         type: GameObjectType.BULLET,
         width: 4,
         height: 4,
-    }
+    },
 ];
 
 const typePropertiesMap = new Map<string, IGameObjectProperties>();

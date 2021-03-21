@@ -1,7 +1,7 @@
 import BoundingBox from '@/common/physics/bounding-box/BoundingBox';
 import Point from '@/common/physics/point/Point';
 import { Direction } from '../physics/Direction';
-import GameObjectProperties, { GameObjectType } from './GameObjectProperties';
+import { GameObjectType } from './GameObjectProperties';
 import IGameObjectProperties from './IGameObjectProperties';
 
 export interface GameObjectOptions {

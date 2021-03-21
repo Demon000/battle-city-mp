@@ -8,7 +8,7 @@ export const rules: ICollisionRule[] = [
         result: [
             {
                 type: CollisionResultType.PREVENT_MOVEMENT,
-            }
+            },
         ],
     },
     {
