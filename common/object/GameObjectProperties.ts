@@ -59,7 +59,9 @@ const shortTypePropertiesMap = new Map<string, IGameObjectProperties>();
 
 for (const property of properties) {
     typePropertiesMap.set(property.type, property);
-    shortTypePropertiesMap.set(property.type, property);
+    if (property.shortType) {
+        shortTypePropertiesMap.set(property.shortType, property);
+    }
 }
 
 export default class GameObjectProperties {
@@ -74,7 +76,7 @@ export default class GameObjectProperties {
     static getShortTypeProperties(shortType: string): IGameObjectProperties {
         const properties = shortTypePropertiesMap.get(shortType);
         if (!properties) {
-            throw new Error('Invalid short type');
+            throw new Error('Invalid short type ' + shortType);
         }
         return properties;
     }
