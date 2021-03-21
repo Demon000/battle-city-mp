@@ -21,7 +21,6 @@
       "@/*": [
         "./*"
       ],
-      "tslib": ["node_modules/tslib"],
     },
     "lib": [
       "esnext",
@@ -31,7 +30,6 @@
     ]
   },
   "include": [
-    "client/shims",
     "**/*.ts",
     "**/*.vue"
   ],
