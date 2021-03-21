@@ -11,7 +11,11 @@ import Player, { PlayerOptions } from '@/common/player/Player';
 
 const app = Express();
 const http = new Http.Server(app);
-const io = new IO.Server(http);
+const io = new IO.Server(http, {
+    cors: {
+        origin: '*',
+    },
+});
 const gameServer = new GameServer();
 
 io.on('connection', (socket: IO.Socket) => {
