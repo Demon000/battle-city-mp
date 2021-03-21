@@ -1,5 +1,6 @@
 import Point from '../physics/point/Point';
-import GameObject from './GameObject';
+import Tank, { TankOptions } from '../tank/Tank';
+import GameObject, { GameObjectOptions } from './GameObject';
 import GameObjectProperties, { GameObjectType } from './GameObjectProperties';
 
 export default class GameObjectFactory {
@@ -10,5 +11,13 @@ export default class GameObjectFactory {
             position: position,
         });
         return object;
+    }
+
+    static buildFromOptions(options: GameObjectOptions): GameObject {
+        if (options.type === GameObjectType.TANK) {
+            return new Tank(options as TankOptions);
+        } else  {
+            return new GameObject(options);
+        }
     }
 }

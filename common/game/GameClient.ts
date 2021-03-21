@@ -88,4 +88,12 @@ export default class GameClient {
         const objectIds = this.collisionService.getOverlappingObjects(box);
         return this.gameObjectService.getMultipleObjects(objectIds);
     }
+
+    registerObjects(objects: GameObject[]): void {
+        this.gameObjectService.registerObjects(objects);
+    }
+
+    addPlayers(players: Player[]): void {
+        this.playerService.addPlayers(players);
+    }
 }
