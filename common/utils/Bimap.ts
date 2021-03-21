@@ -45,11 +45,11 @@ export default class Bimap<L, R> {
     }
 
     add(left: L, right: R): void {
-        if (this.findRight(left)) {
+        if (this.rightExists(left)) {
             throw new Error('Map already contains the given left');
         }
 
-        if (this.findLeft(right)) {
+        if (this.leftExists(right)) {
             throw new Error('Map already contains the given right');
         }
 
