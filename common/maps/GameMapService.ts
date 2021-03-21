@@ -27,6 +27,7 @@ export default class GameMapService {
 
         const mapWidth = blocks.length * resolution;
         const mapHeight = blocks[0].length * resolution;
+        let noBlocks = 0;
         for (let blockY = 0; blockY < mapHeight; blockY += resolution) {
             for (let blockX = 0; blockX < mapWidth; blockX += resolution) {
                 const blockRow = blockY / resolution;
@@ -44,7 +45,9 @@ export default class GameMapService {
                             y: miniBlockY,
                             x: miniBlockX,
                         });
-        
+
+                        noBlocks++;
+
                         if (object.type === GameObjectType.PLAYER_SPAWN) {
                             this.playerSpawnObjectIds.push(object.id);
                         }
@@ -54,6 +57,8 @@ export default class GameMapService {
                 }
             }
         }
+
+        console.log(`Loaded map from ${path} with ${noBlocks} blocks`);
     }
 
     getPlayerSpawnObjectIds(): number[] {
