@@ -33,18 +33,18 @@ export default class PlayerService {
         return this.repository.getAll();
     }
 
-    addPlayerRaw(player: Player): void {
+    addPlayer(player: Player): void {
         this.repository.add(player.id, player);
         this.emitter.emit(PlayerServiceEvent.PLAYER_ADDED, player);
     }
 
-    addPlayersRaw(players: Player[]): void {
+    addPlayers(players: Player[]): void {
         for (const player of players) {
-            this.addPlayerRaw(player);
+            this.addPlayer(player);
         }
     }
 
-    addPlayer(playerId: string): void {
+    createPlayer(playerId: string): void {
         if (this.repository.exists(playerId)) {
             throw new Error('Player is already connected');
         }
@@ -52,7 +52,7 @@ export default class PlayerService {
         const player = new Player({
             id: playerId,
         });
-        this.addPlayerRaw(player);
+        this.addPlayer(player);
     }
 
     setPlayerTankId(playerId: string, tankId: number | undefined): void {

@@ -163,7 +163,7 @@ export default class GameServer {
     }
 
     onPlayerConnected(playerId: string): void {
-        this.playerService.addPlayer(playerId);
+        this.playerService.createPlayer(playerId);
     }
 
     onPlayerAdded(player: Player): void {
