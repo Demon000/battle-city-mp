@@ -64,8 +64,8 @@ gameServer.emitter.on(GameEvent.PLAYER_REMOVED, (playerId: string) => {
     io.emit(GameEvent.PLAYER_REMOVED, playerId);
 });
 
-http.listen(3000, () => {
-    console.log('Game server listening on port 3030');
+http.listen(5000, () => {
+    console.log('Game server listening on port 5000');
 });
 
 gameServer.start();
