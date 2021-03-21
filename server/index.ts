@@ -48,7 +48,7 @@ gameServer.emitter.on(GameEvent.OBJECT_REGISTERED, (object: GameObject) => {
     io.emit(GameEvent.OBJECT_REGISTERED, object.toOptions());
 });
 gameServer.emitter.on(GameEvent.OBJECT_CHANGED, (object: GameObject) => {
-    io.emit(GameEvent.OBJECT_CHANGED, object);
+    io.emit(GameEvent.OBJECT_CHANGED, object.toOptions());
 });
 gameServer.emitter.on(GameEvent.OBJECT_UNREGISTERED, (objectId: number) => {
     io.emit(GameEvent.OBJECT_UNREGISTERED, objectId);
