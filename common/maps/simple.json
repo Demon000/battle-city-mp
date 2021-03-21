@@ -1,0 +1,21 @@
+{
+    "resolution": 16,
+    "blocks": [
+        "################",
+        "#       S      #",
+        "#      SSS     #",
+        "#       S      #",
+        "# SSSSSSSSSSSS #",
+        "# S            #",
+        "# SSSSSSSSSSSS #",
+        "#            S #",
+        "# SSSSSSSSSSSS #",
+        "#      B       #",
+        "#      B       #",
+        "#      B       #",
+        "# BBBBBBBBBBBB #",
+        "#      B       #",
+        "#O     B      O#",
+        "################"
+    ]
+}
