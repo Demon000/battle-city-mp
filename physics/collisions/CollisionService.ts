@@ -1,5 +1,5 @@
-import { GameObjectType } from '@/common/object/GameObjectProperties';
-import GameObjectRepository from '@/common/object/GameObjectRepository';
+import { GameObjectType } from '@/object/GameObjectProperties';
+import GameObjectRepository from '@/object/GameObjectRepository';
 import EventEmitter from 'eventemitter3';
 import { Direction } from 'node:readline';
 import BoundingBox from '../bounding-box/BoundingBox';

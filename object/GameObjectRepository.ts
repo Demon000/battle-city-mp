@@ -1,4 +1,4 @@
-import Bimap from '@/common/utils/Bimap';
+import Bimap from '@/utils/Bimap';
 import GameObject from './GameObject';
 
 export default class GameObjectRepository {

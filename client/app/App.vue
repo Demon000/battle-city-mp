@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import GameClientSocket from '@/common/game/GameClientSocket';
+import GameClientSocket from '@/game/GameClientSocket';
 import { CONFIG_SOCKET_BASE_URL } from '../config';
 import { Vue } from 'vue-class-component';
 

@@ -1,4 +1,4 @@
-import { GameObjectType } from '@/common/object/GameObjectProperties';
+import { GameObjectType } from '@/object/GameObjectProperties';
 import Point from '../point/Point';
 
 export enum CollisionResultType {

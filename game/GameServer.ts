@@ -70,7 +70,7 @@ export default class GameServer {
         this.tankService.emitter.on(TankServiceEvent.TANK_SPAWNED, this.onObjectSpawned, this);
         this.tankService.emitter.on(TankServiceEvent.TANK_DESPAWNED, this.onObjectDespawned, this);
 
-        this.gameMapService.loadFromFile('./common/maps/simple.json');
+        this.gameMapService.loadFromFile('./maps/simple.json');
     }
 
     getGameObjects(): GameObject[] {
