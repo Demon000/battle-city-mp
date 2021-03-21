@@ -55,7 +55,7 @@ export default class PlayerService {
         this.addPlayer(player);
     }
 
-    setPlayerTankId(playerId: string, tankId: number | undefined): void {
+    setPlayerTankId(playerId: string, tankId?: number): void {
         const player = this.repository.get(playerId);
         player.tankId = tankId;
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player);

@@ -14,7 +14,7 @@ export default class BoundingBoxTree {
         return cost;
     }
 
-    fixTreeUpwards(newParentNode: BoundingBoxNode | undefined): void {
+    fixTreeUpwards(newParentNode?: BoundingBoxNode): void {
         while (newParentNode != undefined) {
             if (!newParentNode.left || !newParentNode.right) {
                 throw new Error('Tree node is missing children');

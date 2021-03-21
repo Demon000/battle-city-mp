@@ -13,7 +13,7 @@ import { CONFIG_SOCKET_BASE_URL } from '../config';
 import { Vue } from 'vue-class-component';
 
 export default class App extends Vue {
-    gameClientSocket: GameClientSocket | undefined;
+    gameClientSocket?: GameClientSocket;
 
     async mounted(): Promise<void> {
         this.gameClientSocket = new GameClientSocket(CONFIG_SOCKET_BASE_URL);

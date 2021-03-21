@@ -6,8 +6,8 @@ import GameClient from './GameClient';
 import { GameEvent } from './GameEvent';
 
 export default class GameClientSocket {
-    gameClient: GameClient | undefined;
-    socket: Socket | undefined;
+    gameClient?: GameClient;
+    socket?: Socket;
 
     constructor(serverUrl: string) {
         this.gameClient = new GameClient();

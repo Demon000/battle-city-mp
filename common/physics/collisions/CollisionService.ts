@@ -15,14 +15,14 @@ export enum CollisionServiceEvent {
 export default class CollisionService {
     private gameObjectRepository: GameObjectRepository;
     private boundingBoxRepository = new BoundingBoxRepository();
-    private rulesMap: Map<GameObjectType, Map<GameObjectType, ICollisionRule>> | undefined;
+    private rulesMap?: Map<GameObjectType, Map<GameObjectType, ICollisionRule>>;
 
     emitter = new EventEmitter();
 
     constructor(
         gameObjectRepository: GameObjectRepository,
         boundingBoxRepository: BoundingBoxRepository,
-        rules: ICollisionRule[] | undefined = undefined,
+        rules?: ICollisionRule[],
     ) {
         this.gameObjectRepository = gameObjectRepository;
         this.boundingBoxRepository = boundingBoxRepository;
