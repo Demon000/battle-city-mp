@@ -87,7 +87,7 @@ export default class PlayerService {
             throw new Error('Player does not have a tank');
         }
 
-        this.emitter.emit(PlayerServiceEvent.PLAYER_DESPAWN_TANK_REQUESTED, player.tankId);
+        this.emitter.emit(PlayerServiceEvent.PLAYER_DESPAWN_TANK_REQUESTED, player.id, player.tankId);
     }
 
     addPlayerButtonPressAction(playerId: string, action: ButtonPressAction): void {

@@ -65,6 +65,7 @@ export default class GameServer {
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_UNREGISTERED, this.onObjectUnregistered, this);
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_SPAWN_TANK_REQUESTED, this.onPlayerSpawnTankRequested, this);
+        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_DESPAWN_TANK_REQUESTED, this.onPlayerDespawnTankRequested, this);
         this.tankService.emitter.on(TankServiceEvent.PLAYER_TANK_CHANGED, this.onPlayerTankChanged, this);
         this.tankService.emitter.on(TankServiceEvent.TANK_SPAWNED, this.onObjectSpawned, this);
         this.tankService.emitter.on(TankServiceEvent.TANK_DESPAWNED, this.onObjectDespawned, this);
@@ -193,6 +194,10 @@ export default class GameServer {
         const playerSpawnObjectId = this.gameMapService.getRandomPlayerSpawnObjectId();
         const playerSpawnObject = this.gameObjectService.getObject(playerSpawnObjectId);
         this.tankService.spawnPlayerTank(playerId, playerSpawnObject.position);
+    }
+
+    onPlayerDespawnTankRequested(playerId: string, tankId: number): void {
+        this.tankService.despawnPlayerTank(playerId, tankId);
     }
 
     onPlayerTankChanged(playerId: string, tankId: number): void {
