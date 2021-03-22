@@ -5,35 +5,32 @@ import GameObjectProperties, { GameObjectType } from '@/object/GameObjectPropert
 export interface GameMapOptions {
     resolution: number;
     blocks: string[];
+    objectTypes: string[];
 }
 
 export default class GameMap {
     private resolution: number;
-    private objects = new Array<GameObject>();
-    private playerSpawnObjectIds = new Array<number>();
+    private blocks = new Array<Array<string>>();
 
     constructor(options: GameMapOptions) {
         this.resolution = options.resolution;
 
-        this.createObjectsFromBlocks(options.blocks);
+        for (const row of options.blocks) {
+            this.blocks.push(row.split(''));
+        }
     }
 
-    createObjectsFromBlocks(rows: string[]): void {
-        let noBlocks = 0;
+    getObjects(): GameObject[] {
+        const objects = new Array<GameObject>();
 
-        const blocks = new Array<Array<string>>();
-        for (const row of rows) {
-            blocks.push(row.split(''));
-        }
-
-        const mapHeight = blocks.length * this.resolution;
+        const mapHeight = this.blocks.length * this.resolution;
         for (let bigY = 0; bigY < mapHeight; bigY += this.resolution) {
             const mapRow = bigY / this.resolution;
-            const mapWidth = blocks[mapRow].length * this.resolution;
+            const mapWidth = this.blocks[mapRow].length * this.resolution;
             for (let bigX = 0; bigX < mapWidth; bigX += this.resolution) {
                 const mapColumn = bigX / this.resolution;
 
-                const shortType = blocks[mapRow][mapColumn];
+                const shortType = this.blocks[mapRow][mapColumn];
                 if (shortType === ' ') {
                     continue;
                 }
@@ -46,24 +43,12 @@ export default class GameMap {
                             x: smallX,
                         });
 
-                        noBlocks++;
-
-                        if (object.type === GameObjectType.PLAYER_SPAWN) {
-                            this.playerSpawnObjectIds.push(object.id);
-                        }
-
-                        this.objects.push(object);
+                        objects.push(object);
                     }
                 }
             }
         }
-    }
 
-    getObjects(): GameObject[] {
-        return this.objects;
-    }
-
-    getPlayerSpawnObjectIds(): number[] {
-        return this.playerSpawnObjectIds;
+        return objects;
     }
 }

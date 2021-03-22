@@ -1,6 +1,6 @@
+import { GameObjectType } from '@/object/GameObjectProperties';
 import EventEmitter from 'eventemitter3';
 import fs from 'fs';
-import Random from '../utils/Random';
 import GameMap, { GameMapOptions } from './GameMap';
 
 export enum GameMapServiceEvent {
@@ -23,13 +23,4 @@ export default class GameMapService {
 
         console.log(`Loaded map from ${path} with ${objects.length} objects`);
     }
-
-    getRandomPlayerSpawnObjectId(): number {
-        if (this.map === undefined) {
-            throw new Error('Game map not loaded');
-        }
-
-        const playerSpawnObjectIds = this.map.getPlayerSpawnObjectIds()
-        return Random.getRandomArrayElement(playerSpawnObjectIds);
-    } 
 }

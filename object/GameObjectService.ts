@@ -1,9 +1,11 @@
 import MapRepository from '@/utils/MapRepository';
+import Random from '@/utils/Random';
 import EventEmitter from 'eventemitter3';
 import { Direction } from '../physics/Direction';
 import Point from '../physics/point/Point';
 import PointUtils from '../physics/point/PointUtils';
 import GameObject from './GameObject';
+import { GameObjectType } from './GameObjectProperties';
 
 export enum GameObjectServiceEvent {
     OBJECT_REQUESTED_POSITION = 'object-requested-position',
@@ -88,6 +90,20 @@ export default class GameObjectService {
         if (object.direction != direction) {
             this.emitter.emit(GameObjectServiceEvent.OBJECT_REQUESTED_DIRECTION, object.id, direction);
         }
+    }
+
+    getRandomSpawnPosition(): Point {
+        const objects = this.repository.getAll();
+        const playerSpawnObjects = new Array<GameObject>();
+
+        for (const object of objects) {
+            if (object.type === GameObjectType.PLAYER_SPAWN) {
+                playerSpawnObjects.push(object);
+            }
+        }
+
+        const playerSpawnObject = Random.getRandomArrayElement(playerSpawnObjects);
+        return playerSpawnObject.position;
     }
 
     private processObjectMovement(object: GameObject, delta: number): void {

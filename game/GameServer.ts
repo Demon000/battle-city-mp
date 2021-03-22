@@ -194,9 +194,8 @@ export default class GameServer {
     }
 
     onPlayerSpawnTankRequested(playerId: string): void {
-        const playerSpawnObjectId = this.gameMapService.getRandomPlayerSpawnObjectId();
-        const playerSpawnObject = this.gameObjectService.getObject(playerSpawnObjectId);
-        this.tankService.spawnPlayerTank(playerId, playerSpawnObject.position);
+        const spawnPosition = this.gameObjectService.getRandomSpawnPosition();
+        this.tankService.spawnPlayerTank(playerId, spawnPosition);
     }
 
     onPlayerDespawnTankRequested(playerId: string, tankId: number): void {
