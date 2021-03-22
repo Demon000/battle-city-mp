@@ -4,7 +4,7 @@ import GameObject, { GameObjectOptions } from './GameObject';
 import GameObjectProperties, { GameObjectType } from './GameObjectProperties';
 
 export default class GameObjectFactory {
-    static buildMapObject(shortType: string, position: Point): GameObject {
+    static buildFromShortType(shortType: string, position: Point): GameObject {
         const properties = GameObjectProperties.getShortTypeProperties(shortType);
         const object = new GameObject({
             type: properties.type as GameObjectType,

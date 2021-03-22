@@ -41,7 +41,7 @@ export default class GameMap {
                 const properties = GameObjectProperties.getShortTypeProperties(shortType);
                 for (let smallY = bigY; smallY < bigY + this.resolution; smallY += properties.height) {
                     for (let smallX = bigX; smallX < bigX + this.resolution; smallX += properties.width) {
-                        const object = GameObjectFactory.buildMapObject(shortType, {
+                        const object = GameObjectFactory.buildFromShortType(shortType, {
                             y: smallY,
                             x: smallX,
                         });
