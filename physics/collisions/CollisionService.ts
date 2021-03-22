@@ -2,9 +2,9 @@ import GameObject from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectProperties';
 import MapRepository from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
-import { Direction } from 'node:readline';
 import BoundingBox from '../bounding-box/BoundingBox';
 import BoundingBoxRepository from '../bounding-box/BoundingBoxRepository';
+import { Direction } from '../Direction';
 import Point from '../point/Point';
 import ICollisionRule, { CollisionResultType } from './ICollisionRule';
 

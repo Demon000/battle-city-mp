@@ -1,6 +1,6 @@
+import { Direction } from '@/physics/Direction';
 import MapRepository from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
-import { Direction } from 'node:readline';
 import now from 'performance-now';
 import Action, { ActionOptions, ActionType } from '../actions/Action';
 import ButtonPressAction from '../actions/ButtonPressAction';
