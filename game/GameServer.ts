@@ -12,7 +12,7 @@ import { rules } from '../physics/collisions/CollisionRules';
 import CollisionService, { CollisionServiceEvent } from '../physics/collisions/CollisionService';
 import { CollisionEventType } from '../physics/collisions/ICollisionRule';
 import Point from '../physics/point/Point';
-import Player from '../player/Player';
+import Player, { PlayerSpawnStatus } from '../player/Player';
 import PlayerService, { PlayerServiceEvent } from '../player/PlayerService';
 import TankService, { TankServiceEvent } from '../tank/TankService';
 import { GameEvent } from './GameEvent';
@@ -164,12 +164,7 @@ export default class GameServer {
         console.log('player shooting ' + playerId);
     }
 
-    onPlayerConnected(playerId: string): void {
-        this.playerService.createPlayer(playerId);
-    }
-
     onPlayerAdded(player: Player): void {
-        this.playerService.spawnPlayerTank(player.id);
         this.emitter.emit(GameEvent.PLAYER_ADDED, player);
     }
 
@@ -177,20 +172,25 @@ export default class GameServer {
         this.emitter.emit(GameEvent.PLAYER_CHANGED, player);        
     }
 
-    onPlayerAction(playerId: string, data: ActionOptions): void {
+    onPlayerRemoved(playerId: string): void {
+        this.emitter.emit(GameEvent.PLAYER_REMOVED, playerId);
+    }
+
+    onPlayerActionFromClient(playerId: string, data: ActionOptions): void {
         const action = new Action(data);
         if (action.type === ActionType.BUTTON_PRESS) {
             this.playerService.addPlayerButtonPressAction(playerId, action as ButtonPressAction);
         }
     }
 
-    onPlayerDisconnected(playerId: string): void {
-        this.playerService.despawnPlayerTank(playerId);
-        this.playerService.removePlayer(playerId);
+    onPlayerConnectedFromClient(playerId: string): void {
+        this.playerService.createPlayer(playerId);
+        this.playerService.requestPlayerSpawnStatus(playerId, PlayerSpawnStatus.SPAWN);
     }
 
-    onPlayerRemoved(playerId: string): void {
-        this.emitter.emit(GameEvent.PLAYER_REMOVED, playerId);
+    onPlayerDisconnectedFromClient(playerId: string): void {
+        this.playerService.requestPlayerSpawnStatus(playerId, PlayerSpawnStatus.DESPAWN);
+        this.playerService.requestPlayerDisconnect(playerId);
     }
 
     onPlayerSpawnTankRequested(playerId: string): void {

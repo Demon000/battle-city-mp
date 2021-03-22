@@ -5,8 +5,17 @@ export interface PlayerOptions {
     tankId?: number;
 }
 
+export enum PlayerSpawnStatus {
+    NONE = 'none',
+    SPAWN = 'spawn',
+    DESPAWN = 'despawn',
+}
+
 export default class Player {
     map = new Map<ButtonType, ButtonPressAction>();
+    requestedSpawnStatus = PlayerSpawnStatus.NONE;
+    spawnStatus = PlayerSpawnStatus.NONE;
+    disconnected = false;
     tankId?: number;
     id: string;
 

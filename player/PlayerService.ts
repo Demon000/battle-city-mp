@@ -2,7 +2,7 @@ import MapRepository from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import ButtonPressAction, { MOVE_BUTTON_TYPES, ButtonState, BUTTON_TYPE_DIRECTION, ButtonType } from '../actions/ButtonPressAction';
 import { Direction } from '../physics/Direction';
-import Player from './Player';
+import Player, { PlayerSpawnStatus } from './Player';
 
 
 export enum PlayerServiceEvent {
@@ -73,22 +73,18 @@ export default class PlayerService {
         return player.tankId;
     }
 
-    spawnPlayerTank(playerId: string): void {
+    requestPlayerSpawnStatus(playerId: string, spawnStatus: PlayerSpawnStatus): void {
         const player = this.repository.get(playerId);
         if (player.tankId !== undefined) {
             throw new Error('Player already has a tank');
         }
 
-        this.emitter.emit(PlayerServiceEvent.PLAYER_SPAWN_TANK_REQUESTED, playerId);
+        player.requestedSpawnStatus = spawnStatus;
     }
 
-    despawnPlayerTank(playerId: string): void {
+    requestPlayerDisconnect(playerId: string): void {
         const player = this.repository.get(playerId);
-        if (player.tankId === undefined) {
-            throw new Error('Player does not have a tank');
-        }
-
-        this.emitter.emit(PlayerServiceEvent.PLAYER_DESPAWN_TANK_REQUESTED, player.id, player.tankId);
+        player.disconnected = true;
     }
 
     addPlayerButtonPressAction(playerId: string, action: ButtonPressAction): void {
@@ -130,6 +126,29 @@ export default class PlayerService {
         return action.buttonState === ButtonState.PRESSED;
     }
 
+    processPlayerSpawnStatus(playerId: string): void {
+        const player = this.repository.get(playerId);
+        if (player.requestedSpawnStatus === player.spawnStatus) {
+            return;
+        }
+
+        if (player.requestedSpawnStatus === PlayerSpawnStatus.SPAWN) {
+            this.emitter.emit(PlayerServiceEvent.PLAYER_SPAWN_TANK_REQUESTED, playerId);
+        } else if (player.requestedSpawnStatus === PlayerSpawnStatus.DESPAWN) {
+            this.emitter.emit(PlayerServiceEvent.PLAYER_DESPAWN_TANK_REQUESTED, player.id, player.tankId);
+        }
+
+        player.spawnStatus = player.requestedSpawnStatus;
+    }
+
+    processPlayerDisconnectStatus(playerId: string): void {
+        const player = this.repository.get(playerId);
+        if (player.disconnected) {
+            this.repository.remove(playerId);
+            this.emitter.emit(PlayerServiceEvent.PLAYER_REMOVED, playerId);
+        }
+    }
+
     processPlayerMovement(playerId: string): void {
         const direction = this.getPlayerDominantMovementDirection(playerId);
         if (direction === undefined) {
@@ -151,8 +170,10 @@ export default class PlayerService {
     processPlayerActions(): void {
         const players = this.repository.getAll();
         for (const player of players) {
+            this.processPlayerSpawnStatus(player.id);
             this.processPlayerMovement(player.id);
             this.processPlayerShooting(player.id);
+            this.processPlayerDisconnectStatus(player.id);
         }
     }
 

@@ -20,15 +20,16 @@ const gameServer = new GameServer();
 
 io.on('connection', (socket: IO.Socket) => {
     console.log('New user connected', socket.id);
-    gameServer.onPlayerConnected(socket.id);
+    gameServer.onPlayerConnectedFromClient(socket.id);
 
     socket.on('disconnect', () => {
-        gameServer.onPlayerDisconnected(socket.id);
+        console.log('User disconnected', socket.id);
+        gameServer.onPlayerDisconnectedFromClient(socket.id);
     });
 
     socket.on(GameEvent.PLAYER_ACTION, (options: ActionOptions) => {
         const action = ActionFactory.buildFromOptions(options);
-        gameServer.onPlayerAction(socket.id, action);
+        gameServer.onPlayerActionFromClient(socket.id, action);
     });
 
     socket.on(GameEvent.GET_GAME_OBJECTS, (ack: (objectOptions: GameObjectOptions[]) => void) => {
