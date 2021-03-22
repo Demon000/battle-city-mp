@@ -23,12 +23,37 @@ const properties: IGameObjectProperties[] = [
         shortType: GameShortObjectType.BRICK_WALL,
         width: 4,
         height: 4,
+        sprites: {
+            even: {
+                steps: [
+                    {
+                        filename: 'brick_wall_even.png',
+                    },
+                ],
+            },
+            odd: {
+                steps: [
+                    {
+                        filename: 'brick_wall_odd.png',
+                    },
+                ],
+            },
+        },
     },
     {
         type: GameObjectType.STEEL_WALL,
         shortType: GameShortObjectType.STEEL_WALL,
         width: 8,
         height: 8,
+        sprites: {
+            default: {
+                steps: [
+                    {
+                        filename: 'steel_wall.png',
+                    },
+                ],
+            },
+        },
     },
     {
         type: GameObjectType.PLAYER_SPAWN,
@@ -41,16 +66,70 @@ const properties: IGameObjectProperties[] = [
         shortType: GameShortObjectType.LEVEL_BORDER,
         width: 16,
         height: 16,
+        sprites: {
+            default: {
+                steps: [
+                    {
+                        filename: 'level_border.png',
+                    },
+                ],
+            },
+        },
     },
     {
         type: GameObjectType.TANK,
         width: 16,
         height: 16,
+        sprites: {
+            tank_tier_1_up: {
+                steps: [
+                    {
+                        filename: 'tank_tier_1_up_frame_1.png',
+                        duration: 500,
+                    },
+                    {
+                        filename: 'tank_tier_1_up_frame_2.png',
+                        duration: 500,
+                    }
+                ],
+                duration: 1000,
+            }
+        },
     },
     {
         type: GameObjectType.BULLET,
         width: 4,
         height: 4,
+        sprites: {
+            bullet_up: {
+                steps: [
+                    {
+                        filename: 'bullet_up.png',
+                    },
+                ],
+            },
+            bullet_right: {
+                steps: [
+                    {
+                        filename: 'bullet_right.png',
+                    },
+                ],
+            },
+            bullet_down: {
+                steps: [
+                    {
+                        filename: 'bullet_down.png',
+                    },
+                ],
+            },
+            bullet_left: {
+                steps: [
+                    {
+                        filename: 'bullet_left.png',
+                    },
+                ],
+            },
+        },
     },
 ];
 
