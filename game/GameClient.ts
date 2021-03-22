@@ -1,11 +1,10 @@
+import MapRepository from '@/utils/MapRepository';
 import GameObject from '../object/GameObject';
-import GameObjectRepository from '../object/GameObjectRepository';
 import GameObjectService, { GameObjectServiceEvent } from '../object/GameObjectService';
 import BoundingBox from '../physics/bounding-box/BoundingBox';
 import BoundingBoxRepository from '../physics/bounding-box/BoundingBoxRepository';
 import CollisionService from '../physics/collisions/CollisionService';
 import Player from '../player/Player';
-import PlayerRepository from '../player/PlayerRepository';
 import PlayerService from '../player/PlayerService';
 import Tank from '../tank/Tank';
 
@@ -18,12 +17,12 @@ export default class GameClient {
     private collisionService;
 
     constructor() {
-        this.gameObjectRepository = new GameObjectRepository();
+        this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository();
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
 
-        this.playerRepository = new PlayerRepository();
+        this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.playerRepository);
 
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, this.onObjectBoundingBoxChanged, this);

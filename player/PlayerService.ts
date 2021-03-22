@@ -1,14 +1,15 @@
+import MapRepository from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import ButtonPressAction, { MOVE_BUTTON_TYPES, ButtonState, BUTTON_TYPE_DIRECTION, ButtonType } from '../actions/ButtonPressAction';
 import { Direction } from '../physics/Direction';
 import Player from './Player';
-import PlayerRepository from './PlayerRepository';
 
 
 export enum PlayerServiceEvent {
     PLAYER_ADDED = 'player-added',
     PLAYER_CHANGED = 'player-changed',
     PLAYER_REMOVED = 'player-removed',
+
     PLAYER_MOVING = 'player-moving',
     PLAYER_NOT_MOVING = 'player-not-moving',
     PLAYER_SHOOTING = 'player-shooting',
@@ -18,10 +19,10 @@ export enum PlayerServiceEvent {
 }
 
 export default class PlayerService {
-    private repository: PlayerRepository;
+    private repository;
     emitter = new EventEmitter();
 
-    constructor(repository: PlayerRepository) {
+    constructor(repository: MapRepository<string, Player>) {
         this.repository = repository;
     }
 

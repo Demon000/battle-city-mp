@@ -1,3 +1,4 @@
+import MapRepository from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import { Direction } from 'node:readline';
 import now from 'performance-now';
@@ -5,7 +6,6 @@ import Action, { ActionOptions, ActionType } from '../actions/Action';
 import ButtonPressAction from '../actions/ButtonPressAction';
 import GameMapService, { GameMapServiceEvent } from '../maps/GameMapService';
 import GameObject from '../object/GameObject';
-import GameObjectRepository from '../object/GameObjectRepository';
 import GameObjectService, { GameObjectServiceEvent } from '../object/GameObjectService';
 import BoundingBoxRepository from '../physics/bounding-box/BoundingBoxRepository';
 import { rules } from '../physics/collisions/CollisionRules';
@@ -13,7 +13,6 @@ import CollisionService, { CollisionServiceEvent } from '../physics/collisions/C
 import { CollisionEventType } from '../physics/collisions/ICollisionRule';
 import Point from '../physics/point/Point';
 import Player from '../player/Player';
-import PlayerRepository from '../player/PlayerRepository';
 import PlayerService, { PlayerServiceEvent } from '../player/PlayerService';
 import TankService, { TankServiceEvent } from '../tank/TankService';
 import { GameEvent } from './GameEvent';
@@ -32,14 +31,14 @@ export default class GameServer {
     emitter = new EventEmitter();
 
     constructor() {
-        this.gameObjectRepository = new GameObjectRepository();
+        this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository();
         this.collisionRules = rules;
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository, this.collisionRules);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
         this.gameMapService = new GameMapService();
         this.tankService = new TankService();
-        this.playerRepository = new PlayerRepository();
+        this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.playerRepository);
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_WALL, this.onBulletWillHitWall, this);

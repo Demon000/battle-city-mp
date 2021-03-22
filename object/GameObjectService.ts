@@ -1,9 +1,9 @@
+import MapRepository from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import { Direction } from '../physics/Direction';
 import Point from '../physics/point/Point';
 import PointUtils from '../physics/point/PointUtils';
 import GameObject from './GameObject';
-import GameObjectRepository from './GameObjectRepository';
 
 export enum GameObjectServiceEvent {
     OBJECT_REQUESTED_POSITION = 'object-requested-position',
@@ -18,7 +18,7 @@ export default class GameObjectService {
     private repository;
     emitter = new EventEmitter();
 
-    constructor(repository: GameObjectRepository) {
+    constructor(repository: MapRepository<number, GameObject>) {
         this.repository = repository;
     }
 
@@ -35,7 +35,7 @@ export default class GameObjectService {
     }
 
     registerObject(object: GameObject): void {
-        this.repository.add(object);
+        this.repository.add(object.id, object);
         this.emitter.emit(GameObjectServiceEvent.OBJECT_REGISTERED, object);
     }
 
