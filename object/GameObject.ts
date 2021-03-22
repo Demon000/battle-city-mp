@@ -1,5 +1,6 @@
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import Point from '@/physics/point/Point';
+import now from 'performance-now';
 import { Direction } from '../physics/Direction';
 import GameObjectProperties, { GameObjectType } from './GameObjectProperties';
 import IGameObjectProperties from './IGameObjectProperties';
@@ -11,6 +12,7 @@ export interface GameObjectOptions {
     direction?: Direction;
     requestedDirection?: Direction;
     isMoving?: boolean;
+    spawnTime?: number;
 }
 
 export default class GameObject {
@@ -22,6 +24,7 @@ export default class GameObject {
     direction: Direction;
     requestedDirection: Direction;
     isMoving: boolean;
+    spawnTime: number;
 
     constructor(options: GameObjectOptions) {
         this.id = options.id ?? GameObject.globalId++;
@@ -30,6 +33,7 @@ export default class GameObject {
         this.requestedDirection = options.requestedDirection ?? Direction.UP;
         this.isMoving = options.isMoving ?? false;
         this.position = options.position;
+        this.spawnTime = options.spawnTime ?? now();
     }
 
     toOptions(): GameObjectOptions {
@@ -40,6 +44,7 @@ export default class GameObject {
             direction: this.direction,
             requestedDirection: this.requestedDirection,
             isMoving: this.isMoving,
+            spawnTime: this.spawnTime,
         };
     }
 
@@ -48,6 +53,7 @@ export default class GameObject {
         this.direction = other.direction;
         this.requestedDirection = other.requestedDirection;
         this.isMoving = other.isMoving;
+        this.spawnTime = other.spawnTime;
     }
 
     get properties(): IGameObjectProperties {
