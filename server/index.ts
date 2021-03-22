@@ -69,4 +69,4 @@ http.listen(5000, () => {
     console.log('Game server listening on port 5000');
 });
 
-gameServer.start();
+gameServer.ticker.start();

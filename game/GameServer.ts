@@ -1,5 +1,6 @@
 import { Direction } from '@/physics/Direction';
 import MapRepository from '@/utils/MapRepository';
+import Ticker, { TickerEvent } from '@/utils/Ticker';
 import EventEmitter from 'eventemitter3';
 import now from 'performance-now';
 import Action, { ActionOptions, ActionType } from '../actions/Action';
@@ -27,6 +28,7 @@ export default class GameServer {
     private boundingBoxRepository;
     private collisionRules;
     private collisionService;
+    ticker;
 
     emitter = new EventEmitter();
 
@@ -40,6 +42,7 @@ export default class GameServer {
         this.tankService = new TankService();
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.playerRepository);
+        this.ticker = new Ticker(128);
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_WALL, this.onBulletWillHitWall, this);
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_TANK, this.onBulletWillHitTank, this);
@@ -68,6 +71,8 @@ export default class GameServer {
         this.tankService.emitter.on(TankServiceEvent.PLAYER_TANK_CHANGED, this.onPlayerTankChanged, this);
         this.tankService.emitter.on(TankServiceEvent.TANK_SPAWNED, this.onObjectSpawned, this);
         this.tankService.emitter.on(TankServiceEvent.TANK_DESPAWNED, this.onObjectDespawned, this);
+
+        this.ticker.emitter.on(TickerEvent.TICK, this.onTick, this);
 
         this.gameMapService.loadFromFile('./maps/simple.json');
     }
@@ -206,37 +211,8 @@ export default class GameServer {
         this.playerService.setPlayerTankId(playerId, tankId);
     }
 
-    update(): void {
+    onTick(deltaSeconds: number): void {
         this.playerService.processPlayerActions();
-        this.gameObjectService.processObjectsMovement(this.deltaSeconds);
-    }
-
-    tickRate = 128;
-    tickTime = 1000 / this.tickRate;
-    lastTickTime = 0;
-    deltaSeconds = 0;
-    running = true;
-    tick(): void {
-        const currentTickTime = now();
-        if (this.lastTickTime) {
-            this.deltaSeconds = (currentTickTime - this.lastTickTime) / 1000;
-            this.update();
-        }
-
-        if (!this.running) {
-            return;
-        }
-
-        setTimeout(this.tick.bind(this), this.tickTime);
-    }
-
-    start(): void {
-        this.running = true;
-
-        this.tick();
-    }
-
-    stop(): void {
-        this.running = false;
+        this.gameObjectService.processObjectsMovement(deltaSeconds);
     }
 }
