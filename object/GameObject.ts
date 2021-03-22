@@ -61,7 +61,7 @@ export default class GameObject {
     }
 
     get speed(): number {
-        return 0;
+        return this.properties.speed ?? 0;
     }
 
     getBoundingBox(position=this.position): BoundingBox {
