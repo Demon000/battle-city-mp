@@ -46,7 +46,7 @@ export default class GameServer {
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_TANK, this.onBulletWillHitTank, this);
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_BULLET, this.onBulletWillHitBullet, this);
 
-        this.gameMapService.emitter.on(GameMapServiceEvent.OBJECT_SPAWNED, this.onObjectSpawned, this);
+        this.gameMapService.emitter.on(GameMapServiceEvent.OBJECTS_SPAWNED, this.onObjectsSpawned, this);
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_ADDED, this.onPlayerAdded, this);
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REMOVED, this.onPlayerRemoved, this);
@@ -135,6 +135,10 @@ export default class GameServer {
 
     onObjectChanged(object: GameObject): void {
         this.emitter.emit(GameEvent.OBJECT_CHANGED, object);
+    }
+
+    onObjectsSpawned(objects: GameObject[]): void {
+        this.gameObjectService.registerObjects(objects);
     }
 
     onObjectSpawned(object: GameObject): void {
