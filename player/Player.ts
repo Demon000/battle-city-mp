@@ -6,7 +6,7 @@ export interface PlayerOptions {
 }
 
 export default class Player {
-    map: Map<ButtonType, ButtonPressAction> = new Map();
+    map = new Map<ButtonType, ButtonPressAction>();
     tankId?: number;
     id: string;
 
