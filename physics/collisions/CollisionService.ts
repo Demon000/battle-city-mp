@@ -1,5 +1,6 @@
+import GameObject from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectProperties';
-import GameObjectRepository from '@/object/GameObjectRepository';
+import MapRepository from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import { Direction } from 'node:readline';
 import BoundingBox from '../bounding-box/BoundingBox';
@@ -13,14 +14,14 @@ export enum CollisionServiceEvent {
 }
 
 export default class CollisionService {
-    private gameObjectRepository: GameObjectRepository;
+    private gameObjectRepository;
     private boundingBoxRepository = new BoundingBoxRepository();
     private rulesMap?: Map<GameObjectType, Map<GameObjectType, ICollisionRule>>;
 
     emitter = new EventEmitter();
 
     constructor(
-        gameObjectRepository: GameObjectRepository,
+        gameObjectRepository: MapRepository<number, GameObject>,
         boundingBoxRepository: BoundingBoxRepository,
         rules?: ICollisionRule[],
     ) {
