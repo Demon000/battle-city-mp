@@ -8,7 +8,6 @@ export enum GameMapServiceEvent {
 }
 
 export default class GameMapService {
-    private playerSpawnObjectIds = new Array<number>();
     private map?: GameMap;
     emitter = new EventEmitter();
 
@@ -25,11 +24,12 @@ export default class GameMapService {
         console.log(`Loaded map from ${path} with ${objects.length} objects`);
     }
 
-    getPlayerSpawnObjectIds(): number[] {
-        return this.playerSpawnObjectIds;
-    }
-
     getRandomPlayerSpawnObjectId(): number {
-        return Random.getRandomArrayElement(this.playerSpawnObjectIds);
+        if (this.map === undefined) {
+            throw new Error('Game map not loaded');
+        }
+
+        const playerSpawnObjectIds = this.map.getPlayerSpawnObjectIds()
+        return Random.getRandomArrayElement(playerSpawnObjectIds);
     } 
 }

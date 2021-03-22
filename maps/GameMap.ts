@@ -10,7 +10,7 @@ export interface GameMapOptions {
 export default class GameMap {
     private resolution: number;
     private objects = new Array<GameObject>();
-    private playerSpawnObjects = new Array<GameObject>();
+    private playerSpawnObjectIds = new Array<number>();
 
     constructor(options: GameMapOptions) {
         this.resolution = options.resolution;
@@ -28,12 +28,12 @@ export default class GameMap {
 
         const mapHeight = blocks.length * this.resolution;
         for (let bigY = 0; bigY < mapHeight; bigY += this.resolution) {
-            const mapWidth = blocks[bigY].length * this.resolution;
+            const mapRow = bigY / this.resolution;
+            const mapWidth = blocks[mapRow].length * this.resolution;
             for (let bigX = 0; bigX < mapWidth; bigX += this.resolution) {
-                const blockRow = bigY / this.resolution;
-                const blockColumn = bigX / this.resolution;
+                const mapColumn = bigX / this.resolution;
 
-                const shortType = blocks[blockRow][blockColumn];
+                const shortType = blocks[mapRow][mapColumn];
                 if (shortType === ' ') {
                     continue;
                 }
@@ -49,7 +49,7 @@ export default class GameMap {
                         noBlocks++;
 
                         if (object.type === GameObjectType.PLAYER_SPAWN) {
-                            this.playerSpawnObjects.push(object);
+                            this.playerSpawnObjectIds.push(object.id);
                         }
 
                         this.objects.push(object);
@@ -63,7 +63,7 @@ export default class GameMap {
         return this.objects;
     }
 
-    getPlayerSpawnObjects(): GameObject[] {
-        return this.playerSpawnObjects;
+    getPlayerSpawnObjectIds(): number[] {
+        return this.playerSpawnObjectIds;
     }
 }
