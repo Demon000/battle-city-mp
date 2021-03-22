@@ -13,7 +13,7 @@ export default class Bimap<L, R> {
     getLeft(right: R): L {
         const left = this.findLeft(right);
         if (left === undefined) {
-            throw new Error('Map does not contain the given right'); 
+            throw new Error('Bimap does not contain the given right');
         }
 
         return left;
@@ -22,7 +22,7 @@ export default class Bimap<L, R> {
     getRight(left: L): R {
         const right = this.findRight(left);
         if (right === undefined) {
-            throw new Error('Map does not contain the given left'); 
+            throw new Error('Bimap does not contain the given left');
         }
 
         return right;
@@ -46,11 +46,11 @@ export default class Bimap<L, R> {
 
     add(left: L, right: R): void {
         if (this.rightExists(left)) {
-            throw new Error('Map already contains the given left');
+            throw new Error('Bimap already contains the given left');
         }
 
         if (this.leftExists(right)) {
-            throw new Error('Map already contains the given right');
+            throw new Error('Bimap already contains the given right');
         }
 
         this.leftToRightMap.set(left, right);
