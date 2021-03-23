@@ -1,4 +1,4 @@
-import { io, Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { GameObjectOptions } from '../object/GameObject';
 import GameObjectFactory from '../object/GameObjectFactory';
 import Player, { PlayerOptions } from '../player/Player';

@@ -1,6 +1,6 @@
 import GameObject from '@/object/GameObject';
 import GameObjectFactory from '@/object/GameObjectFactory';
-import GameObjectProperties, { GameObjectType } from '@/object/GameObjectProperties';
+import GameObjectProperties from '@/object/GameObjectProperties';
 
 export interface GameMapOptions {
     resolution: number;

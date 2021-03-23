@@ -90,10 +90,10 @@ const properties: IGameObjectProperties[] = [
                     {
                         filename: 'tank_tier_1_up_frame_2.png',
                         duration: 500,
-                    }
+                    },
                 ],
                 duration: 1000,
-            }
+            },
         },
     },
     {

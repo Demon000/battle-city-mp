@@ -1,4 +1,3 @@
-import { GameObjectType } from '@/object/GameObjectProperties';
 import EventEmitter from 'eventemitter3';
 import fs from 'fs';
 import GameMap, { GameMapOptions } from './GameMap';
