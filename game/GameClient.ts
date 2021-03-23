@@ -25,37 +25,27 @@ export default class GameClient {
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.playerRepository);
 
-        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, this.onObjectBoundingBoxChanged, this);
-        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REGISTERED, this.onObjectRegistered, this);
-        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_UNREGISTERED, this.onObjectUnregistered, this);
     }
 
     onObjectChangedOnServer(object: GameObject): void {
         this.gameObjectService.updateObject(object);
-    }
-
-    onObjectBoundingBoxChanged(objectId: number): void {
-        this.collisionService.updateObjectCollisions(objectId);
+        this.collisionService.updateObjectCollisions(object.id);
     }
 
     onObjectsRegisteredOnServer(objects: GameObject[]): void {
         this.gameObjectService.registerObjects(objects);
+        const objectIds = objects.map(o => o.id);
+        this.collisionService.registerObjectsCollisions(objectIds);
     }
 
     onObjectRegisteredOnServer(object: GameObject): void {
         this.gameObjectService.registerObject(object);
+        this.collisionService.registerObjectCollisions(object.id);
     }
 
     onObjectUnregisteredOnServer(objectId: number): void {
         this.gameObjectService.unregisterObject(objectId);
-    }
-
-    onObjectRegistered(object: GameObject): void {
-        this.collisionService.registerObjectCollisions(object.id);
-    }
-
-    onObjectUnregistered(objectId: number): void {
-        this.collisionService.unregisterObjectCollisions(objectId);
+        this.collisionService.registerObjectCollisions(objectId);
     }
 
     onPlayersAddedOnServer(players: Player[]): void {
@@ -66,7 +56,7 @@ export default class GameClient {
         this.playerService.addPlayer(player);
     }
 
-    onPlayerChangedOnService(player: Player): void {
+    onPlayerChangedOnServer(player: Player): void {
         this.playerService.updatePlayer(player);
     }
 

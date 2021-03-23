@@ -6,25 +6,44 @@ import GameClient from './GameClient';
 import { GameEvent } from './GameEvent';
 
 export default class GameClientSocket {
-    gameClient?: GameClient;
-    socket?: Socket;
+    gameClient;
+    socket;
 
-    constructor(serverUrl: string) {
-        this.gameClient = new GameClient();
+    constructor(serverUrl: string, gameClient: GameClient) {
+        this.gameClient = gameClient;
         this.socket = io(serverUrl);
 
         this.socket.on('connect', () => {
             console.log('Connected');
         });
 
+        this.socket.on(GameEvent.OBJECT_REGISTERED, (objectOptions: GameObjectOptions) => {
+            const object = GameObjectFactory.buildFromOptions(objectOptions);
+            this.gameClient.onObjectRegisteredOnServer(object);
+        });
+
+        this.socket.on(GameEvent.PLAYER_ADDED, (playerOptions: PlayerOptions) => {
+            const player = new Player(playerOptions);
+            this.gameClient.onPlayerAddedOnServer(player);
+        });
+
+        this.socket.on(GameEvent.PLAYER_CHANGED, (playerOptions: PlayerOptions) => {
+            const player = new Player(playerOptions);
+            this.gameClient.onPlayerChangedOnServer(player);
+        });
+
+        this.socket.on(GameEvent.PLAYER_REMOVED, (playerId: string) => {
+            this.gameClient.onPlayerRemovedOnServer(playerId);
+        });
+
         this.socket.emit(GameEvent.GET_GAME_OBJECTS, (objectOptions: GameObjectOptions[]) => {
             const objects = objectOptions.map(o => GameObjectFactory.buildFromOptions(o));
-            this.gameClient?.registerObjects(objects);
+            this.gameClient.onObjectsRegisteredOnServer(objects);
         });
 
         this.socket.emit(GameEvent.GET_PLAYERS, (playerOptions: PlayerOptions[]) => {
             const players = playerOptions.map(p => new Player(p));
-            this.gameClient?.addPlayers(players);
+            this.gameClient.onPlayersAddedOnServer(players);
         });
     }
 }

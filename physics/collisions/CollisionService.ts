@@ -70,6 +70,12 @@ export default class CollisionService {
         this.boundingBoxRepository.addBoxValue(objectId, object.getBoundingBox());
     }
 
+    registerObjectsCollisions(objectIds: number[]): void {
+        for (const objectId of objectIds) {
+            this.registerObjectCollisions(objectId);
+        }
+    }
+
     updateObjectCollisions(objectId: number): void {
         const object = this.gameObjectRepository.get(objectId);
         this.boundingBoxRepository.updateBoxValue(objectId, object.getBoundingBox());
