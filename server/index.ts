@@ -1,13 +1,15 @@
 import Express from 'express';
 import Http from 'http';
 import IO from 'socket.io';
+import dotenv from 'dotenv';
 import { GameEvent } from '@/game/GameEvent';
-
 import { ActionOptions } from '@/actions/Action';
 import ActionFactory from '@/actions/ActionFactory';
 import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import GameServer from '@/game/GameServer';
 import Player, { PlayerOptions } from '@/player/Player';
+
+dotenv.config();
 
 const app = Express();
 const http = new Http.Server(app);
