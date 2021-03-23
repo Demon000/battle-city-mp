@@ -1,5 +1,5 @@
-import EventEmitter from "eventemitter3";
-import now from "performance-now";
+import EventEmitter from 'eventemitter3';
+import now from 'performance-now';
 
 export enum TickerEvent {
     TICK = 'tick',
