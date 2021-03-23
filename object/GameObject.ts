@@ -56,6 +56,13 @@ export default class GameObject {
         this.spawnTime = other.spawnTime;
     }
 
+    get centerPosition(): Point {
+        return {
+            x: this.position.x + this.properties.width / 2,
+            y: this.position.y + this.properties.height / 2,
+        };
+    }
+
     get properties(): IGameObjectProperties {
         return GameObjectProperties.getTypeProperties(this.type);
     }
