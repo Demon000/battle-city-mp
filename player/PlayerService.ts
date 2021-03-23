@@ -75,10 +75,6 @@ export default class PlayerService {
 
     requestPlayerSpawnStatus(playerId: string, spawnStatus: PlayerSpawnStatus): void {
         const player = this.repository.get(playerId);
-        if (player.tankId !== undefined) {
-            throw new Error('Player already has a tank');
-        }
-
         player.requestedSpawnStatus = spawnStatus;
     }
 
