@@ -9,14 +9,24 @@
 
 <script lang="ts">
 import GameClientSocket from '@/game/GameClientSocket';
-import { CONFIG_SOCKET_BASE_URL } from '../config';
+import { CLIENT_CONFIG_SOCKET_BASE_URL } from '../../config';
 import { Vue } from 'vue-class-component';
+import GameClient from '@/game/GameClient';
+import { io, Socket } from 'socket.io-client';
 
 export default class App extends Vue {
+    socket?: Socket;
+    gameClient?: GameClient;
     gameClientSocket?: GameClientSocket;
 
-    async mounted(): Promise<void> {
-        this.gameClientSocket = new GameClientSocket(CONFIG_SOCKET_BASE_URL);
+    mounted(): void {
+        this.socket = io(CLIENT_CONFIG_SOCKET_BASE_URL);
+        this.gameClient = new GameClient(this.$refs.canvas as HTMLCanvasElement);
+        this.gameClientSocket = new GameClientSocket(this.socket, this.gameClient);
+    }
+
+    beforeUnmount(): void {
+        this.socket?.disconnect();
     }
 }
 </script>

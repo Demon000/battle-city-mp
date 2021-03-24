@@ -1,4 +1,4 @@
-import { io } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 import { GameObjectOptions } from '../object/GameObject';
 import GameObjectFactory from '../object/GameObjectFactory';
 import Player, { PlayerOptions } from '../player/Player';
@@ -6,12 +6,12 @@ import GameClient from './GameClient';
 import { GameEvent } from './GameEvent';
 
 export default class GameClientSocket {
-    gameClient;
     socket;
+    gameClient;
 
-    constructor(serverUrl: string, gameClient: GameClient) {
+    constructor(socket: Socket, gameClient: GameClient) {
+        this.socket = socket;
         this.gameClient = gameClient;
-        this.socket = io(serverUrl);
 
         this.socket.on('connect', () => {
             console.log('Connected');

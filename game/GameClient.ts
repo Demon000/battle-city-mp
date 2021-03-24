@@ -1,12 +1,13 @@
+import { CLIENT_CONFIG_FPS, CLIENT_CONFIG_VISIBLE_GAME_SIZE } from '@/config';
+import GameRenderService from '@/renderer/GameRenderService';
 import MapRepository from '@/utils/MapRepository';
+import Ticker, { TickerEvent } from '@/utils/Ticker';
 import GameObject from '../object/GameObject';
-import GameObjectService, { GameObjectServiceEvent } from '../object/GameObjectService';
-import BoundingBox from '../physics/bounding-box/BoundingBox';
+import GameObjectService from '../object/GameObjectService';
 import BoundingBoxRepository from '../physics/bounding-box/BoundingBoxRepository';
 import CollisionService from '../physics/collisions/CollisionService';
 import Player from '../player/Player';
 import PlayerService from '../player/PlayerService';
-import Tank from '../tank/Tank';
 
 export default class GameClient {
     private playerRepository;
@@ -15,16 +16,21 @@ export default class GameClient {
     private gameObjectService;
     private boundingBoxRepository;
     private collisionService;
+    private gameRenderService;
+    ticker;
 
-    constructor() {
+    constructor(canvas: HTMLCanvasElement) {
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository();
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
+        this.gameRenderService = new GameRenderService(canvas, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
+        this.ticker = new Ticker(CLIENT_CONFIG_FPS);
 
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.playerRepository);
 
+        this.ticker.emitter.on(TickerEvent.TICK, this.onTick, this);
     }
 
     onObjectChangedOnServer(object: GameObject): void {
@@ -58,31 +64,25 @@ export default class GameClient {
 
     onPlayerChangedOnServer(player: Player): void {
         this.playerService.updatePlayer(player);
+        let watchedObject = undefined;
+        if (player.tankId !== undefined) {
+            watchedObject = this.gameObjectService.getObject(player.tankId);
+        }
+        this.gameRenderService.setWatchedObject(watchedObject);
     }
 
     onPlayerRemovedOnServer(playerId: string): void {
         this.playerService.removePlayer(playerId);
     }
 
-    getPlayerTank(playerId: string): Tank | undefined {
-        const tankId = this.playerService.getPlayerTankId(playerId);
-        if (tankId === undefined) {
-            return undefined;
+    onTick(): void {
+        const box = this.gameRenderService.getViewableMapBoundingBox();
+        if (box === undefined) {
+            return;
         }
 
-        return this.gameObjectService.getObject(tankId) as Tank;
-    }
-
-    getObjectsInBoundingBox(box: BoundingBox): GameObject[] {
-        const objectIds = this.collisionService.getOverlappingObjects(box);
-        return this.gameObjectService.getMultipleObjects(objectIds);
-    }
-
-    registerObjects(objects: GameObject[]): void {
-        this.gameObjectService.registerObjects(objects);
-    }
-
-    addPlayers(players: Player[]): void {
-        this.playerService.addPlayers(players);
+        const viewableObjectIds = this.collisionService.getOverlappingObjects(box);
+        const viewableObjects = this.gameObjectService.getMultipleObjects(viewableObjectIds);
+        this.gameRenderService.renderObjects(viewableObjects);
     }
 }
