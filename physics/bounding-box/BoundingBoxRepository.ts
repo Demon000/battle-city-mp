@@ -35,6 +35,7 @@ export default class BoundingBoxRepository<V> {
         }
 
         this.tree.removeNode(node);
+        this.map.delete(value);
     }
 
     updateBoxValue(value: V, box: BoundingBox): void {
