@@ -137,12 +137,15 @@ export default class PlayerService {
         player.spawnStatus = player.requestedSpawnStatus;
     }
 
-    processPlayerDisconnectStatus(playerId: string): void {
+    processPlayerDisconnectStatus(playerId: string): boolean {
         const player = this.repository.get(playerId);
-        if (player.disconnected) {
-            this.repository.remove(playerId);
-            this.emitter.emit(PlayerServiceEvent.PLAYER_REMOVED, playerId);
+        if (!player.disconnected) {
+            return false;
         }
+
+        this.repository.remove(playerId);
+        this.emitter.emit(PlayerServiceEvent.PLAYER_REMOVED, playerId);
+        return true;
     }
 
     processPlayerMovement(playerId: string): void {
