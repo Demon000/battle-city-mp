@@ -19,6 +19,7 @@ export default class BoundingBoxRepository<V> {
 
     addBoxValue(value: V, box: BoundingBox): void {
         const node = new BoundingBoxNode<V>(box);
+        node.value = value;
         this.tree.addNode(node);
         this.map.set(value, node);
     }
