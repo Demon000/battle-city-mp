@@ -170,9 +170,13 @@ export default class PlayerService {
         const players = this.repository.getAll();
         for (const player of players) {
             this.processPlayerSpawnStatus(player.id);
+            const disconnected = this.processPlayerDisconnectStatus(player.id);
+            if (disconnected) {
+                continue;
+            }
+
             this.processPlayerMovement(player.id);
             this.processPlayerShooting(player.id);
-            this.processPlayerDisconnectStatus(player.id);
         }
     }
 
