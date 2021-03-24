@@ -21,7 +21,7 @@ export default class GameClient {
 
     constructor(canvas: HTMLCanvasElement) {
         this.gameObjectRepository = new MapRepository<number, GameObject>();
-        this.boundingBoxRepository = new BoundingBoxRepository();
+        this.boundingBoxRepository = new BoundingBoxRepository<number>();
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
         this.gameRenderService = new GameRenderService(canvas, CLIENT_CONFIG_VISIBLE_GAME_SIZE);

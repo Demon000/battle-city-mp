@@ -15,14 +15,14 @@ export enum CollisionServiceEvent {
 
 export default class CollisionService {
     private gameObjectRepository;
-    private boundingBoxRepository = new BoundingBoxRepository();
+    private boundingBoxRepository;
     private rulesMap?: Map<GameObjectType, Map<GameObjectType, ICollisionRule>>;
 
     emitter = new EventEmitter();
 
     constructor(
         gameObjectRepository: MapRepository<number, GameObject>,
-        boundingBoxRepository: BoundingBoxRepository,
+        boundingBoxRepository: BoundingBoxRepository<number>,
         rules?: ICollisionRule[],
     ) {
         this.gameObjectRepository = gameObjectRepository;
@@ -67,6 +67,7 @@ export default class CollisionService {
 
     registerObjectCollisions(objectId: number): void {
         const object = this.gameObjectRepository.get(objectId);
+        console.log(object);
         this.boundingBoxRepository.addBoxValue(objectId, object.getBoundingBox());
     }
 
@@ -82,6 +83,7 @@ export default class CollisionService {
     }
 
     unregisterObjectCollisions(objectId: number): void {
+        console.log(objectId);
         this.boundingBoxRepository.removeValue(objectId);
     }
 

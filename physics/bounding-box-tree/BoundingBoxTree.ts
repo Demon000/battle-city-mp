@@ -2,10 +2,10 @@ import BoundingBox from '../bounding-box/BoundingBox';
 import BoundingBoxNode from './BoundingBoxNode';
 import Utils from '../bounding-box/BoundingBoxUtils';
 
-export default class BoundingBoxTree {
-    root?: BoundingBoxNode;
+export default class BoundingBoxTree<V> {
+    root?: BoundingBoxNode<V>;
 
-    calculateBranchingCost(node: BoundingBoxNode, box: BoundingBox): number {
+    calculateBranchingCost(node: BoundingBoxNode<V>, box: BoundingBox): number {
         const newLeftNodeBox = Utils.combine(box, node.box);
         let cost = Utils.volume(newLeftNodeBox);
         if (!node.isLeaf) {
@@ -14,7 +14,7 @@ export default class BoundingBoxTree {
         return cost;
     }
 
-    fixTreeUpwards(newParentNode?: BoundingBoxNode): void {
+    fixTreeUpwards(newParentNode?: BoundingBoxNode<V>): void {
         while (newParentNode != undefined) {
             if (!newParentNode.left || !newParentNode.right) {
                 throw new Error('Tree node is missing children');
@@ -25,7 +25,7 @@ export default class BoundingBoxTree {
         }
     }
 
-    addNode(node: BoundingBoxNode): void {
+    addNode(node: BoundingBoxNode<V>): void {
         if (!this.root) {
             this.root = node;
             return;
@@ -81,7 +81,7 @@ export default class BoundingBoxTree {
         this.fixTreeUpwards(oldParentNode);
     }
 
-    removeNode(node: BoundingBoxNode): void {
+    removeNode(node: BoundingBoxNode<V>): void {
         if (!node.parent) {
             this.root = undefined;
             return;
@@ -110,9 +110,9 @@ export default class BoundingBoxTree {
         }
     }
 
-    getOverlappingNodes(box: BoundingBox): BoundingBoxNode[] {
-        const nodes: BoundingBoxNode[] = [];
-        const stack: BoundingBoxNode[] = [];
+    getOverlappingNodes(box: BoundingBox): BoundingBoxNode<V>[] {
+        const nodes: BoundingBoxNode<V>[] = [];
+        const stack: BoundingBoxNode<V>[] = [];
         let i = 0;
 
         while (stack[i]) {
