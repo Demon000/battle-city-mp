@@ -63,7 +63,7 @@ export default class BoundingBoxTree<V> {
 
         const oldParentNode = siblingNode.parent;
         const newParentBox = Utils.combine(node.box, siblingNode.box);
-        const newParentNode = new BoundingBoxNode(newParentBox, undefined, node, siblingNode);
+        const newParentNode = new BoundingBoxNode(newParentBox, oldParentNode, node, siblingNode);
         siblingNode.parent = newParentNode;
         node.parent = newParentNode;
 
