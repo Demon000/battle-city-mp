@@ -67,7 +67,6 @@ export default class CollisionService {
 
     registerObjectCollisions(objectId: number): void {
         const object = this.gameObjectRepository.get(objectId);
-        console.log(object);
         this.boundingBoxRepository.addBoxValue(objectId, object.getBoundingBox());
     }
 
@@ -83,7 +82,6 @@ export default class CollisionService {
     }
 
     unregisterObjectCollisions(objectId: number): void {
-        console.log(objectId);
         this.boundingBoxRepository.removeValue(objectId);
     }
 
