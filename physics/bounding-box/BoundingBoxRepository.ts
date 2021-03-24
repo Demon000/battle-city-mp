@@ -19,7 +19,7 @@ export default class BoundingBoxRepository<V> {
 
     addBoxValue(value: V, box: BoundingBox): void {
         if (this.map.has(value)) {
-            throw new Error('Node already exists value');
+            throw new Error('Node already exists with value');
         }
 
         const node = new BoundingBoxNode<V>(box);
