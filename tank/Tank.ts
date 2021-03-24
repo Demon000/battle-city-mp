@@ -44,7 +44,7 @@ export default class Tank extends GameObject {
         this.tier = options.tier ?? TankTier.PLAYER_TIER_1;
     }
 
-    get speed(): number {
+    get movementSpeed(): number {
         return tierToSpeedMap[this.tier];
     }
 

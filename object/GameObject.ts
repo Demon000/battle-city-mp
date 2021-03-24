@@ -11,7 +11,7 @@ export interface GameObjectOptions {
     position: Point;
     direction?: Direction;
     requestedDirection?: Direction;
-    isMoving?: boolean;
+    requestedSpeed?: number;
     spawnTime?: number;
 }
 
@@ -23,7 +23,7 @@ export default class GameObject {
     position: Point;
     direction: Direction;
     requestedDirection: Direction;
-    isMoving: boolean;
+    requestedSpeed: number;
     spawnTime: number;
 
     constructor(options: GameObjectOptions) {
@@ -31,7 +31,7 @@ export default class GameObject {
         this.type = options.type ?? GameObjectType.ANY;
         this.direction = options.direction ?? Direction.UP;
         this.requestedDirection = options.requestedDirection ?? Direction.UP;
-        this.isMoving = options.isMoving ?? false;
+        this.requestedSpeed = options.requestedSpeed ?? 0;
         this.position = options.position;
         this.spawnTime = options.spawnTime ?? now();
     }
@@ -43,7 +43,7 @@ export default class GameObject {
             position: this.position,
             direction: this.direction,
             requestedDirection: this.requestedDirection,
-            isMoving: this.isMoving,
+            requestedSpeed: this.requestedSpeed,
             spawnTime: this.spawnTime,
         };
     }
@@ -52,7 +52,7 @@ export default class GameObject {
         this.position = other.position;
         this.direction = other.direction;
         this.requestedDirection = other.requestedDirection;
-        this.isMoving = other.isMoving;
+        this.requestedSpeed = other.requestedSpeed;
         this.spawnTime = other.spawnTime;
     }
 
@@ -67,7 +67,7 @@ export default class GameObject {
         return GameObjectProperties.getTypeProperties(this.type);
     }
 
-    get speed(): number {
+    get movementSpeed(): number {
         return this.properties.speed ?? 0;
     }
 

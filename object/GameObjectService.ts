@@ -75,7 +75,7 @@ export default class GameObjectService {
 
     setObjectMoving(objectId: number, isMoving: boolean): void {
         const object = this.repository.get(objectId);
-        object.isMoving = isMoving;
+        object.requestedSpeed = isMoving ? object.movementSpeed : 0;
         this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object);
     }
 
@@ -107,7 +107,11 @@ export default class GameObjectService {
     }
 
     private processObjectMovement(object: GameObject, delta: number): void {
-        const distance = object.speed * delta;
+        const distance = object.requestedSpeed * delta;
+        if (distance === 0) {
+            return;
+        }
+
         const position = PointUtils.clone(object.position);
 
         if (object.direction === Direction.UP) {
