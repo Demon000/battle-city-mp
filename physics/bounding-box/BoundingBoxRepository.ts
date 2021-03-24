@@ -18,6 +18,10 @@ export default class BoundingBoxRepository<V> {
     }
 
     addBoxValue(value: V, box: BoundingBox): void {
+        if (this.map.has(value)) {
+            throw new Error('Node already exists value');
+        }
+
         const node = new BoundingBoxNode<V>(box);
         node.value = value;
         this.tree.addNode(node);
