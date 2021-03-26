@@ -83,24 +83,24 @@ export default class BoundingBoxTree<V> {
         }
 
         const parentNode = node.parent;
-        const grentParentNode = node.parent.parent;
+        const grandParentNode = node.parent.parent;
         const siblingNode = parentNode.left === node ? parentNode.right : parentNode.left;
 
         if (siblingNode === undefined) {
             throw new Error('Tree node does not have a sibling');
         }
 
-        if (grentParentNode === undefined) {
+        if (grandParentNode === undefined) {
             this.root = siblingNode;
             siblingNode.parent = undefined;
         } else {
-            if (grentParentNode.left === parentNode) {
-                grentParentNode.left = siblingNode;
+            if (grandParentNode.left === parentNode) {
+                grandParentNode.left = siblingNode;
             } else {
-                grentParentNode.right = siblingNode;
+                grandParentNode.right = siblingNode;
             }
-            siblingNode.parent = grentParentNode;
-            this.fixTreeUpwards(grentParentNode);
+            siblingNode.parent = grandParentNode;
+            this.fixTreeUpwards(grandParentNode);
         }
     }
 
