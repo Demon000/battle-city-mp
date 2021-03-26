@@ -31,23 +31,25 @@ export default class GameClientSocket {
             }
 
             this.initialized = true;
-        }
+        };
 
         this.socket.emit(GameEvent.GET_GAME_OBJECTS, (objectOptions: GameObjectOptions[]) => {
             const objects = objectOptions.map(o => GameObjectFactory.buildFromOptions(o));
             this.gameClient.onObjectsRegisteredOnServer(objects);
+            gameObjectsLoaded = true;
             checkIfInitialized();
         });
 
         this.socket.emit(GameEvent.GET_PLAYERS, (playerOptions: PlayerOptions[]) => {
             const players = playerOptions.map(p => new Player(p));
             this.gameClient.onPlayersAddedOnServer(players);
+            playersLoaded = true;
             checkIfInitialized();
         });
     }
 
     registerListeners(): void {
-        const runIfInitialized = <T extends Function>(fn: T) => {
+        const runIfInitialized = (fn: () => void) => {
             if (this.initialized) {
                 fn();
             }
