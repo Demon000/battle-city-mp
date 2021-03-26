@@ -40,6 +40,7 @@ export default class GameClientSocket {
             }
 
             this.initialized = true;
+            this.gameClient.ticker.start();
         };
 
         this.socket.emit(GameEvent.GET_GAME_OBJECTS, (objectOptions: GameObjectOptions[]) => {
