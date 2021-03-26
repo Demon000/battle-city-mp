@@ -7,13 +7,13 @@ export default class PointUtils {
 
     static min(first: Point, second: Point): Point {
         const x = Math.min(first.x, second.x);
-        const y = Math.min(first.x, second.x);
+        const y = Math.min(first.y, second.y);
         return { x, y };
     }
 
     static max(first: Point, second: Point): Point {
         const x = Math.max(first.x, second.x);
-        const y = Math.max(first.x, second.x);
+        const y = Math.max(first.y, second.y);
         return { x, y };
     }
 
