@@ -1,12 +1,7 @@
+import { ISprite } from '@/object/IGameObjectProperties';
 import GameObject, { GameObjectOptions } from '../object/GameObject';
-import { GameObjectType } from '../object/GameObjectProperties';
-
-enum TankTier {
-    PLAYER_TIER_1 = 'player-tier-1',
-    PLAYER_TIER_2 = 'player-tier-2',
-    PLAYER_TIER_3 = 'player-tier-3',
-    PLAYER_TIER_4 = 'player-tier-4',
-}
+import { GameObjectType } from '../object/GameObjectType';
+import { TankTier } from './TankTier';
 
 const tierToSpeedMap = {
     [TankTier.PLAYER_TIER_1]: 16,

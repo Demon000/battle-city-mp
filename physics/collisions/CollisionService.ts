@@ -1,5 +1,5 @@
 import GameObject from '@/object/GameObject';
-import { GameObjectType } from '@/object/GameObjectProperties';
+import { GameObjectType } from '@/object/GameObjectType';
 import MapRepository from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import BoundingBox from '../bounding-box/BoundingBox';

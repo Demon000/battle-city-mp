@@ -1,21 +1,7 @@
-import IGameObjectProperties from './IGameObjectProperties';
-
-export enum GameObjectType {
-    ANY = 'any',
-    BRICK_WALL = 'brick-wall',
-    STEEL_WALL = 'steel-wall',
-    PLAYER_SPAWN = 'player-spawn',
-    LEVEL_BORDER = 'level-border',
-    TANK = 'tank',
-    BULLET = 'bullet',
-}
-
-export enum GameShortObjectType {
-    BRICK_WALL = 'B',
-    STEEL_WALL = 'S',
-    PLAYER_SPAWN = 'O',
-    LEVEL_BORDER = '#',
-}
+import { Direction } from '@/physics/Direction';
+import GameObject from './GameObject';
+import { GameObjectType, GameShortObjectType } from './GameObjectType';
+import IGameObjectProperties, { ISprite, ISpriteSet } from './IGameObjectProperties';
 
 const properties: IGameObjectProperties[] = [
     {
@@ -23,37 +9,65 @@ const properties: IGameObjectProperties[] = [
         shortType: GameShortObjectType.BRICK_WALL,
         width: 4,
         height: 4,
-        sprites: {
-            even: {
+        sets: [
+            {
                 steps: [
                     {
                         filename: 'brick_wall_even.png',
                     },
                 ],
+                position: {
+                    mod: 8,
+                    divide: 4,
+                    equals: [
+                        {
+                            x: 0,
+                            y: 0,
+                        },
+                        {
+                            x: 1,
+                            y: 1,
+                        },
+                    ],
+                },
             },
-            odd: {
+            {
                 steps: [
                     {
                         filename: 'brick_wall_odd.png',
                     },
                 ],
-            },
-        },
+                position: {
+                    mod: 8,
+                    divide: 4,
+                    equals: [
+                        {
+                            x: 0,
+                            y: 1,
+                        },
+                        {
+                            x: 1,
+                            y: 0,
+                        },
+                    ],
+                },
+            }
+        ],
     },
     {
         type: GameObjectType.STEEL_WALL,
         shortType: GameShortObjectType.STEEL_WALL,
         width: 8,
         height: 8,
-        sprites: {
-            default: {
+        sets: [
+            {
                 steps: [
                     {
                         filename: 'steel_wall.png',
                     },
                 ],
             },
-        },
+        ],
     },
     {
         type: GameObjectType.PLAYER_SPAWN,
@@ -66,22 +80,24 @@ const properties: IGameObjectProperties[] = [
         shortType: GameShortObjectType.LEVEL_BORDER,
         width: 16,
         height: 16,
-        sprites: {
-            default: {
+        sets: [
+            {
                 steps: [
                     {
                         filename: 'level_border.png',
                     },
                 ],
             },
-        },
+        ],
     },
     {
         type: GameObjectType.TANK,
         width: 16,
         height: 16,
-        sprites: {
-            tank_tier_1_up: {
+        sets: [
+            {
+                duration: 1000,
+                direction: Direction.UP,
                 steps: [
                     {
                         filename: 'tank_tier_1_up_frame_1.png',
@@ -92,44 +108,47 @@ const properties: IGameObjectProperties[] = [
                         duration: 500,
                     },
                 ],
-                duration: 1000,
             },
-        },
+        ],
     },
     {
         type: GameObjectType.BULLET,
         width: 4,
         height: 4,
-        sprites: {
-            bullet_up: {
+        sets: [
+            {
+                direction: Direction.UP,
                 steps: [
                     {
                         filename: 'bullet_up.png',
                     },
                 ],
             },
-            bullet_right: {
+            {
+                direction: Direction.RIGHT,
                 steps: [
                     {
                         filename: 'bullet_right.png',
                     },
                 ],
             },
-            bullet_down: {
+            {
+                direction: Direction.DOWN,
                 steps: [
                     {
                         filename: 'bullet_down.png',
                     },
                 ],
             },
-            bullet_left: {
+            {
+                direction: Direction.LEFT,
                 steps: [
                     {
                         filename: 'bullet_left.png',
                     },
                 ],
             },
-        },
+        ],
     },
 ];
 
@@ -147,7 +166,7 @@ export default class GameObjectProperties {
     static getTypeProperties(type: string): IGameObjectProperties {
         const properties = typePropertiesMap.get(type);
         if (!properties) {
-            throw new Error('Invalid type');
+            throw new Error('Invalid type ' + type);
         }
         return properties;
     }
@@ -159,4 +178,44 @@ export default class GameObjectProperties {
         }
         return properties;
     }
+
+    static findSpriteSet(object: GameObject): ISpriteSet | undefined {
+        const properties = this.getTypeProperties(object.type);
+        if (properties.sets === undefined) {
+            return undefined;
+        }
+
+        for (const set of properties.sets) {
+            if (set.direction !== undefined && set.direction !== object.direction) {
+                continue;
+            }
+            
+            if (set.position !== undefined) {
+                const x = object.position.x % set.position.mod / set.position.divide;
+                const y = object.position.y % set.position.mod / set.position.divide;
+                let foundPoint = false
+
+                for (const point of set.position.equals) {
+                    if (point.x === x && point.y === y) {
+                        foundPoint = true;
+                        break;
+                    }
+                }
+
+                if (!foundPoint) {
+                    continue;
+                }
+            }
+
+            return set;
+        }
+
+        return undefined;
+    }
+
+    static findSprite(object: GameObject): ISprite | undefined {
+        const set = this.findSpriteSet(object);
+        return set?.steps[0];
+    }
+
 }

@@ -5,7 +5,7 @@ import { Direction } from '../physics/Direction';
 import Point from '../physics/point/Point';
 import PointUtils from '../physics/point/PointUtils';
 import GameObject from './GameObject';
-import { GameObjectType } from './GameObjectProperties';
+import { GameObjectType } from './GameObjectType';
 
 export enum GameObjectServiceEvent {
     OBJECT_REQUESTED_POSITION = 'object-requested-position',

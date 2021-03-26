@@ -1,14 +1,22 @@
+import { Direction } from '@/physics/Direction';
+import Point from '@/physics/point/Point';
+
 export interface ISprite {
     filename: string;
     image?: HTMLImageElement;
-    width?: number;
-    height?: number;
     duration?: number;
 }
 
 export interface ISpriteSet {
-    steps: ISprite[];
     duration?: number;
+    direction?: Direction;
+    position?: {
+        mod: number,
+        divide: number,
+        equals: Point[];
+    };
+
+    steps: ISprite[];
 }
 
 export default interface IGameObjectProperties {
@@ -19,5 +27,5 @@ export default interface IGameObjectProperties {
     height: number;
     speed?: number;
 
-    sprites?: Record<string, ISpriteSet>;
+    sets?: ISpriteSet[];
 }

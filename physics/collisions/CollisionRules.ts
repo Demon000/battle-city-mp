@@ -1,4 +1,4 @@
-import { GameObjectType } from '@/object/GameObjectProperties';
+import { GameObjectType } from '@/object/GameObjectType';
 import ICollisionRule, { CollisionEventType, CollisionResultType } from './ICollisionRule';
 
 export const rules: ICollisionRule[] = [

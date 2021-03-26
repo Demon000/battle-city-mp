@@ -1,7 +1,8 @@
 import Point from '../physics/point/Point';
 import Tank, { TankOptions } from '../tank/Tank';
 import GameObject, { GameObjectOptions } from './GameObject';
-import GameObjectProperties, { GameObjectType } from './GameObjectProperties';
+import GameObjectProperties from './GameObjectProperties';
+import { GameObjectType } from './GameObjectType';
 
 export default class GameObjectFactory {
     static buildFromShortType(shortType: string, position: Point): GameObject {
