@@ -20,7 +20,9 @@ export default class App extends Vue {
     gameClientSocket?: GameClientSocket;
 
     mounted(): void {
-        this.socket = io(CLIENT_CONFIG_SOCKET_BASE_URL);
+        this.socket = io(CLIENT_CONFIG_SOCKET_BASE_URL, {
+            transports: ['websocket'],
+        });
         this.gameClient = new GameClient(this.$refs.canvas as HTMLCanvasElement);
         this.gameClientSocket = new GameClientSocket(this.socket, this.gameClient);
     }
