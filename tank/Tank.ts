@@ -1,4 +1,3 @@
-import { ISprite } from '@/object/IGameObjectProperties';
 import GameObject, { GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
