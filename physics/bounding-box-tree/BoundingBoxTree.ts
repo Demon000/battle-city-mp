@@ -67,8 +67,10 @@ export default class BoundingBoxTree<V> {
 
         if (oldParentNode.left === siblingNode) {
             oldParentNode.left = newParentNode;
-        } else {
+        } else if (oldParentNode.right === siblingNode) {
             oldParentNode.right = newParentNode;
+        } else {
+            throw new Error('Parent of node being pushed down is inconsistent with parent children');
         }
 
         this.fixTreeUpwards(oldParentNode);
