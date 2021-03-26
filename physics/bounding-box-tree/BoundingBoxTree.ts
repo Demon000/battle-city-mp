@@ -90,18 +90,17 @@ export default class BoundingBoxTree<V> {
             throw new Error('Tree node does not have a sibling');
         }
 
-        if (grentParentNode) {
+        if (grentParentNode === undefined) {
+            this.root = siblingNode;
+            siblingNode.parent = undefined;
+        } else {
             if (grentParentNode.left === parentNode) {
                 grentParentNode.left = siblingNode;
             } else {
                 grentParentNode.right = siblingNode;
             }
             siblingNode.parent = grentParentNode;
-
             this.fixTreeUpwards(grentParentNode);
-        } else {
-            this.root = siblingNode;
-            siblingNode.parent = undefined;
         }
     }
 
