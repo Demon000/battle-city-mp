@@ -22,6 +22,14 @@ export default class GameClientSocket {
         this.initialize();
     }
 
+    createPlayer(playerOptions: PlayerOptions): Player {
+        const player = new Player(playerOptions);
+        if (player.id === this.socket.id) {
+            player.isOwnPlayer = true;
+        }
+        return player;
+    }
+
     initialize(): void {
         let gameObjectsLoaded = false;
         let playersLoaded = false;
@@ -42,7 +50,7 @@ export default class GameClientSocket {
         });
 
         this.socket.emit(GameEvent.GET_PLAYERS, (playerOptions: PlayerOptions[]) => {
-            const players = playerOptions.map(p => new Player(p));
+            const players = playerOptions.map(this.createPlayer);
             this.gameClient.onPlayersAddedOnServer(players);
             playersLoaded = true;
             checkIfInitialized();
@@ -57,12 +65,12 @@ export default class GameClientSocket {
         };
 
         this.socket.on(GameEvent.PLAYER_ADDED, (playerOptions: PlayerOptions) => runIfInitialized(() => {
-            const player = new Player(playerOptions);
+            const player = this.createPlayer(playerOptions);
             this.gameClient.onPlayerAddedOnServer(player);
         }));
 
         this.socket.on(GameEvent.PLAYER_CHANGED, (playerOptions: PlayerOptions) => runIfInitialized(() => {
-            const player = new Player(playerOptions);
+            const player = this.createPlayer(playerOptions);
             this.gameClient.onPlayerChangedOnServer(player);
         }));
 
