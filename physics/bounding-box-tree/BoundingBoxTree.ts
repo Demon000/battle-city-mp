@@ -67,7 +67,7 @@ export default class BoundingBoxTree<V> {
         siblingNode.parent = newParentNode;
         node.parent = newParentNode;
 
-        if (!oldParentNode) {
+        if (oldParentNode === undefined) {
             this.root = newParentNode;
             return;
         }
