@@ -11,15 +11,15 @@ export default class BoundingBoxNode<V> {
 
     constructor(
         box: BoundingBox,
-        parent?: BoundingBoxNode<V>,
         left?: BoundingBoxNode<V>,
         right?: BoundingBoxNode<V>,
+        parent?: BoundingBoxNode<V>,
         height = 1,
     ) {
         this.box = box;
-        this.parent = parent;
         this.left = left;
         this.right = right;
+        this.parent = parent;
         this.height = height;
     }
 
@@ -29,7 +29,7 @@ export default class BoundingBoxNode<V> {
         oldParentNode: BoundingBoxNode<V> | undefined,
     ): BoundingBoxNode<V> {
         const box = BoundingBoxUtils.combine(left.box, right.box);
-        const node = new BoundingBoxNode(box, left, right, oldParentNode);
+        const node = new BoundingBoxNode<V>(box, left, right, oldParentNode);
         node.fixHeight();
         return node;
     }
