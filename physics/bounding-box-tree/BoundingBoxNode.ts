@@ -14,7 +14,7 @@ export default class BoundingBoxNode<V> {
         parent?: BoundingBoxNode<V>,
         left?: BoundingBoxNode<V>,
         right?: BoundingBoxNode<V>,
-        height: number = 1,
+        height = 1,
     ) {
         this.box = box;
         this.parent = parent;
