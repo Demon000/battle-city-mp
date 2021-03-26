@@ -50,6 +50,7 @@ export default class GameServer {
         this.gameMapService.emitter.on(GameMapServiceEvent.OBJECTS_SPAWNED, this.onObjectsSpawned, this);
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_ADDED, this.onPlayerAdded, this);
+        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_CHANGED, this.onPlayerChanged, this);
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REMOVED, this.onPlayerRemoved, this);
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_SHOOTING, this.onPlayerShooting, this);
