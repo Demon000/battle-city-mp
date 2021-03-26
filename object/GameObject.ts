@@ -4,7 +4,7 @@ import now from 'performance-now';
 import { Direction } from '../physics/Direction';
 import GameObjectProperties from './GameObjectProperties';
 import { GameObjectType } from './GameObjectType';
-import IGameObjectProperties from './IGameObjectProperties';
+import IGameObjectProperties, { ISprite } from './IGameObjectProperties';
 
 export interface GameObjectOptions {
     id?: number;
@@ -70,6 +70,10 @@ export default class GameObject {
 
     get movementSpeed(): number {
         return this.properties.speed ?? 0;
+    }
+
+    get sprite(): ISprite | undefined {
+        return GameObjectProperties.findSprite(this);
     }
 
     getBoundingBox(position=this.position): BoundingBox {
