@@ -51,7 +51,7 @@ export default class GameClientSocket {
         });
 
         this.socket.emit(GameEvent.GET_PLAYERS, (playerOptions: PlayerOptions[]) => {
-            const players = playerOptions.map(this.createPlayer);
+            const players = playerOptions.map(o => this.createPlayer(o));
             this.gameClient.onPlayersAddedOnServer(players);
             playersLoaded = true;
             checkIfInitialized();
