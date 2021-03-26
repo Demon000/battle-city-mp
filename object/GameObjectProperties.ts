@@ -179,12 +179,13 @@ export default class GameObjectProperties {
         return properties;
     }
 
-    static findSpriteSet(object: GameObject): ISpriteSet | undefined {
+    static findSpriteSets(object: GameObject): ISpriteSet[] {
         const properties = this.getTypeProperties(object.type);
         if (properties.sets === undefined) {
-            return undefined;
+            return [];
         }
 
+        const matchingSets = new Array<ISpriteSet>();
         for (const set of properties.sets) {
             if (set.direction !== undefined && set.direction !== object.direction) {
                 continue;
@@ -193,7 +194,7 @@ export default class GameObjectProperties {
             if (set.position !== undefined) {
                 const x = object.position.x % set.position.mod / set.position.divide;
                 const y = object.position.y % set.position.mod / set.position.divide;
-                let foundPoint = false
+                let foundPoint = false;
 
                 for (const point of set.position.equals) {
                     if (point.x === x && point.y === y) {
@@ -207,15 +208,14 @@ export default class GameObjectProperties {
                 }
             }
 
-            return set;
+            matchingSets.push(set);
         }
 
-        return undefined;
+        return matchingSets;
     }
 
     static findSprite(object: GameObject): ISprite | undefined {
-        const set = this.findSpriteSet(object);
-        return set?.steps[0];
+        return this.findSpriteSets(object)[0]?.steps[0];
     }
 
 }
