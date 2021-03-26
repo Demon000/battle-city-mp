@@ -20,6 +20,6 @@ export default class BoundingBoxNode<V> {
     }
 
     get isLeaf(): boolean {
-        return !this.left && !this.right;
+        return this.left === undefined && this.right === undefined;
     }
 }
