@@ -51,7 +51,7 @@ const properties: IGameObjectProperties[] = [
                         },
                     ],
                 },
-            }
+            },
         ],
     },
     {
