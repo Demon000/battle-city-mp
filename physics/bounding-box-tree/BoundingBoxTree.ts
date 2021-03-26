@@ -58,8 +58,7 @@ export default class BoundingBoxTree<V> {
 
         const oldParentNode = siblingNode.parent;
         const newParentNode = BoundingBoxNode.fromChildren(node, siblingNode, oldParentNode);
-        siblingNode.parent = newParentNode;
-        node.parent = newParentNode;
+        node.parent = siblingNode.parent = newParentNode;
 
         if (oldParentNode === undefined) {
             this.root = newParentNode;
