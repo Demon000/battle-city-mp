@@ -1,20 +1,35 @@
 import BoundingBox from './BoundingBox';
 import BoundingBoxNode from '../bounding-box-tree/BoundingBoxNode';
 import BoundingBoxTree from '../bounding-box-tree/BoundingBoxTree';
+import BoundingBoxUtils from './BoundingBoxUtils';
 
 export default class BoundingBoxRepository<V> {
+    list = new Array<BoundingBoxNode<V>>();
     tree = new BoundingBoxTree<V>();
     map = new Map<V, BoundingBoxNode<V>>();
 
     getBoxOverlappingValues(box: BoundingBox): V[] {
-        const nodes = this.tree.getOverlappingNodes(box);
-        return nodes.map(n =>  {
+        return this.list.filter(n => {
+            if (BoundingBoxUtils.overlaps(n.box, box)) {
+                return true;
+            }
+
+            return false;
+        }).map(n => {
             if (n.value === undefined) {
                 throw new Error('Overlapping node does not contain a value');
             }
 
             return n.value;
         });
+        // const nodes = this.tree.getOverlappingNodes(box);
+        // return nodes.map(n =>  {
+        //     if (n.value === undefined) {
+        //         throw new Error('Overlapping node does not contain a value');
+        //     }
+
+        //     return n.value;
+        // });
     }
 
     addBoxValue(value: V, box: BoundingBox): void {
@@ -24,7 +39,8 @@ export default class BoundingBoxRepository<V> {
 
         const node = new BoundingBoxNode<V>(box);
         node.value = value;
-        this.tree.addNode(node);
+        this.list.push(node);
+        // this.tree.addNode(node);
         this.map.set(value, node);
     }
 
@@ -34,7 +50,21 @@ export default class BoundingBoxRepository<V> {
             throw new Error('Node does not exist for value');
         }
 
-        this.tree.removeNode(node);
+        const index = this.list.findIndex(n => {
+            if (n.value === value) {
+                return true;
+            }
+
+            return false;
+        });
+
+        if (index === -1) {
+            throw new Error('Node does not exist for value');
+        }
+
+        this.list.splice(index, 1);
+
+        // this.tree.removeNode(node);
         this.map.delete(value);
     }
 
