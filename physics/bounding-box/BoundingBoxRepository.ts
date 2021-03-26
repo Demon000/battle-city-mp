@@ -1,7 +1,6 @@
 import BoundingBox from './BoundingBox';
 import BoundingBoxNode from '../bounding-box-tree/BoundingBoxNode';
 import BoundingBoxTree from '../bounding-box-tree/BoundingBoxTree';
-import BoundingBoxUtils from './BoundingBoxUtils';
 
 export default class BoundingBoxRepository<V> {
     tree = new BoundingBoxTree<V>();
