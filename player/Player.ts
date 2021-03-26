@@ -14,6 +14,8 @@ export enum PlayerSpawnStatus {
 export default class Player {
     map = new Map<ButtonType, ButtonPressAction>();
     requestedSpawnStatus = PlayerSpawnStatus.NONE;
+    requestedGameObjects = false;
+    requestedPlayers = false;
     spawnStatus = PlayerSpawnStatus.NONE;
     disconnected = false;
     isOwnPlayer = false;

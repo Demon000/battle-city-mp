@@ -49,6 +49,9 @@ export default class GameServer {
 
         this.gameMapService.emitter.on(GameMapServiceEvent.OBJECTS_SPAWNED, this.onObjectsSpawned, this);
 
+        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_GAME_OBJECTS, this.onPlayerRequestedGameObjects, this);
+        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_PLAYERS, this.onPlayerRequestedPlayers, this);
+
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_ADDED, this.onPlayerAdded, this);
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_CHANGED, this.onPlayerChanged, this);
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REMOVED, this.onPlayerRemoved, this);
@@ -181,6 +184,24 @@ export default class GameServer {
         this.emitter.emit(GameEvent.PLAYER_REMOVED, playerId);
     }
 
+    onPlayerRequestedGameObjectsFromClient(playerId: string): void {
+        this.playerService.requestPlayerGameObjects(playerId);
+    }
+
+    onPlayerRequestedGameObjects(playerId: string): void {
+        const players = this.playerService.getPlayers();
+        this.emitter.emit(GameEvent.PLAYER_PLAYERS_ADDED, playerId, players);
+    }
+
+    onPlayerRequestedPlayersFromClient(playerId: string): void {
+        this.playerService.requestPlayerPlayers(playerId);
+    }
+
+    onPlayerRequestedPlayers(playerId: string): void {
+        const objects = this.gameObjectService.getObjects();
+        this.emitter.emit(GameEvent.PLAYER_OBJECTS_REGISTERD, playerId, objects);
+    }
+
     onPlayerActionFromClient(playerId: string, data: ActionOptions): void {
         const action = new Action(data);
         if (action.type === ActionType.BUTTON_PRESS) {
@@ -190,6 +211,9 @@ export default class GameServer {
 
     onPlayerConnectedFromClient(playerId: string): void {
         this.playerService.createPlayer(playerId);
+    }
+
+    onPlayerRequestSpawnStatusFromClient(playerId: string): void {
         this.playerService.requestPlayerSpawnStatus(playerId, PlayerSpawnStatus.SPAWN);
     }
 
@@ -212,7 +236,7 @@ export default class GameServer {
     }
 
     onTick(deltaSeconds: number): void {
-        this.playerService.processPlayerActions();
+        this.playerService.processPlayerStatus();
         this.gameObjectService.processObjectsMovement(deltaSeconds);
     }
 }

@@ -30,12 +30,12 @@ export default class GameClientSocket {
             console.log('Connected');
         });
 
-        this.socket.emit(GameEvent.GET_GAME_OBJECTS, (objectOptions: GameObjectOptions[]) => {
+        this.socket.on(GameEvent.OBJECTS_REGISTERD, (objectOptions: GameObjectOptions[]) => {
             const objects = objectOptions.map(o => GameObjectFactory.buildFromOptions(o));
             this.gameClient.onObjectsRegisteredOnServer(objects);
         });
 
-        this.socket.emit(GameEvent.GET_PLAYERS, (playerOptions: PlayerOptions[]) => {
+        this.socket.on(GameEvent.PLAYERS_ADDED, (playerOptions: PlayerOptions[]) => {
             const players = playerOptions.map(o => this.createPlayer(o));
             this.gameClient.onPlayersAddedOnServer(players);
         });
@@ -67,5 +67,14 @@ export default class GameClientSocket {
         this.socket.on(GameEvent.OBJECT_UNREGISTERED, (objectId: number) => {
             this.gameClient.onObjectUnregisteredOnServer(objectId);
         });
+
+        this.socket.emit(GameEvent.PLAYER_REQUEST_GAME_OBJECTS);
+        this.socket.emit(GameEvent.PLAYER_REQUEST_PLAYERS);
+
+        this.gameClient.ticker.start();
+    }
+
+    requestPlayerTankSpawn() {
+        this.socket.emit(GameEvent.PLAYER_REQUEST_TANK_SPAWN);
     }
 }

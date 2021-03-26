@@ -24,6 +24,10 @@ export default class GameObjectService {
         this.repository = repository;
     }
 
+    findObject(objectId: number): GameObject | undefined {
+        return this.repository.find(objectId);
+    }
+
     getObject(objectId: number): GameObject {
         return this.repository.get(objectId);
     }

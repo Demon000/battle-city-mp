@@ -4,6 +4,11 @@
             id="game-canvas"
             ref="canvas"
         ></canvas>
+        <div id="game-overlay">
+            <button
+                @click="onSpawnButtonClick"
+            >Spawn</button>
+        </div>
     </div>
 </template>
 
@@ -25,10 +30,24 @@ export default class App extends Vue {
         });
         this.gameClient = new GameClient(this.$refs.canvas as HTMLCanvasElement);
         this.gameClientSocket = new GameClientSocket(this.socket, this.gameClient);
+
+        window.addEventListener('resize', this.onWindowResize);
     }
 
     beforeUnmount(): void {
         this.socket?.disconnect();
+    }
+
+    onWindowResize(): void {
+        if (this.gameClient) {
+            this.gameClient.onWindowResize();
+        }
+    }
+
+    onSpawnButtonClick(): void {
+        if (this.gameClientSocket !== undefined) {
+            this.gameClientSocket.requestPlayerTankSpawn();
+        }
     }
 }
 </script>
@@ -42,5 +61,15 @@ export default class App extends Vue {
 #game-canvas {
     width: 100%;
     height: 100%;
+}
+
+#game-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+
+    /* background: rgba(0, 0, 0, 0.5); */
 }
 </style>

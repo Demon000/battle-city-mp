@@ -71,13 +71,27 @@ export default class GameClient {
     }
 
     onTick(): void {
-        const box = this.gameRenderService.getViewableMapBoundingBox();
+        const ownPlayer = this.playerService.getOwnPlayer();
+        if (ownPlayer === undefined || ownPlayer.tankId === undefined) {
+            return;
+        }
+
+        const tank = this.gameObjectService.findObject(ownPlayer.tankId);
+        if (tank === undefined) {
+            return;
+        }
+
+        const box = this.gameRenderService.getViewableMapBoundingBox(tank.centerPosition);
         if (box === undefined) {
             return;
         }
 
         const viewableObjectIds = this.collisionService.getOverlappingObjects(box);
         const viewableObjects = this.gameObjectService.getMultipleObjects(viewableObjectIds);
-        this.gameRenderService.renderObjects(viewableObjects);
+        this.gameRenderService.renderObjects(viewableObjects, tank.centerPosition);
+    }
+
+    onWindowResize(): void {
+        this.gameRenderService.calculateDimensions();
     }
 }

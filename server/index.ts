@@ -34,21 +34,25 @@ io.on('connection', (socket: IO.Socket) => {
         gameServer.onPlayerActionFromClient(socket.id, action);
     });
 
-    socket.on(GameEvent.GET_GAME_OBJECTS, (ack: (objectOptions: GameObjectOptions[]) => void) => {
-        const objects = gameServer.getGameObjects();
-        const objectOptions = objects.map(o => o.toOptions());
-        ack(objectOptions);
+    socket.on(GameEvent.PLAYER_REQUEST_GAME_OBJECTS, () => {
+        gameServer.onPlayerRequestedGameObjectsFromClient(socket.id);
     });
 
-    socket.on(GameEvent.GET_PLAYERS, (ack: (playerOptions: PlayerOptions[]) => void) => {
-        const players = gameServer.getPlayers();
-        const playerOptions = players.map(p => p.toOptions());
-        ack(playerOptions);
+    socket.on(GameEvent.PLAYER_REQUEST_PLAYERS, () => {
+        gameServer.onPlayerRequestedPlayersFromClient(socket.id);
+    });
+
+    socket.on(GameEvent.PLAYER_REQUEST_TANK_SPAWN, () => {
+        gameServer.onPlayerRequestSpawnStatusFromClient(socket.id);
     });
 });
 
 gameServer.emitter.on(GameEvent.OBJECT_REGISTERED, (object: GameObject) => {
     io.emit(GameEvent.OBJECT_REGISTERED, object.toOptions());
+});
+gameServer.emitter.on(GameEvent.PLAYER_OBJECTS_REGISTERD, (playerId: string, objects: GameObject[]) => {
+    const objectOptions = objects.map(o => o.toOptions());
+    io.to(playerId).emit(GameEvent.OBJECTS_REGISTERD, objectOptions);
 });
 gameServer.emitter.on(GameEvent.OBJECT_CHANGED, (object: GameObject) => {
     io.emit(GameEvent.OBJECT_CHANGED, object.toOptions());
@@ -59,6 +63,10 @@ gameServer.emitter.on(GameEvent.OBJECT_UNREGISTERED, (objectId: number) => {
 
 gameServer.emitter.on(GameEvent.PLAYER_ADDED, (player: Player) => {
     io.emit(GameEvent.PLAYER_ADDED, player.toOptions());
+});
+gameServer.emitter.on(GameEvent.PLAYER_PLAYERS_ADDED, (playerId: string, players: Player[]) => {
+    const playerOptions = players.map(p => p.toOptions());
+    io.to(playerId).emit(GameEvent.PLAYERS_ADDED, playerOptions);
 });
 gameServer.emitter.on(GameEvent.PLAYER_CHANGED, (player: Player) => {
     io.emit(GameEvent.PLAYER_CHANGED, player.toOptions());

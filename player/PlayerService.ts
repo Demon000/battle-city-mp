@@ -13,8 +13,12 @@ export enum PlayerServiceEvent {
     PLAYER_NOT_MOVING = 'player-not-moving',
     PLAYER_SHOOTING = 'player-shooting',
     PLAYER_NOT_SHOOTING = 'player-not-shooting',
+
     PLAYER_SPAWN_TANK_REQUESTED = 'player-spawn-tank-requested',
     PLAYER_DESPAWN_TANK_REQUESTED = 'player-despawn-tank-requested',
+
+    PLAYER_REQUESTED_GAME_OBJECTS = 'player-requested-game-objects',
+    PLAYER_REQUESTED_PLAYERS = 'player-requested-players',
 }
 
 export default class PlayerService {
@@ -82,6 +86,16 @@ export default class PlayerService {
         player.disconnected = true;
     }
 
+    requestPlayerGameObjects(playerId: string): void {
+        const player = this.repository.get(playerId);
+        player.requestedGameObjects = true;
+    }
+
+    requestPlayerPlayers(playerId: string): void {
+        const player = this.repository.get(playerId);
+        player.requestedPlayers = true;
+    }
+
     addPlayerButtonPressAction(playerId: string, action: ButtonPressAction): void {
         const player = this.repository.get(playerId);
         player.map.set(action.buttonType, action);
@@ -127,9 +141,9 @@ export default class PlayerService {
             return;
         }
 
-        if (player.requestedSpawnStatus === PlayerSpawnStatus.SPAWN) {
+        if (player.requestedSpawnStatus === PlayerSpawnStatus.SPAWN && player.tankId === undefined) {
             this.emitter.emit(PlayerServiceEvent.PLAYER_SPAWN_TANK_REQUESTED, playerId);
-        } else if (player.requestedSpawnStatus === PlayerSpawnStatus.DESPAWN) {
+        } else if (player.requestedSpawnStatus === PlayerSpawnStatus.DESPAWN && player.tankId !== undefined) {
             this.emitter.emit(PlayerServiceEvent.PLAYER_DESPAWN_TANK_REQUESTED, player.id, player.tankId);
         }
 
@@ -165,7 +179,23 @@ export default class PlayerService {
         }
     }
 
-    processPlayerActions(): void {
+    processPlayerGameObjectRequest(playerId: string): void {
+        const player = this.repository.get(playerId);
+        if (player.requestedGameObjects) {
+            this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_GAME_OBJECTS, playerId);
+        }
+        player.requestedGameObjects = false;
+    }
+
+    processPlayerPlayersRequest(playerId: string): void {
+        const player = this.repository.get(playerId);
+        if (player.requestedPlayers) {
+            this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_PLAYERS, playerId);
+        }
+        player.requestedPlayers = false;
+    }
+
+    processPlayerStatus(): void {
         const players = this.repository.getAll();
         for (const player of players) {
             this.processPlayerSpawnStatus(player.id);
@@ -174,6 +204,8 @@ export default class PlayerService {
                 continue;
             }
 
+            this.processPlayerGameObjectRequest(player.id);
+            this.processPlayerPlayersRequest(player.id);
             this.processPlayerMovement(player.id);
             this.processPlayerShooting(player.id);
         }
@@ -182,5 +214,16 @@ export default class PlayerService {
     removePlayer(playerId: string): void {
         this.repository.remove(playerId);
         this.emitter.emit(PlayerServiceEvent.PLAYER_REMOVED, playerId);
+    }
+
+    getOwnPlayer(): Player | undefined {
+        const players = this.repository.getAll();
+        for (const player of players) {
+            if (player.isOwnPlayer) {
+                return player;
+            }
+        }
+
+        return undefined;
     }
 }
