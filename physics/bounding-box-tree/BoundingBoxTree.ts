@@ -115,6 +115,12 @@ export default class BoundingBoxTree<V> {
         const stack: BoundingBoxNode<V>[] = [];
         let i = 0;
 
+        if (this.root === undefined) {
+            return stack;
+        }
+
+        stack.push(this.root);
+
         while (stack[i]) {
             const node = stack[i];
 
