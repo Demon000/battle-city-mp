@@ -6,22 +6,23 @@ export default class BoundingBoxTree<V> {
     root?: BoundingBoxNode<V>;
 
     calculateBranchingCost(node: BoundingBoxNode<V>, box: BoundingBox): number {
-        const newLeftNodeBox = Utils.combine(box, node.box);
-        let cost = Utils.volume(newLeftNodeBox);
-        if (!node.isLeaf) {
+        const newNodeBox = Utils.combine(box, node.box);
+        let cost = Utils.volume(newNodeBox);
+        if (node.left !== undefined && node.right !== undefined) {
             cost -= Utils.volume(node.box);
         }
         return cost;
     }
 
-    fixTreeUpwards(newParentNode?: BoundingBoxNode<V>): void {
-        while (newParentNode != undefined) {
-            if (!newParentNode.left || !newParentNode.right) {
+    fixTreeUpwards(node?: BoundingBoxNode<V>): void {
+        while (node != undefined) {
+            if (node.left === undefined || node.right === undefined) {
                 throw new Error('Tree node is missing children');
             }
 
-            newParentNode.box = Utils.combine(newParentNode.left.box, newParentNode.right.box);
-            newParentNode = newParentNode.parent;
+            node.fixHeight();
+            node.fixBox();
+            node = node.parent;
         }
     }
 
@@ -32,14 +33,8 @@ export default class BoundingBoxTree<V> {
         }
 
         let siblingNode = this.root;
-        while (!siblingNode.isLeaf) {
+        while (siblingNode.left !== undefined && siblingNode.right !== undefined) {
             const currentNodeVolume = Utils.volume(siblingNode.box);
-            const leftNode = siblingNode.left;
-            const rightNode = siblingNode.right;
-
-            if (leftNode === undefined || rightNode === undefined) {
-                throw new Error('Tree node children cannot be undefined');
-            }
 
             const newParentNodeBox = Utils.combine(siblingNode.box, node.box);
             const newParentNodeVolume = Utils.volume(newParentNodeBox);
@@ -47,23 +42,22 @@ export default class BoundingBoxTree<V> {
 
             const minimumPushDownCost = newParentNodeCost - 2 * currentNodeVolume;
 
-            const leftCost = this.calculateBranchingCost(leftNode, node.box) + minimumPushDownCost;
-            const rightCost = this.calculateBranchingCost(rightNode, node.box) + minimumPushDownCost;
+            const leftCost = this.calculateBranchingCost(siblingNode.left, node.box) + minimumPushDownCost;
+            const rightCost = this.calculateBranchingCost(siblingNode.right, node.box) + minimumPushDownCost;
 
             if (newParentNodeCost < leftCost && newParentNodeCost < rightCost) {
                 break;
             }
 
             if (leftCost <= rightCost) {
-                siblingNode = leftNode;
+                siblingNode = siblingNode.left;
             } else {
-                siblingNode = rightNode;
+                siblingNode = siblingNode.right;
             }
         }
 
         const oldParentNode = siblingNode.parent;
-        const newParentBox = Utils.combine(node.box, siblingNode.box);
-        const newParentNode = new BoundingBoxNode<V>(newParentBox, oldParentNode, node, siblingNode);
+        const newParentNode = BoundingBoxNode.fromChildren(node, siblingNode, oldParentNode);
         siblingNode.parent = newParentNode;
         node.parent = newParentNode;
 
@@ -125,13 +119,9 @@ export default class BoundingBoxTree<V> {
             const node = stack[i];
 
             if (Utils.overlaps(node.box, box)) {
-                if (node.isLeaf) {
+                if (node.left === undefined || node.right === undefined) {
                     nodes.push(node);
                 } else {
-                    if (node.left === undefined || node.right === undefined) {
-                        throw new Error('Tree node children cannot be undefined');
-                    }
-
                     stack.push(node.left);
                     stack.push(node.right);
                 }
