@@ -64,11 +64,6 @@ export default class GameClient {
 
     onPlayerChangedOnServer(player: Player): void {
         this.playerService.updatePlayer(player);
-        let watchedObject = undefined;
-        if (player.tankId !== undefined) {
-            watchedObject = this.gameObjectService.getObject(player.tankId);
-        }
-        this.gameRenderService.setWatchedObject(watchedObject);
     }
 
     onPlayerRemovedOnServer(playerId: string): void {
