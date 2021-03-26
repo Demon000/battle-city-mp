@@ -1,8 +1,8 @@
+import { CLIENT_SPRITES_RELATIVE_URL } from '@/config';
 import GameObject from '@/object/GameObject';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 
 export default class GameRenderService {
-    private canvas;
     private gameToRenderSizeScale;
     private renderWidth;
     private renderHeight;
@@ -12,8 +12,6 @@ export default class GameRenderService {
     context: CanvasRenderingContext2D;
 
     constructor(canvas: HTMLCanvasElement, targetGameSize: number) {
-        this.canvas = canvas;
-
         const context = canvas.getContext('2d');
         if (!context) {
             throw new Error('Failed to create canvas context');
@@ -30,7 +28,30 @@ export default class GameRenderService {
     }
 
     renderObjects(objects: GameObject[]): void {
-        console.log(objects);
+        for (const object of objects) {
+            const sprite = object.sprite;
+            if (sprite === undefined) {
+                continue;
+            }
+
+            if (!sprite.image) {
+                sprite.image = new Image();
+                sprite.image.src = `${CLIENT_SPRITES_RELATIVE_URL}/sprite.filename`;
+            }
+
+            if (!sprite.image.complete) {
+                continue;
+            }
+
+            const objectGameRelativeX = object.position.x - (this.watchedObject?.position.x ?? 0);
+            const objectGameRelativeY = object.position.y - (this.watchedObject?.position.y ?? 0);
+            const objectRenderX = (object.position.x - objectGameRelativeX) * this.gameToRenderSizeScale;
+            const objectRenderY = (object.position.y - objectGameRelativeY) * this.gameToRenderSizeScale;
+            const objectRenderWidth = object.properties.width * this.gameToRenderSizeScale;
+            const objectRenderHeight = object.properties.height * this.gameToRenderSizeScale;
+
+            this.context.drawImage(sprite.image, objectRenderX, objectRenderY, objectRenderWidth, objectRenderHeight);
+        }
     }
 
     setWatchedObject(object: GameObject | undefined): void {
