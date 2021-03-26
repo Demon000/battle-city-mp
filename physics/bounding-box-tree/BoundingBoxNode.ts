@@ -30,15 +30,15 @@ export default class BoundingBoxNode<V> {
     ): BoundingBoxNode<V> {
         const box = BoundingBoxUtils.combine(left.box, right.box);
         const node = new BoundingBoxNode<V>(box, left, right, oldParentNode);
-        node.fixHeight();
+        node.recalculateHeight();
         return node;
     }
 
-    fixHeight(): void {
+    recalculateHeight(): void {
         this.height = 1 + Math.max(this.left?.height ?? 0, this.right?.height ?? 0);
     }
 
-    fixBox(): void {
+    recalculateBox(): void {
         if (this.left === undefined || this.right === undefined) {
             throw new Error('Cannot fix box of leaf node');
         }

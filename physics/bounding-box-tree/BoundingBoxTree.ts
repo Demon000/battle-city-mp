@@ -20,8 +20,8 @@ export default class BoundingBoxTree<V> {
                 throw new Error('Tree node is missing children');
             }
 
-            node.fixHeight();
-            node.fixBox();
+            node.recalculateHeight();
+            node.recalculateBox();
             node = node.parent;
         }
     }
