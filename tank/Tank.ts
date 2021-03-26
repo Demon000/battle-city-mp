@@ -41,6 +41,20 @@ export default class Tank extends GameObject {
         this.playerId = options.playerId;
     }
 
+    toOptions(): TankOptions {
+        const gameObjectOptiions = super.toOptions();
+        return Object.assign(gameObjectOptiions, {
+            tier: this.tier,
+            playerId: this.playerId,
+        });
+    }
+
+    setOptions(other: Tank): void {
+        super.setOptions(other);
+        this.tier = other.tier;
+        this.playerId = other.playerId;
+    }
+
     get movementSpeed(): number {
         return tierToSpeedMap[this.tier];
     }
