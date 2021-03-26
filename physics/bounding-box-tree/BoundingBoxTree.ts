@@ -15,7 +15,8 @@ export default class BoundingBoxTree<V> {
     }
 
     fixTreeUpwards(node?: BoundingBoxNode<V>): void {
-        while (node != undefined) {
+        while (node !== undefined) {
+
             if (node.left === undefined || node.right === undefined) {
                 throw new Error('Tree node is missing children');
             }
