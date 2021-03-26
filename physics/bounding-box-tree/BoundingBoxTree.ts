@@ -91,7 +91,7 @@ export default class BoundingBoxTree<V> {
         const grentParentNode = node.parent.parent;
         const siblingNode = parentNode.left === node ? parentNode.right : parentNode.left;
 
-        if (!siblingNode) {
+        if (siblingNode === undefined) {
             throw new Error('Tree node does not have a sibling');
         }
 
