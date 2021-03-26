@@ -26,7 +26,7 @@ export default class BoundingBoxTree<V> {
     }
 
     addNode(node: BoundingBoxNode<V>): void {
-        if (!this.root) {
+        if (this.root === undefined) {
             this.root = node;
             return;
         }
