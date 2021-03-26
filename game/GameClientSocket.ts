@@ -27,7 +27,7 @@ export default class GameClientSocket {
         let playersLoaded = false;
 
         const checkIfInitialized = () => {
-            if (!gameObjectsLoaded || !playersLoaded) {
+            if (!gameObjectsLoaded || !playersLoaded || this.initialized) {
                 return;
             }
 
