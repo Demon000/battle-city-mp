@@ -4,7 +4,6 @@ import ButtonPressAction, { MOVE_BUTTON_TYPES, ButtonState, BUTTON_TYPE_DIRECTIO
 import { Direction } from '../physics/Direction';
 import Player, { PlayerSpawnStatus } from './Player';
 
-
 export enum PlayerServiceEvent {
     PLAYER_ADDED = 'player-added',
     PLAYER_CHANGED = 'player-changed',
