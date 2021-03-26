@@ -96,8 +96,10 @@ export default class BoundingBoxTree<V> {
         } else {
             if (grandParentNode.left === parentNode) {
                 grandParentNode.left = siblingNode;
-            } else {
+            } else if (grandParentNode.right === parentNode) {
                 grandParentNode.right = siblingNode;
+            } else {
+                throw new Error('Grand parent of node being removed is inconsistent with grand parent children');
             }
             siblingNode.parent = grandParentNode;
             this.fixTreeUpwards(grandParentNode);
