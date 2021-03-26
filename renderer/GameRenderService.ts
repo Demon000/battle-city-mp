@@ -1,6 +1,7 @@
 import { CLIENT_SPRITES_RELATIVE_URL } from '@/config';
 import GameObject from '@/object/GameObject';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
+import Point from '@/physics/point/Point';
 
 export default class GameRenderService {
     private gameToRenderSizeScale;
@@ -8,7 +9,6 @@ export default class GameRenderService {
     private renderHeight;
     private gameWidth;
     private gameHeight;
-    private watchedObject: GameObject | undefined;
     context: CanvasRenderingContext2D;
 
     constructor(canvas: HTMLCanvasElement, targetGameSize: number) {
@@ -27,7 +27,7 @@ export default class GameRenderService {
         this.gameHeight = this.renderHeight / this.gameToRenderSizeScale;
     }
 
-    renderObjects(objects: GameObject[]): void {
+    renderObjects(objects: GameObject[], point: Point): void {
         for (const object of objects) {
             const sprite = object.sprite;
             if (sprite === undefined) {
@@ -43,8 +43,8 @@ export default class GameRenderService {
                 continue;
             }
 
-            const objectGameRelativeX = object.position.x - (this.watchedObject?.position.x ?? 0);
-            const objectGameRelativeY = object.position.y - (this.watchedObject?.position.y ?? 0);
+            const objectGameRelativeX = object.position.x - point.x;
+            const objectGameRelativeY = object.position.y - point.y;
             const objectRenderX = (object.position.x - objectGameRelativeX) * this.gameToRenderSizeScale;
             const objectRenderY = (object.position.y - objectGameRelativeY) * this.gameToRenderSizeScale;
             const objectRenderWidth = object.properties.width * this.gameToRenderSizeScale;
@@ -54,23 +54,15 @@ export default class GameRenderService {
         }
     }
 
-    setWatchedObject(object: GameObject | undefined): void {
-        this.watchedObject = object;
-    }
-
-    getViewableMapBoundingBox(): BoundingBox | undefined {
-        if (this.watchedObject === undefined) {
-            return undefined;
-        }
-
+    getViewableMapBoundingBox(position: Point): BoundingBox | undefined {
         return {
             tl: {
-                x: this.watchedObject.position.x - this.gameWidth / 2,
-                y: this.watchedObject.position.y - this.gameHeight / 2,
+                x: position.x - this.gameWidth / 2,
+                y: position.y - this.gameHeight / 2,
             },
             br: {
-                x: this.watchedObject.position.x + this.gameWidth / 2,
-                y: this.watchedObject.position.y + this.gameHeight / 2,
+                x: position.x + this.gameWidth / 2,
+                y: position.y + this.gameHeight / 2,
             },
         };
     }
