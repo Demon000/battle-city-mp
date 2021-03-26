@@ -18,6 +18,7 @@ export default class GameClientSocket {
             console.log('Connected');
         });
 
+        this.registerListeners();
         this.initialize();
     }
 
