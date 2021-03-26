@@ -14,6 +14,7 @@ export default class TankService {
     spawnPlayerTank(playerId: string, position: Point): void {
         const tank = new Tank({
             position,
+            playerId,
         });
         this.emitter.emit(TankServiceEvent.TANK_SPAWNED, tank);
         this.emitter.emit(TankServiceEvent.PLAYER_TANK_CHANGED, playerId, tank.id);
