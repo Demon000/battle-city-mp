@@ -74,7 +74,7 @@ export default class GameClientSocket {
         this.gameClient.ticker.start();
     }
 
-    requestPlayerTankSpawn() {
+    requestPlayerTankSpawn(): void {
         this.socket.emit(GameEvent.PLAYER_REQUEST_TANK_SPAWN);
     }
 }
