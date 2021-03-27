@@ -63,7 +63,7 @@ export default class GameServer {
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REQUESTED_DIRECTION, this.onObjectRequestedDirection, this);
         this.collisionService.emitter.on(CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED, this.onObjectDirectionAllowed, this);
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REQUESTED_POSITION, this.onObjectRequestedPosition, this);
-        this.collisionService.emitter.on(CollisionServiceEvent.OBJECT_MOVE_ALLOWED, this.onObjectPositionAllowed, this);
+        this.collisionService.emitter.on(CollisionServiceEvent.OBJECT_POSITION_ALLOWED, this.onObjectPositionAllowed, this);
 
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, this.onObjectBoundingBoxChanged, this);
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REGISTERED, this.onObjectRegistered, this);

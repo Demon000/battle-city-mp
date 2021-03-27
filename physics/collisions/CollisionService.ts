@@ -9,7 +9,7 @@ import Point from '../point/Point';
 import ICollisionRule, { CollisionResultType } from './ICollisionRule';
 
 export enum CollisionServiceEvent {
-    OBJECT_MOVE_ALLOWED = 'object-move-allowed',
+    OBJECT_POSITION_ALLOWED = 'object-position-allowed',
     OBJECT_DIRECTION_ALLOWED = 'object-direction-allowed',
 }
 
