@@ -1,6 +1,4 @@
 import Action from '@/actions/Action';
-import ButtonPressAction, { ButtonState, ButtonType } from '@/actions/ButtonPressAction';
-import now from 'performance-now';
 import { Socket } from 'socket.io-client';
 import { GameObjectOptions } from '../object/GameObject';
 import GameObjectFactory from '../object/GameObjectFactory';
