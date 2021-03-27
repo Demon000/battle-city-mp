@@ -122,7 +122,7 @@ export default class CollisionService {
             return true;
         }
 
-        this.emitter.emit(CollisionServiceEvent.OBJECT_MOVE_ALLOWED, objectId, position);
+        this.emitter.emit(CollisionServiceEvent.OBJECT_POSITION_ALLOWED, objectId, position);
 
         return false;
     }
