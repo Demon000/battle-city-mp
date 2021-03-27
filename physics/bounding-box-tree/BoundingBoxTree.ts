@@ -34,7 +34,7 @@ export default class BoundingBoxTree<V> {
             } else if (down.parent.right === up) {
                 down.parent.right = down;
             } else {
-                throw new Error('Parent of node being rotated is inconsistent with parent children');
+                throw new Error('Parent of node being rotated is inconsistent');
             }
         }
 
@@ -53,7 +53,7 @@ export default class BoundingBoxTree<V> {
         } else if (up.left === down) {
             up.left = replaceOldDownNode;
         } else {
-            throw new Error('Parent of node being rotated is inconsistent with parent children');
+            throw new Error('Parent of node being rotated is inconsistent');
         }
 
         down.right = newDownRightNode;
@@ -137,7 +137,7 @@ export default class BoundingBoxTree<V> {
         } else if (oldParentNode.right === siblingNode) {
             oldParentNode.right = newParentNode;
         } else {
-            throw new Error('Parent of node being pushed down is inconsistent with parent children');
+            throw new Error('Parent of node being pushed down is inconsistent');
         }
 
         this.fixTreeUpwards(oldParentNode);
@@ -151,7 +151,15 @@ export default class BoundingBoxTree<V> {
 
         const parentNode = node.parent;
         const grandParentNode = node.parent.parent;
-        const siblingNode = parentNode.left === node ? parentNode.right : parentNode.left;
+
+        let siblingNode;
+        if (parentNode.left === node) {
+            siblingNode = parentNode.right;
+        } else if (parentNode.right === node) {
+            siblingNode = parentNode.left;
+        } else {
+            throw new Error('Parent of node being removed is inconsistent');
+        }
 
         if (siblingNode === undefined) {
             throw new Error('Tree node does not have a sibling');
@@ -166,7 +174,7 @@ export default class BoundingBoxTree<V> {
             } else if (grandParentNode.right === parentNode) {
                 grandParentNode.right = siblingNode;
             } else {
-                throw new Error('Grand parent of node being removed is inconsistent with grand parent children');
+                throw new Error('Grand parent of node being removed is inconsistent');
             }
             siblingNode.parent = grandParentNode;
             this.fixTreeUpwards(grandParentNode);
