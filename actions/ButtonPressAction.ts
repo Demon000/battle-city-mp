@@ -2,11 +2,11 @@ import { Direction } from '../physics/Direction';
 import Action, { ActionOptions, ActionType } from './Action';
 
 export enum ButtonType {
-    UP,
-    RIGHT,
-    DOWN,
-    LEFT,
-    SHOOT,
+    UP = 'up',
+    RIGHT = 'right',
+    DOWN = 'down',
+    LEFT = 'left',
+    SHOOT = 'shoot',
 }
 
 export const BUTTON_TYPE_DIRECTION: Partial<Record<ButtonType, Direction>> = {
@@ -24,8 +24,8 @@ export const MOVE_BUTTON_TYPES = [
 ];
 
 export enum ButtonState {
-    PRESSED,
-    UNPRESSED,
+    PRESSED = 'pressed',
+    UNPRESSED = 'unpressed',
 }
 
 export interface ButtonPressActionOptions extends ActionOptions {

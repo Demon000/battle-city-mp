@@ -18,6 +18,7 @@ import { CLIENT_CONFIG_SOCKET_BASE_URL } from '../../config';
 import { Vue } from 'vue-class-component';
 import GameClient from '@/game/GameClient';
 import { io, Socket } from 'socket.io-client';
+import ActionFactory from '@/actions/ActionFactory';
 
 export default class App extends Vue {
     socket?: Socket;
@@ -32,6 +33,26 @@ export default class App extends Vue {
         this.gameClientSocket = new GameClientSocket(this.socket, this.gameClient);
 
         window.addEventListener('resize', this.onWindowResize);
+
+        window.addEventListener('keydown', this.onKeyboardEvent);
+        window.addEventListener('keyup', this.onKeyboardEvent);
+    }
+
+    onKeyboardEvent(event: KeyboardEvent): void {
+        if (!this.gameClientSocket) {
+            return;
+        }
+
+        if (event.repeat) {
+            return;
+        }
+
+        const action = ActionFactory.buildFromEvent(event);
+        if (action === undefined) {
+            return;
+        }
+
+        this.gameClientSocket.requestPlayerAction(action);
     }
 
     beforeUnmount(): void {

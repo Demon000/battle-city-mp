@@ -202,8 +202,7 @@ export default class GameServer {
         this.emitter.emit(GameEvent.PLAYER_OBJECTS_REGISTERD, playerId, objects);
     }
 
-    onPlayerActionFromClient(playerId: string, data: ActionOptions): void {
-        const action = new Action(data);
+    onPlayerActionFromClient(playerId: string, action: Action): void {
         if (action.type === ActionType.BUTTON_PRESS) {
             this.playerService.addPlayerButtonPressAction(playerId, action as ButtonPressAction);
         }

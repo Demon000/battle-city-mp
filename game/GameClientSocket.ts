@@ -1,3 +1,6 @@
+import Action from '@/actions/Action';
+import ButtonPressAction, { ButtonState, ButtonType } from '@/actions/ButtonPressAction';
+import now from 'performance-now';
 import { Socket } from 'socket.io-client';
 import { GameObjectOptions } from '../object/GameObject';
 import GameObjectFactory from '../object/GameObjectFactory';
@@ -76,5 +79,9 @@ export default class GameClientSocket {
 
     requestPlayerTankSpawn(): void {
         this.socket.emit(GameEvent.PLAYER_REQUEST_TANK_SPAWN);
+    }
+
+    requestPlayerAction(action: Action): void {
+        this.socket.emit(GameEvent.PLAYER_ACTION, action.toOptions());
     }
 }
