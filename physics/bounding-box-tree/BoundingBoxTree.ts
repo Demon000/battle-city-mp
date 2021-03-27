@@ -14,8 +14,75 @@ export default class BoundingBoxTree<V> {
         return cost;
     }
 
+    private swapNodeUp(up: BoundingBoxNode<V>, down: BoundingBoxNode<V>) {
+        const left = down.left;
+        const right = down.right;
+
+        if (left === undefined || right === undefined) {
+            throw new Error('Height of node being balanced is inconsistent with structure');
+        }
+
+        down.left = up;
+        down.parent = up.parent;
+        up.parent = down;
+
+        if (down.parent === undefined) {
+            this.root = down;
+        } else {
+            if (down.parent.left === up) {
+                down.parent.left = down;
+            } else if (down.parent.right === up) {
+                down.parent.right = down;
+            } else {
+                throw new Error('Parent of node being rotated is inconsistent with parent children');
+            }
+        }
+
+        let newDownRightNode;
+        let replaceOldDownNode;
+        if (left.height > right.height) {
+            newDownRightNode = left;
+            replaceOldDownNode = right;
+        } else {
+            newDownRightNode = right;
+            replaceOldDownNode = left;
+        }
+
+        if (up.right === down) {
+            up.right = replaceOldDownNode;
+        } else if (up.left === down) {
+            up.left = replaceOldDownNode;
+        } else {
+            throw new Error('Parent of node being rotated is inconsistent with parent children');
+        }
+
+        down.right = newDownRightNode;
+        replaceOldDownNode.parent = up;
+
+        up.recalculateBox();
+        up.recalculateHeight();
+        down.recalculateBox();
+        down.recalculateHeight();
+    }
+
+    private balance(node: BoundingBoxNode<V>): BoundingBoxNode<V> {
+        if (node.left === undefined || node.right === undefined || node.height < 3) {
+            return node;
+        }
+
+        const balance = node.right.height - node.left.height;
+        if (balance === 0) {
+            return node;
+        }
+
+        const nodeToSwap = balance > 1 ? node.right : node.left;
+        this.swapNodeUp(node, nodeToSwap);
+        return nodeToSwap;
+    }
+
     fixTreeUpwards(node?: BoundingBoxNode<V>): void {
         while (node !== undefined) {
+            node = this.balance(node);
 
             if (node.left !== undefined || node.right !== undefined) {
                 node.recalculateHeight();
