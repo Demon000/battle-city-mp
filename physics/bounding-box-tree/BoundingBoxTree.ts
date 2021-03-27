@@ -40,7 +40,7 @@ export default class BoundingBoxTree<V> {
 
         let newDownRightNode;
         let replaceOldDownNode;
-        if (left.height > right.height) {
+        if (left.maxHeight > right.maxHeight) {
             newDownRightNode = left;
             replaceOldDownNode = right;
         } else {
@@ -59,36 +59,43 @@ export default class BoundingBoxTree<V> {
         down.right = newDownRightNode;
         replaceOldDownNode.parent = up;
 
-        up.recalculateBox();
-        up.recalculateHeight();
-        down.recalculateBox();
-        down.recalculateHeight();
+        up.recalculate();
+        down.recalculate();
     }
 
     private balance(node: BoundingBoxNode<V>): BoundingBoxNode<V> {
-        if (node.left === undefined || node.right === undefined || node.height < 3) {
+        if (node.left === undefined || node.right === undefined || node.maxHeight < 4) {
             return node;
         }
 
-        const balance = node.right.height - node.left.height;
+        const balance = node.right.maxHeight - node.left.maxHeight;
         if (balance === 0) {
             return node;
         }
 
-        const nodeToSwap = balance > 1 ? node.right : node.left;
-        this.swapNodeUp(node, nodeToSwap);
-        return nodeToSwap;
+        let nodeToSwap;
+        if (balance > 1) {
+            nodeToSwap = node.right;
+        } else if (balance < -1) {
+            nodeToSwap = node.left;
+        }
+
+        if (nodeToSwap !== undefined) {
+            this.swapNodeUp(node, nodeToSwap);
+            return nodeToSwap;
+        }
+
+        return node;
     }
 
     fixTreeUpwards(node?: BoundingBoxNode<V>): void {
         while (node !== undefined) {
-            node = this.balance(node);
-
             if (node.left !== undefined && node.right !== undefined) {
                 node.recalculateHeight();
                 node.recalculateBox();
             }
 
+            node = this.balance(node);
             node = node.parent;
         }
     }

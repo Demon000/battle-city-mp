@@ -7,20 +7,20 @@ export default class BoundingBoxNode<V> {
     left?: BoundingBoxNode<V>;
     right?: BoundingBoxNode<V>;
     value?: V;
-    height: number;
+    maxHeight: number;
 
     constructor(
         box: BoundingBox,
         left?: BoundingBoxNode<V>,
         right?: BoundingBoxNode<V>,
         parent?: BoundingBoxNode<V>,
-        height = 1,
+        maxHeight = 1,
     ) {
         this.box = box;
         this.left = left;
         this.right = right;
         this.parent = parent;
-        this.height = height;
+        this.maxHeight = maxHeight;
     }
 
     static fromChildren<V>(
@@ -39,7 +39,7 @@ export default class BoundingBoxNode<V> {
             throw new Error('Cannot recalculate height of leaf node');
         }
 
-        this.height = 1 + Math.max(this.left.height, this.right.height);
+        this.maxHeight = 1 + Math.max(this.left.maxHeight, this.right.maxHeight);
     }
 
     recalculateBox(): void {
@@ -48,5 +48,10 @@ export default class BoundingBoxNode<V> {
         }
 
         this.box = BoundingBoxUtils.combine(this.left.box, this.right.box);
+    }
+
+    recalculate(): void {
+        this.recalculateBox();
+        this.recalculateHeight();
     }
 }
