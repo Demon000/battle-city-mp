@@ -39,9 +39,6 @@ export default class GameRenderService {
         this.context.fillStyle = 'black';
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        let minObjectX = 10000;
-        let minObjectY = 10000;
-
         const canvasX = point.x - this.gameWidth / 2;
         const canvasY = point.y - this.gameHeight / 2;
 
@@ -62,14 +59,6 @@ export default class GameRenderService {
 
             const objectGameRelativeX = object.position.x - canvasX;
             const objectGameRelativeY = object.position.y - canvasY;
-
-            if (object.position.x < minObjectX) {
-                minObjectX = object.position.x;
-            }
-
-            if (object.position.y < minObjectY) {
-                minObjectY = object.position.y;
-            }
 
             const objectRenderX = objectGameRelativeX * this.gameToRenderSizeScale;
             const objectRenderY = objectGameRelativeY * this.gameToRenderSizeScale;
