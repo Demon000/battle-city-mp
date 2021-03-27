@@ -28,7 +28,7 @@ export default class GameRenderService {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
 
-        const minRenderSize = Math.min(this.canvas.width, this.canvas.height);
+        const minRenderSize = Math.max(this.canvas.width, this.canvas.height);
         this.gameToRenderSizeScale = minRenderSize / this.targetGameSize;
         this.gameWidth = this.canvas.width / this.gameToRenderSizeScale;
         this.gameHeight = this.canvas.height / this.gameToRenderSizeScale;
