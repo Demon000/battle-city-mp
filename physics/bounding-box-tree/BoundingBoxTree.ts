@@ -182,8 +182,8 @@ export default class BoundingBoxTree<V> {
     }
 
     getOverlappingNodes(box: BoundingBox): BoundingBoxNode<V>[] {
-        const nodes: BoundingBoxNode<V>[] = [];
-        const stack: BoundingBoxNode<V>[] = [];
+        const nodes = new Array<BoundingBoxNode<V>>();
+        const stack = new Array<BoundingBoxNode<V>>();
         let i = 0;
 
         if (this.root === undefined) {
