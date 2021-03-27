@@ -68,6 +68,7 @@ export default class GameServer {
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, this.onObjectBoundingBoxChanged, this);
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REGISTERED, this.onObjectRegistered, this);
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_UNREGISTERED, this.onObjectUnregistered, this);
+        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_CHANGED, this.onObjectChanged, this);
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_SPAWN_TANK_REQUESTED, this.onPlayerSpawnTankRequested, this);
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_DESPAWN_TANK_REQUESTED, this.onPlayerDespawnTankRequested, this);
