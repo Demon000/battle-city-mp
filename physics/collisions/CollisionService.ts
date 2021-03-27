@@ -99,7 +99,7 @@ export default class CollisionService {
                 continue;
             }
 
-            const overlappingObject = this.gameObjectRepository.get(objectId);
+            const overlappingObject = this.gameObjectRepository.get(overlappingObjectId);
             const rule = this.getRule(movingObject.type, overlappingObject.type);
             if (rule === undefined) {
                 continue;
