@@ -35,12 +35,16 @@ export default class BoundingBoxNode<V> {
     }
 
     recalculateHeight(): void {
-        this.height = 1 + Math.max(this.left?.height ?? 0, this.right?.height ?? 0);
+        if (this.left === undefined || this.right === undefined) {
+            throw new Error('Cannot recalculate height of leaf node');
+        }
+
+        this.height = 1 + Math.max(this.left.height, this.right.height);
     }
 
     recalculateBox(): void {
         if (this.left === undefined || this.right === undefined) {
-            throw new Error('Cannot fix box of leaf node');
+            throw new Error('Cannot recalculate box of leaf node');
         }
 
         this.box = BoundingBoxUtils.combine(this.left.box, this.right.box);
