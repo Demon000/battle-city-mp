@@ -109,6 +109,48 @@ const properties: IGameObjectProperties[] = [
                     },
                 ],
             },
+            {
+                duration: 1000,
+                direction: Direction.RIGHT,
+                steps: [
+                    {
+                        filename: 'tank_tier_1_right_frame_1.png',
+                        duration: 500,
+                    },
+                    {
+                        filename: 'tank_tier_1_right_frame_2.png',
+                        duration: 500,
+                    },
+                ],
+            },
+            {
+                duration: 1000,
+                direction: Direction.DOWN,
+                steps: [
+                    {
+                        filename: 'tank_tier_1_down_frame_1.png',
+                        duration: 500,
+                    },
+                    {
+                        filename: 'tank_tier_1_down_frame_2.png',
+                        duration: 500,
+                    },
+                ],
+            },
+            {
+                duration: 1000,
+                direction: Direction.LEFT,
+                steps: [
+                    {
+                        filename: 'tank_tier_1_left_frame_1.png',
+                        duration: 500,
+                    },
+                    {
+                        filename: 'tank_tier_1_left_frame_2.png',
+                        duration: 500,
+                    },
+                ],
+            },
         ],
     },
     {
