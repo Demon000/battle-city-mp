@@ -26,6 +26,7 @@ export default interface IGameObjectProperties {
     width: number;
     height: number;
     speed?: number;
+    oppositeDirectionSwitchSnapping?: number;
 
     sets?: ISpriteSet[];
 }

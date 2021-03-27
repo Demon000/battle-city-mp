@@ -94,6 +94,7 @@ const properties: IGameObjectProperties[] = [
         type: GameObjectType.TANK,
         width: 16,
         height: 16,
+        oppositeDirectionSwitchSnapping: 4,
         sets: [
             {
                 duration: 1000,
@@ -259,5 +260,4 @@ export default class GameObjectProperties {
     static findSprite(object: GameObject): ISprite | undefined {
         return this.findSpriteSets(object)[0]?.steps[0];
     }
-
 }

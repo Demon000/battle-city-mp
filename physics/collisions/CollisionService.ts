@@ -7,6 +7,7 @@ import BoundingBoxRepository from '../bounding-box/BoundingBoxRepository';
 import BoundingBoxUtils from '../bounding-box/BoundingBoxUtils';
 import { Direction } from '../Direction';
 import Point from '../point/Point';
+import DirectionUtils from './DirectionUtils';
 import ICollisionRule, { CollisionResultType } from './ICollisionRule';
 
 export enum CollisionServiceEvent {
@@ -135,7 +136,28 @@ export default class CollisionService {
         return false;
     }
 
+    calculateSnappedCoordinates(value: number, snapping: number): number {
+        const overSnapping = value % snapping;
+        let snapped = value - overSnapping;
+        if (overSnapping > snapping / 2) {
+            snapped += snapping;
+        }
+        return snapped;
+    }
+
     validateObjectDirection(objectId: number, direction: Direction): void {
+        const gameObject = this.gameObjectRepository.get(objectId);
+        if (gameObject.properties.oppositeDirectionSwitchSnapping !== undefined &&
+                !DirectionUtils.isSameAxis(gameObject.direction, direction)) {
+            const snappedX = this.calculateSnappedCoordinates(gameObject.position.x, gameObject.properties.oppositeDirectionSwitchSnapping);
+            const snappedY = this.calculateSnappedCoordinates(gameObject.position.y, gameObject.properties.oppositeDirectionSwitchSnapping);
+
+            this.validateObjectMovement(objectId, {
+                x: snappedX,
+                y: snappedY,
+            });
+        }
+
         this.emitter.emit(CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED, objectId, direction);
     }
 }
