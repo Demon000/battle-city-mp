@@ -47,22 +47,17 @@ export default class CollisionService {
         }
     }
 
-    private getRule(movingType: GameObjectType, staticType: GameObjectType): ICollisionRule {
+    private getRule(movingType: GameObjectType, staticType: GameObjectType): ICollisionRule | undefined {
         if (!this.rulesMap) {
             throw new Error('getRule called but no rules supplied');
         }
 
         const movingMap = this.rulesMap.get(movingType);
-        if (!movingMap) {
-            throw new Error('Invalid moving type');
+        if (movingMap === undefined) {
+            return undefined;
         }
 
-        const rule = movingMap.get(staticType);
-        if (!rule) {
-            throw new Error('Invalid static type');
-        }
-
-        return rule;
+        return movingMap.get(staticType);
     }
 
     registerObjectCollisions(objectId: number): void {
@@ -106,6 +101,9 @@ export default class CollisionService {
 
             const overlappingObject = this.gameObjectRepository.get(objectId);
             const rule = this.getRule(movingObject.type, overlappingObject.type);
+            if (rule === undefined) {
+                continue;
+            }
 
             for (let result of rule.result) {
                 if (typeof(result) == 'function') {
