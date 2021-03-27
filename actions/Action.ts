@@ -16,4 +16,11 @@ export default class Action {
         this.timestamp = options.timestamp;
         this.type = options.type ?? ActionType.ANY;
     }
+
+    toOptions(): ActionOptions {
+        return {
+            type: this.type,
+            timestamp: this.timestamp,
+        };
+    }
 }

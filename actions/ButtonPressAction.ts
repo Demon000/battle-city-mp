@@ -45,4 +45,12 @@ export default class ButtonPressAction extends Action {
         this.buttonType = options.buttonType;
         this.buttonState = options.buttonState;
     }
+
+    toOptions(): ButtonPressActionOptions {
+        const actionOptions = super.toOptions();
+        return Object.assign(actionOptions, {
+            buttonType: this.buttonType,
+            buttonState: this.buttonState,
+        });
+    }
 }
