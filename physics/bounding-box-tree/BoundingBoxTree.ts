@@ -17,12 +17,11 @@ export default class BoundingBoxTree<V> {
     fixTreeUpwards(node?: BoundingBoxNode<V>): void {
         while (node !== undefined) {
 
-            if (node.left === undefined || node.right === undefined) {
-                throw new Error('Tree node is missing children');
+            if (node.left !== undefined || node.right !== undefined) {
+                node.recalculateHeight();
+                node.recalculateBox();
             }
 
-            node.recalculateHeight();
-            node.recalculateBox();
             node = node.parent;
         }
     }
