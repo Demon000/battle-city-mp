@@ -4,6 +4,7 @@ import MapRepository from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import BoundingBox from '../bounding-box/BoundingBox';
 import BoundingBoxRepository from '../bounding-box/BoundingBoxRepository';
+import BoundingBoxUtils from '../bounding-box/BoundingBoxUtils';
 import { Direction } from '../Direction';
 import Point from '../point/Point';
 import ICollisionRule, { CollisionResultType } from './ICollisionRule';
@@ -111,6 +112,13 @@ export default class CollisionService {
                 }
                 
                 if (result.type === CollisionResultType.PREVENT_MOVEMENT) {
+                    if (result.tolerance !== undefined) {
+                        const overlappingWithTolerance = BoundingBoxUtils.overlaps(movedBoundingBox,
+                            overlappingObject.getBoundingBox(), result.tolerance);
+                        if (!overlappingWithTolerance) {
+                            continue;
+                        }
+                    }
                     preventMovement = true;
                 } else if (result.type === CollisionResultType.NOTIFY) {
                     this.emitter.emit(result.name, objectId, position, overlappingObjectId);

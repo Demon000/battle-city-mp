@@ -4,10 +4,11 @@ import ICollisionRule, { CollisionEventType, CollisionResultType } from './IColl
 export const rules: ICollisionRule[] = [
     {
         movingTypes: [GameObjectType.TANK],
-        staticTypes: [GameObjectType.BRICK_WALL, GameObjectType.STEEL_WALL],
+        staticTypes: [GameObjectType.BRICK_WALL, GameObjectType.STEEL_WALL, GameObjectType.LEVEL_BORDER],
         result: [
             {
                 type: CollisionResultType.PREVENT_MOVEMENT,
+                tolerance: 1,
             },
         ],
     },
