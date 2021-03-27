@@ -167,7 +167,6 @@ export default class BoundingBoxTree<V> {
 
         if (grandParentNode === undefined) {
             this.root = siblingNode;
-            siblingNode.parent = undefined;
         } else {
             if (grandParentNode.left === parentNode) {
                 grandParentNode.left = siblingNode;
@@ -176,9 +175,10 @@ export default class BoundingBoxTree<V> {
             } else {
                 throw new Error('Grand parent of node being removed is inconsistent');
             }
-            siblingNode.parent = grandParentNode;
-            this.fixTreeUpwards(grandParentNode);
         }
+
+        siblingNode.parent = grandParentNode;
+        this.fixTreeUpwards(grandParentNode);
     }
 
     getOverlappingNodes(box: BoundingBox): BoundingBoxNode<V>[] {
