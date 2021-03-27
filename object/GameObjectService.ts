@@ -67,6 +67,7 @@ export default class GameObjectService {
         const object = this.repository.get(objectId);
         object.requestedDirection = direction;
         this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object);
+        this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, objectId);
     }
 
     setObjectDirection(objectId: number, direction: Direction): void {
