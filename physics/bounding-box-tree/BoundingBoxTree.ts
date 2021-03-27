@@ -84,7 +84,7 @@ export default class BoundingBoxTree<V> {
         while (node !== undefined) {
             node = this.balance(node);
 
-            if (node.left !== undefined || node.right !== undefined) {
+            if (node.left !== undefined && node.right !== undefined) {
                 node.recalculateHeight();
                 node.recalculateBox();
             }
