@@ -28,6 +28,8 @@ export default class GameClientSocket {
 
     listen(): void {
         this.socket.on('connect', () => {
+            this.socket.emit(GameEvent.PLAYER_REQUEST_GAME_OBJECTS);
+            this.socket.emit(GameEvent.PLAYER_REQUEST_PLAYERS);
             this.gameClient.ticker.start();
             console.log('Connected');
         });
@@ -74,9 +76,6 @@ export default class GameClientSocket {
         this.socket.on(GameEvent.OBJECT_UNREGISTERED, (objectId: number) => {
             this.gameClient.onObjectUnregisteredOnServer(objectId);
         });
-
-        this.socket.emit(GameEvent.PLAYER_REQUEST_GAME_OBJECTS);
-        this.socket.emit(GameEvent.PLAYER_REQUEST_PLAYERS);
     }
 
     requestPlayerTankSpawn(): void {
