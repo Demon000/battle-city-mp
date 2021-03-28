@@ -28,11 +28,13 @@ const tierToMaxBulletsMap = {
 export interface TankOptions extends GameObjectOptions {
     tier?: TankTier;
     playerId?: string;
+    isShooting?: boolean;
 }
 
 export default class Tank extends GameObject {
     tier: TankTier;
     playerId?: string;
+    isShooting: boolean;
 
     constructor(options: TankOptions) {
         options.type = GameObjectType.TANK;
@@ -41,6 +43,7 @@ export default class Tank extends GameObject {
 
         this.tier = options.tier ?? TankTier.PLAYER_TIER_1;
         this.playerId = options.playerId;
+        this.isShooting = options.isShooting ?? false;
     }
 
     toOptions(): TankOptions {

@@ -1,5 +1,7 @@
+import BulletService, { BulletServiceEvent } from '@/bullet/BulletService';
 import { Direction } from '@/physics/Direction';
 import Tank from '@/tank/Tank';
+import TankService, { TankServiceEvent } from '@/tank/TankService';
 import MapRepository from '@/utils/MapRepository';
 import Ticker, { TickerEvent } from '@/utils/Ticker';
 import EventEmitter from 'eventemitter3';
@@ -23,6 +25,8 @@ export default class GameServer {
     private playerService;
     private gameObjectRepository;
     private gameObjectService;
+    private tankService;
+    private bulletService;
     private boundingBoxRepository;
     private collisionRules;
     private collisionService;
@@ -36,6 +40,8 @@ export default class GameServer {
         this.collisionRules = rules;
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository, this.collisionRules);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
+        this.tankService = new TankService(this.gameObjectRepository);
+        this.bulletService = new BulletService(this.gameObjectRepository);
         this.gameMapService = new GameMapService();
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.playerRepository);
@@ -81,8 +87,12 @@ export default class GameServer {
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_SHOOT,
             (playerId: string, isShooting: boolean) => {
-                // spawn bullet using tank position
-                console.log('player shooting ' + playerId);
+                const tankId = this.playerService.getPlayerTankId(playerId);
+                if (tankId === undefined) {
+                    return;
+                }
+
+                this.tankService.setTankShooting(tankId, isShooting);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_MOVE,
@@ -162,20 +172,44 @@ export default class GameServer {
             });
 
         /**
+         * TankService event handlers
+         */
+        this.tankService.emitter.on(TankServiceEvent.TANK_REQUESTED_BULLET_SPAWN,
+            (tankId: number) => {
+                this.bulletService.spawnBulletForTank(tankId);
+            });
+
+        /**
+         * BulletService event handlers
+         */
+        this.bulletService.emitter.on(BulletServiceEvent.TANK_BULLET_SPAWNED,
+            (tankId: number, bullet: GameObject) => {
+                console.log(bullet);
+                this.gameObjectService.registerObject(bullet);
+            });
+
+        /**
          * CollisionService event handlers
          */
         this.collisionService.emitter.on(CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED,
             (objectId: number, direction: Direction) => {
                 this.gameObjectService.setObjectDirection(objectId, direction);
             });
+
         this.collisionService.emitter.on(CollisionServiceEvent.OBJECT_POSITION_ALLOWED,
             (objectId: number, position: Point) => {
                 this.gameObjectService.setObjectPosition(objectId, position);
             });
 
+        this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_LEVEL_BORDER,
+            (movingObjectId: number, position: Point, staticObjectId: number) => {
+                this.gameObjectService.setObjectDestroyed(movingObjectId);
+            });
+
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_WALL,
             (movingObjectId: number, position: Point, staticObjectId: number) => {
-                console.log('Bullet hit wall');
+                this.gameObjectService.setObjectDestroyed(movingObjectId);
+                this.gameObjectService.setObjectDestroyed(staticObjectId);
             });
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_TANK,
@@ -185,7 +219,8 @@ export default class GameServer {
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_BULLET,
             (movingObjectId: number, position: Point, staticObjectId: number) => {
-                console.log('Bullet hit bullet');
+                this.gameObjectService.setObjectDestroyed(movingObjectId);
+                this.gameObjectService.setObjectDestroyed(staticObjectId);
             });
 
         /**
@@ -194,7 +229,8 @@ export default class GameServer {
         this.ticker.emitter.on(TickerEvent.TICK,
             (deltaSeconds: number) => {
                 this.playerService.processPlayerStatus();
-                this.gameObjectService.processObjectsMovement(deltaSeconds);
+                this.tankService.processTanksShooting();
+                this.gameObjectService.processObjectsStatus(deltaSeconds);
             });
 
         this.gameMapService.loadFromFile('./maps/simple.json');

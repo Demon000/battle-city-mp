@@ -12,6 +12,25 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
+        movingTypes: [GameObjectType.TANK],
+        staticTypes: [GameObjectType.TANK],
+        result: [
+            {
+                type: CollisionResultType.PREVENT_MOVEMENT,
+            },
+        ],
+    },
+    {
+        movingTypes: [GameObjectType.BULLET],
+        staticTypes: [GameObjectType.LEVEL_BORDER],
+        result: [
+            {
+                type: CollisionResultType.NOTIFY,
+                name: CollisionEventType.BULLET_HIT_LEVEL_BORDER,
+            },
+        ],
+    },
+    {
         movingTypes: [GameObjectType.BULLET],
         staticTypes: [GameObjectType.BRICK_WALL, GameObjectType.STEEL_WALL],
         result: [

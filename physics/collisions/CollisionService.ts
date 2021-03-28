@@ -111,7 +111,7 @@ export default class CollisionService {
                 if (typeof(result) == 'function') {
                     result = result(objectId, position, overlappingObjectId);
                 }
-                
+
                 if (result.type === CollisionResultType.PREVENT_MOVEMENT) {
                     if (result.tolerance !== undefined) {
                         const overlappingWithTolerance = BoundingBoxUtils.overlaps(movedBoundingBox,

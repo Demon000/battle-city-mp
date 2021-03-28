@@ -24,6 +24,7 @@ export default class GameObject {
     direction: Direction;
     requestedSpeed: number;
     spawnTime: number;
+    destroyed = false;
 
     constructor(options: GameObjectOptions) {
         this.id = options.id ?? GameObject.globalId++;

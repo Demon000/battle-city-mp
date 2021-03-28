@@ -70,6 +70,11 @@ export default class GameObjectService {
         this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, objectId);
     }
 
+    setObjectDestroyed(objectId: number): void {
+        const object = this.repository.get(objectId);
+        object.destroyed = true;
+    }
+
     setObjectMoving(objectId: number, isMoving: boolean): void {
         const object = this.repository.get(objectId);
         const requestedSpeed = isMoving ? object.movementSpeed : 0;
@@ -129,9 +134,16 @@ export default class GameObjectService {
         this.emitter.emit(GameObjectServiceEvent.OBJECT_REQUESTED_POSITION, object.id, position);
     }
 
-    processObjectsMovement(delta: number): void {
+    private processObjectDestroy(object: GameObject): void {
+        if (object.destroyed) {
+            this.unregisterObject(object.id);
+        }
+    }
+
+    processObjectsStatus(delta: number): void {
         const objects = this.repository.getAll();
         for (const object of objects) {
+            this.processObjectDestroy(object);
             this.processObjectMovement(object, delta);
         }
     }
