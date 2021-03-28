@@ -42,4 +42,9 @@ export default class BoundingBoxRepository<V> {
         this.removeValue(value);
         this.addBoxValue(value, box);
     }
+
+    clear(): void {
+        this.map.clear();
+        this.tree.clearNodes();
+    }
 }

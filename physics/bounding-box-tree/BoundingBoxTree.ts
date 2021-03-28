@@ -216,4 +216,8 @@ export default class BoundingBoxTree<V> {
 
         return nodes;
     }
+
+    clearNodes(): void {
+        this.root = undefined;
+    }
 }
