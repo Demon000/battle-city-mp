@@ -189,8 +189,8 @@ export default class GameServer {
     }
 
     onPlayerRequestedGameObjects(playerId: string): void {
-        const players = this.playerService.getPlayers();
-        this.emitter.emit(GameEvent.PLAYER_PLAYERS_ADDED, playerId, players);
+        const objects = this.gameObjectService.getObjects();
+        this.emitter.emit(GameEvent.PLAYER_OBJECTS_REGISTERD, playerId, objects);
     }
 
     onPlayerRequestedPlayersFromClient(playerId: string): void {
@@ -198,8 +198,8 @@ export default class GameServer {
     }
 
     onPlayerRequestedPlayers(playerId: string): void {
-        const objects = this.gameObjectService.getObjects();
-        this.emitter.emit(GameEvent.PLAYER_OBJECTS_REGISTERD, playerId, objects);
+        const players = this.playerService.getPlayers();
+        this.emitter.emit(GameEvent.PLAYER_PLAYERS_ADDED, playerId, players);
     }
 
     onPlayerActionFromClient(playerId: string, action: Action): void {
