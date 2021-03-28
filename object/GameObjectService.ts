@@ -134,16 +134,23 @@ export default class GameObjectService {
         this.emitter.emit(GameObjectServiceEvent.OBJECT_REQUESTED_POSITION, object.id, position);
     }
 
-    private processObjectDestroy(object: GameObject): void {
+    private processObjectDestroy(object: GameObject): boolean {
         if (object.destroyed) {
             this.unregisterObject(object.id);
+            return true;
         }
+
+        return false;
     }
 
     processObjectsStatus(delta: number): void {
         const objects = this.repository.getAll();
         for (const object of objects) {
-            this.processObjectDestroy(object);
+            const destroyed = this.processObjectDestroy(object);
+            if (destroyed) {
+                continue;
+            }
+
             this.processObjectMovement(object, delta);
         }
     }
