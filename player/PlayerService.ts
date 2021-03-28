@@ -97,7 +97,7 @@ export default class PlayerService {
         player.map.set(action.buttonType, action);
     }
     
-    getPlayerDominantMovementDirection(player: Player): Direction | undefined {
+    private getPlayerDominantMovementDirection(player: Player): Direction | undefined {
         let actions: ButtonPressAction[] = [];
 
         for (const buttonType of MOVE_BUTTON_TYPES) {
@@ -120,7 +120,7 @@ export default class PlayerService {
         return BUTTON_TYPE_DIRECTION[actions[0].buttonType];
     }
 
-    isPlayerShooting(player: Player): boolean {
+    private isPlayerShooting(player: Player): boolean {
         const action = player.map.get(ButtonType.SHOOT);
         if (!action) {
             return false;
@@ -129,7 +129,7 @@ export default class PlayerService {
         return action.buttonState === ButtonState.PRESSED;
     }
 
-    processPlayerSpawnStatus(player: Player): void {
+    private processPlayerSpawnStatus(player: Player): void {
         if (player.requestedSpawnStatus === player.spawnStatus) {
             return;
         }
@@ -143,7 +143,7 @@ export default class PlayerService {
         player.spawnStatus = player.requestedSpawnStatus;
     }
 
-    processPlayerDisconnectStatus(player: Player): boolean {
+    private processPlayerDisconnectStatus(player: Player): boolean {
         if (!player.disconnected) {
             return false;
         }
@@ -153,7 +153,7 @@ export default class PlayerService {
         return true;
     }
 
-    processPlayerMovement(player: Player): void {
+    private processPlayerMovement(player: Player): void {
         const direction = this.getPlayerDominantMovementDirection(player);
         if (direction === player.lastRequestedDirection) {
             return;
@@ -168,7 +168,7 @@ export default class PlayerService {
         }
     }
 
-    processPlayerShooting(player: Player): void {
+    private processPlayerShooting(player: Player): void {
         const isShooting = this.isPlayerShooting(player);
         if (isShooting) {
             this.emitter.emit(PlayerServiceEvent.PLAYER_SHOOTING, player.id);
@@ -177,14 +177,14 @@ export default class PlayerService {
         }
     }
 
-    processPlayerGameObjectRequest(player: Player): void {
+    private processPlayerGameObjectRequest(player: Player): void {
         if (player.requestedGameObjects) {
             this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_GAME_OBJECTS, player.id);
         }
         player.requestedGameObjects = false;
     }
 
-    processPlayerPlayersRequest(player: Player): void {
+    private processPlayerPlayersRequest(player: Player): void {
         if (player.requestedPlayers) {
             this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_PLAYERS, player.id);
         }
