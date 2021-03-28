@@ -4,10 +4,10 @@
   "author": "Demon000",
   "license": "GPL-3.0",
   "scripts": {
-    "run-client-dev": "vue-cli-service serve",
+    "client-dev": "vue-cli-service serve",
     "lint": "eslint . --ext .ts --ext .vue",
     "lint-fix": "eslint . --fix --ext .ts --ext .vue",
-    "run-server-dev": "ts-node-dev -r tsconfig-paths/register server/index.ts"
+    "server-dev": "ts-node-dev -r tsconfig-paths/register server/index.ts"
   },
   "devDependencies": {
     "@types/express": "^4.17.11",
