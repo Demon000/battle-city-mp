@@ -3,7 +3,7 @@ import Tank from '@/tank/Tank';
 import MapRepository from '@/utils/MapRepository';
 import Ticker, { TickerEvent } from '@/utils/Ticker';
 import EventEmitter from 'eventemitter3';
-import Action, { ActionOptions, ActionType } from '../actions/Action';
+import Action, { ActionType } from '../actions/Action';
 import ButtonPressAction from '../actions/ButtonPressAction';
 import GameMapService, { GameMapServiceEvent } from '../maps/GameMapService';
 import GameObject from '../object/GameObject';
