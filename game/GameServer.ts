@@ -1,4 +1,5 @@
 import { Direction } from '@/physics/Direction';
+import Tank from '@/tank/Tank';
 import MapRepository from '@/utils/MapRepository';
 import Ticker, { TickerEvent } from '@/utils/Ticker';
 import EventEmitter from 'eventemitter3';
@@ -14,12 +15,10 @@ import { CollisionEventType } from '../physics/collisions/ICollisionRule';
 import Point from '../physics/point/Point';
 import Player, { PlayerSpawnStatus } from '../player/Player';
 import PlayerService, { PlayerServiceEvent } from '../player/PlayerService';
-import TankService, { TankServiceEvent } from '../tank/TankService';
 import { GameEvent } from './GameEvent';
 
 export default class GameServer {
     private gameMapService;
-    private tankService;
     private playerRepository;
     private playerService;
     private gameObjectRepository;
@@ -38,7 +37,6 @@ export default class GameServer {
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository, this.collisionRules);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
         this.gameMapService = new GameMapService();
-        this.tankService = new TankService();
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.playerRepository);
         this.ticker = new Ticker(128);
@@ -110,12 +108,19 @@ export default class GameServer {
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_SPAWN_TANK_REQUESTED,
             (playerId: string) => {
-                const spawnPosition = this.gameObjectService.getRandomSpawnPosition();
-                this.tankService.spawnPlayerTank(playerId, spawnPosition);
+                const position = this.gameObjectService.getRandomSpawnPosition();
+                const tank = new Tank({
+                    position,
+                    playerId,
+                });
+                this.gameObjectService.registerObject(tank);
+                this.playerService.setPlayerTankId(playerId, tank.id);
             });
+
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_DESPAWN_TANK_REQUESTED,
             (playerId: string, tankId: number) => {
-                this.tankService.despawnPlayerTank(playerId, tankId);
+                this.gameObjectService.unregisterObject(tankId);
+                this.playerService.setPlayerTankId(playerId, undefined);
             });
 
         /**
@@ -151,24 +156,6 @@ export default class GameServer {
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_CHANGED,
             (object: GameObject) => {
                 this.emitter.emit(GameEvent.OBJECT_CHANGED, object);
-            });
-
-        /**
-         * TankService event handlers
-         */
-        this.tankService.emitter.on(TankServiceEvent.PLAYER_TANK_CHANGED,
-            (playerId: string, tankId: number) => {
-                this.playerService.setPlayerTankId(playerId, tankId);
-            });
-
-        this.tankService.emitter.on(TankServiceEvent.TANK_SPAWNED,
-            (object: GameObject) => {
-                this.gameObjectService.registerObject(object);
-            });
-
-        this.tankService.emitter.on(TankServiceEvent.TANK_DESPAWNED,
-            (objectId: number) => {
-                this.gameObjectService.unregisterObject(objectId);
             });
 
         /**
