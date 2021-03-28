@@ -26,16 +26,18 @@ export default class App extends Vue {
     gameClientSocket?: GameClientSocket;
 
     mounted(): void {
+        const canvas = this.$refs.canvas as HTMLCanvasElement;
+
         this.socket = io(CLIENT_CONFIG_SOCKET_BASE_URL, {
             transports: ['websocket'],
         });
-        this.gameClient = new GameClient(this.$refs.canvas as HTMLCanvasElement);
+        this.gameClient = new GameClient(canvas);
         this.gameClientSocket = new GameClientSocket(this.socket, this.gameClient);
 
         window.addEventListener('resize', this.onWindowResize);
-
         window.addEventListener('keydown', this.onKeyboardEvent);
         window.addEventListener('keyup', this.onKeyboardEvent);
+        window.addEventListener('contextmenu', (e: Event) => e.preventDefault());
     }
 
     onKeyboardEvent(event: KeyboardEvent): void {
