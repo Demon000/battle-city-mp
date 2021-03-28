@@ -1,4 +1,5 @@
 import { Direction } from '@/physics/Direction';
+import now from 'performance-now';
 import GameObject from './GameObject';
 import { GameObjectType, GameShortObjectType } from './GameObjectType';
 import IGameObjectProperties, { ISprite, ISpriteSet } from './IGameObjectProperties';
@@ -97,58 +98,58 @@ const properties: IGameObjectProperties[] = [
         directionAxisSnapping: 4,
         sets: [
             {
-                duration: 1000,
+                duration: 100,
                 direction: Direction.UP,
                 steps: [
                     {
                         filename: 'tank_tier_1_up_frame_1.png',
-                        duration: 500,
+                        duration: 50,
                     },
                     {
                         filename: 'tank_tier_1_up_frame_2.png',
-                        duration: 500,
+                        duration: 50,
                     },
                 ],
             },
             {
-                duration: 1000,
+                duration: 100,
                 direction: Direction.RIGHT,
                 steps: [
                     {
                         filename: 'tank_tier_1_right_frame_1.png',
-                        duration: 500,
+                        duration: 50,
                     },
                     {
                         filename: 'tank_tier_1_right_frame_2.png',
-                        duration: 500,
+                        duration: 50,
                     },
                 ],
             },
             {
-                duration: 1000,
+                duration: 100,
                 direction: Direction.DOWN,
                 steps: [
                     {
                         filename: 'tank_tier_1_down_frame_1.png',
-                        duration: 500,
+                        duration: 50,
                     },
                     {
                         filename: 'tank_tier_1_down_frame_2.png',
-                        duration: 500,
+                        duration: 50,
                     },
                 ],
             },
             {
-                duration: 1000,
+                duration: 100,
                 direction: Direction.LEFT,
                 steps: [
                     {
                         filename: 'tank_tier_1_left_frame_1.png',
-                        duration: 500,
+                        duration: 50,
                     },
                     {
                         filename: 'tank_tier_1_left_frame_2.png',
-                        duration: 500,
+                        duration: 50,
                     },
                 ],
             },
@@ -255,6 +256,36 @@ export default class GameObjectProperties {
         }
 
         return matchingSets;
+    }
+
+    static findAnimationSprite(object: GameObject, set?: ISpriteSet): ISprite | undefined {
+        if (set === undefined) {
+            set = this.findSpriteSets(object)[0];
+        }
+
+        if (set === undefined) {
+            return undefined;
+        }
+
+        if (set.duration === undefined) {
+            return set.steps[0];
+        }
+
+        const currentAnimationTime = (now() - object.spawnTime) % set.duration;
+        let iterationAnimationTime = 0;
+        for (const step of set.steps) {
+            if (step.duration === undefined) {
+                return step;
+            }
+
+            if (currentAnimationTime < iterationAnimationTime + step.duration) {
+                return step;
+            }
+
+            iterationAnimationTime += step.duration;
+        }
+
+        return undefined;
     }
 
     static findSprite(object: GameObject): ISprite | undefined {

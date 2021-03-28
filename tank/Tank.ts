@@ -1,3 +1,5 @@
+import GameObjectProperties from '@/object/GameObjectProperties';
+import { ISprite } from '@/object/IGameObjectProperties';
 import GameObject, { GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
@@ -65,5 +67,13 @@ export default class Tank extends GameObject {
 
     get maxBullets(): number {
         return tierToMaxBulletsMap[this.tier];
+    }
+
+    get sprite(): ISprite | undefined {
+        if (this.requestedSpeed) {
+            return GameObjectProperties.findAnimationSprite(this);
+        } else {
+            return GameObjectProperties.findSprite(this);
+        }
     }
 }
