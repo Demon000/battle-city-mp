@@ -147,10 +147,10 @@ export default class CollisionService {
 
     validateObjectDirection(objectId: number, direction: Direction): void {
         const gameObject = this.gameObjectRepository.get(objectId);
-        if (gameObject.properties.oppositeDirectionSwitchSnapping !== undefined &&
+        if (gameObject.properties.directionAxisSnapping !== undefined &&
                 !DirectionUtils.isSameAxis(gameObject.direction, direction)) {
-            const snappedX = this.calculateSnappedCoordinates(gameObject.position.x, gameObject.properties.oppositeDirectionSwitchSnapping);
-            const snappedY = this.calculateSnappedCoordinates(gameObject.position.y, gameObject.properties.oppositeDirectionSwitchSnapping);
+            const snappedX = this.calculateSnappedCoordinates(gameObject.position.x, gameObject.properties.directionAxisSnapping);
+            const snappedY = this.calculateSnappedCoordinates(gameObject.position.y, gameObject.properties.directionAxisSnapping);
 
             this.validateObjectMovement(objectId, {
                 x: snappedX,
