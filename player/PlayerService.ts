@@ -12,7 +12,6 @@ export enum PlayerServiceEvent {
     PLAYER_MOVING = 'player-moving',
     PLAYER_NOT_MOVING = 'player-not-moving',
     PLAYER_SHOOTING = 'player-shooting',
-    PLAYER_NOT_SHOOTING = 'player-not-shooting',
 
     PLAYER_SPAWN_TANK_REQUESTED = 'player-spawn-tank-requested',
     PLAYER_DESPAWN_TANK_REQUESTED = 'player-despawn-tank-requested',
@@ -172,8 +171,6 @@ export default class PlayerService {
         const isShooting = this.isPlayerShooting(player);
         if (isShooting) {
             this.emitter.emit(PlayerServiceEvent.PLAYER_SHOOTING, player.id);
-        } else {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_NOT_SHOOTING, player.id);
         }
     }
 
