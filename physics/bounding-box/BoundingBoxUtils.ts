@@ -15,7 +15,7 @@ export default class BoundingBoxUtils {
     }
 
     static overlaps(first: BoundingBox, second: BoundingBox, tolernace = 0): boolean {
-        return first.tl.x - second.br.x <= -tolernace && first.br.x - second.tl.x >= tolernace &&
-                first.tl.y - second.br.y <= -tolernace && first.br.y - second.tl.y >= tolernace;
+        return first.tl.x - second.br.x < -tolernace && first.br.x - second.tl.x > tolernace &&
+                first.tl.y - second.br.y < -tolernace && first.br.y - second.tl.y > tolernace;
     }
 }
