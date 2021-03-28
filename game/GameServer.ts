@@ -184,7 +184,6 @@ export default class GameServer {
          */
         this.bulletService.emitter.on(BulletServiceEvent.TANK_BULLET_SPAWNED,
             (tankId: number, bullet: GameObject) => {
-                console.log(bullet);
                 this.gameObjectService.registerObject(bullet);
             });
 
