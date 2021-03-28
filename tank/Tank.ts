@@ -5,14 +5,14 @@ import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
 
 const tierToSpeedMap = {
-    [TankTier.PLAYER_TIER_1]: 16,
+    [TankTier.PLAYER_TIER_1]: 32,
     [TankTier.PLAYER_TIER_2]: 24,
     [TankTier.PLAYER_TIER_3]: 24,
     [TankTier.PLAYER_TIER_4]: 24,
 };
 
 const tierToBulletSpeedMap = {
-    [TankTier.PLAYER_TIER_1]: 24,
+    [TankTier.PLAYER_TIER_1]: 64,
     [TankTier.PLAYER_TIER_2]: 32,
     [TankTier.PLAYER_TIER_3]: 32,
     [TankTier.PLAYER_TIER_4]: 48,
