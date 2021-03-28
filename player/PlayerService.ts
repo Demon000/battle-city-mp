@@ -170,6 +170,12 @@ export default class PlayerService {
 
     private processPlayerShooting(player: Player): void {
         const isShooting = this.isPlayerShooting(player);
+        if (isShooting === player.lastIsShooting) {
+            return;
+        }
+
+        player.lastIsShooting = isShooting;
+
         if (isShooting) {
             this.emitter.emit(PlayerServiceEvent.PLAYER_SHOOTING, player.id);
         } else {
