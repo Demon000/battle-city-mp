@@ -11,7 +11,6 @@ export interface GameObjectOptions {
     type?: GameObjectType;
     position: Point;
     direction?: Direction;
-    requestedDirection?: Direction;
     requestedSpeed?: number;
     spawnTime?: number;
 }
@@ -23,7 +22,6 @@ export default class GameObject {
     type: GameObjectType;
     position: Point;
     direction: Direction;
-    requestedDirection: Direction;
     requestedSpeed: number;
     spawnTime: number;
 
@@ -31,7 +29,6 @@ export default class GameObject {
         this.id = options.id ?? GameObject.globalId++;
         this.type = options.type ?? GameObjectType.ANY;
         this.direction = options.direction ?? Direction.UP;
-        this.requestedDirection = options.requestedDirection ?? Direction.UP;
         this.requestedSpeed = options.requestedSpeed ?? 0;
         this.position = options.position;
         this.spawnTime = options.spawnTime ?? now();
@@ -43,7 +40,6 @@ export default class GameObject {
             type: this.type,
             position: this.position,
             direction: this.direction,
-            requestedDirection: this.requestedDirection,
             requestedSpeed: this.requestedSpeed,
             spawnTime: this.spawnTime,
         };
@@ -52,7 +48,6 @@ export default class GameObject {
     setOptions(other: GameObject): void {
         this.position = other.position;
         this.direction = other.direction;
-        this.requestedDirection = other.requestedDirection;
         this.requestedSpeed = other.requestedSpeed;
         this.spawnTime = other.spawnTime;
     }

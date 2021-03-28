@@ -121,7 +121,6 @@ export default class GameServer {
     }
 
     onObjectRequestedDirection(objectId: number, direction: Direction): void {
-        this.gameObjectService.setObjectRequestedDirection(objectId, direction);
         this.collisionService.validateObjectDirection(objectId, direction);
     }
 
