@@ -27,6 +27,11 @@
       "dom",
       "dom.iterable",
       "scripthost"
+    ],
+    "plugins": [
+      {
+        "transform": "typescript-transform-paths"
+      }
     ]
   },
   "include": [
