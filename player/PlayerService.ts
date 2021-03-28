@@ -9,13 +9,9 @@ export enum PlayerServiceEvent {
     PLAYER_CHANGED = 'player-changed',
     PLAYER_REMOVED = 'player-removed',
 
-    PLAYER_MOVING = 'player-moving',
-    PLAYER_NOT_MOVING = 'player-not-moving',
-    PLAYER_SHOOTING = 'player-shooting',
-    PLAYER_NOT_SHOOTING = 'player-not-shooting',
-
-    PLAYER_SPAWN_TANK_REQUESTED = 'player-spawn-tank-requested',
-    PLAYER_DESPAWN_TANK_REQUESTED = 'player-despawn-tank-requested',
+    PLAYER_REQUESTED_MOVE = 'player-requested-move',
+    PLAYER_REQUESTED_SHOOT = 'player-requested-shoot',
+    PLAYER_REQUESTED_SPAWN_STATUS = 'player-requested-spawn-status',
 
     PLAYER_REQUESTED_GAME_OBJECTS = 'player-requested-game-objects',
     PLAYER_REQUESTED_PLAYERS = 'player-requested-players',
@@ -138,13 +134,12 @@ export default class PlayerService {
             return;
         }
 
-        if (player.requestedSpawnStatus === PlayerSpawnStatus.SPAWN && player.tankId === undefined) {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_SPAWN_TANK_REQUESTED, player.id);
-        } else if (player.requestedSpawnStatus === PlayerSpawnStatus.DESPAWN && player.tankId !== undefined) {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_DESPAWN_TANK_REQUESTED, player.id, player.tankId);
-        }
-
         player.spawnStatus = player.requestedSpawnStatus;
+
+        if ((player.requestedSpawnStatus === PlayerSpawnStatus.SPAWN && player.tankId === undefined)
+            || (player.requestedSpawnStatus === PlayerSpawnStatus.DESPAWN && player.tankId !== undefined)) {
+            this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_SPAWN_STATUS, player.id, player.requestedSpawnStatus);
+        }
     }
 
     private processPlayerDisconnectStatus(player: Player): boolean {
@@ -164,12 +159,7 @@ export default class PlayerService {
         }
 
         player.lastRequestedDirection = direction;
-
-        if (direction === undefined) {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_NOT_MOVING, player.id);
-        } else {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_MOVING, player.id, direction);
-        }
+        this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_MOVE, player.id, direction);
     }
 
     private processPlayerShooting(player: Player): void {
@@ -179,12 +169,7 @@ export default class PlayerService {
         }
 
         player.lastIsShooting = isShooting;
-
-        if (isShooting) {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_SHOOTING, player.id);
-        } else {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_NOT_SHOOTING, player.id);
-        }
+        this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_SHOOT, player.id, isShooting);
     }
 
     private processPlayerGameObjectRequest(player: Player): void {

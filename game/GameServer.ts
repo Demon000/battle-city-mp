@@ -79,48 +79,51 @@ export default class GameServer {
                 this.emitter.emit(GameEvent.PLAYER_REMOVED, playerId);
             });
 
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_SHOOTING,
-            (playerId: string) => {
+        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_SHOOT,
+            (playerId: string, isShooting: boolean) => {
                 // spawn bullet using tank position
                 console.log('player shooting ' + playerId);
             });
 
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_MOVING,
+        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_MOVE,
             (playerId: string, direction: Direction) => {
-                const tankId = this.playerService.getPlayerTankId(playerId);
-                if (tankId === undefined) {
+                const player = this.playerService.getPlayer(playerId);
+                if (player.tankId === undefined) {
                     return;
                 }
 
-                this.gameObjectService.processObjectDirection(tankId, direction);
-                this.gameObjectService.setObjectMoving(tankId, true);
-            });
-
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_NOT_MOVING,
-            (playerId: string) => {
-                const tankId = this.playerService.getPlayerTankId(playerId);
-                if (tankId === undefined) {
-                    return;
+                if (direction === undefined) {
+                    this.gameObjectService.setObjectMoving(player.tankId, false);
+                } else {
+                    this.gameObjectService.processObjectDirection(player.tankId, direction);
+                    this.gameObjectService.setObjectMoving(player.tankId, true);
                 }
-    
-                this.gameObjectService.setObjectMoving(tankId, false);
             });
 
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_SPAWN_TANK_REQUESTED,
-            (playerId: string) => {
-                const position = this.gameObjectService.getRandomSpawnPosition();
-                const tank = new Tank({
-                    position,
-                    playerId,
-                });
-                this.gameObjectService.registerObject(tank);
-                this.playerService.setPlayerTankId(playerId, tank.id);
-            });
+        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_SPAWN_STATUS,
+            (playerId: string, status: PlayerSpawnStatus) => {
+                const player = this.playerService.getPlayer(playerId);
 
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_DESPAWN_TANK_REQUESTED,
-            (playerId: string, tankId: number) => {
-                this.gameObjectService.unregisterObject(tankId);
-                this.playerService.setPlayerTankId(playerId, undefined);
+                if (status === PlayerSpawnStatus.SPAWN) {
+                    if (player.tankId !== undefined) {
+                        return;
+                    }
+
+                    const position = this.gameObjectService.getRandomSpawnPosition();
+                    const tank = new Tank({
+                        position,
+                        playerId,
+                    });
+                    this.gameObjectService.registerObject(tank);
+                    this.playerService.setPlayerTankId(playerId, tank.id);
+                } else {
+                    if (player.tankId === undefined) {
+                        return;
+                    }
+
+                    this.gameObjectService.unregisterObject(player.tankId);
+                    this.playerService.setPlayerTankId(playerId, undefined);
+                }
             });
 
         /**
