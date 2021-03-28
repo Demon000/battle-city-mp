@@ -94,4 +94,9 @@ export default class GameClient {
     onWindowResize(): void {
         this.gameRenderService.calculateDimensions();
     }
+
+    clear(): void {
+        this.gameObjectRepository.clear();
+        this.boundingBoxRepository.clear();
+    }
 }
