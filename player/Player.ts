@@ -1,3 +1,4 @@
+import { Direction } from '@/physics/Direction';
 import ButtonPressAction, { ButtonType } from '../actions/ButtonPressAction';
 
 export interface PlayerOptions {
@@ -13,6 +14,7 @@ export enum PlayerSpawnStatus {
 
 export default class Player {
     map = new Map<ButtonType, ButtonPressAction>();
+    lastRequestedDirection: Direction | undefined;
     requestedSpawnStatus = PlayerSpawnStatus.NONE;
     requestedGameObjects = false;
     requestedPlayers = false;

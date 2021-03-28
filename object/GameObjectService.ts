@@ -80,7 +80,12 @@ export default class GameObjectService {
 
     setObjectMoving(objectId: number, isMoving: boolean): void {
         const object = this.repository.get(objectId);
-        object.requestedSpeed = isMoving ? object.movementSpeed : 0;
+        const requestedSpeed = isMoving ? object.movementSpeed : 0;
+        if (object.requestedSpeed === requestedSpeed) {
+            return;
+        }
+
+        object.requestedSpeed = requestedSpeed;
         this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object);
     }
 
@@ -92,7 +97,7 @@ export default class GameObjectService {
 
     processObjectDirection(tankId: number, direction: Direction): void {
         const object = this.repository.get(tankId);
-        if (object.direction != direction) {
+        if (object.direction !== direction) {
             this.emitter.emit(GameObjectServiceEvent.OBJECT_REQUESTED_DIRECTION, object.id, direction);
         }
     }

@@ -162,7 +162,15 @@ export default class PlayerService {
     }
 
     processPlayerMovement(playerId: string): void {
+        const player = this.repository.get(playerId);
+
         const direction = this.getPlayerDominantMovementDirection(playerId);
+        if (direction === player.lastRequestedDirection) {
+            return;
+        }
+
+        player.lastRequestedDirection = direction;
+
         if (direction === undefined) {
             this.emitter.emit(PlayerServiceEvent.PLAYER_NOT_MOVING, playerId);
         } else {
