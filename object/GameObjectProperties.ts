@@ -98,58 +98,58 @@ const properties: IGameObjectProperties[] = [
         directionAxisSnapping: 4,
         sets: [
             {
-                duration: 100,
+                duration: 125,
                 direction: Direction.UP,
                 steps: [
                     {
                         filename: 'tank_tier_1_up_frame_1.png',
-                        duration: 50,
+                        duration: 62.5,
                     },
                     {
                         filename: 'tank_tier_1_up_frame_2.png',
-                        duration: 50,
+                        duration: 62.5,
                     },
                 ],
             },
             {
-                duration: 100,
+                duration: 125,
                 direction: Direction.RIGHT,
                 steps: [
                     {
                         filename: 'tank_tier_1_right_frame_1.png',
-                        duration: 50,
+                        duration: 62.5,
                     },
                     {
                         filename: 'tank_tier_1_right_frame_2.png',
-                        duration: 50,
+                        duration: 62.5,
                     },
                 ],
             },
             {
-                duration: 100,
+                duration: 125,
                 direction: Direction.DOWN,
                 steps: [
                     {
                         filename: 'tank_tier_1_down_frame_1.png',
-                        duration: 50,
+                        duration: 62.5,
                     },
                     {
                         filename: 'tank_tier_1_down_frame_2.png',
-                        duration: 50,
+                        duration: 62.5,
                     },
                 ],
             },
             {
-                duration: 100,
+                duration: 125,
                 direction: Direction.LEFT,
                 steps: [
                     {
                         filename: 'tank_tier_1_left_frame_1.png',
-                        duration: 50,
+                        duration: 62.5,
                     },
                     {
                         filename: 'tank_tier_1_left_frame_2.png',
-                        duration: 50,
+                        duration: 62.5,
                     },
                 ],
             },
