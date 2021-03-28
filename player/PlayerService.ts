@@ -29,10 +29,6 @@ export default class PlayerService {
         this.repository = repository;
     }
 
-    getPlayer(playerId: string): Player {
-        return this.repository.get(playerId);
-    }
-
     getPlayers(): Player[] {
         return this.repository.getAll();
     }
