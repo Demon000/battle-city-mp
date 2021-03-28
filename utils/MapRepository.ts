@@ -38,4 +38,8 @@ export default class MapRepository<K, V> {
     remove(key: K): void {
         this.map.delete(key);
     }
+
+    clear(): void {
+        this.map.clear();
+    }
 }
