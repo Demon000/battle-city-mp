@@ -97,8 +97,7 @@ export default class PlayerService {
         player.map.set(action.buttonType, action);
     }
     
-    getPlayerDominantMovementDirection(playerId: string): Direction | undefined {
-        const player = this.repository.get(playerId);
+    getPlayerDominantMovementDirection(player: Player): Direction | undefined {
         let actions: ButtonPressAction[] = [];
 
         for (const buttonType of MOVE_BUTTON_TYPES) {
@@ -121,8 +120,7 @@ export default class PlayerService {
         return BUTTON_TYPE_DIRECTION[actions[0].buttonType];
     }
 
-    isPlayerShooting(playerId: string): boolean {
-        const player = this.repository.get(playerId);
+    isPlayerShooting(player: Player): boolean {
         const action = player.map.get(ButtonType.SHOOT);
         if (!action) {
             return false;
@@ -131,14 +129,13 @@ export default class PlayerService {
         return action.buttonState === ButtonState.PRESSED;
     }
 
-    processPlayerSpawnStatus(playerId: string): void {
-        const player = this.repository.get(playerId);
+    processPlayerSpawnStatus(player: Player): void {
         if (player.requestedSpawnStatus === player.spawnStatus) {
             return;
         }
 
         if (player.requestedSpawnStatus === PlayerSpawnStatus.SPAWN && player.tankId === undefined) {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_SPAWN_TANK_REQUESTED, playerId);
+            this.emitter.emit(PlayerServiceEvent.PLAYER_SPAWN_TANK_REQUESTED, player.id);
         } else if (player.requestedSpawnStatus === PlayerSpawnStatus.DESPAWN && player.tankId !== undefined) {
             this.emitter.emit(PlayerServiceEvent.PLAYER_DESPAWN_TANK_REQUESTED, player.id, player.tankId);
         }
@@ -146,21 +143,18 @@ export default class PlayerService {
         player.spawnStatus = player.requestedSpawnStatus;
     }
 
-    processPlayerDisconnectStatus(playerId: string): boolean {
-        const player = this.repository.get(playerId);
+    processPlayerDisconnectStatus(player: Player): boolean {
         if (!player.disconnected) {
             return false;
         }
 
-        this.repository.remove(playerId);
-        this.emitter.emit(PlayerServiceEvent.PLAYER_REMOVED, playerId);
+        this.repository.remove(player.id);
+        this.emitter.emit(PlayerServiceEvent.PLAYER_REMOVED, player.id);
         return true;
     }
 
-    processPlayerMovement(playerId: string): void {
-        const player = this.repository.get(playerId);
-
-        const direction = this.getPlayerDominantMovementDirection(playerId);
+    processPlayerMovement(player: Player): void {
+        const direction = this.getPlayerDominantMovementDirection(player);
         if (direction === player.lastRequestedDirection) {
             return;
         }
@@ -168,33 +162,31 @@ export default class PlayerService {
         player.lastRequestedDirection = direction;
 
         if (direction === undefined) {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_NOT_MOVING, playerId);
+            this.emitter.emit(PlayerServiceEvent.PLAYER_NOT_MOVING, player.id);
         } else {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_MOVING, playerId, direction);
+            this.emitter.emit(PlayerServiceEvent.PLAYER_MOVING, player.id, direction);
         }
     }
 
-    processPlayerShooting(playerId: string): void {
-        const isShooting = this.isPlayerShooting(playerId);
+    processPlayerShooting(player: Player): void {
+        const isShooting = this.isPlayerShooting(player);
         if (isShooting) {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_SHOOTING, playerId);
+            this.emitter.emit(PlayerServiceEvent.PLAYER_SHOOTING, player.id);
         } else {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_NOT_SHOOTING, playerId);
+            this.emitter.emit(PlayerServiceEvent.PLAYER_NOT_SHOOTING, player.id);
         }
     }
 
-    processPlayerGameObjectRequest(playerId: string): void {
-        const player = this.repository.get(playerId);
+    processPlayerGameObjectRequest(player: Player): void {
         if (player.requestedGameObjects) {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_GAME_OBJECTS, playerId);
+            this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_GAME_OBJECTS, player.id);
         }
         player.requestedGameObjects = false;
     }
 
-    processPlayerPlayersRequest(playerId: string): void {
-        const player = this.repository.get(playerId);
+    processPlayerPlayersRequest(player: Player): void {
         if (player.requestedPlayers) {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_PLAYERS, playerId);
+            this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_PLAYERS, player.id);
         }
         player.requestedPlayers = false;
     }
@@ -202,16 +194,16 @@ export default class PlayerService {
     processPlayerStatus(): void {
         const players = this.repository.getAll();
         for (const player of players) {
-            this.processPlayerSpawnStatus(player.id);
-            const disconnected = this.processPlayerDisconnectStatus(player.id);
+            this.processPlayerSpawnStatus(player);
+            const disconnected = this.processPlayerDisconnectStatus(player);
             if (disconnected) {
                 continue;
             }
 
-            this.processPlayerGameObjectRequest(player.id);
-            this.processPlayerPlayersRequest(player.id);
-            this.processPlayerMovement(player.id);
-            this.processPlayerShooting(player.id);
+            this.processPlayerGameObjectRequest(player);
+            this.processPlayerPlayersRequest(player);
+            this.processPlayerMovement(player);
+            this.processPlayerShooting(player);
         }
     }
 
