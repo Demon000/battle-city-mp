@@ -198,11 +198,11 @@ export default class GameServer {
     }
 
     onPlayerRequestedGameObjectsFromClient(playerId: string): void {
-        this.playerService.requestPlayerGameObjects(playerId);
+        this.playerService.setPlayerRequestedGameObjects(playerId);
     }
 
     onPlayerRequestedPlayersFromClient(playerId: string): void {
-        this.playerService.requestPlayerPlayers(playerId);
+        this.playerService.setPlayerRequestedPlayers(playerId);
     }
 
     onPlayerActionFromClient(playerId: string, action: Action): void {
@@ -216,11 +216,11 @@ export default class GameServer {
     }
 
     onPlayerRequestSpawnStatusFromClient(playerId: string): void {
-        this.playerService.requestPlayerSpawnStatus(playerId, PlayerSpawnStatus.SPAWN);
+        this.playerService.setPlayerRequestedSpawnStatus(playerId, PlayerSpawnStatus.SPAWN);
     }
 
     onPlayerDisconnectedFromClient(playerId: string): void {
-        this.playerService.requestPlayerSpawnStatus(playerId, PlayerSpawnStatus.DESPAWN);
-        this.playerService.requestPlayerDisconnect(playerId);
+        this.playerService.setPlayerRequestedSpawnStatus(playerId, PlayerSpawnStatus.DESPAWN);
+        this.playerService.setPlayerRequestedDisconnect(playerId);
     }
 }

@@ -72,22 +72,22 @@ export default class PlayerService {
         return player.tankId;
     }
 
-    requestPlayerSpawnStatus(playerId: string, spawnStatus: PlayerSpawnStatus): void {
+    setPlayerRequestedSpawnStatus(playerId: string, spawnStatus: PlayerSpawnStatus): void {
         const player = this.repository.get(playerId);
         player.requestedSpawnStatus = spawnStatus;
     }
 
-    requestPlayerDisconnect(playerId: string): void {
+    setPlayerRequestedDisconnect(playerId: string): void {
         const player = this.repository.get(playerId);
         player.disconnected = true;
     }
 
-    requestPlayerGameObjects(playerId: string): void {
+    setPlayerRequestedGameObjects(playerId: string): void {
         const player = this.repository.get(playerId);
         player.requestedGameObjects = true;
     }
 
-    requestPlayerPlayers(playerId: string): void {
+    setPlayerRequestedPlayers(playerId: string): void {
         const player = this.repository.get(playerId);
         player.requestedPlayers = true;
     }
