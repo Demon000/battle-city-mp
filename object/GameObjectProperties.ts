@@ -270,7 +270,7 @@ export default class GameObjectProperties {
             return set.steps[0];
         }
 
-        const currentAnimationTime = Date.now() % set.duration;
+        const currentAnimationTime = (Date.now() - object.spawnTime) % set.duration;
         let iterationAnimationTime = 0;
         for (const step of set.steps) {
             if (step.duration === undefined) {
