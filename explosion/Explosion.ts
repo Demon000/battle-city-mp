@@ -1,7 +1,7 @@
 import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import GameObjectProperties from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
-import { ISprite } from '@/object/IGameObjectProperties';
+import { ISprite, ISpriteSet } from '@/object/IGameObjectProperties';
 import { ExplosionType } from './ExplosionType';
 
 export interface ExplosionOptions extends GameObjectOptions {
@@ -22,15 +22,29 @@ export default class Explosion extends GameObject {
         this.destroyedObjectType = options.destroyedObjectType;
     }
 
-    get sprite(): ISprite | undefined {
+    get spriteSet(): ISpriteSet | undefined {
         const sets = GameObjectProperties.findSpriteSets(this);
         for (const set of sets) {
             if (set.meta?.explosionType === this.explosionType) {
-                return GameObjectProperties.findAnimationSprite(this, set);
+                return set;
             }
         }
 
         return undefined;
+    }
+
+    get sprite(): ISprite | undefined {
+        const set = this.spriteSet;
+        if (set === undefined) {
+            return undefined;
+        }
+
+        return GameObjectProperties.findAnimationSprite(this, set);
+    }
+
+    get automaticDestroyTime(): number | undefined {
+        const set = this.spriteSet;
+        return set?.duration;
     }
 
     toOptions(): ExplosionOptions {

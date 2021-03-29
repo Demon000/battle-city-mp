@@ -222,7 +222,6 @@ const properties: IGameObjectProperties[] = [
         type: GameObjectType.EXPLOSION,
         width: 0,
         height: 0,
-        automaticDestroyTime: 1000,
         spriteSets: [
             {
                 duration: 180,

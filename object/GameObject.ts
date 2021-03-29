@@ -77,6 +77,10 @@ export default class GameObject {
         return GameObjectProperties.findAudioEffect(this);
     }
 
+    get automaticDestroyTime(): number | undefined {
+        return this.properties.automaticDestroyTime;
+    }
+
     getBoundingBox(position=this.position): BoundingBox {
         return {
             tl: position,
