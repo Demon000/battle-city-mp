@@ -8,7 +8,7 @@ export const rules: ICollisionRule[] = [
             GameObjectType.BRICK_WALL,
             GameObjectType.STEEL_WALL,
             GameObjectType.LEVEL_BORDER,
-            GameObjectType.TANK
+            GameObjectType.TANK,
         ],
         result: [
             {

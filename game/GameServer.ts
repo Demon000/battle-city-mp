@@ -1,3 +1,4 @@
+import Bullet from '@/bullet/Bullet';
 import BulletService, { BulletServiceEvent } from '@/bullet/BulletService';
 import { Direction } from '@/physics/Direction';
 import Tank from '@/tank/Tank';
@@ -183,14 +184,22 @@ export default class GameServer {
         /**
          * BulletService event handlers
          */
-        this.bulletService.emitter.on(BulletServiceEvent.TANK_BULLET_SPAWNED,
-            (tankId: number, bullet: GameObject) => {
+        this.bulletService.emitter.on(BulletServiceEvent.BULLET_SPAWNED,
+            (bullet: Bullet) => {
                 this.gameObjectService.registerObject(bullet);
+                this.tankService.addTankBullet(bullet.tankId, bullet.id);
+                this.tankService.setTankLastBulletShotTime(bullet.tankId, bullet.spawnTime);
             });
 
         /**
          * CollisionService event handlers
          */
+        const destroyBullet = (bulletId: number) => {
+            const bullet = this.bulletService.getBullet(bulletId);
+            this.gameObjectService.setObjectDestroyed(bulletId);
+            this.tankService.removeTankBullet(bullet.tankId, bulletId);
+        };
+
         this.collisionService.emitter.on(CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED,
             (objectId: number, direction: Direction) => {
                 this.gameObjectService.setObjectDirection(objectId, direction);
@@ -203,12 +212,12 @@ export default class GameServer {
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_LEVEL_BORDER,
             (movingObjectId: number, position: Point, staticObjectId: number) => {
-                this.gameObjectService.setObjectDestroyed(movingObjectId);
+                destroyBullet(movingObjectId);
             });
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_WALL,
             (movingObjectId: number, position: Point, staticObjectId: number) => {
-                this.gameObjectService.setObjectDestroyed(movingObjectId);
+                destroyBullet(movingObjectId);
                 this.gameObjectService.setObjectDestroyed(staticObjectId);
             });
 
@@ -219,8 +228,8 @@ export default class GameServer {
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_BULLET,
             (movingObjectId: number, position: Point, staticObjectId: number) => {
-                this.gameObjectService.setObjectDestroyed(movingObjectId);
-                this.gameObjectService.setObjectDestroyed(staticObjectId);
+                destroyBullet(movingObjectId);
+                destroyBullet(staticObjectId);
             });
 
         /**

@@ -25,16 +25,27 @@ const tierToMaxBulletsMap = {
     [TankTier.PLAYER_TIER_4]: 2,
 };
 
+const tierToBulletCooldownMap = {
+    [TankTier.PLAYER_TIER_1]: 250,
+    [TankTier.PLAYER_TIER_2]: 250,
+    [TankTier.PLAYER_TIER_3]: 250,
+    [TankTier.PLAYER_TIER_4]: 250,
+};
+
 export interface TankOptions extends GameObjectOptions {
     tier?: TankTier;
     playerId?: string;
     isShooting?: boolean;
+    lastBulletShotTime?: number;
+    bulletIds?: number[];
 }
 
 export default class Tank extends GameObject {
     tier: TankTier;
     playerId?: string;
     isShooting: boolean;
+    lastBulletShotTime: number;
+    bulletIds: number[];
 
     constructor(options: TankOptions) {
         options.type = GameObjectType.TANK;
@@ -44,6 +55,8 @@ export default class Tank extends GameObject {
         this.tier = options.tier ?? TankTier.PLAYER_TIER_1;
         this.playerId = options.playerId;
         this.isShooting = options.isShooting ?? false;
+        this.lastBulletShotTime = options.lastBulletShotTime ?? 0;
+        this.bulletIds = options.bulletIds ?? new Array<number>();
     }
 
     toOptions(): TankOptions {
@@ -51,6 +64,8 @@ export default class Tank extends GameObject {
         return Object.assign(gameObjectOptiions, {
             tier: this.tier,
             playerId: this.playerId,
+            lastBulletShotTime: this.lastBulletShotTime,
+            bulletIds: this.bulletIds,
         });
     }
 
@@ -58,6 +73,8 @@ export default class Tank extends GameObject {
         super.setOptions(other);
         this.tier = other.tier;
         this.playerId = other.playerId;
+        this.lastBulletShotTime = other.lastBulletShotTime;
+        this.bulletIds = other.bulletIds;
     }
 
     get movementSpeed(): number {
@@ -70,6 +87,10 @@ export default class Tank extends GameObject {
 
     get maxBullets(): number {
         return tierToMaxBulletsMap[this.tier];
+    }
+
+    get bulletCooldown(): number {
+        return tierToBulletCooldownMap[this.tier];
     }
 
     get sprite(): ISprite | undefined {

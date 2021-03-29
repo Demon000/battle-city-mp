@@ -38,8 +38,31 @@ export default class TankService {
         return object as Tank;
     }
 
-    processTankShooting(tank: Tank): void {
-        if (!tank.isShooting) {
+    addTankBullet(tankId: number, bulletId: number): void {
+        const tank = this.getTank(tankId);
+        tank.bulletIds.push(bulletId);
+    }
+
+    removeTankBullet(tankId: number, bulletId: number): void {
+        const tank = this.getTank(tankId);
+        const bulletIndex = tank.bulletIds.findIndex(b => b === bulletId);
+        tank.bulletIds.splice(bulletIndex, 1);
+    }
+
+    private canTankSpawnBullet(tank: Tank): boolean {
+        if (tank.bulletIds.length >= tank.maxBullets) {
+            return false;
+        }
+
+        if (Date.now() - tank.lastBulletShotTime < tank.bulletCooldown) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private processTankShooting(tank: Tank): void {
+        if (!tank.isShooting || !this.canTankSpawnBullet(tank)) {
             return;
         }
 
@@ -57,5 +80,10 @@ export default class TankService {
     setTankShooting(tankId: number, isShooting: boolean): void {
         const tank = this.getTank(tankId);
         tank.isShooting = isShooting;
+    }
+
+    setTankLastBulletShotTime(tankId: number, lastBulletShotTime: number): void {
+        const tank = this.getTank(tankId);
+        tank.lastBulletShotTime = lastBulletShotTime;
     }
 }

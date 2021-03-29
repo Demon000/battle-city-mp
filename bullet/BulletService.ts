@@ -5,9 +5,10 @@ import { Direction } from '@/physics/Direction';
 import Tank from '@/tank/Tank';
 import MapRepository from '@/utils/MapRepository';
 import { EventEmitter } from 'eventemitter3';
+import Bullet from './Bullet';
 
 export enum BulletServiceEvent {
-    TANK_BULLET_SPAWNED = 'tank-bullet-spawned',
+    BULLET_SPAWNED = 'bullet-spawned',
 }
 
 export default class BulletService {
@@ -16,6 +17,15 @@ export default class BulletService {
 
     constructor(repository: MapRepository<number, GameObject>) {
         this.repository = repository;
+    }
+
+    getBullet(bulletId: number): Bullet {
+        const object = this.repository.get(bulletId);
+        if (object.type !== GameObjectType.BULLET) {
+            throw new Error('Game object type is not bullet');
+        }
+
+        return object as Bullet;
     }
 
     spawnBulletForTank(tank: Tank): void {
@@ -46,7 +56,7 @@ export default class BulletService {
                 throw new Error('Invalid direction');
         }
 
-        const bullet = new GameObject({
+        const bullet = new Bullet({
             type: GameObjectType.BULLET,
             direction: tank.direction,
             position: {
@@ -54,8 +64,9 @@ export default class BulletService {
                 x: bulletX,
             },
             requestedSpeed: tank.bulletSpeed,
+            tankId: tank.id,
         });
 
-        this.emitter.emit(BulletServiceEvent.TANK_BULLET_SPAWNED, tank.id, bullet);
+        this.emitter.emit(BulletServiceEvent.BULLET_SPAWNED, bullet);
     }
 }
