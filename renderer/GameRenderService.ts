@@ -57,13 +57,34 @@ export default class GameRenderService {
                 continue;
             }
 
-            const objectGameRelativeX = object.position.x - canvasX;
-            const objectGameRelativeY = object.position.y - canvasY;
+            let objectRelativeX = object.position.x - canvasX;
+            if (sprite.offset !== undefined) {
+                objectRelativeX += sprite.offset.x;
+            }
 
-            const objectRenderX = objectGameRelativeX * this.gameToRenderSizeScale;
-            const objectRenderY = objectGameRelativeY * this.gameToRenderSizeScale;
-            const objectRenderWidth = object.properties.width * this.gameToRenderSizeScale;
-            const objectRenderHeight = object.properties.height * this.gameToRenderSizeScale;
+            let objectRelativeY = object.position.y - canvasY;
+            if (sprite.offset !== undefined) {
+                objectRelativeY += sprite.offset.y;
+            }
+
+            let objectWidth;
+            if (sprite.width === undefined) {
+                objectWidth = object.properties.width;
+            } else {
+                objectWidth = sprite.width;
+            }
+
+            let objectHeight;
+            if (sprite.height === undefined) {
+                objectHeight = object.properties.height;
+            } else {
+                objectHeight = sprite.height;
+            }
+
+            const objectRenderX = objectRelativeX * this.gameToRenderSizeScale;
+            const objectRenderY = objectRelativeY * this.gameToRenderSizeScale;
+            const objectRenderWidth = objectWidth * this.gameToRenderSizeScale;
+            const objectRenderHeight = objectHeight * this.gameToRenderSizeScale;
 
             this.context.drawImage(sprite.image, objectRenderX, objectRenderY, objectRenderWidth, objectRenderHeight);
         }

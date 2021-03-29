@@ -1,3 +1,4 @@
+import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
 import GameObject from './GameObject';
 import { GameObjectType, GameShortObjectType } from './GameObjectType';
@@ -193,6 +194,102 @@ const properties: IGameObjectProperties[] = [
             },
         ],
     },
+    {
+        type: GameObjectType.EXPLOSION,
+        width: 0,
+        height: 0,
+        automaticDestroyTime: 1000,
+        sets: [
+            {
+                duration: 180,
+                once: true,
+                meta: {
+                    explosionType: ExplosionType.SMALL,
+                },
+                steps: [
+                    {
+                        filename: 'explosion_small_frame_1.png',
+                        duration: 60,
+                        offset: {
+                            y: -8,
+                            x: -8,
+                        },
+                        width: 16,
+                        height: 16,
+                    },
+                    {
+                        filename: 'explosion_small_frame_2.png',
+                        duration: 60,
+                        offset: {
+                            y: -8,
+                            x: -8,
+                        },
+                        width: 16,
+                        height: 16,
+                    },
+                    {
+                        filename: 'explosion_small_frame_3.png',
+                        duration: 60,
+                        offset: {
+                            y: -8,
+                            x: -8,
+                        },
+                        width: 16,
+                        height: 16,
+                    },
+                ],
+            },
+            {
+                duration: 240,
+                once: true,
+                meta: {
+                    explosionType: ExplosionType.BIG,
+                },
+                steps: [
+                    {
+                        filename: 'explosion_small_frame_3.png',
+                        duration: 60,
+                        offset: {
+                            y: -8,
+                            x: -8,
+                        },
+                        width: 16,
+                        height: 16,
+                    },
+                    {
+                        filename: 'explosion_big_frame_1.png',
+                        duration: 60,
+                        offset: {
+                            y: -16,
+                            x: -16,
+                        },
+                        width: 32,
+                        height: 32,
+                    },
+                    {
+                        filename: 'explosion_big_frame_2.png',
+                        duration: 60,
+                        offset: {
+                            y: -16,
+                            x: -16,
+                        },
+                        width: 32,
+                        height: 32,
+                    },
+                    {
+                        filename: 'explosion_big_frame_1.png',
+                        duration: 60,
+                        offset: {
+                            y: -16,
+                            x: -16,
+                        },
+                        width: 32,
+                        height: 32,
+                    },
+                ],
+            },
+        ],
+    },
 ];
 
 const typePropertiesMap = new Map<string, IGameObjectProperties>();
@@ -270,7 +367,11 @@ export default class GameObjectProperties {
             return set.steps[0];
         }
 
-        const currentAnimationTime = (Date.now() - object.spawnTime) % set.duration;
+        let currentAnimationTime = (Date.now() - object.spawnTime);
+        if (!set.once) {
+            currentAnimationTime %= set.duration;
+        }
+
         let iterationAnimationTime = 0;
         for (const step of set.steps) {
             if (step.duration === undefined) {

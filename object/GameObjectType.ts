@@ -13,4 +13,5 @@ export enum GameObjectType {
     LEVEL_BORDER = 'level-border',
     TANK = 'tank',
     BULLET = 'bullet',
+    EXPLOSION = 'explosion',
 }

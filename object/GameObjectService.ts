@@ -134,8 +134,16 @@ export default class GameObjectService {
         this.emitter.emit(GameObjectServiceEvent.OBJECT_REQUESTED_POSITION, object.id, position);
     }
 
+    private isPastAutomaticDestroy(object: GameObject): boolean {
+        if (object.properties.automaticDestroyTime === undefined) {
+            return false;
+        }
+
+        return Date.now() - object.spawnTime > object.properties.automaticDestroyTime;
+    }
+
     private processObjectDestroy(object: GameObject): boolean {
-        if (object.destroyed) {
+        if (object.destroyed || this.isPastAutomaticDestroy(object)) {
             this.unregisterObject(object.id);
             return true;
         }

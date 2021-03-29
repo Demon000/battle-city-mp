@@ -1,4 +1,5 @@
 import Bullet, { BulletOptions } from '@/bullet/Bullet';
+import Explosion, { ExplosionOptions } from '@/explosion/Explosion';
 import Point from '../physics/point/Point';
 import Tank, { TankOptions } from '../tank/Tank';
 import GameObject, { GameObjectOptions } from './GameObject';
@@ -16,10 +17,13 @@ export default class GameObjectFactory {
     }
 
     static buildFromOptions(options: GameObjectOptions): GameObject {
+        console.log(options);
         if (options.type === GameObjectType.TANK) {
             return new Tank(options as TankOptions);
         } else if (options.type === GameObjectType.BULLET) {
             return new Bullet(options as BulletOptions);
+        } else if (options.type === GameObjectType.EXPLOSION) {
+            return new Explosion(options as ExplosionOptions);
         } else {
             return new GameObject(options);
         }
