@@ -13,7 +13,7 @@ export interface ISprite {
 export interface ISpriteSet {
     duration?: number;
     direction?: Direction;
-    once?: boolean;
+    loop?: boolean;
     position?: {
         mod: number,
         divide: number,

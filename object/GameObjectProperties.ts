@@ -226,7 +226,7 @@ const properties: IGameObjectProperties[] = [
         spriteSets: [
             {
                 duration: 180,
-                once: true,
+                loop: false,
                 meta: {
                     explosionType: ExplosionType.SMALL,
                 },
@@ -265,7 +265,7 @@ const properties: IGameObjectProperties[] = [
             },
             {
                 duration: 240,
-                once: true,
+                loop: false,
                 meta: {
                     explosionType: ExplosionType.BIG,
                 },
@@ -392,7 +392,7 @@ export default class GameObjectProperties {
         }
 
         let currentAnimationTime = (Date.now() - object.spawnTime);
-        if (!set.once) {
+        if (set.loop === undefined || set.loop === true) {
             currentAnimationTime %= set.duration;
         }
 
