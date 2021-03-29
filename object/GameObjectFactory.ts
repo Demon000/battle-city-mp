@@ -17,7 +17,6 @@ export default class GameObjectFactory {
     }
 
     static buildFromOptions(options: GameObjectOptions): GameObject {
-        console.log(options);
         if (options.type === GameObjectType.TANK) {
             return new Tank(options as TankOptions);
         } else if (options.type === GameObjectType.BULLET) {
