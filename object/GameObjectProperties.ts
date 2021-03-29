@@ -95,7 +95,7 @@ const properties: IGameObjectProperties[] = [
         type: GameObjectType.TANK,
         width: 16,
         height: 16,
-        directionAxisSnapping: 4,
+        directionAxisSnapping: 8,
         sets: [
             {
                 duration: 125,
