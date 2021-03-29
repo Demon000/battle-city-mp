@@ -1,7 +1,7 @@
 import Bullet from '@/bullet/Bullet';
 import BulletService, { BulletServiceEvent } from '@/bullet/BulletService';
 import Explosion from '@/explosion/Explosion';
-import { ExplosionType } from "@/explosion/ExplosionType";
+import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
 import Tank from '@/tank/Tank';
 import TankService, { TankServiceEvent } from '@/tank/TankService';
