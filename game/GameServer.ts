@@ -176,7 +176,8 @@ export default class GameServer {
          */
         this.tankService.emitter.on(TankServiceEvent.TANK_REQUESTED_BULLET_SPAWN,
             (tankId: number) => {
-                this.bulletService.spawnBulletForTank(tankId);
+                const tank = this.tankService.getTank(tankId);
+                this.bulletService.spawnBulletForTank(tank);
             });
 
         /**

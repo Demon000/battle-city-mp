@@ -29,6 +29,15 @@ export default class TankService {
         return tanks;
     }
 
+    getTank(tankId: number): Tank {
+        const object = this.repository.get(tankId);
+        if (object.type !== GameObjectType.TANK) {
+            throw new Error('Game object type is not tank');
+        }
+
+        return object as Tank;
+    }
+
     processTankShooting(tank: Tank): void {
         if (!tank.isShooting) {
             return;
@@ -46,12 +55,7 @@ export default class TankService {
     }
 
     setTankShooting(tankId: number, isShooting: boolean): void {
-        const object = this.repository.get(tankId);
-        if (object.type !== GameObjectType.TANK) {
-            throw new Error('Game object type is not tank');
-        }
-
-        const tank = object as Tank;
+        const tank = this.getTank(tankId);
         tank.isShooting = isShooting;
     }
 }

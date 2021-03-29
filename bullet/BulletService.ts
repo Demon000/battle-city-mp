@@ -18,21 +18,16 @@ export default class BulletService {
         this.repository = repository;
     }
 
-    spawnBulletForTank(tankId: number): void {
-        const object = this.repository.get(tankId);
-        if (object.type !== GameObjectType.TANK) {
-            throw new Error('Game object type is not tank');
-        }
-
-        const box = object.getBoundingBox();
-        const objectCenterPosition = object.centerPosition;
+    spawnBulletForTank(tank: Tank): void {
+        const box = tank.getBoundingBox();
+        const objectCenterPosition = tank.centerPosition;
         const properties = GameObjectProperties.getTypeProperties(GameObjectType.BULLET);
 
         let bulletY;
         let bulletX;
-        switch (object.direction) {
+        switch (tank.direction) {
             case Direction.UP:
-                bulletY = object.position.y - properties.height;
+                bulletY = tank.position.y - properties.height;
                 bulletX = objectCenterPosition.x - properties.width / 2;
                 break;
             case Direction.RIGHT:
@@ -45,16 +40,15 @@ export default class BulletService {
                 break;
             case Direction.LEFT:
                 bulletY = objectCenterPosition.y - properties.height / 2;
-                bulletX = object.position.x - properties.width;
+                bulletX = tank.position.x - properties.width;
                 break;
             default:
                 throw new Error('Invalid direction');
         }
 
-        const tank = object as Tank;
         const bullet = new GameObject({
             type: GameObjectType.BULLET,
-            direction: object.direction,
+            direction: tank.direction,
             position: {
                 y: bulletY,
                 x: bulletX,
@@ -62,6 +56,6 @@ export default class BulletService {
             requestedSpeed: tank.bulletSpeed,
         });
 
-        this.emitter.emit(BulletServiceEvent.TANK_BULLET_SPAWNED, object.id, bullet);
+        this.emitter.emit(BulletServiceEvent.TANK_BULLET_SPAWNED, tank.id, bullet);
     }
 }
