@@ -135,11 +135,11 @@ export default class GameObjectService {
     }
 
     private isPastAutomaticDestroy(object: GameObject): boolean {
-        if (object.properties.automaticDestroyTime === undefined) {
+        if (object.automaticDestroyTime === undefined) {
             return false;
         }
 
-        return Date.now() - object.spawnTime > object.properties.automaticDestroyTime;
+        return Date.now() - object.spawnTime > object.automaticDestroyTime;
     }
 
     private processObjectDestroy(object: GameObject): boolean {
