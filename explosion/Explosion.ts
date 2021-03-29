@@ -6,10 +6,12 @@ import { ExplosionType } from './ExplosionType';
 
 export interface ExplosionOptions extends GameObjectOptions {
     explosionType: ExplosionType;
+    destroyedObjectType: GameObjectType;
 }
 
 export default class Explosion extends GameObject {
     explosionType: ExplosionType;
+    destroyedObjectType: GameObjectType;
 
     constructor(options: ExplosionOptions) {
         options.type = GameObjectType.EXPLOSION;
@@ -17,6 +19,7 @@ export default class Explosion extends GameObject {
         super(options);
 
         this.explosionType = options.explosionType;
+        this.destroyedObjectType = options.destroyedObjectType;
     }
 
     get sprite(): ISprite | undefined {
@@ -34,11 +37,13 @@ export default class Explosion extends GameObject {
         const gameObjectOption = super.toOptions();
         return Object.assign(gameObjectOption, {
             explosionType: this.explosionType,
+            destroyedObjectType: this.destroyedObjectType,
         });
     }
 
     setOptions(other: Explosion): void {
         super.setOptions(other);
         this.explosionType = other.explosionType;
+        this.destroyedObjectType = other.destroyedObjectType;
     }
 }

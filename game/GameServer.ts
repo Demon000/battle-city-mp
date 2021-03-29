@@ -201,6 +201,7 @@ export default class GameServer {
             const explosion = new Explosion({
                 explosionType: type,
                 position: object.centerPosition,
+                destroyedObjectType: object.type,
             });
             this.gameObjectService.registerObject(explosion);
         };
