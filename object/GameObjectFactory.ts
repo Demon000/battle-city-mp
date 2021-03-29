@@ -1,3 +1,4 @@
+import Bullet, { BulletOptions } from '@/bullet/Bullet';
 import Point from '../physics/point/Point';
 import Tank, { TankOptions } from '../tank/Tank';
 import GameObject, { GameObjectOptions } from './GameObject';
@@ -17,7 +18,9 @@ export default class GameObjectFactory {
     static buildFromOptions(options: GameObjectOptions): GameObject {
         if (options.type === GameObjectType.TANK) {
             return new Tank(options as TankOptions);
-        } else  {
+        } else if (options.type === GameObjectType.BULLET) {
+            return new Bullet(options as BulletOptions);
+        } else {
             return new GameObject(options);
         }
     }
