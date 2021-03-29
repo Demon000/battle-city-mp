@@ -1,6 +1,5 @@
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import Point from '@/physics/point/Point';
-import now from 'performance-now';
 import { Direction } from '../physics/Direction';
 import GameObjectProperties from './GameObjectProperties';
 import { GameObjectType } from './GameObjectType';
@@ -32,7 +31,7 @@ export default class GameObject {
         this.direction = options.direction ?? Direction.UP;
         this.requestedSpeed = options.requestedSpeed ?? 0;
         this.position = options.position;
-        this.spawnTime = options.spawnTime ?? now();
+        this.spawnTime = options.spawnTime ?? Date.now();
     }
 
     toOptions(): GameObjectOptions {

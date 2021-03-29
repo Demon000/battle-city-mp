@@ -1,5 +1,4 @@
 import { Direction } from '@/physics/Direction';
-import now from 'performance-now';
 import GameObject from './GameObject';
 import { GameObjectType, GameShortObjectType } from './GameObjectType';
 import IGameObjectProperties, { ISprite, ISpriteSet } from './IGameObjectProperties';
@@ -271,7 +270,7 @@ export default class GameObjectProperties {
             return set.steps[0];
         }
 
-        const currentAnimationTime = now() % set.duration;
+        const currentAnimationTime = Date.now() % set.duration;
         let iterationAnimationTime = 0;
         for (const step of set.steps) {
             if (step.duration === undefined) {
