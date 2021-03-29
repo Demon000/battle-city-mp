@@ -60,8 +60,8 @@ export default class Tank extends GameObject {
     }
 
     toOptions(): TankOptions {
-        const gameObjectOptiions = super.toOptions();
-        return Object.assign(gameObjectOptiions, {
+        const gameObjectOptions = super.toOptions();
+        return Object.assign(gameObjectOptions, {
             tier: this.tier,
             playerId: this.playerId,
             lastBulletShotTime: this.lastBulletShotTime,
