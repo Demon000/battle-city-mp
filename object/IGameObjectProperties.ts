@@ -34,5 +34,5 @@ export default interface IGameObjectProperties {
     directionAxisSnapping?: number;
     automaticDestroyTime?: number;
 
-    sets?: ISpriteSet[];
+    spriteSets?: ISpriteSet[];
 }

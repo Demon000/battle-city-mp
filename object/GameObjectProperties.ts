@@ -10,7 +10,7 @@ const properties: IGameObjectProperties[] = [
         shortType: GameShortObjectType.BRICK_WALL,
         width: 4,
         height: 4,
-        sets: [
+        spriteSets: [
             {
                 steps: [
                     {
@@ -60,7 +60,7 @@ const properties: IGameObjectProperties[] = [
         shortType: GameShortObjectType.STEEL_WALL,
         width: 8,
         height: 8,
-        sets: [
+        spriteSets: [
             {
                 steps: [
                     {
@@ -81,7 +81,7 @@ const properties: IGameObjectProperties[] = [
         shortType: GameShortObjectType.LEVEL_BORDER,
         width: 16,
         height: 16,
-        sets: [
+        spriteSets: [
             {
                 steps: [
                     {
@@ -96,7 +96,7 @@ const properties: IGameObjectProperties[] = [
         width: 16,
         height: 16,
         directionAxisSnapping: 4,
-        sets: [
+        spriteSets: [
             {
                 duration: 125,
                 direction: Direction.UP,
@@ -157,14 +157,20 @@ const properties: IGameObjectProperties[] = [
     },
     {
         type: GameObjectType.BULLET,
-        width: 4,
-        height: 4,
-        sets: [
+        width: 2,
+        height: 2,
+        spriteSets: [
             {
                 direction: Direction.UP,
                 steps: [
                     {
                         filename: 'bullet_up.png',
+                        offset: {
+                            y: -2,
+                            x: -2,
+                        },
+                        width: 4,
+                        height: 4,
                     },
                 ],
             },
@@ -173,6 +179,12 @@ const properties: IGameObjectProperties[] = [
                 steps: [
                     {
                         filename: 'bullet_right.png',
+                        offset: {
+                            y: -2,
+                            x: -2,
+                        },
+                        width: 4,
+                        height: 4,
                     },
                 ],
             },
@@ -181,6 +193,12 @@ const properties: IGameObjectProperties[] = [
                 steps: [
                     {
                         filename: 'bullet_down.png',
+                        offset: {
+                            y: -2,
+                            x: -2,
+                        },
+                        width: 4,
+                        height: 4,
                     },
                 ],
             },
@@ -189,6 +207,12 @@ const properties: IGameObjectProperties[] = [
                 steps: [
                     {
                         filename: 'bullet_left.png',
+                        offset: {
+                            y: -2,
+                            x: -2,
+                        },
+                        width: 4,
+                        height: 4,
                     },
                 ],
             },
@@ -199,7 +223,7 @@ const properties: IGameObjectProperties[] = [
         width: 0,
         height: 0,
         automaticDestroyTime: 1000,
-        sets: [
+        spriteSets: [
             {
                 duration: 180,
                 once: true,
@@ -321,12 +345,12 @@ export default class GameObjectProperties {
 
     static findSpriteSets(object: GameObject): ISpriteSet[] {
         const properties = this.getTypeProperties(object.type);
-        if (properties.sets === undefined) {
+        if (properties.spriteSets === undefined) {
             return [];
         }
 
         const matchingSets = new Array<ISpriteSet>();
-        for (const set of properties.sets) {
+        for (const set of properties.spriteSets) {
             if (set.direction !== undefined && set.direction !== object.direction) {
                 continue;
             }
