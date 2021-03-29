@@ -1,4 +1,5 @@
 import { CLIENT_CONFIG_FPS, CLIENT_CONFIG_VISIBLE_GAME_SIZE } from '@/config';
+import GameAudioService from '@/renderer/GameAudioService';
 import GameRenderService from '@/renderer/GameRenderService';
 import MapRepository from '@/utils/MapRepository';
 import Ticker, { TickerEvent } from '@/utils/Ticker';
@@ -17,6 +18,7 @@ export default class GameClient {
     private boundingBoxRepository;
     private collisionService;
     private gameRenderService;
+    private gameAudioService;
     ticker;
 
     constructor(canvas: HTMLCanvasElement) {
@@ -25,6 +27,7 @@ export default class GameClient {
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
         this.gameRenderService = new GameRenderService(canvas, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
+        this.gameAudioService = new GameAudioService();
         this.ticker = new Ticker(CLIENT_CONFIG_FPS);
 
         this.playerRepository = new MapRepository<string, Player>();
@@ -89,6 +92,7 @@ export default class GameClient {
         const viewableObjectIds = this.collisionService.getOverlappingObjects(box);
         const viewableObjects = this.gameObjectService.getMultipleObjects(viewableObjectIds);
         this.gameRenderService.renderObjects(viewableObjects, tank.centerPosition);
+        this.gameAudioService.playObjectSounds(viewableObjects, tank.centerPosition);
     }
 
     onWindowResize(): void {

@@ -1,4 +1,5 @@
 import Express from 'express';
+import Cors from 'cors';
 import Http from 'http';
 import IO from 'socket.io';
 import dotenv from 'dotenv';
@@ -79,6 +80,7 @@ http.listen(5000, () => {
     console.log('Game server listening on port 5000');
 });
 
+app.use(Cors())
 app.use(Express.static('./assets'));
 
 gameServer.ticker.start();

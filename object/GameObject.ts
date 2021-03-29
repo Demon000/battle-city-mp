@@ -3,7 +3,7 @@ import Point from '@/physics/point/Point';
 import { Direction } from '../physics/Direction';
 import GameObjectProperties from './GameObjectProperties';
 import { GameObjectType } from './GameObjectType';
-import IGameObjectProperties, { ISprite } from './IGameObjectProperties';
+import IGameObjectProperties, { IAudioEffect, ISprite } from './IGameObjectProperties';
 
 export interface GameObjectOptions {
     id?: number;
@@ -24,6 +24,8 @@ export default class GameObject {
     requestedSpeed: number;
     spawnTime: number;
     destroyed = false;
+    panner?: PannerNode;
+    isPlayingAudio = false;
 
     constructor(options: GameObjectOptions) {
         this.id = options.id ?? GameObject.globalId++;
@@ -69,6 +71,10 @@ export default class GameObject {
 
     get sprite(): ISprite | undefined {
         return GameObjectProperties.findSprite(this);
+    }
+
+    get audioEffect(): IAudioEffect | undefined {
+        return GameObjectProperties.findAudioEffect(this);
     }
 
     getBoundingBox(position=this.position): BoundingBox {

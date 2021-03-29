@@ -5,6 +5,9 @@ export const CLIENT_CONFIG_SOCKET_BASE_URL: string = process.env
 export const CLIENT_SPRITES_RELATIVE_URL: string = process.env
     .VUE_APP_SPRITES_RELATIVE_URL as string;
 // eslint-disable-next-line
+export const CLIENT_SOUNDS_RELATIVE_URL: string = process.env
+    .VUE_APP_SOUNDS_RELATIVE_URL as string;
+// eslint-disable-next-line
 export const CLIENT_CONFIG_FPS: number = Number.parseInt(process.env
     .VUE_APP_CLIENT_FPS!);
 // eslint-disable-next-line

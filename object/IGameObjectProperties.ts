@@ -24,6 +24,13 @@ export interface ISpriteSet {
     steps: ISprite[];
 }
 
+export interface IAudioEffect {
+    filename: string;
+    loop?: boolean;
+    buffer?: AudioBuffer;
+    meta?: Record<string, string | number>;
+}
+
 export default interface IGameObjectProperties {
     type: string;
     shortType?: string;
@@ -35,4 +42,5 @@ export default interface IGameObjectProperties {
     automaticDestroyTime?: number;
 
     spriteSets?: ISpriteSet[];
+    audioEffects?: IAudioEffect[];
 }

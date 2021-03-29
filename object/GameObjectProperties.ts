@@ -2,7 +2,7 @@ import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
 import GameObject from './GameObject';
 import { GameObjectType, GameShortObjectType } from './GameObjectType';
-import IGameObjectProperties, { ISprite, ISpriteSet } from './IGameObjectProperties';
+import IGameObjectProperties, { IAudioEffect, ISprite, ISpriteSet } from './IGameObjectProperties';
 
 const properties: IGameObjectProperties[] = [
     {
@@ -313,6 +313,14 @@ const properties: IGameObjectProperties[] = [
                 ],
             },
         ],
+        audioEffects: [
+            {
+                filename: 'destroy_brick_wall.wav',
+                meta: {
+                    destroyedObjectType: GameObjectType.BRICK_WALL,
+                },
+            },
+        ],
     },
 ];
 
@@ -414,5 +422,18 @@ export default class GameObjectProperties {
 
     static findSprite(object: GameObject): ISprite | undefined {
         return this.findSpriteSets(object)[0]?.steps[0];
+    }
+
+    static findAudioEffects(object: GameObject): IAudioEffect[] {
+        const properties = this.getTypeProperties(object.type);
+        if (properties.audioEffects === undefined) {
+            return [];
+        }
+
+        return properties.audioEffects;
+    }
+
+    static findAudioEffect(object: GameObject): IAudioEffect {
+        return this.findAudioEffects(object)[0];
     }
 }
