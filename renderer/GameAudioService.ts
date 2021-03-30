@@ -43,16 +43,16 @@ export default class GameAudioService {
         return audioEffect.buffer !== undefined;
     }
 
-    createObjectAudioEffectPanner(object: GameObject): boolean {
+    createObjectAudioEffectPanner(object: GameObject): void {
         if (object.audioEffectPanner !== undefined) {
-            return true;
+            return;
         }
 
-        object.audioEffectPanner = this.context.createPanner();
-        object.audioEffectPanner.panningModel = 'HRTF';
-        object.audioEffectPanner.connect(this.context.destination);
-
-        return false;
+        const panner = new PannerNode(this.context, {
+            panningModel: 'HRTF',
+        });
+        panner.connect(this.context.destination);
+        object.audioEffectPanner = panner;
     }
 
     stopObjectAudioEffectIfDifferent(object: GameObject, audioEffect: IAudioEffect | undefined): boolean {
@@ -84,9 +84,10 @@ export default class GameAudioService {
             throw new Error('Audio effect panner is inconsistent');
         }
 
-        const source = this.context.createBufferSource();
-        source.loop = audioEffect.loop ?? false;
-        source.buffer = audioEffect.buffer;
+        const source = new AudioBufferSourceNode(this.context, {
+            buffer: audioEffect.buffer,
+            loop: audioEffect.loop ?? false,
+        });
         source.connect(object.audioEffectPanner);
         source.addEventListener('ended', () => {
             object.audioEffectBufferSource = undefined;
