@@ -34,14 +34,11 @@ export default class GameRenderService {
         this.gameHeight = this.canvas.height / this.gameToRenderSizeScale;
     }
 
-    renderObjects(objects: GameObject[], point: Point): void {
-        this.context.imageSmoothingEnabled = false;
-        this.context.fillStyle = 'black';
-        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
+    renderObjectsPass(objects: GameObject[], point: Point, pass: number): GameObject[] {
         const canvasX = point.x - this.gameWidth / 2;
         const canvasY = point.y - this.gameHeight / 2;
 
+        const leftOverRenderObjects = new Array<GameObject>();
         for (const object of objects) {
             const sprite = object.sprite;
             if (sprite === undefined) {
@@ -54,6 +51,11 @@ export default class GameRenderService {
             }
 
             if (!sprite.image.complete) {
+                continue;
+            }
+
+            if (sprite.renderPass !== undefined && pass < sprite.renderPass) {
+                leftOverRenderObjects.push(object);
                 continue;
             }
 
@@ -87,6 +89,21 @@ export default class GameRenderService {
             const objectRenderHeight = objectHeight * this.gameToRenderSizeScale;
 
             this.context.drawImage(sprite.image, objectRenderX, objectRenderY, objectRenderWidth, objectRenderHeight);
+        }
+
+        return leftOverRenderObjects;
+    }
+
+    renderObjects(objects: GameObject[], point: Point): void {
+        this.context.imageSmoothingEnabled = false;
+        this.context.fillStyle = 'black';
+        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        let renderObjects = objects;
+        let pass = 0;
+        while (renderObjects.length) {
+            renderObjects = this.renderObjectsPass(renderObjects, point, pass);
+            pass++;
         }
     }
 

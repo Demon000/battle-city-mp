@@ -3,7 +3,7 @@ import { Direction } from '@/physics/Direction';
 import Point from '@/physics/point/Point';
 import GameObject from './GameObject';
 import { GameObjectType, GameShortObjectType } from './GameObjectType';
-import IGameObjectProperties, { IAudioEffect, ISprite, ISpriteSet } from './IGameObjectProperties';
+import IGameObjectProperties, { IAudioEffect, ISprite, ISpriteSet, RenderPass } from './IGameObjectProperties';
 
 const properties: IGameObjectProperties[] = [
     {
@@ -292,6 +292,7 @@ const properties: IGameObjectProperties[] = [
                         },
                         width: 16,
                         height: 16,
+                        renderPass: RenderPass.EXPLOSIONS,
                     },
                     {
                         filename: 'explosion_small_frame_2.png',
@@ -302,6 +303,7 @@ const properties: IGameObjectProperties[] = [
                         },
                         width: 16,
                         height: 16,
+                        renderPass: RenderPass.EXPLOSIONS,
                     },
                     {
                         filename: 'explosion_small_frame_3.png',
@@ -312,6 +314,7 @@ const properties: IGameObjectProperties[] = [
                         },
                         width: 16,
                         height: 16,
+                        renderPass: RenderPass.EXPLOSIONS,
                     },
                 ],
             },
@@ -331,6 +334,7 @@ const properties: IGameObjectProperties[] = [
                         },
                         width: 16,
                         height: 16,
+                        renderPass: RenderPass.EXPLOSIONS,
                     },
                     {
                         filename: 'explosion_big_frame_1.png',
@@ -341,6 +345,7 @@ const properties: IGameObjectProperties[] = [
                         },
                         width: 32,
                         height: 32,
+                        renderPass: RenderPass.EXPLOSIONS,
                     },
                     {
                         filename: 'explosion_big_frame_2.png',
@@ -351,6 +356,7 @@ const properties: IGameObjectProperties[] = [
                         },
                         width: 32,
                         height: 32,
+                        renderPass: RenderPass.EXPLOSIONS,
                     },
                     {
                         filename: 'explosion_big_frame_1.png',
@@ -361,6 +367,7 @@ const properties: IGameObjectProperties[] = [
                         },
                         width: 32,
                         height: 32,
+                        renderPass: RenderPass.EXPLOSIONS,
                     },
                 ],
             },

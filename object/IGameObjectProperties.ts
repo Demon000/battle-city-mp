@@ -1,6 +1,11 @@
 import { Direction } from '@/physics/Direction';
 import Point from '@/physics/point/Point';
 
+export enum RenderPass {
+    ALL = 0,
+    EXPLOSIONS = 1,
+}
+
 export interface ISprite {
     filename: string;
     image?: HTMLImageElement;
@@ -8,6 +13,7 @@ export interface ISprite {
     offset?: Point;
     width?: number;
     height?: number;
+    renderPass?: number;
 }
 
 export type ResourceMeta = Record<string, string | number | boolean>;
