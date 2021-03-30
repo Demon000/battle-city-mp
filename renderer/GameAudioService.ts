@@ -66,6 +66,7 @@ export default class GameAudioService {
         }
 
         object.audioEffectBufferSource.stop();
+        object.audioEffectBufferSource.disconnect();
         object.audioEffectBufferSource = undefined;
         return true;
     }
