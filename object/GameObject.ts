@@ -24,8 +24,8 @@ export default class GameObject {
     requestedSpeed: number;
     spawnTime: number;
     destroyed = false;
-    panner?: PannerNode;
-    isPlayingAudio = false;
+    audioEffectPanner?: PannerNode;
+    audioEffectBufferSource?: AudioBufferSourceNode;
 
     constructor(options: GameObjectOptions) {
         this.id = options.id ?? GameObject.globalId++;
