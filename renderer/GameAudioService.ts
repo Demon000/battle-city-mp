@@ -14,7 +14,6 @@ export default class GameAudioService {
     private context;
     private compressorNode;
     private finalNode;
-    private rolloffFactor;
     private objectsPlayingAudioEffects = new Set<GameObject>();
 
     constructor() {
@@ -22,8 +21,6 @@ export default class GameAudioService {
         this.compressorNode = new DynamicsCompressorNode(this.context);
         this.compressorNode.connect(this.context.destination);
         this.finalNode = this.compressorNode;
-
-        this.rolloffFactor = 2 / CLIENT_CONFIG_VISIBLE_GAME_SIZE;
     }
 
     setCartesianPositions(positioned: CartesianPositioned, point: Point): void {
@@ -59,7 +56,8 @@ export default class GameAudioService {
 
         const panner = new PannerNode(this.context, {
             panningModel: 'HRTF',
-            rolloffFactor: this.rolloffFactor,
+            distanceModel: 'linear',
+            maxDistance: CLIENT_CONFIG_VISIBLE_GAME_SIZE / 2,
         });
         panner.connect(this.finalNode);
         object.audioEffectPanner = panner;
