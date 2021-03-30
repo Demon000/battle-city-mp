@@ -1,5 +1,5 @@
 import GameObjectProperties from '@/object/GameObjectProperties';
-import { ISprite } from '@/object/IGameObjectProperties';
+import { IAudioEffect, ISprite } from '@/object/IGameObjectProperties';
 import GameObject, { GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
@@ -99,5 +99,21 @@ export default class Tank extends GameObject {
         } else {
             return GameObjectProperties.findSprite(this);
         }
+    }
+
+    get audioEffect(): IAudioEffect | undefined {
+        const audioEffects = GameObjectProperties.findAudioEffects(this);
+
+        for (const audioEffect of audioEffects) {
+            if (audioEffect.meta === undefined) {
+                return audioEffect;
+            }
+
+            if (audioEffect.meta.isMoving === true && this.requestedSpeed > 0) {
+                return audioEffect;
+            }
+        }
+
+        return undefined;
     }
 }

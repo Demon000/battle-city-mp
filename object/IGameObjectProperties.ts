@@ -28,7 +28,7 @@ export interface IAudioEffect {
     filename: string;
     loop?: boolean;
     buffer?: AudioBuffer;
-    meta?: Record<string, string | number>;
+    meta?: Record<string, string | number | boolean>;
 }
 
 export default interface IGameObjectProperties {

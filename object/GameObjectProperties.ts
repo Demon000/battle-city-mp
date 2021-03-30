@@ -154,6 +154,14 @@ const properties: IGameObjectProperties[] = [
                 ],
             },
         ],
+        audioEffects: [
+            {
+                filename: 'tank_moving.wav',
+                meta: {
+                    isMoving: true,
+                },
+            },
+        ],
     },
     {
         type: GameObjectType.BULLET,
