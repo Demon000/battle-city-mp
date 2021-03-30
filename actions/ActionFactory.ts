@@ -24,15 +24,19 @@ export default class ActionFactory {
 
             let buttonType;
             switch (keyboardEvent.key) {
+                case 'W':
                 case 'w':
                     buttonType = ButtonType.UP;
                     break;
+                case 'A':
                 case 'a':
                     buttonType = ButtonType.LEFT;
                     break;
+                case 'S':
                 case 's':
                     buttonType = ButtonType.DOWN;
                     break;
+                case 'D':
                 case 'd':
                     buttonType = ButtonType.RIGHT;
                     break;
