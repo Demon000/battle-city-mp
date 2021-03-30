@@ -1,4 +1,4 @@
-import { CLIENT_SOUNDS_RELATIVE_URL } from '@/config';
+import { CLIENT_CONFIG_VISIBLE_GAME_SIZE, CLIENT_SOUNDS_RELATIVE_URL } from '@/config';
 import GameObject from '@/object/GameObject';
 import { IAudioEffect } from '@/object/IGameObjectProperties';
 import Point from '@/physics/point/Point';
@@ -12,9 +12,12 @@ interface CartesianPositioned {
 
 export default class GameAudioService {
     private context;
+    private rolloffFactor;
 
     constructor() {
         this.context = new AudioContext();
+
+        this.rolloffFactor = 2 / CLIENT_CONFIG_VISIBLE_GAME_SIZE;
     }
 
     setCartesianPositions(positioned: CartesianPositioned, point: Point): void {
@@ -50,6 +53,7 @@ export default class GameAudioService {
 
         const panner = new PannerNode(this.context, {
             panningModel: 'HRTF',
+            rolloffFactor: this.rolloffFactor,
         });
         panner.connect(this.context.destination);
         object.audioEffectPanner = panner;
