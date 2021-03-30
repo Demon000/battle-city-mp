@@ -94,9 +94,6 @@ export default class GameAudioService {
             loop: audioEffect.loop ?? false,
         });
         source.connect(object.audioEffectPanner);
-        source.addEventListener('ended', () => {
-            object.audioEffectBufferSource = undefined;
-        });
         source.start();
         object.audioEffectBufferSource = source;
     }
