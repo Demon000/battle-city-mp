@@ -2,6 +2,7 @@ import Bullet from '@/bullet/Bullet';
 import BulletService, { BulletServiceEvent } from '@/bullet/BulletService';
 import Explosion from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
+import { GameObjectType } from '@/object/GameObjectType';
 import { Direction } from '@/physics/Direction';
 import Tank from '@/tank/Tank';
 import TankService, { TankServiceEvent } from '@/tank/TankService';
@@ -196,12 +197,12 @@ export default class GameServer {
         /**
          * CollisionService event handlers
          */
-        const spawnExplosion = (objectId: number, type: ExplosionType) => {
+        const spawnExplosion = (objectId: number, type: ExplosionType, destroyedObjectType?: GameObjectType) => {
             const object = this.gameObjectService.getObject(objectId);
             const explosion = new Explosion({
                 explosionType: type,
                 position: object.centerPosition,
-                destroyedObjectType: object.type,
+                destroyedObjectType,
             });
             this.gameObjectService.registerObject(explosion);
         };
@@ -223,27 +224,28 @@ export default class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_LEVEL_BORDER,
-            (movingObjectId: number, position: Point, staticObjectId: number) => {
+            (movingObjectId: number, _position: Point, _staticObjectId: number) => {
                 spawnExplosion(movingObjectId, ExplosionType.SMALL);
                 destroyBullet(movingObjectId);
             });
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_WALL,
-            (movingObjectId: number, position: Point, staticObjectId: number) => {
-                spawnExplosion(movingObjectId, ExplosionType.SMALL);
+            (movingObjectId: number, _position: Point, staticObjectId: number) => {
+                const object = this.gameObjectService.getObject(staticObjectId);
+                spawnExplosion(movingObjectId, ExplosionType.SMALL, object.type);
                 destroyBullet(movingObjectId);
                 this.gameObjectService.setObjectDestroyed(staticObjectId);
             });
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_TANK,
-            (movingObjectId: number, position: Point, staticObjectId: number) => {
+            (movingObjectId: number, _position: Point, staticObjectId: number) => {
                 spawnExplosion(movingObjectId, ExplosionType.SMALL);
-                spawnExplosion(staticObjectId, ExplosionType.BIG);
+                spawnExplosion(staticObjectId, ExplosionType.BIG, GameObjectType.TANK);
                 destroyBullet(movingObjectId);
             });
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_BULLET,
-            (movingObjectId: number, position: Point, staticObjectId: number) => {
+            (movingObjectId: number, _position: Point, staticObjectId: number) => {
                 spawnExplosion(movingObjectId, ExplosionType.SMALL);
                 destroyBullet(movingObjectId);
                 destroyBullet(staticObjectId);

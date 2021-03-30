@@ -1,17 +1,17 @@
 import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import GameObjectProperties from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
-import { ISprite, ISpriteSet } from '@/object/IGameObjectProperties';
+import { IAudioEffect, ISprite, ISpriteSet } from '@/object/IGameObjectProperties';
 import { ExplosionType } from './ExplosionType';
 
 export interface ExplosionOptions extends GameObjectOptions {
     explosionType: ExplosionType;
-    destroyedObjectType: GameObjectType;
+    destroyedObjectType?: GameObjectType;
 }
 
 export default class Explosion extends GameObject {
     explosionType: ExplosionType;
-    destroyedObjectType: GameObjectType;
+    destroyedObjectType?: GameObjectType;
 
     constructor(options: ExplosionOptions) {
         options.type = GameObjectType.EXPLOSION;
@@ -40,6 +40,22 @@ export default class Explosion extends GameObject {
         }
 
         return GameObjectProperties.findAnimationSprite(this, set);
+    }
+
+    get audioEffect(): IAudioEffect | undefined {
+        const audioEffects = GameObjectProperties.findAudioEffects(this);
+
+        for (const audioEffect of audioEffects) {
+            if (audioEffect.meta === undefined) {
+                return audioEffect;
+            }
+
+            if (audioEffect.meta.destroyedObjectType === this.destroyedObjectType) {
+                return audioEffect;
+            }
+        }
+
+        return undefined;
     }
 
     get automaticDestroyTime(): number | undefined {

@@ -314,10 +314,19 @@ const properties: IGameObjectProperties[] = [
         ],
         audioEffects: [
             {
-                filename: 'destroy_brick_wall.wav',
+                filename: 'destroy_tank.wav',
                 meta: {
-                    destroyedObjectType: GameObjectType.BRICK_WALL,
+                    destroyedObjectType: GameObjectType.TANK,
                 },
+            },
+            {
+                filename: 'destroy_steel_wall.wav',
+                meta: {
+                    destroyedObjectType: GameObjectType.STEEL_WALL,
+                },
+            },
+            {
+                filename: 'destroy.wav',
             },
         ],
     },
