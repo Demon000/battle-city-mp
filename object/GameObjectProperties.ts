@@ -72,6 +72,22 @@ const properties: IGameObjectProperties[] = [
         ],
     },
     {
+        type: GameObjectType.BUSH,
+        shortType: GameShortObjectType.BUSH,
+        width: 8,
+        height: 8,
+        spriteSets: [
+            {
+                steps: [
+                    {
+                        filename: 'bush.png',
+                        renderPass: RenderPass.BUSHES,
+                    },
+                ],
+            },
+        ],
+    },
+    {
         type: GameObjectType.PLAYER_SPAWN,
         shortType: GameShortObjectType.PLAYER_SPAWN,
         width: 16,
