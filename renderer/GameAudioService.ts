@@ -107,7 +107,7 @@ export default class GameAudioService {
                 throw new Error('Failed to create audio effect panner');
             }
 
-            this.setCartesianPositions(object.audioEffectPanner, object.position);
+            this.setCartesianPositions(object.audioEffectPanner, object.centerPosition);
 
             const audioEffect = object.audioEffect;
             const stoppedAudioEffect = this.stopObjectAudioEffectIfDifferent(object, audioEffect);
