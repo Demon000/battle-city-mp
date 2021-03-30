@@ -80,7 +80,7 @@ http.listen(5000, () => {
     console.log('Game server listening on port 5000');
 });
 
-app.use(Cors())
+app.use(Cors());
 app.use(Express.static('./assets'));
 
 gameServer.ticker.start();
