@@ -218,6 +218,7 @@ const properties: IGameObjectProperties[] = [
         audioEffects: [
             {
                 filename: 'tank_moving.wav',
+                loop: true,
                 meta: {
                     isMoving: true,
                 },

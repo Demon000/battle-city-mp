@@ -13,6 +13,7 @@ interface CartesianPositioned {
 export default class GameAudioService {
     private context;
     private rolloffFactor;
+    private objectsPlayingAudioEffects = new Set<GameObject>();
 
     constructor() {
         this.context = new AudioContext();
@@ -59,7 +60,7 @@ export default class GameAudioService {
         object.audioEffectPanner = panner;
     }
 
-    stopObjectAudioEffectIfDifferent(object: GameObject, audioEffect: IAudioEffect | undefined): boolean {
+    stopObjectAudioEffectIfDifferent(object: GameObject, audioEffect?: IAudioEffect): boolean {
         if (object.audioEffectBufferSource === undefined) {
             return true;
         }
@@ -106,6 +107,7 @@ export default class GameAudioService {
         this.context.listener.forwardY.value = 0;
         this.context.listener.forwardZ.value = 0;
 
+        const objectsCurrentlyPlayingAudioEffects = new Set<GameObject>();
         for (const object of objects) {
             if (!object.hasAudioEffects) {
                 continue;
@@ -120,16 +122,24 @@ export default class GameAudioService {
 
             const audioEffect = object.audioEffect;
             const stoppedAudioEffect = this.stopObjectAudioEffectIfDifferent(object, audioEffect);
-            if (!stoppedAudioEffect) {
-                continue;
+            if (stoppedAudioEffect) {
+                const loadedBuffer = this.loadAudioEffectBuffer(audioEffect);
+                if (!loadedBuffer) {
+                    continue;
+                }
+
+                this.createObjectAudioBufferSource(object, audioEffect);
             }
 
-            const loadedBuffer = this.loadAudioEffectBuffer(audioEffect);
-            if (!loadedBuffer) {
-                continue;
-            }
-
-            this.createObjectAudioBufferSource(object, audioEffect);
+            objectsCurrentlyPlayingAudioEffects.add(object);
         }
+
+        for (const object of this.objectsPlayingAudioEffects) {
+            if (!objectsCurrentlyPlayingAudioEffects.has(object)) {
+                this.stopObjectAudioEffectIfDifferent(object);
+            }
+        }
+
+        this.objectsPlayingAudioEffects = objectsCurrentlyPlayingAudioEffects;
     }
 }
