@@ -1,5 +1,6 @@
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
+import Point from '@/physics/point/Point';
 import GameObject from './GameObject';
 import { GameObjectType, GameShortObjectType } from './GameObjectType';
 import IGameObjectProperties, { IAudioEffect, ISprite, ISpriteSet } from './IGameObjectProperties';
@@ -100,6 +101,9 @@ const properties: IGameObjectProperties[] = [
             {
                 duration: 125,
                 direction: Direction.UP,
+                meta: {
+                    isMoving: true,
+                },
                 steps: [
                     {
                         filename: 'tank_tier_1_up_frame_1.png',
@@ -112,8 +116,19 @@ const properties: IGameObjectProperties[] = [
                 ],
             },
             {
+                direction: Direction.UP,
+                steps: [
+                    {
+                        filename: 'tank_tier_1_up_frame_1.png',
+                    },
+                ],
+            },
+            {
                 duration: 125,
                 direction: Direction.RIGHT,
+                meta: {
+                    isMoving: true,
+                },
                 steps: [
                     {
                         filename: 'tank_tier_1_right_frame_1.png',
@@ -126,8 +141,19 @@ const properties: IGameObjectProperties[] = [
                 ],
             },
             {
+                direction: Direction.RIGHT,
+                steps: [
+                    {
+                        filename: 'tank_tier_1_right_frame_1.png',
+                    },
+                ],
+            },
+            {
                 duration: 125,
                 direction: Direction.DOWN,
+                meta: {
+                    isMoving: true,
+                },
                 steps: [
                     {
                         filename: 'tank_tier_1_down_frame_1.png',
@@ -140,8 +166,19 @@ const properties: IGameObjectProperties[] = [
                 ],
             },
             {
+                direction: Direction.DOWN,
+                steps: [
+                    {
+                        filename: 'tank_tier_1_down_frame_1.png',
+                    },
+                ],
+            },
+            {
                 duration: 125,
                 direction: Direction.LEFT,
+                meta: {
+                    isMoving: true,
+                },
                 steps: [
                     {
                         filename: 'tank_tier_1_left_frame_1.png',
@@ -150,6 +187,14 @@ const properties: IGameObjectProperties[] = [
                     {
                         filename: 'tank_tier_1_left_frame_2.png',
                         duration: 62.5,
+                    },
+                ],
+            },
+            {
+                direction: Direction.LEFT,
+                steps: [
+                    {
+                        filename: 'tank_tier_1_left_frame_1.png',
                     },
                 ],
             },
@@ -373,49 +418,61 @@ export default class GameObjectProperties {
             return [];
         }
 
-        const matchingSets = new Array<ISpriteSet>();
-        for (const set of properties.spriteSets) {
-            if (set.direction !== undefined && set.direction !== object.direction) {
-                continue;
-            }
-            
-            if (set.position !== undefined) {
-                const x = object.position.x % set.position.mod / set.position.divide;
-                const y = object.position.y % set.position.mod / set.position.divide;
-                let foundPoint = false;
-
-                for (const point of set.position.equals) {
-                    if (point.x === x && point.y === y) {
-                        foundPoint = true;
-                        break;
-                    }
-                }
-
-                if (!foundPoint) {
-                    continue;
-                }
-            }
-
-            matchingSets.push(set);
-        }
-
-        return matchingSets;
+        return properties.spriteSets;
     }
 
-    static findAnimationSprite(object: GameObject, set?: ISpriteSet): ISprite | undefined {
-        if (set === undefined) {
-            set = this.findSpriteSets(object)[0];
+    static isSpriteSetMatchingPosition(set: ISpriteSet, position: Point): boolean {
+        if (set.position === undefined) {
+            return true;
         }
 
-        if (set === undefined) {
-            return undefined;
+        const x = position.x % set.position.mod / set.position.divide;
+        const y = position.y % set.position.mod / set.position.divide;
+
+        for (const point of set.position.equals) {
+            if (point.x === x && point.y === y) {
+                return true;
+            }
         }
 
+        return false;
+    }
+
+    static isSpriteSetMatchingDirection(set: ISpriteSet, direction: Direction): boolean {
+        if (set.direction === undefined) {
+            return true;
+        }
+
+        return set.direction === direction;
+    }
+
+    static findSpriteSet(object: GameObject): ISpriteSet | undefined {
+        const sets = this.findSpriteSets(object);
+        for (const set of sets) {
+            if (!this.isSpriteSetMatchingDirection(set, object.direction)) {
+                continue;
+            }
+
+            if (!this.isSpriteSetMatchingPosition(set, object.position)) {
+                continue;
+            }
+
+            if (set.meta !== undefined && !object.isMatchingMeta(set.meta)) {
+                continue;
+            }
+
+            return set;
+        }
+
+        return undefined;
+    }
+
+    static findAnimationSprite(set: ISpriteSet, referenceTime: number): ISprite | undefined {
         if (set.duration === undefined) {
-            return set.steps[0];
+            throw new Error('Invalid call to find animation sprite when sprite set is not animated');
         }
 
-        let currentAnimationTime = (Date.now() - object.spawnTime);
+        let currentAnimationTime = (Date.now() - referenceTime);
         if (set.loop === undefined || set.loop === true) {
             currentAnimationTime %= set.duration;
         }
@@ -437,7 +494,16 @@ export default class GameObjectProperties {
     }
 
     static findSprite(object: GameObject): ISprite | undefined {
-        return this.findSpriteSets(object)[0]?.steps[0];
+        const spriteSet = this.findSpriteSet(object);
+        if (spriteSet === undefined) {
+            return undefined;
+        }
+
+        if (spriteSet.duration === undefined) {
+            return spriteSet.steps[0];
+        }
+
+        return this.findAnimationSprite(spriteSet, object.spawnTime);
     }
 
     static findAudioEffects(object: GameObject): IAudioEffect[] {
@@ -449,7 +515,17 @@ export default class GameObjectProperties {
         return properties.audioEffects;
     }
 
-    static findAudioEffect(object: GameObject): IAudioEffect {
-        return this.findAudioEffects(object)[0];
+    static findAudioEffect(object: GameObject): IAudioEffect | undefined {
+        const audioEffects = this.findAudioEffects(object);
+
+        for (const audioEffect of audioEffects) {
+            if (audioEffect.meta !== undefined && !object.isMatchingMeta(audioEffect.meta)) {
+                continue;
+            }
+
+            return audioEffect;
+        }
+
+        return undefined;
     }
 }

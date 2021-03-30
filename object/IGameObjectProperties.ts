@@ -10,6 +10,8 @@ export interface ISprite {
     height?: number;
 }
 
+export type ResourceMeta = Record<string, string | number | boolean>;
+
 export interface ISpriteSet {
     duration?: number;
     direction?: Direction;
@@ -19,8 +21,7 @@ export interface ISpriteSet {
         divide: number,
         equals: Point[];
     };
-    meta?: Record<string, string | number>;
-
+    meta?: ResourceMeta;
     steps: ISprite[];
 }
 
@@ -28,7 +29,7 @@ export interface IAudioEffect {
     filename: string;
     loop?: boolean;
     buffer?: AudioBuffer;
-    meta?: Record<string, string | number | boolean>;
+    meta?: ResourceMeta;
 }
 
 export default interface IGameObjectProperties {

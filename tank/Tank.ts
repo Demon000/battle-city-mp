@@ -1,5 +1,4 @@
-import GameObjectProperties from '@/object/GameObjectProperties';
-import { IAudioEffect, ISprite } from '@/object/IGameObjectProperties';
+import { ResourceMeta } from '@/object/IGameObjectProperties';
 import GameObject, { GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
@@ -93,27 +92,11 @@ export default class Tank extends GameObject {
         return tierToBulletCooldownMap[this.tier];
     }
 
-    get sprite(): ISprite | undefined {
-        if (this.requestedSpeed) {
-            return GameObjectProperties.findAnimationSprite(this);
-        } else {
-            return GameObjectProperties.findSprite(this);
-        }
-    }
-
-    get audioEffect(): IAudioEffect | undefined {
-        const audioEffects = GameObjectProperties.findAudioEffects(this);
-
-        for (const audioEffect of audioEffects) {
-            if (audioEffect.meta === undefined) {
-                return audioEffect;
-            }
-
-            if (audioEffect.meta.isMoving === true && this.requestedSpeed > 0) {
-                return audioEffect;
-            }
+    isMatchingMeta(meta: ResourceMeta): boolean {
+        if (meta.isMoving === true && this.requestedSpeed > 0) {
+            return true;
         }
 
-        return undefined;
+        return false;
     }
 }

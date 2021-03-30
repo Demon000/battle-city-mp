@@ -3,7 +3,7 @@ import Point from '@/physics/point/Point';
 import { Direction } from '../physics/Direction';
 import GameObjectProperties from './GameObjectProperties';
 import { GameObjectType } from './GameObjectType';
-import IGameObjectProperties, { IAudioEffect, ISprite } from './IGameObjectProperties';
+import IGameObjectProperties, { IAudioEffect, ISprite, ResourceMeta } from './IGameObjectProperties';
 
 export interface GameObjectOptions {
     id?: number;
@@ -79,6 +79,10 @@ export default class GameObject {
 
     get automaticDestroyTime(): number | undefined {
         return this.properties.automaticDestroyTime;
+    }
+
+    isMatchingMeta(_meta: ResourceMeta): boolean {
+        return false;
     }
 
     getBoundingBox(position=this.position): BoundingBox {

@@ -1,7 +1,7 @@
 import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import GameObjectProperties from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
-import { IAudioEffect, ISprite, ISpriteSet } from '@/object/IGameObjectProperties';
+import { ResourceMeta } from '@/object/IGameObjectProperties';
 import { ExplosionType } from './ExplosionType';
 
 export interface ExplosionOptions extends GameObjectOptions {
@@ -22,45 +22,21 @@ export default class Explosion extends GameObject {
         this.destroyedObjectType = options.destroyedObjectType;
     }
 
-    get spriteSet(): ISpriteSet | undefined {
-        const sets = GameObjectProperties.findSpriteSets(this);
-        for (const set of sets) {
-            if (set.meta?.explosionType === this.explosionType) {
-                return set;
-            }
-        }
-
-        return undefined;
-    }
-
-    get sprite(): ISprite | undefined {
-        const set = this.spriteSet;
-        if (set === undefined) {
-            return undefined;
-        }
-
-        return GameObjectProperties.findAnimationSprite(this, set);
-    }
-
-    get audioEffect(): IAudioEffect | undefined {
-        const audioEffects = GameObjectProperties.findAudioEffects(this);
-
-        for (const audioEffect of audioEffects) {
-            if (audioEffect.meta === undefined) {
-                return audioEffect;
-            }
-
-            if (audioEffect.meta.destroyedObjectType === this.destroyedObjectType) {
-                return audioEffect;
-            }
-        }
-
-        return undefined;
-    }
-
     get automaticDestroyTime(): number | undefined {
-        const set = this.spriteSet;
+        const set = GameObjectProperties.findSpriteSet(this);
         return set?.duration;
+    }
+
+    isMatchingMeta(meta: ResourceMeta): boolean {
+        if (meta.explosionType === this.explosionType) {
+            return true;
+        }
+
+        if (meta.destroyedObjectType === this.destroyedObjectType) {
+            return true;
+        }
+
+        return false;
     }
 
     toOptions(): ExplosionOptions {
