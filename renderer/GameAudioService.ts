@@ -12,11 +12,16 @@ interface CartesianPositioned {
 
 export default class GameAudioService {
     private context;
+    private compressorNode;
+    private finalNode;
     private rolloffFactor;
     private objectsPlayingAudioEffects = new Set<GameObject>();
 
     constructor() {
         this.context = new AudioContext();
+        this.compressorNode = new DynamicsCompressorNode(this.context);
+        this.compressorNode.connect(this.context.destination);
+        this.finalNode = this.compressorNode;
 
         this.rolloffFactor = 2 / CLIENT_CONFIG_VISIBLE_GAME_SIZE;
     }
@@ -56,7 +61,7 @@ export default class GameAudioService {
             panningModel: 'HRTF',
             rolloffFactor: this.rolloffFactor,
         });
-        panner.connect(this.context.destination);
+        panner.connect(this.finalNode);
         object.audioEffectPanner = panner;
     }
 
