@@ -107,6 +107,10 @@ export default class GameAudioService {
         this.context.listener.forwardZ.value = 0;
 
         for (const object of objects) {
+            if (!object.hasAudioEffects) {
+                continue;
+            }
+
             this.createObjectAudioEffectPanner(object);
             if (!object.audioEffectPanner) {
                 throw new Error('Failed to create audio effect panner');

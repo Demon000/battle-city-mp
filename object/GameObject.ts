@@ -73,6 +73,10 @@ export default class GameObject {
         return GameObjectProperties.findSprite(this);
     }
 
+    get hasAudioEffects(): boolean {
+        return !!GameObjectProperties.findAudioEffects(this).length;
+    }
+
     get audioEffect(): IAudioEffect | undefined {
         return GameObjectProperties.findAudioEffect(this);
     }
