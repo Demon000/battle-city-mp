@@ -287,6 +287,11 @@ const properties: IGameObjectProperties[] = [
                 ],
             },
         ],
+        audioEffects: [
+            {
+                filename: 'shoot_bullet.wav',
+            },
+        ],
     },
     {
         type: GameObjectType.EXPLOSION,
@@ -397,9 +402,9 @@ const properties: IGameObjectProperties[] = [
                 },
             },
             {
-                filename: 'destroy_steel_wall.wav',
+                filename: 'bullet_hit.wav',
                 meta: {
-                    destroyedObjectType: GameObjectType.STEEL_WALL,
+                    destroyedObjectType: GameObjectType.LEVEL_BORDER,
                 },
             },
             {

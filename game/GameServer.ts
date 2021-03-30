@@ -225,14 +225,14 @@ export default class GameServer {
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_LEVEL_BORDER,
             (movingObjectId: number, _position: Point, _staticObjectId: number) => {
-                spawnExplosion(movingObjectId, ExplosionType.SMALL);
+                spawnExplosion(movingObjectId, ExplosionType.SMALL, GameObjectType.LEVEL_BORDER);
                 destroyBullet(movingObjectId);
             });
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_WALL,
             (movingObjectId: number, _position: Point, staticObjectId: number) => {
                 const object = this.gameObjectService.getObject(staticObjectId);
-                spawnExplosion(movingObjectId, ExplosionType.SMALL, object.type);
+                spawnExplosion(movingObjectId, ExplosionType.SMALL);
                 destroyBullet(movingObjectId);
                 this.gameObjectService.setObjectDestroyed(staticObjectId);
             });
