@@ -8,10 +8,32 @@
             <button
                 @click="onSpawnButtonClick"
             >Spawn</button>
+            <div id="fullscreen-controls">
+                <img
+                    class="image-button"
+                    :src="`${CLIENT_SPRITES_RELATIVE_URL}/fullscreen_button.png`"
+                    alt="Enter fullscreen"
+                    v-if="!isFullscreen"
+                    @click="onFullscreenButtonClick"
+                >
+
+                <img
+                    class="image-button"
+                    :src="`${CLIENT_SPRITES_RELATIVE_URL}/fullscreen_exit_button.png`"
+                    alt="Exit fullscreen"
+                    v-if="isFullscreen"
+                    @click="onFullscreenButtonClick"
+                >
+            </div>
             <div id="virtual-controls">
                 <div
                     ref="dpad"
                     id="virtual-dpad"
+                >
+                </div>
+                <div
+                    id="virtual-shoot-button"
+                    ref="shootButton"
                 >
                 </div>
             </div>
@@ -21,18 +43,21 @@
 
 <script lang="ts">
 import GameClientSocket from '@/game/GameClientSocket';
-import { CLIENT_CONFIG_SOCKET_BASE_URL } from '../../config';
+import { CLIENT_CONFIG_SOCKET_BASE_URL, CLIENT_SPRITES_RELATIVE_URL } from '../../config';
 import { Vue } from 'vue-class-component';
 import GameClient from '@/game/GameClient';
 import { io, Socket } from 'socket.io-client';
 import ActionFactory from '@/actions/ActionFactory';
 import DirectionalJoystickWrapper, { DirectionalJoystickEvent } from '../DirectionalJoystickWrapper';
+import screenfull = require('screenfull');
 
 export default class App extends Vue {
     socket?: Socket;
     gameClient?: GameClient;
     gameClientSocket?: GameClientSocket;
     joystick?: DirectionalJoystickWrapper;
+    isFullscreen = false;
+    CLIENT_SPRITES_RELATIVE_URL = CLIENT_SPRITES_RELATIVE_URL;
 
     mounted(): void {
         const canvas = this.$refs.canvas as HTMLCanvasElement;
@@ -50,8 +75,24 @@ export default class App extends Vue {
         window.addEventListener('keydown', this.onKeyboardEvent);
         window.addEventListener('keyup', this.onKeyboardEvent);
         window.addEventListener('contextmenu', (e: Event) => e.preventDefault());
+
+        const shootButton = this.$refs.shootButton as HTMLElement;
+        shootButton.addEventListener('touchstart', this.onShootButtonTouchEvent);
+        shootButton.addEventListener('touchend', this.onShootButtonTouchEvent);
+
+
         this.joystick.on('dirdown', this.onJoystickEvent);
         this.joystick.on('dirup', this.onJoystickEvent);
+
+        if (screenfull.isEnabled) {
+            screenfull.on('change', this.onFullscreenChanged);
+        }
+    }
+
+    onFullscreenChanged(): void {
+        if (screenfull.isEnabled) {
+            this.isFullscreen = screenfull.isFullscreen;
+        }
     }
 
     onKeyboardEvent(event: KeyboardEvent): void {
@@ -69,6 +110,15 @@ export default class App extends Vue {
         }
 
         this.gameClientSocket.requestPlayerAction(action);
+    }
+
+    onShootButtonTouchEvent(event: TouchEvent): void {
+        const action = ActionFactory.buildFromShootButtonTouchEvent(event.type);
+        if (action === undefined) {
+            return;
+        }
+
+        this.gameClientSocket?.requestPlayerAction(action);
     }
 
     onJoystickEvent(event: DirectionalJoystickEvent): void {
@@ -99,6 +149,12 @@ export default class App extends Vue {
             this.gameClientSocket.requestPlayerTankSpawn();
         }
     }
+
+    onFullscreenButtonClick(event: MouseEvent): void {
+        if (screenfull.isEnabled) {
+            screenfull.toggle();
+        }
+    }
 }
 </script>
 
@@ -119,8 +175,24 @@ export default class App extends Vue {
     height: 100%;
     top: 0;
     left: 0;
+}
 
-    /* background: rgba(0, 0, 0, 0.5); */
+.image-button {
+    padding: 8px;
+    width: 32px;
+    height: 32px;
+    image-rendering: pixelated;
+    cursor: pointer;
+}
+
+
+#fullscreen-controls {
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    background: rgba(0, 0, 0, 0.25);
+    border-bottom-left-radius: 12px;
 }
 
 #virtual-controls {
@@ -129,12 +201,26 @@ export default class App extends Vue {
     left: 0;
     width: 100%;
     height: 50%;
+
+    display: none;
 }
 
 #virtual-dpad {
     position: relative;
 
+    width: 70%;
+    height: 100%;
+}
+
+#virtual-shoot-button {
     width: 50%;
     height: 100%;
 }
+
+@media (pointer: coarse) {
+    #virtual-controls {
+        display: flex;
+    }
+}
+
 </style>

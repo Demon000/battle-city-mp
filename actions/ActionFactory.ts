@@ -59,7 +59,6 @@ export default class ActionFactory {
 
     static buildFromJoystickEvent(type: string, angle: string): Action | undefined {
         let buttonState;
-
         switch (type) {
             case 'dirup':
                 buttonState = ButtonState.UNPRESSED;
@@ -93,6 +92,26 @@ export default class ActionFactory {
             timestamp: Date.now(),
             buttonState,
             buttonType,
+        });
+    }
+
+    static buildFromShootButtonTouchEvent(type: string): Action | undefined {
+        let buttonState;
+        switch (type) {
+            case 'touchend':
+                buttonState = ButtonState.UNPRESSED;
+                break;
+            case 'touchstart':
+                buttonState = ButtonState.PRESSED;
+                break;
+            default:
+                throw new Error('Invalid button event type');
+        }
+
+        return new ButtonPressAction({
+            timestamp: Date.now(),
+            buttonState,
+            buttonType: ButtonType.SHOOT,
         });
     }
 }
