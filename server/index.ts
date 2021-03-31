@@ -9,8 +9,25 @@ import ActionFactory from '@/actions/ActionFactory';
 import GameObject from '@/object/GameObject';
 import GameServer from '@/game/GameServer';
 import Player from '@/player/Player';
+import yargs from 'yargs';
 
 dotenv.config();
+
+const argv = yargs(process.argv.slice(2))
+    .usage('Usage: $0 [options]')
+    .options('host', {
+        alias: 'h',
+        type: 'string',
+        default: '0.0.0.0',
+        description: 'specify host',
+    })
+    .options('port', {
+        alias: 'p',
+        type: 'number',
+        default: 5000,
+        description: 'specify port',
+    })
+    .argv;
 
 const app = Express();
 const http = new Http.Server(app);
@@ -76,8 +93,8 @@ gameServer.emitter.on(GameEvent.PLAYER_REMOVED, (playerId: string) => {
     io.emit(GameEvent.PLAYER_REMOVED, playerId);
 });
 
-http.listen(5000, () => {
-    console.log('Game server listening on port 5000');
+http.listen(argv.port, argv.host, () => {
+    console.log(`Game server listening on ${argv.host}:${argv.port}`);
 });
 
 app.use(Cors());
