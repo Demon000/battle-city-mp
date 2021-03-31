@@ -1,6 +1,6 @@
 import { CLIENT_CONFIG_VISIBLE_GAME_SIZE, CLIENT_SOUNDS_RELATIVE_URL } from '@/config';
 import GameObject from '@/object/GameObject';
-import { IAudioEffect } from '@/object/IGameObjectProperties';
+import { AudioEffectLoadingState, IAudioEffect } from '@/object/IGameObjectProperties';
 import Point from '@/physics/point/Point';
 import axios from 'axios';
 
@@ -29,38 +29,36 @@ export default class GameAudioService {
         positioned.positionZ.value = -point.x; 
     }
 
-    loadAudioEffectBuffer(audioEffect: IAudioEffect | undefined): boolean {
-        if (audioEffect === undefined) {
-            return false;
-        }
-
-        if (audioEffect.buffer !== undefined) {
+    loadAudioEffectBuffer(audioEffect: IAudioEffect): boolean {
+        if (audioEffect.state === AudioEffectLoadingState.LOADED) {
             return true;
         }
 
+        if (audioEffect.state === AudioEffectLoadingState.LOADING) {
+            return false;
+        }
+
+        audioEffect.state = AudioEffectLoadingState.LOADING;
         axios.get(`${CLIENT_SOUNDS_RELATIVE_URL}/${audioEffect.filename}`, {
             responseType: 'arraybuffer',
         }).then(response => {
             return this.context.decodeAudioData(response.data);
         }).then(buffer => {
             audioEffect.buffer = buffer;
+            audioEffect.state = AudioEffectLoadingState.LOADED;
         });
 
-        return audioEffect.buffer !== undefined;
+        return false;
     }
 
-    createObjectAudioEffectPanner(object: GameObject): void {
-        if (object.audioEffectPanner !== undefined) {
-            return;
-        }
-
+    createObjectAudioEffectPanner(): PannerNode {
         const panner = new PannerNode(this.context, {
             panningModel: 'HRTF',
             distanceModel: 'linear',
             maxDistance: CLIENT_CONFIG_VISIBLE_GAME_SIZE / 2,
         });
         panner.connect(this.finalNode);
-        object.audioEffectPanner = panner;
+        return panner;
     }
 
     stopObjectAudioEffectIfDifferent(object: GameObject, audioEffect?: IAudioEffect): boolean {
@@ -113,15 +111,25 @@ export default class GameAudioService {
                 continue;
             }
 
-            this.createObjectAudioEffectPanner(object);
-            if (!object.audioEffectPanner) {
-                throw new Error('Failed to create audio effect panner');
+            if (object.audioEffectPanner === undefined) {
+                object.audioEffectPanner = this.createObjectAudioEffectPanner();
             }
 
             this.setCartesianPositions(object.audioEffectPanner, object.centerPosition);
 
+            // Retrieve the current object audio effect
             const audioEffect = object.audioEffect;
+
+            // Try to stop any ongoing effect if the current audio effect is different
             const stoppedAudioEffect = this.stopObjectAudioEffectIfDifferent(object, audioEffect);
+
+            // The objects has no current audio effect
+            if (audioEffect === undefined) {
+                continue;
+            }
+
+            // If we stopped the old audio effect, it means that it differed
+            // Load and play the new audio effect
             if (stoppedAudioEffect) {
                 const loadedBuffer = this.loadAudioEffectBuffer(audioEffect);
                 if (!loadedBuffer) {
@@ -131,6 +139,8 @@ export default class GameAudioService {
                 this.createObjectAudioBufferSource(object, audioEffect);
             }
 
+            // Keep track of the currently playing audio effects
+            // And stop the ones that are no longer playing
             objectsCurrentlyPlayingAudioEffects.add(object);
         }
 

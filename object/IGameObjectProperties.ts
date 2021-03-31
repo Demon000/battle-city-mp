@@ -32,10 +32,16 @@ export interface ISpriteSet {
     steps: ISprite[];
 }
 
+export enum AudioEffectLoadingState {
+    LOADING = 'loading',
+    LOADED = 'loaded',
+}
+
 export interface IAudioEffect {
     filename: string;
     loop?: boolean;
     buffer?: AudioBuffer;
+    state?: AudioEffectLoadingState;
     meta?: ResourceMeta;
 }
 
