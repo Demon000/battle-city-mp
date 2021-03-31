@@ -8,6 +8,13 @@
             <button
                 @click="onSpawnButtonClick"
             >Spawn</button>
+            <div id="virtual-controls">
+                <div
+                    ref="dpad"
+                    id="virtual-dpad"
+                >
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -19,11 +26,13 @@ import { Vue } from 'vue-class-component';
 import GameClient from '@/game/GameClient';
 import { io, Socket } from 'socket.io-client';
 import ActionFactory from '@/actions/ActionFactory';
+import DirectionalJoystickWrapper, { DirectionalJoystickEvent } from '../DirectionalJoystickWrapper';
 
 export default class App extends Vue {
     socket?: Socket;
     gameClient?: GameClient;
     gameClientSocket?: GameClientSocket;
+    joystick?: DirectionalJoystickWrapper;
 
     mounted(): void {
         const canvas = this.$refs.canvas as HTMLCanvasElement;
@@ -33,11 +42,16 @@ export default class App extends Vue {
         });
         this.gameClient = new GameClient(canvas);
         this.gameClientSocket = new GameClientSocket(this.socket, this.gameClient);
+        this.joystick = new DirectionalJoystickWrapper({
+            zone: this.$refs.dpad as HTMLElement,
+        });
 
         window.addEventListener('resize', this.onWindowResize);
         window.addEventListener('keydown', this.onKeyboardEvent);
         window.addEventListener('keyup', this.onKeyboardEvent);
         window.addEventListener('contextmenu', (e: Event) => e.preventDefault());
+        this.joystick.on('dirdown', this.onJoystickEvent);
+        this.joystick.on('dirup', this.onJoystickEvent);
     }
 
     onKeyboardEvent(event: KeyboardEvent): void {
@@ -50,6 +64,19 @@ export default class App extends Vue {
         }
 
         const action = ActionFactory.buildFromEvent(event);
+        if (action === undefined) {
+            return;
+        }
+
+        this.gameClientSocket.requestPlayerAction(action);
+    }
+
+    onJoystickEvent(event: DirectionalJoystickEvent): void {
+        if (!this.gameClientSocket) {
+            return;
+        }
+
+        const action = ActionFactory.buildFromJoystickEvent(event.type, event.angle);
         if (action === undefined) {
             return;
         }
@@ -94,5 +121,20 @@ export default class App extends Vue {
     left: 0;
 
     /* background: rgba(0, 0, 0, 0.5); */
+}
+
+#virtual-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+}
+
+#virtual-dpad {
+    position: relative;
+
+    width: 50%;
+    height: 100%;
 }
 </style>

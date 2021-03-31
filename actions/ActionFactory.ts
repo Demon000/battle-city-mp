@@ -56,4 +56,43 @@ export default class ActionFactory {
             throw new Error('Invalid event type');
         }
     }
+
+    static buildFromJoystickEvent(type: string, angle: string): Action | undefined {
+        let buttonState;
+
+        switch (type) {
+            case 'dirup':
+                buttonState = ButtonState.UNPRESSED;
+                break;
+            case 'dirdown':
+                buttonState = ButtonState.PRESSED;
+                break;
+            default:
+                throw new Error('Invalid joystick event type');
+        }
+
+        let buttonType;
+        switch (angle) {
+            case 'up':
+                buttonType = ButtonType.UP;
+                break;
+            case 'down':
+                buttonType = ButtonType.DOWN;
+                break;
+            case 'right':
+                buttonType = ButtonType.RIGHT;
+                break;
+            case 'left':
+                buttonType = ButtonType.LEFT;
+                break;
+            default:
+                throw new Error('Invalid joystick button angle');
+        }
+
+        return new ButtonPressAction({
+            timestamp: Date.now(),
+            buttonState,
+            buttonType,
+        });
+    }
 }
