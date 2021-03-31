@@ -222,5 +222,4 @@ export default class App extends Vue {
         display: flex;
     }
 }
-
 </style>
