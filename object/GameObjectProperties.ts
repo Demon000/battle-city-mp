@@ -236,8 +236,8 @@ const properties: IGameObjectProperties[] = [
                     {
                         filename: 'bullet_up.png',
                         offset: {
-                            y: -2,
-                            x: -2,
+                            y: -1,
+                            x: -1,
                         },
                         width: 4,
                         height: 4,
@@ -250,8 +250,8 @@ const properties: IGameObjectProperties[] = [
                     {
                         filename: 'bullet_right.png',
                         offset: {
-                            y: -2,
-                            x: -2,
+                            y: -1,
+                            x: -1,
                         },
                         width: 4,
                         height: 4,
@@ -264,8 +264,8 @@ const properties: IGameObjectProperties[] = [
                     {
                         filename: 'bullet_down.png',
                         offset: {
-                            y: -2,
-                            x: -2,
+                            y: -1,
+                            x: -1,
                         },
                         width: 4,
                         height: 4,
@@ -278,8 +278,8 @@ const properties: IGameObjectProperties[] = [
                     {
                         filename: 'bullet_left.png',
                         offset: {
-                            y: -2,
-                            x: -2,
+                            y: -1,
+                            x: -1,
                         },
                         width: 4,
                         height: 4,
