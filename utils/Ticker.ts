@@ -6,21 +6,22 @@ export enum TickerEvent {
 }
 
 export default class Ticker {
-    tickRate: number;
-    tickTime: number;
+    tickTime?: number;
     lastTickTime = 0;
     deltaSeconds = 0;
     running = true;
     emitter = new EventEmitter();
+    useRequestAnimationFrame;
 
-    constructor(tickRate: number) {
-        this.tickRate = tickRate;
-        this.tickTime = 1000 / tickRate;
+    constructor(tickRate?: number) {
+        if (tickRate === undefined) {
+            this.useRequestAnimationFrame = true;
+        } else {
+            this.tickTime = 1000 / tickRate;
+        }
     }
 
-    tick(): void {
-        const currentTickTime = now();
-
+    tick(currentTickTime: number): void {
         if (this.lastTickTime) {
             const deltaSeconds = (currentTickTime - this.lastTickTime) / 1000;
             this.emitter.emit(TickerEvent.TICK, deltaSeconds);
@@ -32,13 +33,24 @@ export default class Ticker {
             return;
         }
 
-        setTimeout(this.tick.bind(this), this.tickTime);
+        this.callTick();
+    }
+
+    callTick(): void {
+        if (this.useRequestAnimationFrame) {
+            requestAnimationFrame((currentTickTime) => {
+                this.tick(currentTickTime);
+            });
+        } else {
+            setTimeout(() => {
+                const currentTickTime = now();
+                this.tick(currentTickTime);
+            }, this.tickTime);
+        }
     }
 
     start(): void {
-        this.running = true;
-
-        this.tick();
+        this.callTick();
     }
 
     stop(): void {

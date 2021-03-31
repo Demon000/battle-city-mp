@@ -28,7 +28,7 @@ export default class GameClient {
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
         this.gameRenderService = new GameRenderService(canvas, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
         this.gameAudioService = new GameAudioService();
-        this.ticker = new Ticker(CLIENT_CONFIG_FPS);
+        this.ticker = new Ticker();
 
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.playerRepository);
