@@ -130,16 +130,12 @@ export default class PlayerService {
     }
 
     private processPlayerSpawnStatus(player: Player): void {
-        if (player.requestedSpawnStatus === player.spawnStatus) {
-            return;
-        }
-
-        player.spawnStatus = player.requestedSpawnStatus;
-
         if ((player.requestedSpawnStatus === PlayerSpawnStatus.SPAWN && player.tankId === undefined)
             || (player.requestedSpawnStatus === PlayerSpawnStatus.DESPAWN && player.tankId !== undefined)) {
             this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_SPAWN_STATUS, player.id, player.requestedSpawnStatus);
         }
+
+        player.requestedSpawnStatus = PlayerSpawnStatus.NONE;
     }
 
     private processPlayerDisconnectStatus(player: Player): boolean {

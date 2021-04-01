@@ -19,7 +19,6 @@ export default class Player {
     requestedSpawnStatus = PlayerSpawnStatus.NONE;
     requestedGameObjects = false;
     requestedPlayers = false;
-    spawnStatus = PlayerSpawnStatus.NONE;
     disconnected = false;
     isOwnPlayer = false;
     tankId?: number;
