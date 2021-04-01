@@ -112,10 +112,6 @@ export default class CollisionService {
             }
 
             for (let result of rule.result) {
-                if (typeof(result) == 'function') {
-                    result = result(objectId, position, overlappingObjectId);
-                }
-
                 if (result.type === CollisionResultType.PREVENT_MOVEMENT) {
                     preventMovement = true;
                 } else if (result.type === CollisionResultType.NOTIFY) {
