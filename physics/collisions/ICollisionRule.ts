@@ -1,5 +1,4 @@
 import { GameObjectType } from '@/object/GameObjectType';
-import Point from '../point/Point';
 
 export enum CollisionResultType {
     PREVENT_MOVEMENT = 'prevent-movement',
@@ -20,14 +19,8 @@ export type ICollisionResult = {
     name: CollisionEventType,
 };
 
-export type CollisionRuleResultFunction = (
-    movingObjectId: number,
-    newPosition: Point,
-    staticObjectId: number,
-) => ICollisionResult;
-
 export default interface ICollisionRule {
     movingTypes: GameObjectType[];
     staticTypes: GameObjectType[];
-    result: (ICollisionResult | CollisionRuleResultFunction)[];
+    result: ICollisionResult[];
 }
