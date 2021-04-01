@@ -15,7 +15,6 @@ export enum CollisionEventType {
 
 export type ICollisionResult = {
     type: CollisionResultType.PREVENT_MOVEMENT;
-    tolerance?: number,
 } | {
     type: CollisionResultType.NOTIFY,
     name: CollisionEventType,
