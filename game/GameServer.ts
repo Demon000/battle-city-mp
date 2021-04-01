@@ -229,11 +229,24 @@ export default class GameServer {
                 destroyBullet(movingObjectId);
             });
 
-        this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_WALL,
+        this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_STEEL_WALL,
             (movingObjectId: number, _position: Point, staticObjectId: number) => {
                 spawnExplosion(movingObjectId, ExplosionType.SMALL);
                 destroyBullet(movingObjectId);
                 this.gameObjectService.setObjectDestroyed(staticObjectId);
+            });
+
+        this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_BRICK_WALL,
+            (bulletId: number, _position: Point, brickWallId: number) => {
+                const destroyBox = this.bulletService.getBulletBrickWallDestroyBox(bulletId, brickWallId);
+                const objectsIds = this.collisionService.getOverlappingObjects(destroyBox);
+                const objects = this.gameObjectService.getMultipleObjects(objectsIds);
+                const brickWalls = objects.filter(o => o.type === GameObjectType.BRICK_WALL);
+                spawnExplosion(bulletId, ExplosionType.SMALL);
+                destroyBullet(bulletId);
+                for (const brickWall of brickWalls) {
+                    this.gameObjectService.setObjectDestroyed(brickWall.id);
+                }
             });
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_TANK,

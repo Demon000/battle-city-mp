@@ -6,7 +6,8 @@ export enum CollisionResultType {
 }
 
 export enum CollisionEventType {
-    BULLET_HIT_WALL = 'bullet-hit-wall',
+    BULLET_HIT_BRICK_WALL = 'bullet-hit-brick-wall',
+    BULLET_HIT_STEEL_WALL = 'bullet-hit-steel-wall',
     BULLET_HIT_TANK = 'bullet-hit-tank',
     BULLET_HIT_BULLET = 'bullet-hit-bullet',
     BULLET_HIT_LEVEL_BORDER = 'bullet-hit-level-border',

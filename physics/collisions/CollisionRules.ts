@@ -28,11 +28,24 @@ export const rules: ICollisionRule[] = [
     },
     {
         movingTypes: [GameObjectType.BULLET],
-        staticTypes: [GameObjectType.BRICK_WALL, GameObjectType.STEEL_WALL],
+        staticTypes: [GameObjectType.BRICK_WALL],
         result: [
             {
                 type: CollisionResultType.NOTIFY,
-                name: CollisionEventType.BULLET_HIT_WALL,
+                name: CollisionEventType.BULLET_HIT_BRICK_WALL,
+            },
+            {
+                type: CollisionResultType.PREVENT_MOVEMENT,
+            },
+        ],
+    },
+    {
+        movingTypes: [GameObjectType.BULLET],
+        staticTypes: [GameObjectType.STEEL_WALL],
+        result: [
+            {
+                type: CollisionResultType.NOTIFY,
+                name: CollisionEventType.BULLET_HIT_STEEL_WALL,
             },
         ],
     },

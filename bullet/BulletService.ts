@@ -1,6 +1,9 @@
 import GameObject from '@/object/GameObject';
 import GameObjectProperties from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
+import BoundingBox from '@/physics/bounding-box/BoundingBox';
+import BoundingBoxUtils from '@/physics/bounding-box/BoundingBoxUtils';
+import DirectionUtils from '@/physics/collisions/DirectionUtils';
 import { Direction } from '@/physics/Direction';
 import Tank from '@/tank/Tank';
 import MapRepository from '@/utils/MapRepository';
@@ -26,6 +29,37 @@ export default class BulletService {
         }
 
         return object as Bullet;
+    }
+
+    getBulletBrickWallDestroyBox(bulletId: number, brickWallId: number): BoundingBox {
+        const bullet = this.repository.get(bulletId);
+        const brickWall = this.repository.get(brickWallId);
+        const box = brickWall.getBoundingBox();
+
+        const bulletCenterPosition = bullet.centerPosition;
+        const brickWallCenterPosition = brickWall.centerPosition;
+
+        if (DirectionUtils.isHorizontalAxis(bullet.direction)) {
+            const brickWallHeight = brickWall.properties.height;
+            if (bulletCenterPosition.y > brickWallCenterPosition.y) {
+                box.tl.y -= brickWallHeight;
+                box.br.y += brickWallHeight * 2;
+            } else {
+                box.tl.y -= brickWallHeight * 2;
+                box.br.y += brickWallHeight;
+            }
+        } else {
+            const brickWallWidth = brickWall.properties.width;
+            if (bulletCenterPosition.x > brickWallCenterPosition.x) {
+                box.tl.x -= brickWallWidth;
+                box.br.x += brickWallWidth * 2;
+            } else {
+                box.tl.x -= brickWallWidth * 2;
+                box.br.x += brickWallWidth;
+            }
+        }
+
+        return box;
     }
 
     spawnBulletForTank(tank: Tank): void {
