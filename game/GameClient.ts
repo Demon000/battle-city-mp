@@ -1,4 +1,4 @@
-import { CLIENT_CONFIG_FPS, CLIENT_CONFIG_VISIBLE_GAME_SIZE } from '@/config';
+import { CLIENT_CONFIG_VISIBLE_GAME_SIZE } from '@/config';
 import GameAudioService from '@/renderer/GameAudioService';
 import GameCamera from '@/renderer/GameCamera';
 import GameRenderService from '@/renderer/GameRenderService';
