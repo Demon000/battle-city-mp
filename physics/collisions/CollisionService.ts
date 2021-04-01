@@ -4,7 +4,6 @@ import MapRepository from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import BoundingBox from '../bounding-box/BoundingBox';
 import BoundingBoxRepository from '../bounding-box/BoundingBoxRepository';
-import BoundingBoxUtils from '../bounding-box/BoundingBoxUtils';
 import { Direction } from '../Direction';
 import Point from '../point/Point';
 import DirectionUtils from './DirectionUtils';
@@ -111,7 +110,7 @@ export default class CollisionService {
                 continue;
             }
 
-            for (let result of rule.result) {
+            for (const result of rule.result) {
                 if (result.type === CollisionResultType.PREVENT_MOVEMENT) {
                     preventMovement = true;
                 } else if (result.type === CollisionResultType.NOTIFY) {

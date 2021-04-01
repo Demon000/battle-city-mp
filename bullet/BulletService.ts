@@ -2,7 +2,6 @@ import GameObject from '@/object/GameObject';
 import GameObjectProperties from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
-import BoundingBoxUtils from '@/physics/bounding-box/BoundingBoxUtils';
 import DirectionUtils from '@/physics/collisions/DirectionUtils';
 import { Direction } from '@/physics/Direction';
 import Tank from '@/tank/Tank';
