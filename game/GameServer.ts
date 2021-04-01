@@ -231,7 +231,6 @@ export default class GameServer {
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_WALL,
             (movingObjectId: number, _position: Point, staticObjectId: number) => {
-                const object = this.gameObjectService.getObject(staticObjectId);
                 spawnExplosion(movingObjectId, ExplosionType.SMALL);
                 destroyBullet(movingObjectId);
                 this.gameObjectService.setObjectDestroyed(staticObjectId);
