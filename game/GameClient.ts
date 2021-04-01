@@ -1,5 +1,6 @@
 import { CLIENT_CONFIG_FPS, CLIENT_CONFIG_VISIBLE_GAME_SIZE } from '@/config';
 import GameAudioService from '@/renderer/GameAudioService';
+import GameCamera from '@/renderer/GameCamera';
 import GameRenderService from '@/renderer/GameRenderService';
 import MapRepository from '@/utils/MapRepository';
 import Ticker, { TickerEvent } from '@/utils/Ticker';
@@ -17,6 +18,7 @@ export default class GameClient {
     private gameObjectService;
     private boundingBoxRepository;
     private collisionService;
+    private gameCamera;
     private gameRenderService;
     private gameAudioService;
     ticker;
@@ -26,6 +28,7 @@ export default class GameClient {
         this.boundingBoxRepository = new BoundingBoxRepository<number>();
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
+        this.gameCamera = new GameCamera();
         this.gameRenderService = new GameRenderService(canvas, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
         this.gameAudioService = new GameAudioService();
         this.ticker = new Ticker();
@@ -75,24 +78,31 @@ export default class GameClient {
 
     onTick(): void {
         const ownPlayer = this.playerService.getOwnPlayer();
-        if (ownPlayer === undefined || ownPlayer.tankId === undefined) {
+        if (ownPlayer === undefined) {
             return;
         }
 
-        const tank = this.gameObjectService.findObject(ownPlayer.tankId);
-        if (tank === undefined) {
+        if (ownPlayer.tankId !== undefined) {
+            const tank = this.gameObjectService.findObject(ownPlayer.tankId);
+            if (tank !== undefined) {
+                this.gameCamera.setPosition(tank.centerPosition);
+            }
+        }
+
+        const position = this.gameCamera.getPosition();
+        if (position === undefined) {
             return;
         }
 
-        const box = this.gameRenderService.getViewableMapBoundingBox(tank.centerPosition);
+        const box = this.gameRenderService.getViewableMapBoundingBox(position);
         if (box === undefined) {
             return;
         }
 
         const viewableObjectIds = this.collisionService.getOverlappingObjects(box);
         const viewableObjects = this.gameObjectService.getMultipleObjects(viewableObjectIds);
-        this.gameRenderService.renderObjects(viewableObjects, tank.centerPosition);
-        this.gameAudioService.playObjectSounds(viewableObjects, tank.centerPosition);
+        this.gameRenderService.renderObjects(viewableObjects, position);
+        this.gameAudioService.playObjectSounds(viewableObjects, position);
     }
 
     onWindowResize(): void {
