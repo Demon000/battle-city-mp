@@ -87,8 +87,8 @@ export default class CollisionService {
     }
 
     validateObjectMovement(objectId: number, position: Point): boolean {
-        if (!this.rulesMap) {
-            return false;
+        if (this.rulesMap === undefined) {
+            throw new Error('Cannot validate object movement when rules map is not set');
         }
 
         let preventMovement = false;
