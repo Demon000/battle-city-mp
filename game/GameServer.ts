@@ -238,10 +238,16 @@ export default class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_TANK,
-            (movingObjectId: number, _position: Point, staticObjectId: number) => {
-                spawnExplosion(movingObjectId, ExplosionType.SMALL);
-                spawnExplosion(staticObjectId, ExplosionType.BIG, GameObjectType.TANK);
-                destroyBullet(movingObjectId);
+            (bulletId: number, _position: Point, tankId: number) => {
+                spawnExplosion(bulletId, ExplosionType.SMALL);
+                spawnExplosion(tankId, ExplosionType.BIG, GameObjectType.TANK);
+                destroyBullet(bulletId);
+
+                const tank = this.tankService.getTank(tankId);
+                if (tank.playerId !== undefined) {
+                    this.playerService.setPlayerTankId(tank.playerId, undefined);
+                }
+                this.gameObjectService.unregisterObject(tankId);
             });
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_BULLET,
