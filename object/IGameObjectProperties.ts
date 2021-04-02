@@ -4,6 +4,7 @@ import Point from '@/physics/point/Point';
 export enum RenderPass {
     ALL = 0,
     TANK = 1,
+    BULLET = 1,
     BUSHES = 2,
     EXPLOSIONS = 3,
 }
