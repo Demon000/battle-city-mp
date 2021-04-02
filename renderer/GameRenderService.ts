@@ -92,7 +92,20 @@ export default class GameRenderService {
             const objectRenderWidth = objectWidth * this.gameToRenderSizeScale;
             const objectRenderHeight = objectHeight * this.gameToRenderSizeScale;
 
-            this.context.drawImage(sprite.image, objectRenderX, objectRenderY, objectRenderWidth, objectRenderHeight);
+            if (sprite.canvas === undefined || sprite.canvas.width !== objectRenderWidth
+                || sprite.canvas.height !== objectRenderHeight) {
+                sprite.canvas = new OffscreenCanvas(objectRenderWidth, objectRenderHeight);
+                const context = sprite.canvas.getContext('2d');
+                if (context === null) {
+                    throw new Error('Failed to create offscreen canvas context');
+                }
+                context.imageSmoothingEnabled = false;
+                context.drawImage(sprite.image, 0, 0, objectRenderWidth, objectRenderHeight);
+                sprite.context = context;
+                console.log('drawing offscreen');
+            }
+
+            this.context.drawImage(sprite.canvas, objectRenderX, objectRenderY);
         }
 
         return leftOverRenderObjects;

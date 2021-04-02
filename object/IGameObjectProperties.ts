@@ -15,6 +15,10 @@ export interface ISprite {
     width?: number;
     height?: number;
     renderPass?: number;
+    canvas?: OffscreenCanvas;
+    context?: OffscreenCanvasRenderingContext2D;
+    canvasRenderedWidth?: number;
+    canvasRenderedHeight?: number;
 }
 
 export type ResourceMeta = Record<string, string | number | boolean>;
