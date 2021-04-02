@@ -92,11 +92,12 @@ export default class BulletService {
         const bullet = new Bullet({
             type: GameObjectType.BULLET,
             direction: tank.direction,
+            movementDirection: tank.direction,
             position: {
                 y: bulletY,
                 x: bulletX,
             },
-            requestedSpeed: tank.bulletSpeed,
+            movementSpeed: tank.bulletSpeed,
             tankId: tank.id,
         });
 

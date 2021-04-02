@@ -75,21 +75,16 @@ export default class GameObjectService {
         object.destroyed = true;
     }
 
-    setObjectMoving(objectId: number, isMoving: boolean): void {
-        const object = this.repository.get(objectId);
-        const requestedSpeed = isMoving ? object.movementSpeed : 0;
-        if (object.requestedSpeed === requestedSpeed) {
-            return;
-        }
-
-        object.requestedSpeed = requestedSpeed;
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object);
-    }
-
     updateObject(newObject: GameObject): void {
         const object = this.repository.get(newObject.id);
         object.setOptions(newObject);
         this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, object.id);
+    }
+
+    setObjectMovementDirection(objectId: number, direction: Direction | undefined): void {
+        const object = this.repository.get(objectId);
+        object.movementDirection = direction;
+        this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object);
     }
 
     processObjectDirection(tankId: number, direction: Direction): void {
@@ -114,7 +109,21 @@ export default class GameObjectService {
     }
 
     private processObjectMovement(object: GameObject, delta: number): void {
-        const distance = object.requestedSpeed * delta;
+        let newMovementSpeed = object.movementSpeed;
+        if (object.movementDirection === undefined) {
+            newMovementSpeed -= object.maxMovementSpeed * object.delecerationFactor * delta;
+            newMovementSpeed = Math.max(0, newMovementSpeed);
+        } else {
+            newMovementSpeed += object.maxMovementSpeed * object.accelerationFactor * delta;
+            newMovementSpeed = Math.min(object.maxMovementSpeed, newMovementSpeed);
+        }
+
+        if (object.movementSpeed !== newMovementSpeed) {
+            object.movementSpeed = newMovementSpeed;
+            this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object);
+        }
+
+        const distance = object.movementSpeed * delta;
         if (distance === 0) {
             return;
         }

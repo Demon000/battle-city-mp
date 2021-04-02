@@ -55,7 +55,6 @@ export default interface IGameObjectProperties {
 
     width: number;
     height: number;
-    speed?: number;
     directionAxisSnapping?: number;
     automaticDestroyTime?: number;
 

@@ -10,7 +10,8 @@ export interface GameObjectOptions {
     type?: GameObjectType;
     position: Point;
     direction?: Direction;
-    requestedSpeed?: number;
+    movementSpeed?: number;
+    movementDirection?: Direction;
     spawnTime?: number;
 }
 
@@ -21,7 +22,8 @@ export default class GameObject {
     type: GameObjectType;
     _position: Point;
     _direction: Direction;
-    requestedSpeed: number;
+    movementSpeed: number;
+    movementDirection?: Direction;
     spawnTime: number;
     destroyed = false;
     audioEffectPanner?: PannerNode;
@@ -34,7 +36,8 @@ export default class GameObject {
         this.type = options.type ?? GameObjectType.ANY;
         this._position = options.position;
         this._direction = options.direction ?? Direction.UP;
-        this.requestedSpeed = options.requestedSpeed ?? 0;
+        this.movementSpeed = options.movementSpeed ?? 0;
+        this.movementDirection = options.movementDirection;
         this.spawnTime = options.spawnTime ?? Date.now();
     }
 
@@ -44,7 +47,8 @@ export default class GameObject {
             type: this.type,
             position: this._position,
             direction: this.direction,
-            requestedSpeed: this.requestedSpeed,
+            movementSpeed: this.movementSpeed,
+            movementDirection: this.movementDirection,
             spawnTime: this.spawnTime,
         };
     }
@@ -52,7 +56,8 @@ export default class GameObject {
     setOptions(other: GameObject): void {
         this.position = other.position;
         this.direction = other.direction;
-        this.requestedSpeed = other.requestedSpeed;
+        this.movementSpeed = other.movementSpeed;
+        this.movementDirection = other.movementDirection;
         this.spawnTime = other.spawnTime;
     }
 
@@ -85,8 +90,16 @@ export default class GameObject {
         return GameObjectProperties.getTypeProperties(this.type);
     }
 
-    get movementSpeed(): number {
-        return this.properties.speed ?? 0;
+    get maxMovementSpeed(): number {
+        return this.movementSpeed;
+    }
+
+    get accelerationFactor(): number {
+        return 0;
+    }
+
+    get delecerationFactor(): number {
+        return 0;
     }
 
     get sprite(): ISprite | undefined {

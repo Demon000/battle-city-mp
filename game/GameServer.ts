@@ -106,11 +106,9 @@ export default class GameServer {
                     return;
                 }
 
-                if (direction === undefined) {
-                    this.gameObjectService.setObjectMoving(player.tankId, false);
-                } else {
+                this.gameObjectService.setObjectMovementDirection(player.tankId, direction);
+                if (direction !== undefined) {
                     this.gameObjectService.processObjectDirection(player.tankId, direction);
-                    this.gameObjectService.setObjectMoving(player.tankId, true);
                 }
             });
 

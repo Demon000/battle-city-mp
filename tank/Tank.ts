@@ -3,11 +3,25 @@ import GameObject, { GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
 
-const tierToSpeedMap = {
-    [TankTier.PLAYER_TIER_1]: 32,
+const tierToMaxSpeedMap = {
+    [TankTier.PLAYER_TIER_1]: 48,
     [TankTier.PLAYER_TIER_2]: 24,
     [TankTier.PLAYER_TIER_3]: 24,
     [TankTier.PLAYER_TIER_4]: 24,
+};
+
+const tierToAccelerationFactorMap = {
+    [TankTier.PLAYER_TIER_1]: 2,
+    [TankTier.PLAYER_TIER_2]: 1,
+    [TankTier.PLAYER_TIER_3]: 1,
+    [TankTier.PLAYER_TIER_4]: 1,
+};
+
+const tierToDecelerationFactorMap = {
+    [TankTier.PLAYER_TIER_1]: 4,
+    [TankTier.PLAYER_TIER_2]: 1,
+    [TankTier.PLAYER_TIER_3]: 1,
+    [TankTier.PLAYER_TIER_4]: 1,
 };
 
 const tierToBulletSpeedMap = {
@@ -77,15 +91,23 @@ export default class Tank extends GameObject {
     }
 
     get sprite(): ISprite | undefined {
-        if (this.requestedSpeed > 0) {
+        if (this.movementSpeed > 0) {
             this.invalidateSprite = true;
         }
 
         return super.sprite;
     }
 
-    get movementSpeed(): number {
-        return tierToSpeedMap[this.tier];
+    get maxMovementSpeed(): number {
+        return tierToMaxSpeedMap[this.tier];
+    }
+
+    get accelerationFactor(): number {
+        return tierToAccelerationFactorMap[this.tier];
+    }
+
+    get delecerationFactor(): number {
+        return tierToDecelerationFactorMap[this.tier];
     }
 
     get bulletSpeed(): number {
@@ -101,7 +123,7 @@ export default class Tank extends GameObject {
     }
 
     isMatchingMeta(meta: ResourceMeta): boolean {
-        if (meta.isMoving === true && this.requestedSpeed > 0) {
+        if (meta.isMoving && this.movementSpeed > 0) {
             return true;
         }
 
