@@ -8,6 +8,13 @@ export default class GameCamera {
     }
 
     getPosition(): Point | undefined {
-        return this.position;
+        if (this.position === undefined) {
+            return undefined;
+        }
+
+        return {
+            x: Math.floor(this.position.x),
+            y: Math.floor(this.position.y),
+        };
     }
 }

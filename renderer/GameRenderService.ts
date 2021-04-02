@@ -33,7 +33,9 @@ export default class GameRenderService {
         const minRenderSize = Math.max(this.canvas.width, this.canvas.height);
         this.gameToRenderSizeScale = Math.ceil(minRenderSize / this.targetGameSize);
         this.gameWidth = this.canvas.width / this.gameToRenderSizeScale;
+        this.gameWidth -= this.gameWidth % 2;
         this.gameHeight = this.canvas.height / this.gameToRenderSizeScale;
+        this.gameHeight -= this.gameHeight % 2;
     }
 
     renderObjectsPass(objects: GameObject[], point: Point, pass: number): GameObject[] {
@@ -61,12 +63,12 @@ export default class GameRenderService {
                 continue;
             }
 
-            let objectRelativeX = object.position.x - canvasX;
+            let objectRelativeX = Math.floor(object.position.x) - canvasX;
             if (sprite.offset !== undefined) {
                 objectRelativeX += sprite.offset.x;
             }
 
-            let objectRelativeY = object.position.y - canvasY;
+            let objectRelativeY = Math.floor(object.position.y) - canvasY;
             if (sprite.offset !== undefined) {
                 objectRelativeY += sprite.offset.y;
             }
