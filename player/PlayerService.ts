@@ -182,7 +182,7 @@ export default class PlayerService {
         player.requestedPlayers = false;
     }
 
-    processPlayerStatus(): void {
+    processPlayersStatus(): void {
         const players = this.repository.getAll();
         for (const player of players) {
             this.processPlayerSpawnStatus(player);

@@ -272,7 +272,7 @@ export default class GameServer {
          */
         this.ticker.emitter.on(TickerEvent.TICK,
             (deltaSeconds: number) => {
-                this.playerService.processPlayerStatus();
+                this.playerService.processPlayersStatus();
                 this.tankService.processTanksShooting();
                 this.gameObjectService.processObjectsStatus(deltaSeconds);
             });
