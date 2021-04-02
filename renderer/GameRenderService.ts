@@ -31,7 +31,7 @@ export default class GameRenderService {
         this.canvas.height = window.innerHeight;
 
         const minRenderSize = Math.max(this.canvas.width, this.canvas.height);
-        this.gameToRenderSizeScale = minRenderSize / this.targetGameSize;
+        this.gameToRenderSizeScale = Math.ceil(minRenderSize / this.targetGameSize);
         this.gameWidth = this.canvas.width / this.gameToRenderSizeScale;
         this.gameHeight = this.canvas.height / this.gameToRenderSizeScale;
     }
@@ -85,10 +85,10 @@ export default class GameRenderService {
                 objectHeight = sprite.height;
             }
 
-            const objectRenderX = objectRelativeX * this.gameToRenderSizeScale;
-            const objectRenderY = objectRelativeY * this.gameToRenderSizeScale;
-            const objectRenderWidth = objectWidth * this.gameToRenderSizeScale;
-            const objectRenderHeight = objectHeight * this.gameToRenderSizeScale;
+            const objectRenderX = Math.floor(objectRelativeX) * this.gameToRenderSizeScale;
+            const objectRenderY = Math.floor(objectRelativeY) * this.gameToRenderSizeScale;
+            const objectRenderWidth = Math.floor(objectWidth) * this.gameToRenderSizeScale;
+            const objectRenderHeight = Math.floor(objectHeight) * this.gameToRenderSizeScale;
 
             this.context.drawImage(sprite.image, objectRenderX, objectRenderY, objectRenderWidth, objectRenderHeight);
         }
