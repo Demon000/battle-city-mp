@@ -70,7 +70,7 @@ export default class TankService {
     }
 
     private resetTankOnIce(tank: Tank): void {
-        if (Date.now() - tank.lastSlippingTime < tank.slippingTime) {
+        if (!tank.isSlipping || Date.now() - tank.lastSlippingTime < tank.slippingTime) {
             return;
         }
 
