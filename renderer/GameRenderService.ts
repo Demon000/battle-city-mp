@@ -85,10 +85,10 @@ export default class GameRenderService {
                 objectHeight = sprite.height;
             }
 
-            const objectRenderX = Math.floor(objectRelativeX) * this.gameToRenderSizeScale;
-            const objectRenderY = Math.floor(objectRelativeY) * this.gameToRenderSizeScale;
-            const objectRenderWidth = Math.floor(objectWidth) * this.gameToRenderSizeScale;
-            const objectRenderHeight = Math.floor(objectHeight) * this.gameToRenderSizeScale;
+            const objectRenderX = objectRelativeX * this.gameToRenderSizeScale;
+            const objectRenderY = objectRelativeY * this.gameToRenderSizeScale;
+            const objectRenderWidth = objectWidth * this.gameToRenderSizeScale;
+            const objectRenderHeight = objectHeight * this.gameToRenderSizeScale;
 
             this.context.drawImage(sprite.image, objectRenderX, objectRenderY, objectRenderWidth, objectRenderHeight);
         }
