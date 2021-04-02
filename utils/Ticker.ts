@@ -9,7 +9,7 @@ export default class Ticker {
     tickTime?: number;
     lastTickTime = 0;
     deltaSeconds = 0;
-    running = true;
+    running = false;
     emitter = new EventEmitter();
     useRequestAnimationFrame;
 
@@ -50,6 +50,11 @@ export default class Ticker {
     }
 
     start(): void {
+        if (this.running) {
+            return;
+        }
+
+        this.running = true;
         this.callTick();
     }
 
