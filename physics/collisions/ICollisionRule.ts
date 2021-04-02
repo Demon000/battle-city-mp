@@ -11,6 +11,7 @@ export enum CollisionEventType {
     BULLET_HIT_TANK = 'bullet-hit-tank',
     BULLET_HIT_BULLET = 'bullet-hit-bullet',
     BULLET_HIT_LEVEL_BORDER = 'bullet-hit-level-border',
+    TANK_ON_ICE = 'tank-on-ice',
 }
 
 export type ICollisionResult = {

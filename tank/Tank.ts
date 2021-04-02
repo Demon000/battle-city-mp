@@ -45,10 +45,40 @@ const tierToBulletCooldownMap = {
     [TankTier.PLAYER_TIER_4]: 250,
 };
 
+const tierToSlippingTimeMap = {
+    [TankTier.PLAYER_TIER_1]: 1000,
+    [TankTier.PLAYER_TIER_2]: 1000,
+    [TankTier.PLAYER_TIER_3]: 1000,
+    [TankTier.PLAYER_TIER_4]: 1000,
+};
+
+const tierToSlippingMaxSpeedMap = {
+    [TankTier.PLAYER_TIER_1]: 1.5,
+    [TankTier.PLAYER_TIER_2]: 1.5,
+    [TankTier.PLAYER_TIER_3]: 1.5,
+    [TankTier.PLAYER_TIER_4]: 1.5,
+};
+
+const tierToSlippingAccelerationMap = {
+    [TankTier.PLAYER_TIER_1]: 2,
+    [TankTier.PLAYER_TIER_2]: 2,
+    [TankTier.PLAYER_TIER_3]: 2,
+    [TankTier.PLAYER_TIER_4]: 2,
+};
+
+const tierToSlippingDecelerationMap = {
+    [TankTier.PLAYER_TIER_1]: 0.5,
+    [TankTier.PLAYER_TIER_2]: 0.5,
+    [TankTier.PLAYER_TIER_3]: 0.5,
+    [TankTier.PLAYER_TIER_4]: 0.5,
+};
+
 export interface TankOptions extends GameObjectOptions {
     tier?: TankTier;
     playerId?: string;
     isShooting?: boolean;
+    isOnIce?: boolean;
+    lastSlippingTime?: number;
     lastBulletShotTime?: number;
     bulletIds?: number[];
 }
@@ -57,6 +87,8 @@ export default class Tank extends GameObject {
     tier: TankTier;
     playerId?: string;
     isShooting: boolean;
+    isSlipping: boolean;
+    lastSlippingTime: number;
     lastBulletShotTime: number;
     bulletIds: number[];
 
@@ -68,7 +100,9 @@ export default class Tank extends GameObject {
         this.tier = options.tier ?? TankTier.PLAYER_TIER_1;
         this.playerId = options.playerId;
         this.isShooting = options.isShooting ?? false;
+        this.isSlipping = options.isOnIce ?? false;
         this.lastBulletShotTime = options.lastBulletShotTime ?? 0;
+        this.lastSlippingTime = options.lastSlippingTime ?? 0;
         this.bulletIds = options.bulletIds ?? new Array<number>();
     }
 
@@ -77,6 +111,7 @@ export default class Tank extends GameObject {
         return Object.assign(gameObjectOptions, {
             tier: this.tier,
             playerId: this.playerId,
+            lastSlippingTime: this.lastSlippingTime,
             lastBulletShotTime: this.lastBulletShotTime,
             bulletIds: this.bulletIds,
         });
@@ -86,6 +121,7 @@ export default class Tank extends GameObject {
         super.setOptions(other);
         this.tier = other.tier;
         this.playerId = other.playerId;
+        this.lastSlippingTime = other.lastSlippingTime;
         this.lastBulletShotTime = other.lastBulletShotTime;
         this.bulletIds = other.bulletIds;
     }
@@ -99,15 +135,34 @@ export default class Tank extends GameObject {
     }
 
     get maxMovementSpeed(): number {
-        return tierToMaxSpeedMap[this.tier];
+        let speed = tierToMaxSpeedMap[this.tier];
+        if (this.isSlipping) {
+            speed *= tierToSlippingMaxSpeedMap[this.tier];
+        }
+
+        return speed;
     }
 
     get accelerationFactor(): number {
-        return tierToAccelerationFactorMap[this.tier];
+        let factor = tierToAccelerationFactorMap[this.tier];
+        if (this.isSlipping) {
+            factor *= tierToSlippingAccelerationMap[this.tier];
+        }
+
+        return factor;
     }
 
     get delecerationFactor(): number {
-        return tierToDecelerationFactorMap[this.tier];
+        let factor = tierToDecelerationFactorMap[this.tier];
+        if (this.isSlipping) {
+            factor *= tierToSlippingDecelerationMap[this.tier];
+        }
+
+        return factor;
+    }
+
+    get slippingTime(): number {
+        return tierToSlippingTimeMap[this.tier];
     }
 
     get bulletSpeed(): number {

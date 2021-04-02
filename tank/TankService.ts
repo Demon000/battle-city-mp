@@ -69,17 +69,32 @@ export default class TankService {
         this.emitter.emit(TankServiceEvent.TANK_REQUESTED_BULLET_SPAWN, tank.id);
     }
 
-    processTanksShooting(): void {
+    private resetTankOnIce(tank: Tank): void {
+        if (Date.now() - tank.lastSlippingTime < tank.slippingTime) {
+            return;
+        }
+
+        tank.isSlipping = false;
+    }
+
+    processTanksStatus(): void {
         const tanks = this.getTanks();
 
         for (const tank of tanks) {
             this.processTankShooting(tank);
+            this.resetTankOnIce(tank);
         }
     }
 
     setTankShooting(tankId: number, isShooting: boolean): void {
         const tank = this.getTank(tankId);
         tank.isShooting = isShooting;
+    }
+
+    setTankOnIce(tankId: number): void {
+        const tank = this.getTank(tankId);
+        tank.isSlipping = true;
+        tank.lastSlippingTime = Date.now();
     }
 
     setTankLastBulletShotTime(tankId: number, lastBulletShotTime: number): void {

@@ -3,8 +3,9 @@ import Point from '@/physics/point/Point';
 
 export enum RenderPass {
     ALL = 0,
-    BUSHES = 1,
-    EXPLOSIONS = 2,
+    TANK = 1,
+    BUSHES = 2,
+    EXPLOSIONS = 3,
 }
 
 export interface ISprite {

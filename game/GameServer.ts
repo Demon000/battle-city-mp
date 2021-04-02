@@ -267,13 +267,18 @@ export default class GameServer {
                 destroyBullet(staticObjectId);
             });
 
+        this.collisionService.emitter.on(CollisionEventType.TANK_ON_ICE,
+            (tankId: number, _position: Point, _iceId: number) => {
+                this.tankService.setTankOnIce(tankId);
+            });
+
         /**
          * Ticker event handlers
          */
         this.ticker.emitter.on(TickerEvent.TICK,
             (deltaSeconds: number) => {
                 this.playerService.processPlayersStatus();
-                this.tankService.processTanksShooting();
+                this.tankService.processTanksStatus();
                 this.gameObjectService.processObjectsStatus(deltaSeconds);
             });
 

@@ -123,10 +123,12 @@ const properties: IGameObjectProperties[] = [
                 steps: [
                     {
                         filename: 'tank_tier_1_up_frame_1.png',
+                        renderPass: RenderPass.TANK,
                         duration: 62.5,
                     },
                     {
                         filename: 'tank_tier_1_up_frame_2.png',
+                        renderPass: RenderPass.TANK,
                         duration: 62.5,
                     },
                 ],
@@ -136,6 +138,7 @@ const properties: IGameObjectProperties[] = [
                 steps: [
                     {
                         filename: 'tank_tier_1_up_frame_1.png',
+                        renderPass: RenderPass.TANK,
                     },
                 ],
             },
@@ -148,10 +151,12 @@ const properties: IGameObjectProperties[] = [
                 steps: [
                     {
                         filename: 'tank_tier_1_right_frame_1.png',
+                        renderPass: RenderPass.TANK,
                         duration: 62.5,
                     },
                     {
                         filename: 'tank_tier_1_right_frame_2.png',
+                        renderPass: RenderPass.TANK,
                         duration: 62.5,
                     },
                 ],
@@ -161,6 +166,7 @@ const properties: IGameObjectProperties[] = [
                 steps: [
                     {
                         filename: 'tank_tier_1_right_frame_1.png',
+                        renderPass: RenderPass.TANK,
                     },
                 ],
             },
@@ -173,10 +179,12 @@ const properties: IGameObjectProperties[] = [
                 steps: [
                     {
                         filename: 'tank_tier_1_down_frame_1.png',
+                        renderPass: RenderPass.TANK,
                         duration: 62.5,
                     },
                     {
                         filename: 'tank_tier_1_down_frame_2.png',
+                        renderPass: RenderPass.TANK,
                         duration: 62.5,
                     },
                 ],
@@ -186,6 +194,7 @@ const properties: IGameObjectProperties[] = [
                 steps: [
                     {
                         filename: 'tank_tier_1_down_frame_1.png',
+                        renderPass: RenderPass.TANK,
                     },
                 ],
             },
@@ -198,10 +207,12 @@ const properties: IGameObjectProperties[] = [
                 steps: [
                     {
                         filename: 'tank_tier_1_left_frame_1.png',
+                        renderPass: RenderPass.TANK,
                         duration: 62.5,
                     },
                     {
                         filename: 'tank_tier_1_left_frame_2.png',
+                        renderPass: RenderPass.TANK,
                         duration: 62.5,
                     },
                 ],
@@ -211,6 +222,7 @@ const properties: IGameObjectProperties[] = [
                 steps: [
                     {
                         filename: 'tank_tier_1_left_frame_1.png',
+                        renderPass: RenderPass.TANK,
                     },
                 ],
             },
@@ -409,6 +421,21 @@ const properties: IGameObjectProperties[] = [
             },
             {
                 filename: 'destroy.wav',
+            },
+        ],
+    },
+    {
+        type: GameObjectType.ICE,
+        shortType: GameShortObjectType.ICE,
+        width: 8,
+        height: 8,
+        spriteSets: [
+            {
+                steps: [
+                    {
+                        filename: 'ice.png',
+                    },
+                ],
             },
         ],
     },

@@ -17,6 +17,18 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
+        movingTypes: [GameObjectType.TANK],
+        staticTypes: [
+            GameObjectType.ICE,
+        ],
+        result: [
+            {
+                type: CollisionResultType.NOTIFY,
+                name: CollisionEventType.TANK_ON_ICE,
+            },
+        ],
+    },
+    {
         movingTypes: [GameObjectType.BULLET],
         staticTypes: [GameObjectType.LEVEL_BORDER],
         result: [

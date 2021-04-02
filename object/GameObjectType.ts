@@ -4,6 +4,7 @@ export enum GameShortObjectType {
     STEEL_WALL = 'S',
     PLAYER_SPAWN = 'O',
     LEVEL_BORDER = '#',
+    ICE = 'I',
 }
 
 export enum GameObjectType {
@@ -16,4 +17,5 @@ export enum GameObjectType {
     TANK = 'tank',
     BULLET = 'bullet',
     EXPLOSION = 'explosion',
+    ICE = 'ice',
 }
