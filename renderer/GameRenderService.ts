@@ -15,7 +15,9 @@ export default class GameRenderService {
         this.canvas = canvas;
         this.targetGameSize = targetGameSize;
 
-        const context = canvas.getContext('2d');
+        const context = canvas.getContext('2d', {
+            alpha: false,
+        });
         if (!context) {
             throw new Error('Failed to create canvas context');
         }
