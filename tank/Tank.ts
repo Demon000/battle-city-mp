@@ -1,4 +1,4 @@
-import { ResourceMeta } from '@/object/IGameObjectProperties';
+import { ISprite, ResourceMeta } from '@/object/IGameObjectProperties';
 import GameObject, { GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
@@ -74,6 +74,14 @@ export default class Tank extends GameObject {
         this.playerId = other.playerId;
         this.lastBulletShotTime = other.lastBulletShotTime;
         this.bulletIds = other.bulletIds;
+    }
+
+    get sprite(): ISprite | undefined {
+        if (this.requestedSpeed > 0) {
+            this.invalidateSprite = true;
+        }
+
+        return super.sprite;
     }
 
     get movementSpeed(): number {

@@ -19,20 +19,22 @@ export default class GameObject {
 
     id: number;
     type: GameObjectType;
-    position: Point;
-    direction: Direction;
+    _position: Point;
+    _direction: Direction;
     requestedSpeed: number;
     spawnTime: number;
     destroyed = false;
     audioEffectPanner?: PannerNode;
     audioEffectBufferSource?: AudioBufferSourceNode;
+    invalidateSprite = true;
+    _sprite?: ISprite;
 
     constructor(options: GameObjectOptions) {
         this.id = options.id ?? GameObject.globalId++;
         this.type = options.type ?? GameObjectType.ANY;
-        this.direction = options.direction ?? Direction.UP;
+        this._position = options.position;
+        this._direction = options.direction ?? Direction.UP;
         this.requestedSpeed = options.requestedSpeed ?? 0;
-        this.position = options.position;
         this.spawnTime = options.spawnTime ?? Date.now();
     }
 
@@ -40,7 +42,7 @@ export default class GameObject {
         return {
             id: this.id,
             type: this.type,
-            position: this.position,
+            position: this._position,
             direction: this.direction,
             requestedSpeed: this.requestedSpeed,
             spawnTime: this.spawnTime,
@@ -52,6 +54,24 @@ export default class GameObject {
         this.direction = other.direction;
         this.requestedSpeed = other.requestedSpeed;
         this.spawnTime = other.spawnTime;
+    }
+
+    set direction(direction: Direction) {
+        this._direction = direction;
+        this.invalidateSprite = true;
+    }
+
+    get direction(): Direction {
+        return this._direction;
+    }
+
+    set position(position: Point) {
+        this._position = position;
+        this.invalidateSprite = true;
+    }
+
+    get position(): Point {
+        return this._position;
     }
 
     get centerPosition(): Point {
@@ -70,7 +90,12 @@ export default class GameObject {
     }
 
     get sprite(): ISprite | undefined {
-        return GameObjectProperties.findSprite(this);
+        if (this.invalidateSprite) {
+            this._sprite = GameObjectProperties.findSprite(this);
+            this.invalidateSprite = false;
+        }
+
+        return this._sprite;
     }
 
     get hasAudioEffects(): boolean {

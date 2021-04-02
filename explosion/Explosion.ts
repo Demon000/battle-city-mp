@@ -1,7 +1,7 @@
 import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import GameObjectProperties from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
-import { ResourceMeta } from '@/object/IGameObjectProperties';
+import { ISprite, ResourceMeta } from '@/object/IGameObjectProperties';
 import { ExplosionType } from './ExplosionType';
 
 export interface ExplosionOptions extends GameObjectOptions {
@@ -25,6 +25,11 @@ export default class Explosion extends GameObject {
     get automaticDestroyTime(): number | undefined {
         const set = GameObjectProperties.findSpriteSet(this);
         return set?.duration;
+    }
+
+    get sprite(): ISprite | undefined {
+        this.invalidateSprite = true;
+        return super.sprite;
     }
 
     isMatchingMeta(meta: ResourceMeta): boolean {
