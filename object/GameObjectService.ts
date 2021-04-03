@@ -110,12 +110,11 @@ export default class GameObjectService {
 
     private processObjectMovement(object: GameObject, delta: number): void {
         let newMovementSpeed = object.movementSpeed;
-        if (object.movementDirection === undefined) {
+        if (object.movementDirection === undefined || object.maxMovementSpeed < newMovementSpeed) {
             newMovementSpeed -= object.maxMovementSpeed * object.delecerationFactor * delta;
             newMovementSpeed = Math.max(0, newMovementSpeed);
-        } else {
+        } else if (newMovementSpeed < object.maxMovementSpeed) {
             newMovementSpeed += object.maxMovementSpeed * object.accelerationFactor * delta;
-            newMovementSpeed = Math.min(object.maxMovementSpeed, newMovementSpeed);
         }
 
         if (object.movementSpeed !== newMovementSpeed) {
