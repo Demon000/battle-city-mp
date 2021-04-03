@@ -1,9 +1,64 @@
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
 import Point from '@/physics/point/Point';
+import { TankTier } from '@/tank/TankTier';
 import GameObject from './GameObject';
 import { GameObjectType, GameShortObjectType } from './GameObjectType';
-import IGameObjectProperties, { IAudioEffect, ISprite, ISpriteSet, RenderPass } from './IGameObjectProperties';
+import IGameObjectProperties, { IAudioEffect, ISprite, ISpriteSet, RenderPass, ResourceMeta } from './IGameObjectProperties';
+
+const generateTankTierSpriteSet = (direction: Direction, tier: TankTier,
+    frames: number, totalDuration?: number, meta?: ResourceMeta): ISpriteSet => {
+    let frameDuration;
+    if (totalDuration === undefined) {
+        frameDuration = undefined;
+    } else {
+        frameDuration = totalDuration / frames;
+    }
+
+    const set = {
+        duration: totalDuration,
+        direction,
+        meta,
+        steps: [],
+    } as ISpriteSet;
+
+    for (let i = 0; i < frames; i++) {
+        set.steps.push({
+            filename: `tank_${tier}_${direction}_${i}.png`,
+            renderPass: RenderPass.TANK,
+            duration: frameDuration,
+        });
+    }
+
+    return set;
+};
+
+const tankAnimationDuration = 125;
+const tankMovingMeta = {
+    isMoving: true,
+};
+const generateTankTierSpriteSets = (tier: TankTier): ISpriteSet[] => {
+    const sets = new Array<ISpriteSet>();
+
+    for (const direction of Object.values(Direction)) {
+        sets.push(
+            generateTankTierSpriteSet(direction, tier, 2, tankAnimationDuration, tankMovingMeta),
+            generateTankTierSpriteSet(direction, tier, 1),
+        );
+    }
+
+    return sets;
+};
+
+const generateTankSpriteSets = (): ISpriteSet[] => {
+    const sets = new Array<ISpriteSet>();
+
+    for (const tier of Object.values(TankTier)) {
+        sets.push(...generateTankTierSpriteSets(tier));
+    }
+
+    return sets;
+};
 
 const properties: IGameObjectProperties[] = [
     {
@@ -113,120 +168,7 @@ const properties: IGameObjectProperties[] = [
         width: 16,
         height: 16,
         directionAxisSnapping: 4,
-        spriteSets: [
-            {
-                duration: 125,
-                direction: Direction.UP,
-                meta: {
-                    isMoving: true,
-                },
-                steps: [
-                    {
-                        filename: 'tank_tier_1_up_frame_1.png',
-                        renderPass: RenderPass.TANK,
-                        duration: 62.5,
-                    },
-                    {
-                        filename: 'tank_tier_1_up_frame_2.png',
-                        renderPass: RenderPass.TANK,
-                        duration: 62.5,
-                    },
-                ],
-            },
-            {
-                direction: Direction.UP,
-                steps: [
-                    {
-                        filename: 'tank_tier_1_up_frame_1.png',
-                        renderPass: RenderPass.TANK,
-                    },
-                ],
-            },
-            {
-                duration: 125,
-                direction: Direction.RIGHT,
-                meta: {
-                    isMoving: true,
-                },
-                steps: [
-                    {
-                        filename: 'tank_tier_1_right_frame_1.png',
-                        renderPass: RenderPass.TANK,
-                        duration: 62.5,
-                    },
-                    {
-                        filename: 'tank_tier_1_right_frame_2.png',
-                        renderPass: RenderPass.TANK,
-                        duration: 62.5,
-                    },
-                ],
-            },
-            {
-                direction: Direction.RIGHT,
-                steps: [
-                    {
-                        filename: 'tank_tier_1_right_frame_1.png',
-                        renderPass: RenderPass.TANK,
-                    },
-                ],
-            },
-            {
-                duration: 125,
-                direction: Direction.DOWN,
-                meta: {
-                    isMoving: true,
-                },
-                steps: [
-                    {
-                        filename: 'tank_tier_1_down_frame_1.png',
-                        renderPass: RenderPass.TANK,
-                        duration: 62.5,
-                    },
-                    {
-                        filename: 'tank_tier_1_down_frame_2.png',
-                        renderPass: RenderPass.TANK,
-                        duration: 62.5,
-                    },
-                ],
-            },
-            {
-                direction: Direction.DOWN,
-                steps: [
-                    {
-                        filename: 'tank_tier_1_down_frame_1.png',
-                        renderPass: RenderPass.TANK,
-                    },
-                ],
-            },
-            {
-                duration: 125,
-                direction: Direction.LEFT,
-                meta: {
-                    isMoving: true,
-                },
-                steps: [
-                    {
-                        filename: 'tank_tier_1_left_frame_1.png',
-                        renderPass: RenderPass.TANK,
-                        duration: 62.5,
-                    },
-                    {
-                        filename: 'tank_tier_1_left_frame_2.png',
-                        renderPass: RenderPass.TANK,
-                        duration: 62.5,
-                    },
-                ],
-            },
-            {
-                direction: Direction.LEFT,
-                steps: [
-                    {
-                        filename: 'tank_tier_1_left_frame_1.png',
-                        renderPass: RenderPass.TANK,
-                    },
-                ],
-            },
-        ],
+        spriteSets: generateTankSpriteSets(),
         audioEffects: [
             {
                 filename: 'tank_moving.wav',
