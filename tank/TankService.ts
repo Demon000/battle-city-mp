@@ -38,6 +38,19 @@ export default class TankService {
         return object as Tank;
     }
 
+    findTank(tankId: number): Tank | undefined {
+        const object = this.repository.find(tankId);
+        if (object === undefined) {
+            return undefined;
+        }
+
+        if (object.type !== GameObjectType.TANK) {
+            throw new Error('Game object type is not tank');
+        }
+
+        return object as Tank;
+    }
+
     addTankBullet(tankId: number, bulletId: number): void {
         const tank = this.getTank(tankId);
         tank.bulletIds.push(bulletId);

@@ -209,6 +209,11 @@ export default class GameServer {
         const destroyBullet = (bulletId: number) => {
             const bullet = this.bulletService.getBullet(bulletId);
             this.gameObjectService.setObjectDestroyed(bulletId);
+            const tank = this.tankService.findTank(bullet.tankId);
+            if (tank === undefined) {
+                return;
+            }
+
             this.tankService.removeTankBullet(bullet.tankId, bulletId);
         };
 
