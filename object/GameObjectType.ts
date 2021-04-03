@@ -9,6 +9,7 @@ export enum GameShortObjectType {
 
 export enum GameObjectType {
     ANY = 'any',
+    NONE = 'none',
     BRICK_WALL = 'brick-wall',
     STEEL_WALL = 'steel-wall',
     BUSH = 'bush',

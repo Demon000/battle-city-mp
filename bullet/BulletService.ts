@@ -8,6 +8,7 @@ import Tank from '@/tank/Tank';
 import MapRepository from '@/utils/MapRepository';
 import { EventEmitter } from 'eventemitter3';
 import Bullet from './Bullet';
+import { BulletPower } from './BulletPower';
 
 export enum BulletServiceEvent {
     BULLET_SPAWNED = 'bullet-spawned',
@@ -31,15 +32,16 @@ export default class BulletService {
     }
 
     getBulletBrickWallDestroyBox(bulletId: number, brickWallId: number): BoundingBox {
-        const bullet = this.repository.get(bulletId);
+        const bullet = this.getBullet(bulletId);
         const brickWall = this.repository.get(brickWallId);
         const box = brickWall.getBoundingBox();
 
         const bulletCenterPosition = bullet.centerPosition;
         const brickWallCenterPosition = brickWall.centerPosition;
 
+        const brickWallWidth = brickWall.properties.width;
+        const brickWallHeight = brickWall.properties.height;
         if (DirectionUtils.isHorizontalAxis(bullet.direction)) {
-            const brickWallHeight = brickWall.properties.height;
             if (bulletCenterPosition.y > brickWallCenterPosition.y) {
                 box.tl.y -= brickWallHeight;
                 box.br.y += brickWallHeight * 2;
@@ -47,14 +49,29 @@ export default class BulletService {
                 box.tl.y -= brickWallHeight * 2;
                 box.br.y += brickWallHeight;
             }
+
+            if (bullet.power === BulletPower.DESTROY_STEEL_POWER) {
+                if (bullet.direction === Direction.RIGHT) {
+                    box.br.x += brickWallWidth;
+                } else {
+                    box.tl.x -= brickWallWidth;
+                }
+            }
         } else {
-            const brickWallWidth = brickWall.properties.width;
             if (bulletCenterPosition.x > brickWallCenterPosition.x) {
                 box.tl.x -= brickWallWidth;
                 box.br.x += brickWallWidth * 2;
             } else {
                 box.tl.x -= brickWallWidth * 2;
                 box.br.x += brickWallWidth;
+            }
+
+            if (bullet.power === BulletPower.DESTROY_STEEL_POWER) {
+                if (bullet.direction === Direction.DOWN) {
+                    box.br.y += brickWallHeight;
+                } else {
+                    box.tl.y -= brickWallHeight;
+                }
             }
         }
 
@@ -99,6 +116,7 @@ export default class BulletService {
             },
             movementSpeed: tank.bulletSpeed,
             tankId: tank.id,
+            power: tank.bulletPower,
         });
 
         this.emitter.emit(BulletServiceEvent.BULLET_SPAWNED, bullet);

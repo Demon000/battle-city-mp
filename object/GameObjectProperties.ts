@@ -362,7 +362,7 @@ const properties: IGameObjectProperties[] = [
             {
                 filename: 'bullet_hit.wav',
                 meta: {
-                    destroyedObjectType: GameObjectType.LEVEL_BORDER,
+                    destroyedObjectType: GameObjectType.NONE,
                 },
             },
             {

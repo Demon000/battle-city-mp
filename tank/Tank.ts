@@ -1,3 +1,4 @@
+import { BulletPower } from '@/bullet/BulletPower';
 import { ISprite, ResourceMeta } from '@/object/IGameObjectProperties';
 import GameObject, { GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
@@ -43,6 +44,13 @@ const tierToBulletCooldownMap = {
     [TankTier.PLAYER_TIER_2]: 250,
     [TankTier.PLAYER_TIER_3]: 250,
     [TankTier.PLAYER_TIER_4]: 250,
+};
+
+const tierToBulletPowerMap = {
+    [TankTier.PLAYER_TIER_1]: BulletPower.DESTROY_BRICK_POWER,
+    [TankTier.PLAYER_TIER_2]: BulletPower.DESTROY_BRICK_POWER,
+    [TankTier.PLAYER_TIER_3]: BulletPower.DESTROY_BRICK_POWER,
+    [TankTier.PLAYER_TIER_4]: BulletPower.DESTROY_BRICK_POWER,
 };
 
 const tierToSlippingTimeMap = {
@@ -167,6 +175,10 @@ export default class Tank extends GameObject {
 
     get bulletSpeed(): number {
         return tierToBulletSpeedMap[this.tier];
+    }
+
+    get bulletPower(): BulletPower {
+        return tierToBulletPowerMap[this.tier];
     }
 
     get maxBullets(): number {

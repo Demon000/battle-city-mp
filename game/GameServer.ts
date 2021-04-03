@@ -1,4 +1,5 @@
 import Bullet from '@/bullet/Bullet';
+import { BulletPower } from '@/bullet/BulletPower';
 import BulletService, { BulletServiceEvent } from '@/bullet/BulletService';
 import Explosion from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
@@ -223,15 +224,20 @@ export default class GameServer {
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_LEVEL_BORDER,
             (movingObjectId: number, _position: Point, _staticObjectId: number) => {
-                spawnExplosion(movingObjectId, ExplosionType.SMALL, GameObjectType.LEVEL_BORDER);
+                spawnExplosion(movingObjectId, ExplosionType.SMALL, GameObjectType.NONE);
                 destroyBullet(movingObjectId);
             });
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_STEEL_WALL,
-            (movingObjectId: number, _position: Point, staticObjectId: number) => {
-                spawnExplosion(movingObjectId, ExplosionType.SMALL);
-                destroyBullet(movingObjectId);
-                this.gameObjectService.setObjectDestroyed(staticObjectId);
+            (bulletId: number, _position: Point, steelWallId: number) => {
+                const bullet = this.bulletService.getBullet(bulletId);
+                destroyBullet(bulletId);
+                if (bullet.power === BulletPower.DESTROY_STEEL_POWER) {
+                    spawnExplosion(bulletId, ExplosionType.SMALL);
+                    this.gameObjectService.setObjectDestroyed(steelWallId);
+                } else {
+                    spawnExplosion(bulletId, ExplosionType.SMALL, GameObjectType.NONE);
+                }
             });
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_BRICK_WALL,
