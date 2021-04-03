@@ -102,7 +102,6 @@ export default class GameRenderService {
                 context.imageSmoothingEnabled = false;
                 context.drawImage(sprite.image, 0, 0, objectRenderWidth, objectRenderHeight);
                 sprite.context = context;
-                console.log('drawing offscreen');
             }
 
             this.context.drawImage(sprite.canvas, objectRenderX, objectRenderY);
