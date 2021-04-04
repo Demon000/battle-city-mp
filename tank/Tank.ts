@@ -190,10 +190,14 @@ export default class Tank extends GameObject {
     }
 
     isMatchingMeta(meta: ResourceMeta): boolean {
-        if (meta.isMoving && this.movementSpeed > 0) {
-            return true;
+        if (meta.isMoving === undefined && meta.isMoving !== this.movementSpeed > 0) {
+            return false;
         }
 
-        return false;
+        if (meta.tier !== this.tier) {
+            return false;
+        }
+
+        return true;
     }
 }

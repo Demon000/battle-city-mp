@@ -126,6 +126,7 @@ export default class GameServer {
                     const tank = new Tank({
                         position,
                         playerId,
+                        tier: player.requestedTankTier,
                     });
                     this.gameObjectService.registerObject(tank);
                     this.playerService.setPlayerTankId(playerId, tank.id);

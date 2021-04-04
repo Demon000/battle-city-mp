@@ -34,17 +34,18 @@ const generateTankTierSpriteSet = (direction: Direction, tier: TankTier,
     return set;
 };
 
-const tankAnimationDuration = 125;
-const tankMovingMeta = {
-    isMoving: true,
-};
 const generateTankTierSpriteSets = (tier: TankTier): ISpriteSet[] => {
     const sets = new Array<ISpriteSet>();
 
     for (const direction of Object.values(Direction)) {
         sets.push(
-            generateTankTierSpriteSet(direction, tier, 2, tankAnimationDuration, tankMovingMeta),
-            generateTankTierSpriteSet(direction, tier, 1),
+            generateTankTierSpriteSet(direction, tier, 2, 125, {
+                tier,
+                isMoving: true,
+            }),
+            generateTankTierSpriteSet(direction, tier, 1, undefined, {
+                isMoving: false,
+            }),
         );
     }
 
