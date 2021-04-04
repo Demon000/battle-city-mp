@@ -1,5 +1,6 @@
 import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
+import { ResourceMeta } from '@/object/IGameObjectProperties';
 import { BulletPower } from './BulletPower';
 
 export interface BulletOptions extends GameObjectOptions {
@@ -31,5 +32,13 @@ export default class Bullet extends GameObject {
     setOptions(other: Bullet): void {
         super.setOptions(other);
         this.tankId = other.tankId;
+    }
+
+    isMatchingMeta(meta: ResourceMeta): boolean {
+        if (meta.power !== this.power) {
+            return false;
+        }
+
+        return true;
     }
 }

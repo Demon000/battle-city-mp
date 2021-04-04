@@ -50,7 +50,7 @@ export default class BulletService {
                 box.br.y += brickWallHeight;
             }
 
-            if (bullet.power === BulletPower.DESTROY_STEEL_POWER) {
+            if (bullet.power === BulletPower.HEAVY) {
                 if (bullet.direction === Direction.RIGHT) {
                     box.br.x += brickWallWidth;
                 } else {
@@ -66,7 +66,7 @@ export default class BulletService {
                 box.br.x += brickWallWidth;
             }
 
-            if (bullet.power === BulletPower.DESTROY_STEEL_POWER) {
+            if (bullet.power === BulletPower.HEAVY) {
                 if (bullet.direction === Direction.DOWN) {
                     box.br.y += brickWallHeight;
                 } else {

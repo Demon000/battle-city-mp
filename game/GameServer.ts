@@ -237,7 +237,7 @@ export default class GameServer {
             (bulletId: number, _position: Point, steelWallId: number) => {
                 const bullet = this.bulletService.getBullet(bulletId);
                 destroyBullet(bulletId);
-                if (bullet.power === BulletPower.DESTROY_STEEL_POWER) {
+                if (bullet.power === BulletPower.HEAVY) {
                     spawnExplosion(bulletId, ExplosionType.SMALL);
                     this.gameObjectService.setObjectDestroyed(steelWallId);
                 } else {

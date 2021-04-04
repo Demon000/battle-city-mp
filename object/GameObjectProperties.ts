@@ -1,3 +1,4 @@
+import { BulletPower } from '@/bullet/BulletPower';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
 import Point from '@/physics/point/Point';
@@ -186,9 +187,12 @@ const properties: IGameObjectProperties[] = [
         spriteSets: [
             {
                 direction: Direction.UP,
+                meta: {
+                    power: BulletPower.LIGHT,
+                },
                 steps: [
                     {
-                        filename: 'bullet_up.png',
+                        filename: 'bullet_light_up.png',
                         offset: {
                             y: -1,
                             x: -1,
@@ -201,9 +205,12 @@ const properties: IGameObjectProperties[] = [
             },
             {
                 direction: Direction.RIGHT,
+                meta: {
+                    power: BulletPower.LIGHT,
+                },
                 steps: [
                     {
-                        filename: 'bullet_right.png',
+                        filename: 'bullet_light_right.png',
                         offset: {
                             y: -1,
                             x: -1,
@@ -216,9 +223,12 @@ const properties: IGameObjectProperties[] = [
             },
             {
                 direction: Direction.DOWN,
+                meta: {
+                    power: BulletPower.LIGHT,
+                },
                 steps: [
                     {
-                        filename: 'bullet_down.png',
+                        filename: 'bullet_light_down.png',
                         offset: {
                             y: -1,
                             x: -1,
@@ -231,9 +241,84 @@ const properties: IGameObjectProperties[] = [
             },
             {
                 direction: Direction.LEFT,
+                meta: {
+                    power: BulletPower.LIGHT,
+                },
                 steps: [
                     {
-                        filename: 'bullet_left.png',
+                        filename: 'bullet_light_left.png',
+                        offset: {
+                            y: -1,
+                            x: -1,
+                        },
+                        width: 4,
+                        height: 4,
+                        renderPass: RenderPass.BULLET,
+                    },
+                ],
+            },
+            {
+                direction: Direction.UP,
+                meta: {
+                    power: BulletPower.HEAVY,
+                },
+                steps: [
+                    {
+                        filename: 'bullet_heavy_up.png',
+                        offset: {
+                            y: -1,
+                            x: -1,
+                        },
+                        width: 4,
+                        height: 4,
+                        renderPass: RenderPass.BULLET,
+                    },
+                ],
+            },
+            {
+                direction: Direction.RIGHT,
+                meta: {
+                    power: BulletPower.HEAVY,
+                },
+                steps: [
+                    {
+                        filename: 'bullet_heavy_right.png',
+                        offset: {
+                            y: -1,
+                            x: -1,
+                        },
+                        width: 4,
+                        height: 4,
+                        renderPass: RenderPass.BULLET,
+                    },
+                ],
+            },
+            {
+                direction: Direction.DOWN,
+                meta: {
+                    power: BulletPower.HEAVY,
+                },
+                steps: [
+                    {
+                        filename: 'bullet_heavy_down.png',
+                        offset: {
+                            y: -1,
+                            x: -1,
+                        },
+                        width: 4,
+                        height: 4,
+                        renderPass: RenderPass.BULLET,
+                    },
+                ],
+            },
+            {
+                direction: Direction.LEFT,
+                meta: {
+                    power: BulletPower.HEAVY,
+                },
+                steps: [
+                    {
+                        filename: 'bullet_heavy_left.png',
                         offset: {
                             y: -1,
                             x: -1,
