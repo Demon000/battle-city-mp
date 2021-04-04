@@ -5,84 +5,73 @@ import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
 
 const tierToMaxSpeedMap = {
-    [TankTier.PLAYER_TIER_1]: 48,
-    [TankTier.PLAYER_TIER_2]: 24,
-    [TankTier.PLAYER_TIER_3]: 24,
-    [TankTier.PLAYER_TIER_4]: 24,
+    [TankTier.NORMAL]: 64,
+    [TankTier.LIGHT]: 96,
+    [TankTier.HEAVY]: 48,
 };
 
 const tierToAccelerationFactorMap = {
-    [TankTier.PLAYER_TIER_1]: 2,
-    [TankTier.PLAYER_TIER_2]: 1,
-    [TankTier.PLAYER_TIER_3]: 1,
-    [TankTier.PLAYER_TIER_4]: 1,
+    [TankTier.NORMAL]: 3,
+    [TankTier.LIGHT]: 2,
+    [TankTier.HEAVY]: 1,
 };
 
 const tierToDecelerationFactorMap = {
-    [TankTier.PLAYER_TIER_1]: 4,
-    [TankTier.PLAYER_TIER_2]: 1,
-    [TankTier.PLAYER_TIER_3]: 1,
-    [TankTier.PLAYER_TIER_4]: 1,
+    [TankTier.NORMAL]: 4,
+    [TankTier.LIGHT]: 2,
+    [TankTier.HEAVY]: 1,
 };
 
 const tierToBulletSpeedMap = {
-    [TankTier.PLAYER_TIER_1]: 64,
-    [TankTier.PLAYER_TIER_2]: 32,
-    [TankTier.PLAYER_TIER_3]: 32,
-    [TankTier.PLAYER_TIER_4]: 48,
+    [TankTier.NORMAL]: 128,
+    [TankTier.LIGHT]: 160,
+    [TankTier.HEAVY]: 192,
 };
 
 const tierToMaxBulletsMap = {
-    [TankTier.PLAYER_TIER_1]: 1,
-    [TankTier.PLAYER_TIER_2]: 2,
-    [TankTier.PLAYER_TIER_3]: 2,
-    [TankTier.PLAYER_TIER_4]: 2,
+    [TankTier.NORMAL]: 2,
+    [TankTier.LIGHT]: 3,
+    [TankTier.HEAVY]: 4,
 };
 
 const tierToBulletCooldownMap = {
-    [TankTier.PLAYER_TIER_1]: 250,
-    [TankTier.PLAYER_TIER_2]: 250,
-    [TankTier.PLAYER_TIER_3]: 250,
-    [TankTier.PLAYER_TIER_4]: 250,
+    [TankTier.NORMAL]: 250,
+    [TankTier.LIGHT]: 250,
+    [TankTier.HEAVY]: 500,
 };
 
 const tierToBulletPowerMap = {
-    [TankTier.PLAYER_TIER_1]: BulletPower.DESTROY_BRICK_POWER,
-    [TankTier.PLAYER_TIER_2]: BulletPower.DESTROY_BRICK_POWER,
-    [TankTier.PLAYER_TIER_3]: BulletPower.DESTROY_BRICK_POWER,
-    [TankTier.PLAYER_TIER_4]: BulletPower.DESTROY_BRICK_POWER,
+    [TankTier.NORMAL]: BulletPower.LIGHT,
+    [TankTier.LIGHT]: BulletPower.LIGHT,
+    [TankTier.HEAVY]: BulletPower.HEAVY,
 };
 
 const tierToSlippingTimeMap = {
-    [TankTier.PLAYER_TIER_1]: 1000,
-    [TankTier.PLAYER_TIER_2]: 1000,
-    [TankTier.PLAYER_TIER_3]: 1000,
-    [TankTier.PLAYER_TIER_4]: 1000,
+    [TankTier.NORMAL]: 1000,
+    [TankTier.LIGHT]: 1000,
+    [TankTier.HEAVY]: 1000,
 };
 
 const tierToSlippingMaxSpeedMap = {
-    [TankTier.PLAYER_TIER_1]: 1.5,
-    [TankTier.PLAYER_TIER_2]: 1.5,
-    [TankTier.PLAYER_TIER_3]: 1.5,
-    [TankTier.PLAYER_TIER_4]: 1.5,
+    [TankTier.NORMAL]: 1.5,
+    [TankTier.LIGHT]: 1.5,
+    [TankTier.HEAVY]: 1.5,
 };
 
 const tierToSlippingAccelerationMap = {
-    [TankTier.PLAYER_TIER_1]: 2,
-    [TankTier.PLAYER_TIER_2]: 2,
-    [TankTier.PLAYER_TIER_3]: 2,
-    [TankTier.PLAYER_TIER_4]: 2,
+    [TankTier.NORMAL]: 10,
+    [TankTier.LIGHT]: 2,
+    [TankTier.HEAVY]: 2,
 };
 
 const tierToSlippingDecelerationMap = {
-    [TankTier.PLAYER_TIER_1]: 0.5,
-    [TankTier.PLAYER_TIER_2]: 0.5,
-    [TankTier.PLAYER_TIER_3]: 0.5,
-    [TankTier.PLAYER_TIER_4]: 0.5,
+    [TankTier.NORMAL]: 0.0001,
+    [TankTier.LIGHT]: 0.5,
+    [TankTier.HEAVY]: 0.5,
 };
 
 export interface TankOptions extends GameObjectOptions {
-    tier?: TankTier;
+    tier: TankTier;
     playerId?: string;
     isShooting?: boolean;
     isOnIce?: boolean;
@@ -105,7 +94,7 @@ export default class Tank extends GameObject {
 
         super(options);
 
-        this.tier = options.tier ?? TankTier.PLAYER_TIER_1;
+        this.tier = options.tier;
         this.playerId = options.playerId;
         this.isShooting = options.isShooting ?? false;
         this.isSlipping = options.isOnIce ?? false;

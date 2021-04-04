@@ -1,3 +1,4 @@
+import { TankTier } from '@/tank/TankTier';
 import MapRepository from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import ButtonPressAction, { MOVE_BUTTON_TYPES, ButtonState, BUTTON_TYPE_DIRECTION, ButtonType } from '../actions/ButtonPressAction';
@@ -90,6 +91,11 @@ export default class PlayerService {
     setPlayerRequestedPlayers(playerId: string): void {
         const player = this.repository.get(playerId);
         player.requestedPlayers = true;
+    }
+
+    setPlayerRequestedTankTier(playerId: string, tier: TankTier): void {
+        const player = this.repository.get(playerId);
+        player.requestedTankTier = tier;
     }
 
     addPlayerButtonPressAction(playerId: string, action: ButtonPressAction): void {

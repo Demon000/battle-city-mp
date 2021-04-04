@@ -1,4 +1,5 @@
 import { Direction } from '@/physics/Direction';
+import { TankTier } from '@/tank/TankTier';
 import ButtonPressAction, { ButtonType } from '../actions/ButtonPressAction';
 
 export interface PlayerOptions {
@@ -19,6 +20,7 @@ export default class Player {
     requestedSpawnStatus = PlayerSpawnStatus.NONE;
     requestedGameObjects = false;
     requestedPlayers = false;
+    requestedTankTier = TankTier.NORMAL;
     disconnected = false;
     isOwnPlayer = false;
     tankId?: number;
