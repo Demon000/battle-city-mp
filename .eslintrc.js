@@ -40,6 +40,11 @@ module.exports = {
             'named': 'never',
         }],
 
+        'no-unused-vars': 'off',
+        "@typescript-eslint/no-unused-vars": ["error", {
+            "argsIgnorePattern": "^_",
+        }],
+
         'vue/no-unused-components': ['warn'],
         'vue/comment-directive': 'off',
     }
