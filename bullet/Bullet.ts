@@ -8,6 +8,8 @@ export interface BulletOptions extends GameObjectOptions {
     power: BulletPower;
 }
 
+export type PartialBulletOptions = Partial<BulletOptions>;
+
 export default class Bullet extends GameObject {
     tankId: number;
     power: BulletPower;
@@ -29,9 +31,16 @@ export default class Bullet extends GameObject {
         });
     }
 
-    setOptions(other: Bullet): void {
-        super.setOptions(other);
-        this.tankId = other.tankId;
+    setOptions(options: PartialBulletOptions): void {
+        super.setOptions(options);
+
+        if (options.tankId !== undefined) {
+            this.tankId = options.tankId;
+        }
+
+        if (options.power !== undefined) {
+            this.power = options.power;
+        }
     }
 
     isMatchingMeta(meta: ResourceMeta): boolean {

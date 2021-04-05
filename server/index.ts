@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 import { GameEvent } from '@/game/GameEvent';
 import { ActionOptions } from '@/actions/Action';
 import ActionFactory from '@/actions/ActionFactory';
-import GameObject from '@/object/GameObject';
+import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import GameServer from '@/game/GameServer';
 import Player from '@/player/Player';
 import yargs from 'yargs';
@@ -72,8 +72,8 @@ gameServer.emitter.on(GameEvent.PLAYER_OBJECTS_REGISTERD, (playerId: string, obj
     const objectOptions = objects.map(o => o.toOptions());
     io.to(playerId).emit(GameEvent.OBJECTS_REGISTERD, objectOptions);
 });
-gameServer.emitter.on(GameEvent.OBJECT_CHANGED, (object: GameObject) => {
-    io.emit(GameEvent.OBJECT_CHANGED, object.toOptions());
+gameServer.emitter.on(GameEvent.OBJECT_CHANGED, (objectId: number, objectOptions: GameObjectOptions) => {
+    io.emit(GameEvent.OBJECT_CHANGED, objectId, objectOptions);
 });
 gameServer.emitter.on(GameEvent.OBJECT_UNREGISTERED, (objectId: number) => {
     io.emit(GameEvent.OBJECT_UNREGISTERED, objectId);

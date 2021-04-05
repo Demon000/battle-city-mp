@@ -13,7 +13,7 @@ import EventEmitter from 'eventemitter3';
 import Action, { ActionType } from '../actions/Action';
 import ButtonPressAction from '../actions/ButtonPressAction';
 import GameMapService, { GameMapServiceEvent } from '../maps/GameMapService';
-import GameObject from '../object/GameObject';
+import GameObject, { GameObjectOptions } from '../object/GameObject';
 import GameObjectService, { GameObjectServiceEvent } from '../object/GameObjectService';
 import BoundingBoxRepository from '../physics/bounding-box/BoundingBoxRepository';
 import { rules } from '../physics/collisions/CollisionRules';
@@ -164,8 +164,8 @@ export default class GameServer {
             });
 
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_CHANGED,
-            (object: GameObject) => {
-                this.emitter.emit(GameEvent.OBJECT_CHANGED, object);
+            (objectId: number, objectOptions: GameObjectOptions) => {
+                this.emitter.emit(GameEvent.OBJECT_CHANGED, objectId, objectOptions);
             });
 
         /**

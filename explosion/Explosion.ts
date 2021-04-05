@@ -9,6 +9,8 @@ export interface ExplosionOptions extends GameObjectOptions {
     destroyedObjectType?: GameObjectType;
 }
 
+export type PartialExplosionOptions = Partial<ExplosionOptions>;
+
 export default class Explosion extends GameObject {
     explosionType: ExplosionType;
     destroyedObjectType?: GameObjectType;
@@ -52,9 +54,15 @@ export default class Explosion extends GameObject {
         });
     }
 
-    setOptions(other: Explosion): void {
-        super.setOptions(other);
-        this.explosionType = other.explosionType;
-        this.destroyedObjectType = other.destroyedObjectType;
+    setOptions(options: PartialExplosionOptions): void {
+        super.setOptions(options);
+
+        if (options.explosionType !== undefined) {
+            this.explosionType = options.explosionType;
+        }
+
+        if (options.destroyedObjectType !== undefined) {
+            this.destroyedObjectType = options.destroyedObjectType;
+        }
     }
 }

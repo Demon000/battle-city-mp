@@ -4,7 +4,7 @@ import EventEmitter from 'eventemitter3';
 import { Direction } from '../physics/Direction';
 import Point from '../physics/point/Point';
 import PointUtils from '../physics/point/PointUtils';
-import GameObject from './GameObject';
+import GameObject, { GameObjectOptions, PartialGameObjectOptions } from './GameObject';
 import { GameObjectType } from './GameObjectType';
 
 export enum GameObjectServiceEvent {
@@ -59,15 +59,18 @@ export default class GameObjectService {
     setObjectPosition(objectId: number, position: Point): void {
         const object = this.repository.get(objectId);
         object.position = position;
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object);
+        this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
+            position,
+        } as GameObjectOptions);
         this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, objectId);
     }
 
     setObjectDirection(objectId: number, direction: Direction): void {
         const object = this.repository.get(objectId);
         object.direction = direction;
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object);
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, objectId);
+        this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
+            direction,
+        } as GameObjectOptions);
     }
 
     setObjectDestroyed(objectId: number): void {
@@ -75,16 +78,21 @@ export default class GameObjectService {
         object.destroyed = true;
     }
 
-    updateObject(newObject: GameObject): void {
-        const object = this.repository.get(newObject.id);
-        object.setOptions(newObject);
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, object.id);
+    updateObject(objectId: number, objectOptions: PartialGameObjectOptions): void {
+        const object = this.repository.get(objectId);
+        object.setOptions(objectOptions);
+        this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, object.toOptions());
+        if (objectOptions.position !== undefined) {
+            this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, object.id);
+        }
     }
 
     setObjectMovementDirection(objectId: number, direction: Direction | null): void {
         const object = this.repository.get(objectId);
         object.movementDirection = direction;
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object);
+        this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
+            movementDirection: direction,
+        } as GameObjectOptions);
     }
 
     processObjectDirection(object: GameObject): void {
@@ -120,7 +128,9 @@ export default class GameObjectService {
 
         if (object.movementSpeed !== newMovementSpeed) {
             object.movementSpeed = newMovementSpeed;
-            this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object);
+            this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
+                movementSpeed: newMovementSpeed,
+            } as GameObjectOptions);
         }
 
         const distance = object.movementSpeed * delta;

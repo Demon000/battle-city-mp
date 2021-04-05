@@ -80,6 +80,8 @@ export interface TankOptions extends GameObjectOptions {
     bulletIds?: number[];
 }
 
+export type PartialTankOptions = Partial<TankOptions>;
+
 export default class Tank extends GameObject {
     tier: TankTier;
     playerId: string;
@@ -114,13 +116,28 @@ export default class Tank extends GameObject {
         });
     }
 
-    setOptions(other: Tank): void {
-        super.setOptions(other);
-        this.tier = other.tier;
-        this.playerId = other.playerId;
-        this.lastSlippingTime = other.lastSlippingTime;
-        this.lastBulletShotTime = other.lastBulletShotTime;
-        this.bulletIds = other.bulletIds;
+    setOptions(options: PartialTankOptions): void {
+        super.setOptions(options);
+
+        if (options.tier !== undefined) {
+            this.tier = options.tier;
+        }
+
+        if (options.playerId !== undefined) {
+            this.playerId = options.playerId;
+        }
+
+        if (options.lastSlippingTime !== undefined) {
+            this.lastSlippingTime = options.lastSlippingTime;
+        }
+
+        if (options.lastBulletShotTime !== undefined) {
+            this.lastBulletShotTime = options.lastBulletShotTime;
+        }
+
+        if (options.bulletIds !== undefined) {
+            this.bulletIds = options.bulletIds;
+        }
     }
 
     get sprite(): ISprite | null | undefined {

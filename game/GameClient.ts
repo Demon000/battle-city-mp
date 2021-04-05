@@ -4,8 +4,8 @@ import GameCamera from '@/renderer/GameCamera';
 import GameRenderService from '@/renderer/GameRenderService';
 import MapRepository from '@/utils/MapRepository';
 import Ticker, { TickerEvent } from '@/utils/Ticker';
-import GameObject from '../object/GameObject';
-import GameObjectService from '../object/GameObjectService';
+import GameObject, { GameObjectOptions, PartialGameObjectOptions } from '../object/GameObject';
+import GameObjectService, { GameObjectServiceEvent } from '../object/GameObjectService';
 import BoundingBoxRepository from '../physics/bounding-box/BoundingBoxRepository';
 import CollisionService from '../physics/collisions/CollisionService';
 import Player from '../player/Player';
@@ -36,12 +36,16 @@ export default class GameClient {
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.playerRepository);
 
+        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED,
+            (objectId: number) => {
+                this.collisionService.updateObjectCollisions(objectId);
+            });
+
         this.ticker.emitter.on(TickerEvent.TICK, this.onTick, this);
     }
 
-    onObjectChangedOnServer(object: GameObject): void {
-        this.gameObjectService.updateObject(object);
-        this.collisionService.updateObjectCollisions(object.id);
+    onObjectChangedOnServer(objectId: number, objectOptions: PartialGameObjectOptions): void {
+        this.gameObjectService.updateObject(objectId, objectOptions);
     }
 
     onObjectsRegisteredOnServer(objects: GameObject[]): void {

@@ -15,6 +15,8 @@ export interface GameObjectOptions {
     spawnTime?: number;
 }
 
+export type PartialGameObjectOptions = Partial<GameObject>;
+
 export default class GameObject {
     static globalId = 0;
 
@@ -54,12 +56,26 @@ export default class GameObject {
         };
     }
 
-    setOptions(other: GameObject): void {
-        this.position = other.position;
-        this.direction = other.direction;
-        this.movementSpeed = other.movementSpeed;
-        this.movementDirection = other.movementDirection;
-        this.spawnTime = other.spawnTime;
+    setOptions(options: PartialGameObjectOptions): void {
+        if (options.position !== undefined) {
+            this.position = options.position;
+        }
+
+        if (options.direction !== undefined) {
+            this.direction = options.direction;
+        }
+
+        if (options.movementSpeed !== undefined) {
+            this.movementSpeed = options.movementSpeed;
+        }
+
+        if (options.movementDirection !== undefined) {
+            this.movementDirection = options.movementDirection;
+        }
+
+        if (options.spawnTime !== undefined) {
+            this.spawnTime = options.spawnTime;
+        }
     }
 
     set direction(direction: Direction) {

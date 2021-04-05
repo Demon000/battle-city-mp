@@ -68,9 +68,8 @@ export default class GameClientSocket {
             this.gameClient.onObjectRegisteredOnServer(object);
         });
 
-        this.socket.on(GameEvent.OBJECT_CHANGED, (objectOptions: GameObjectOptions) => {
-            const object = GameObjectFactory.buildFromOptions(objectOptions);
-            this.gameClient.onObjectChangedOnServer(object);
+        this.socket.on(GameEvent.OBJECT_CHANGED, (objectId: number, objectOptions: GameObjectOptions) => {
+            this.gameClient.onObjectChangedOnServer(objectId, objectOptions);
         });
 
         this.socket.on(GameEvent.OBJECT_UNREGISTERED, (objectId: number) => {
