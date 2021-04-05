@@ -4,6 +4,7 @@ import BulletService, { BulletServiceEvent } from '@/bullet/BulletService';
 import Explosion from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { GameObjectType } from '@/object/GameObjectType';
+import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import { Direction } from '@/physics/Direction';
 import Tank from '@/tank/Tank';
 import TankService, { TankServiceEvent } from '@/tank/TankService';
@@ -13,16 +14,27 @@ import EventEmitter from 'eventemitter3';
 import Action, { ActionType } from '../actions/Action';
 import ButtonPressAction from '../actions/ButtonPressAction';
 import GameMapService, { GameMapServiceEvent } from '../maps/GameMapService';
-import GameObject, { GameObjectOptions } from '../object/GameObject';
+import GameObject, { GameObjectOptions, PartialGameObjectOptions } from '../object/GameObject';
 import GameObjectService, { GameObjectServiceEvent } from '../object/GameObjectService';
 import BoundingBoxRepository from '../physics/bounding-box/BoundingBoxRepository';
 import { rules } from '../physics/collisions/CollisionRules';
 import CollisionService, { CollisionServiceEvent } from '../physics/collisions/CollisionService';
-import { CollisionEventType } from '../physics/collisions/ICollisionRule';
+import { CollisionEvent } from '../physics/collisions/ICollisionRule';
 import Point from '../physics/point/Point';
 import Player, { PlayerSpawnStatus } from '../player/Player';
 import PlayerService, { PlayerServiceEvent } from '../player/PlayerService';
 import { GameEvent } from './GameEvent';
+
+export interface GameServerEvents {
+    [GameEvent.PLAYER_OBJECTS_REGISTERD]: (playerId: string, objects: GameObject[]) => void,
+    [GameEvent.PLAYER_PLAYERS_ADDED]: (playerId: string, players: Player[]) => void,
+    [GameEvent.PLAYER_ADDED]: (player: Player) => void,
+    [GameEvent.PLAYER_CHANGED]: (player: Player) => void,
+    [GameEvent.PLAYER_REMOVED]: (playerId: string) => void,
+    [GameEvent.OBJECT_REGISTERED]: (object: GameObject) => void,
+    [GameEvent.OBJECT_CHANGED]: (objectId: number, options: PartialGameObjectOptions) => void,
+    [GameEvent.OBJECT_UNREGISTERED]: (objectId: number) => void,
+}
 
 export default class GameServer {
     private gameMapService;
@@ -37,7 +49,7 @@ export default class GameServer {
     private collisionService;
     ticker;
 
-    emitter = new EventEmitter();
+    emitter = new EventEmitter<GameServerEvents>();
 
     constructor() {
         this.gameObjectRepository = new MapRepository<number, GameObject>();
@@ -101,7 +113,7 @@ export default class GameServer {
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_MOVE,
-            (playerId: string, direction: Direction) => {
+            (playerId: string, direction: Direction | undefined) => {
                 const player = this.playerService.getPlayer(playerId);
                 if (player.tankId === null) {
                     return;
@@ -147,8 +159,8 @@ export default class GameServer {
             });
 
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED,
-            (objectId: number) => {
-                this.collisionService.updateObjectCollisions(objectId);
+            (objectId: number, box: BoundingBox) => {
+                this.collisionService.updateObjectCollisions(objectId, box);
             });
 
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REGISTERED,
@@ -221,13 +233,13 @@ export default class GameServer {
                 this.gameObjectService.setObjectPosition(objectId, position);
             });
 
-        this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_LEVEL_BORDER,
+        this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_LEVEL_BORDER,
             (movingObjectId: number, _position: Point, _staticObjectId: number) => {
                 spawnExplosion(movingObjectId, ExplosionType.SMALL, GameObjectType.NONE);
                 destroyBullet(movingObjectId);
             });
 
-        this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_STEEL_WALL,
+        this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_STEEL_WALL,
             (bulletId: number, _position: Point, steelWallId: number) => {
                 const bullet = this.bulletService.getBullet(bulletId);
                 destroyBullet(bulletId);
@@ -239,7 +251,7 @@ export default class GameServer {
                 }
             });
 
-        this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_BRICK_WALL,
+        this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BRICK_WALL,
             (bulletId: number, _position: Point, brickWallId: number) => {
                 const destroyBox = this.bulletService.getBulletBrickWallDestroyBox(bulletId, brickWallId);
                 const objectsIds = this.collisionService.getOverlappingObjects(destroyBox);
@@ -252,7 +264,7 @@ export default class GameServer {
                 }
             });
 
-        this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_TANK,
+        this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_TANK,
             (bulletId: number, _position: Point, tankId: number) => {
                 spawnExplosion(bulletId, ExplosionType.SMALL);
                 spawnExplosion(tankId, ExplosionType.BIG, GameObjectType.TANK);
@@ -262,14 +274,14 @@ export default class GameServer {
                 this.playerService.setPlayerRequestedSpawnStatus(tank.playerId, PlayerSpawnStatus.DESPAWN);
             });
 
-        this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_BULLET,
+        this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BULLET,
             (movingObjectId: number, _position: Point, staticObjectId: number) => {
                 spawnExplosion(movingObjectId, ExplosionType.SMALL);
                 destroyBullet(movingObjectId);
                 destroyBullet(staticObjectId);
             });
 
-        this.collisionService.emitter.on(CollisionEventType.TANK_ON_ICE,
+        this.collisionService.emitter.on(CollisionEvent.TANK_ON_ICE,
             (tankId: number, _position: Point, _iceId: number) => {
                 this.tankService.setTankOnIce(tankId);
             });

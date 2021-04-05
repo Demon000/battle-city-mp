@@ -1,5 +1,5 @@
 import { GameObjectType } from '@/object/GameObjectType';
-import ICollisionRule, { CollisionEventType, CollisionResultType } from './ICollisionRule';
+import ICollisionRule, { CollisionEvent, CollisionResultEvent } from './ICollisionRule';
 
 export const rules: ICollisionRule[] = [
     {
@@ -12,7 +12,7 @@ export const rules: ICollisionRule[] = [
         ],
         result: [
             {
-                type: CollisionResultType.PREVENT_MOVEMENT,
+                type: CollisionResultEvent.PREVENT_MOVEMENT,
             },
         ],
     },
@@ -23,8 +23,8 @@ export const rules: ICollisionRule[] = [
         ],
         result: [
             {
-                type: CollisionResultType.NOTIFY,
-                name: CollisionEventType.TANK_ON_ICE,
+                type: CollisionResultEvent.NOTIFY,
+                name: CollisionEvent.TANK_ON_ICE,
             },
         ],
     },
@@ -33,8 +33,8 @@ export const rules: ICollisionRule[] = [
         staticTypes: [GameObjectType.LEVEL_BORDER],
         result: [
             {
-                type: CollisionResultType.NOTIFY,
-                name: CollisionEventType.BULLET_HIT_LEVEL_BORDER,
+                type: CollisionResultEvent.NOTIFY,
+                name: CollisionEvent.BULLET_HIT_LEVEL_BORDER,
             },
         ],
     },
@@ -43,11 +43,11 @@ export const rules: ICollisionRule[] = [
         staticTypes: [GameObjectType.BRICK_WALL],
         result: [
             {
-                type: CollisionResultType.NOTIFY,
-                name: CollisionEventType.BULLET_HIT_BRICK_WALL,
+                type: CollisionResultEvent.NOTIFY,
+                name: CollisionEvent.BULLET_HIT_BRICK_WALL,
             },
             {
-                type: CollisionResultType.PREVENT_MOVEMENT,
+                type: CollisionResultEvent.PREVENT_MOVEMENT,
             },
         ],
     },
@@ -56,8 +56,8 @@ export const rules: ICollisionRule[] = [
         staticTypes: [GameObjectType.STEEL_WALL],
         result: [
             {
-                type: CollisionResultType.NOTIFY,
-                name: CollisionEventType.BULLET_HIT_STEEL_WALL,
+                type: CollisionResultEvent.NOTIFY,
+                name: CollisionEvent.BULLET_HIT_STEEL_WALL,
             },
         ],
     },
@@ -66,8 +66,8 @@ export const rules: ICollisionRule[] = [
         staticTypes: [GameObjectType.TANK],
         result: [
             {
-                type: CollisionResultType.NOTIFY,
-                name: CollisionEventType.BULLET_HIT_TANK,
+                type: CollisionResultEvent.NOTIFY,
+                name: CollisionEvent.BULLET_HIT_TANK,
             },
         ],
     },
@@ -76,8 +76,8 @@ export const rules: ICollisionRule[] = [
         staticTypes: [GameObjectType.BULLET],
         result: [
             {
-                type: CollisionResultType.NOTIFY,
-                name: CollisionEventType.BULLET_HIT_BULLET,
+                type: CollisionResultEvent.NOTIFY,
+                name: CollisionEvent.BULLET_HIT_BULLET,
             },
         ],
     },

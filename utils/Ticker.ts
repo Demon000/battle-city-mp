@@ -5,12 +5,16 @@ export enum TickerEvent {
     TICK = 'tick',
 }
 
+interface TickerEvents {
+    [TickerEvent.TICK]: (deltaSeconds: number) => void,
+}
+
 export default class Ticker {
     tickTime?: number;
     lastTickTime = 0;
     deltaSeconds = 0;
     running = false;
-    emitter = new EventEmitter();
+    emitter = new EventEmitter<TickerEvents>();
     useRequestAnimationFrame;
 
     constructor(tickRate?: number) {

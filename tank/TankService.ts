@@ -8,9 +8,13 @@ export enum TankServiceEvent {
     TANK_REQUESTED_BULLET_SPAWN = 'tank-requested-bullet-spawn',
 }
 
+interface TankServiceEvents {
+    [TankServiceEvent.TANK_REQUESTED_BULLET_SPAWN]: (tankId: number) => void,
+}
+
 export default class TankService {
     private repository;
-    emitter = new EventEmitter();
+    emitter = new EventEmitter<TankServiceEvents>();
 
     constructor(repository: MapRepository<number, GameObject>) {
         this.repository = repository;

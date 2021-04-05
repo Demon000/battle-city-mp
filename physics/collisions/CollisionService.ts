@@ -7,11 +7,16 @@ import BoundingBoxRepository from '../bounding-box/BoundingBoxRepository';
 import { Direction } from '../Direction';
 import Point from '../point/Point';
 import DirectionUtils from './DirectionUtils';
-import ICollisionRule, { CollisionResultType } from './ICollisionRule';
+import ICollisionRule, { CollisionEvents, CollisionResultEvent } from './ICollisionRule';
 
 export enum CollisionServiceEvent {
     OBJECT_POSITION_ALLOWED = 'object-position-allowed',
     OBJECT_DIRECTION_ALLOWED = 'object-direction-allowed',
+}
+
+interface CollisionServiceEvents extends CollisionEvents {
+    [CollisionServiceEvent.OBJECT_POSITION_ALLOWED]: (movingObjectId: number, position: Point) => void,
+    [CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED]: (movingObjectId: number, direction: Direction) => void,
 }
 
 export default class CollisionService {
@@ -19,7 +24,7 @@ export default class CollisionService {
     private boundingBoxRepository;
     private rulesMap?: Map<GameObjectType, Map<GameObjectType, ICollisionRule>>;
 
-    emitter = new EventEmitter();
+    emitter = new EventEmitter<CollisionServiceEvents>();
 
     constructor(
         gameObjectRepository: MapRepository<number, GameObject>,
@@ -72,9 +77,8 @@ export default class CollisionService {
         }
     }
 
-    updateObjectCollisions(objectId: number): void {
-        const object = this.gameObjectRepository.get(objectId);
-        this.boundingBoxRepository.updateBoxValue(objectId, object.getBoundingBox());
+    updateObjectCollisions(objectId: number, box: BoundingBox): void {
+        this.boundingBoxRepository.updateBoxValue(objectId, box);
     }
 
     unregisterObjectCollisions(objectId: number): void {
@@ -111,9 +115,9 @@ export default class CollisionService {
             }
 
             for (const result of rule.result) {
-                if (result.type === CollisionResultType.PREVENT_MOVEMENT) {
+                if (result.type === CollisionResultEvent.PREVENT_MOVEMENT) {
                     preventMovement = true;
-                } else if (result.type === CollisionResultType.NOTIFY) {
+                } else if (result.type === CollisionResultEvent.NOTIFY) {
                     this.emitter.emit(result.name, objectId, position, overlappingObjectId);
                 }
             }

@@ -1,4 +1,5 @@
 import { CLIENT_CONFIG_VISIBLE_GAME_SIZE } from '@/config';
+import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import GameAudioService from '@/renderer/GameAudioService';
 import GameCamera from '@/renderer/GameCamera';
 import GameRenderService from '@/renderer/GameRenderService';
@@ -37,8 +38,8 @@ export default class GameClient {
         this.playerService = new PlayerService(this.playerRepository);
 
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED,
-            (objectId: number) => {
-                this.collisionService.updateObjectCollisions(objectId);
+            (objectId: number, box: BoundingBox) => {
+                this.collisionService.updateObjectCollisions(objectId, box);
             });
 
         this.ticker.emitter.on(TickerEvent.TICK, this.onTick, this);

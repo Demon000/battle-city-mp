@@ -1,3 +1,4 @@
+import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import MapRepository from '@/utils/MapRepository';
 import Random from '@/utils/Random';
 import EventEmitter from 'eventemitter3';
@@ -16,9 +17,18 @@ export enum GameObjectServiceEvent {
     OBJECT_UNREGISTERED = 'object-unregistered',
 }
 
+interface GameObjectServiceEvents {
+    [GameObjectServiceEvent.OBJECT_REQUESTED_POSITION]: (objectId: number, position: Point) => void,
+    [GameObjectServiceEvent.OBJECT_REQUESTED_DIRECTION]: (objectId: number, direction: Direction) => void,
+    [GameObjectServiceEvent.OBJECT_CHANGED]: (objectId: number, options: PartialGameObjectOptions) => void,
+    [GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED]: (objectId: number, box: BoundingBox) => void,
+    [GameObjectServiceEvent.OBJECT_REGISTERED]: (object: GameObject) => void,
+    [GameObjectServiceEvent.OBJECT_UNREGISTERED]: (objectId: number) => void,
+}
+
 export default class GameObjectService {
     private repository;
-    emitter = new EventEmitter();
+    emitter = new EventEmitter<GameObjectServiceEvents>();
 
     constructor(repository: MapRepository<number, GameObject>) {
         this.repository = repository;
@@ -62,7 +72,7 @@ export default class GameObjectService {
         this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
             position,
         } as GameObjectOptions);
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, objectId);
+        this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, objectId, object.getBoundingBox());
     }
 
     setObjectDirection(objectId: number, direction: Direction): void {
@@ -83,7 +93,7 @@ export default class GameObjectService {
         object.setOptions(objectOptions);
         this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, object.toOptions());
         if (objectOptions.position !== undefined) {
-            this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, object.id);
+            this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, object.id, object.getBoundingBox());
         }
     }
 

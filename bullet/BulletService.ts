@@ -14,9 +14,13 @@ export enum BulletServiceEvent {
     BULLET_SPAWNED = 'bullet-spawned',
 }
 
+interface BulletServiceEvents {
+    [BulletServiceEvent.BULLET_SPAWNED]: (bullet: Bullet) => void,
+}
+
 export default class BulletService {
     private repository;
-    emitter = new EventEmitter();
+    emitter = new EventEmitter<BulletServiceEvents>();
 
     constructor(repository: MapRepository<number, GameObject>) {
         this.repository = repository;

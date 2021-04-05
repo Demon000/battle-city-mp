@@ -18,9 +18,20 @@ export enum PlayerServiceEvent {
     PLAYER_REQUESTED_PLAYERS = 'player-requested-players',
 }
 
+interface PlayerServiceEvents {
+    [PlayerServiceEvent.PLAYER_ADDED]: (player: Player) => void,
+    [PlayerServiceEvent.PLAYER_CHANGED]: (player: Player) => void,
+    [PlayerServiceEvent.PLAYER_REMOVED]: (playerId: string) => void,
+    [PlayerServiceEvent.PLAYER_REQUESTED_MOVE]: (playerId: string, direction: Direction | undefined) => void,
+    [PlayerServiceEvent.PLAYER_REQUESTED_SHOOT]: (playerId: string, isShooting: boolean) => void,
+    [PlayerServiceEvent.PLAYER_REQUESTED_SPAWN_STATUS]: (playerId: string, spawnStatus: PlayerSpawnStatus) => void,
+    [PlayerServiceEvent.PLAYER_REQUESTED_GAME_OBJECTS]: (playerId: string) => void,
+    [PlayerServiceEvent.PLAYER_REQUESTED_PLAYERS]: (playerId: string) => void,
+}
+
 export default class PlayerService {
     private repository;
-    emitter = new EventEmitter();
+    emitter = new EventEmitter<PlayerServiceEvents>();
 
     constructor(repository: MapRepository<string, Player>) {
         this.repository = repository;
