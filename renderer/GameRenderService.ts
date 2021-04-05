@@ -121,31 +121,24 @@ export default class GameRenderService {
         const canvasX = point.x - this.gameWidth / 2;
         const canvasY = point.y - this.gameHeight / 2;
 
-        const leftoverObjects = new Array<GameObject>();
-        for (const object of objects) {
+        return objects.filter(object => {
             const renderer = this.getRenderer(object);
             const sprites = renderer.sprites;
             if (sprites === undefined) {
-                continue;
+                return false;
             }
 
-            let hasLeftoverSprites = false;
-            for (const sprite of sprites) {
-                if ((sprite.renderPass === undefined && pass !== 0)
-                    || (sprite.renderPass !== undefined && sprite.renderPass !== pass)) {
-                    hasLeftoverSprites = true;
-                    continue;
-                }
+            const renderedSprites = sprites.filter(sprite => {
+                return (sprite.renderPass === undefined && pass === 0)
+                    || (sprite.renderPass !== undefined && sprite.renderPass === pass);
+            });
 
+            renderedSprites.forEach(sprite => {
                 this.renderSprite(object, sprite, canvasX, canvasY);
-            }
+            });
 
-            if (hasLeftoverSprites) {
-                leftoverObjects.push(object);
-            }
-        }
-
-        return leftoverObjects;
+            return renderedSprites.length !== sprites.length;
+        });
     }
 
     renderObjects(objects: GameObject[], point: Point): void {

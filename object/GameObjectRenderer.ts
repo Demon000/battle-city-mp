@@ -26,13 +26,7 @@ export default class GameObjectRenderer {
         const x = position.x % setPosition.mod / setPosition.divide;
         const y = position.y % setPosition.mod / setPosition.divide;
 
-        for (const point of setPosition.equals) {
-            if (point.x === x && point.y === y) {
-                return true;
-            }
-        }
-
-        return false;
+        return setPosition.equals.some(p => p.x === x && p.y === y);
     }
 
     private isSpriteSetMatchingDirection(setDirection: Direction, direction: Direction): boolean {
@@ -161,15 +155,9 @@ export default class GameObjectRenderer {
             throw new Error('Inconsistent sprite sets');
         }
 
-        const sprites = new Array<ISprite>();
-        for (const set of this.sets) {
-            const sprite = this.getSprite(set);
-            if (sprite !== undefined && sprite !== null) {
-                sprites.push(sprite);
-            }
-        }
-
-        return sprites;
+        return this.sets
+            .map(set => this.getSprite(set))
+            .filter(sprite => sprite !== undefined && sprite !== null) as ISprite[];
     }
 
     get sprites(): ISprite[] | undefined {
