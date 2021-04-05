@@ -8,7 +8,7 @@ import IGameObjectProperties, { IAudioEffect, ISprite, ResourceMeta } from './IG
 export interface GameObjectOptions {
     id?: number;
     type?: GameObjectType;
-    position: Point;
+    position?: Point;
     direction?: Direction;
     movementSpeed?: number;
     movementDirection?: Direction | null;
@@ -35,7 +35,7 @@ export default class GameObject {
     constructor(options: GameObjectOptions) {
         this.id = options.id ?? GameObject.globalId++;
         this.type = options.type ?? GameObjectType.ANY;
-        this._position = options.position;
+        this._position = options.position ?? {x: 0, y: 0};
         this._direction = options.direction ?? Direction.UP;
         this.movementSpeed = options.movementSpeed ?? 0;
         this.movementDirection = options.movementDirection ?? null;
