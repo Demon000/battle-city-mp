@@ -4,7 +4,7 @@ import ButtonPressAction, { ButtonType } from '../actions/ButtonPressAction';
 
 export interface PlayerOptions {
     id: string;
-    tankId?: number;
+    tankId: number | null;
 }
 
 export enum PlayerSpawnStatus {
@@ -23,7 +23,7 @@ export default class Player {
     requestedTankTier = TankTier.NORMAL;
     disconnected = false;
     isOwnPlayer = false;
-    tankId?: number;
+    tankId: number | null;
     id: string;
 
     constructor(options: PlayerOptions) {

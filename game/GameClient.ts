@@ -82,7 +82,7 @@ export default class GameClient {
             return;
         }
 
-        if (ownPlayer.tankId !== undefined) {
+        if (ownPlayer.tankId !== null) {
             const tank = this.gameObjectService.findObject(ownPlayer.tankId);
             if (tank !== undefined) {
                 this.gameCamera.setPosition(tank.centerPosition);

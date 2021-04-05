@@ -81,16 +81,16 @@ export default class GameObjectService {
         this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, object.id);
     }
 
-    setObjectMovementDirection(objectId: number, direction: Direction | undefined): void {
+    setObjectMovementDirection(objectId: number, direction: Direction | null): void {
         const object = this.repository.get(objectId);
         object.movementDirection = direction;
         this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object);
     }
 
-    processObjectDirection(tankId: number, direction: Direction): void {
-        const object = this.repository.get(tankId);
-        if (object.direction !== direction) {
-            this.emitter.emit(GameObjectServiceEvent.OBJECT_REQUESTED_DIRECTION, object.id, direction);
+    processObjectDirection(object: GameObject): void {
+        if (object.movementDirection !== null
+            && object.direction !== object.movementDirection) {
+            this.emitter.emit(GameObjectServiceEvent.OBJECT_REQUESTED_DIRECTION, object.id, object.movementDirection);
         }
     }
 
@@ -110,11 +110,12 @@ export default class GameObjectService {
 
     private processObjectMovement(object: GameObject, delta: number): void {
         let newMovementSpeed = object.movementSpeed;
-        if (object.movementDirection === undefined || object.maxMovementSpeed < newMovementSpeed) {
+        if (object.movementDirection === null || object.maxMovementSpeed < newMovementSpeed) {
             newMovementSpeed -= object.maxMovementSpeed * object.delecerationFactor * delta;
             newMovementSpeed = Math.max(0, newMovementSpeed);
         } else if (newMovementSpeed < object.maxMovementSpeed) {
             newMovementSpeed += object.maxMovementSpeed * object.accelerationFactor * delta;
+            newMovementSpeed = Math.min(newMovementSpeed, object.maxMovementSpeed);
         }
 
         if (object.movementSpeed !== newMovementSpeed) {
@@ -128,7 +129,6 @@ export default class GameObjectService {
         }
 
         const position = PointUtils.clone(object.position);
-
         if (object.direction === Direction.UP) {
             position.y -= distance;
         } else if (object.direction === Direction.RIGHT) {
@@ -168,6 +168,7 @@ export default class GameObjectService {
             }
 
             this.processObjectMovement(object, delta);
+            this.processObjectDirection(object);
         }
     }
 }

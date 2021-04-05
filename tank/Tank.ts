@@ -65,14 +65,14 @@ const tierToSlippingAccelerationMap = {
 };
 
 const tierToSlippingDecelerationMap = {
-    [TankTier.NORMAL]: 0.0001,
+    [TankTier.NORMAL]: 0.5,
     [TankTier.LIGHT]: 0.5,
     [TankTier.HEAVY]: 0.5,
 };
 
 export interface TankOptions extends GameObjectOptions {
     tier: TankTier;
-    playerId?: string;
+    playerId: string;
     isShooting?: boolean;
     isOnIce?: boolean;
     lastSlippingTime?: number;
@@ -82,7 +82,7 @@ export interface TankOptions extends GameObjectOptions {
 
 export default class Tank extends GameObject {
     tier: TankTier;
-    playerId?: string;
+    playerId: string;
     isShooting: boolean;
     isSlipping: boolean;
     lastSlippingTime: number;
@@ -123,9 +123,9 @@ export default class Tank extends GameObject {
         this.bulletIds = other.bulletIds;
     }
 
-    get sprite(): ISprite | undefined {
+    get sprite(): ISprite | null | undefined {
         if (this.movementSpeed > 0) {
-            this.invalidateSprite = true;
+            this._sprite = null;
         }
 
         return super.sprite;

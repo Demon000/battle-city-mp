@@ -11,7 +11,7 @@ export interface GameObjectOptions {
     position: Point;
     direction?: Direction;
     movementSpeed?: number;
-    movementDirection?: Direction;
+    movementDirection?: Direction | null;
     spawnTime?: number;
 }
 
@@ -23,13 +23,14 @@ export default class GameObject {
     _position: Point;
     _direction: Direction;
     movementSpeed: number;
-    movementDirection?: Direction;
+    movementDirection: Direction | null;
     spawnTime: number;
+
     destroyed = false;
-    audioEffectPanner?: PannerNode;
-    audioEffectBufferSource?: AudioBufferSourceNode;
-    invalidateSprite = true;
-    _sprite?: ISprite;
+    audioEffectPanner: PannerNode | null = null;
+    audioEffectBufferSource: AudioBufferSourceNode | null = null;
+    _sprite?: ISprite | null = null;
+    _audioEffect?: IAudioEffect | null = null;
 
     constructor(options: GameObjectOptions) {
         this.id = options.id ?? GameObject.globalId++;
@@ -37,7 +38,7 @@ export default class GameObject {
         this._position = options.position;
         this._direction = options.direction ?? Direction.UP;
         this.movementSpeed = options.movementSpeed ?? 0;
-        this.movementDirection = options.movementDirection;
+        this.movementDirection = options.movementDirection ?? null;
         this.spawnTime = options.spawnTime ?? Date.now();
     }
 
@@ -63,7 +64,7 @@ export default class GameObject {
 
     set direction(direction: Direction) {
         this._direction = direction;
-        this.invalidateSprite = true;
+        this._sprite = null;
     }
 
     get direction(): Direction {
@@ -72,7 +73,7 @@ export default class GameObject {
 
     set position(position: Point) {
         this._position = position;
-        this.invalidateSprite = true;
+        this._sprite = null;
     }
 
     get position(): Point {
@@ -102,21 +103,44 @@ export default class GameObject {
         return 0;
     }
 
-    get sprite(): ISprite | undefined {
-        if (this.invalidateSprite) {
-            this._sprite = GameObjectProperties.findSprite(this);
-            this.invalidateSprite = false;
+    get sprite(): ISprite | null | undefined {
+        if (this._sprite !== null) {
+            return this._sprite;
+        }
+
+        const spriteSets = GameObjectProperties.findSpriteSets(this);
+        if (!spriteSets) {
+            this._sprite = undefined;
+        } else {
+            const sprite = GameObjectProperties.findSprite(this);
+            if (sprite === undefined) {
+                return null;
+            }
+    
+            this._sprite = sprite;
         }
 
         return this._sprite;
     }
 
-    get hasAudioEffects(): boolean {
-        return !!GameObjectProperties.findAudioEffects(this).length;
-    }
+    get audioEffect(): IAudioEffect | null | undefined {
+        if (this._audioEffect !== null) {
+            return this._audioEffect;
+        }
 
-    get audioEffect(): IAudioEffect | undefined {
-        return GameObjectProperties.findAudioEffect(this);
+        const audioEffects = GameObjectProperties.findAudioEffects(this);
+        if (!audioEffects) {
+            this._audioEffect = undefined;
+        } else {
+            const audioEffect =  GameObjectProperties.findAudioEffect(this);
+            if (audioEffect === undefined) {
+                return null;
+            }
+
+            this._audioEffect = audioEffect;
+        }
+
+        return this._audioEffect;
     }
 
     get automaticDestroyTime(): number | undefined {

@@ -61,19 +61,19 @@ export default class GameAudioService {
         return panner;
     }
 
-    stopObjectAudioEffectIfDifferent(object: GameObject, audioEffect?: IAudioEffect): boolean {
-        if (object.audioEffectBufferSource === undefined) {
+    stopObjectAudioEffectIfDifferent(object: GameObject, audioEffect: IAudioEffect | null): boolean {
+        if (object.audioEffectBufferSource === null) {
             return true;
         }
 
-        if (audioEffect !== undefined
+        if (audioEffect !== null
             && object.audioEffectBufferSource.buffer === audioEffect.buffer) {
             return false;
         }
 
         object.audioEffectBufferSource.stop();
         object.audioEffectBufferSource.disconnect();
-        object.audioEffectBufferSource = undefined;
+        object.audioEffectBufferSource = null;
         return true;
     }
 
@@ -86,7 +86,7 @@ export default class GameAudioService {
             throw new Error('Audio effect buffer is inconsistent');
         }
 
-        if (object.audioEffectPanner === undefined) {
+        if (object.audioEffectPanner === null) {
             throw new Error('Audio effect panner is inconsistent');
         }
 
@@ -107,24 +107,23 @@ export default class GameAudioService {
 
         const objectsCurrentlyPlayingAudioEffects = new Set<GameObject>();
         for (const object of objects) {
-            if (!object.hasAudioEffects) {
+            // Retrieve the current object audio effect
+            const audioEffect = object.audioEffect;
+            if (audioEffect === undefined) {
                 continue;
             }
 
-            if (object.audioEffectPanner === undefined) {
+            if (object.audioEffectPanner === null) {
                 object.audioEffectPanner = this.createObjectAudioEffectPanner();
             }
 
             this.setCartesianPositions(object.audioEffectPanner, object.centerPosition);
 
-            // Retrieve the current object audio effect
-            const audioEffect = object.audioEffect;
-
             // Try to stop any ongoing effect if the current audio effect is different
             const stoppedAudioEffect = this.stopObjectAudioEffectIfDifferent(object, audioEffect);
 
             // The objects has no current audio effect
-            if (audioEffect === undefined) {
+            if (audioEffect === null) {
                 continue;
             }
 
@@ -146,7 +145,7 @@ export default class GameAudioService {
 
         for (const object of this.objectsPlayingAudioEffects) {
             if (!objectsCurrentlyPlayingAudioEffects.has(object)) {
-                this.stopObjectAudioEffectIfDifferent(object);
+                this.stopObjectAudioEffectIfDifferent(object, null);
             }
         }
 

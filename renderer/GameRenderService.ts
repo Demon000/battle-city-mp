@@ -45,7 +45,7 @@ export default class GameRenderService {
         const leftOverRenderObjects = new Array<GameObject>();
         for (const object of objects) {
             const sprite = object.sprite;
-            if (sprite === undefined) {
+            if (sprite === undefined || sprite === null) {
                 continue;
             }
 

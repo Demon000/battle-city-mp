@@ -52,11 +52,12 @@ export default class PlayerService {
  
         const player = new Player({
             id: playerId,
+            tankId: null,
         });
         this.addPlayer(player);
     }
 
-    setPlayerTankId(playerId: string, tankId?: number): void {
+    setPlayerTankId(playerId: string, tankId: number | null): void {
         const player = this.repository.get(playerId);
         player.tankId = tankId;
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player);
@@ -68,7 +69,7 @@ export default class PlayerService {
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player);
     }
 
-    getPlayerTankId(playerId: string): number | undefined {
+    getPlayerTankId(playerId: string): number | null {
         const player = this.repository.get(playerId);
         return player.tankId;
     }
@@ -136,8 +137,8 @@ export default class PlayerService {
     }
 
     private processPlayerSpawnStatus(player: Player): void {
-        if ((player.requestedSpawnStatus === PlayerSpawnStatus.SPAWN && player.tankId === undefined)
-            || (player.requestedSpawnStatus === PlayerSpawnStatus.DESPAWN && player.tankId !== undefined)) {
+        if ((player.requestedSpawnStatus === PlayerSpawnStatus.SPAWN && player.tankId === null)
+            || (player.requestedSpawnStatus === PlayerSpawnStatus.DESPAWN && player.tankId !== null)) {
             this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_SPAWN_STATUS, player.id, player.requestedSpawnStatus);
         }
 

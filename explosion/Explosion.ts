@@ -27,8 +27,8 @@ export default class Explosion extends GameObject {
         return set?.duration;
     }
 
-    get sprite(): ISprite | undefined {
-        this.invalidateSprite = true;
+    get sprite(): ISprite | null | undefined {
+        this._sprite = null;
         return super.sprite;
     }
 

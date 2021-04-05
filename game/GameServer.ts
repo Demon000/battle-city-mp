@@ -92,24 +92,25 @@ export default class GameServer {
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_SHOOT,
             (playerId: string, isShooting: boolean) => {
-                const tankId = this.playerService.getPlayerTankId(playerId);
-                if (tankId === undefined) {
+                const player = this.playerService.getPlayer(playerId);
+                if (player.tankId === null) {
                     return;
                 }
 
-                this.tankService.setTankShooting(tankId, isShooting);
+                this.tankService.setTankShooting(player.tankId, isShooting);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_MOVE,
             (playerId: string, direction: Direction) => {
                 const player = this.playerService.getPlayer(playerId);
-                if (player.tankId === undefined) {
+                if (player.tankId === null) {
                     return;
                 }
 
-                this.gameObjectService.setObjectMovementDirection(player.tankId, direction);
-                if (direction !== undefined) {
-                    this.gameObjectService.processObjectDirection(player.tankId, direction);
+                if (direction === undefined) {
+                    this.gameObjectService.setObjectMovementDirection(player.tankId, null);
+                } else {
+                    this.gameObjectService.setObjectMovementDirection(player.tankId, direction);
                 }
             });
 
@@ -117,11 +118,7 @@ export default class GameServer {
             (playerId: string, status: PlayerSpawnStatus) => {
                 const player = this.playerService.getPlayer(playerId);
 
-                if (status === PlayerSpawnStatus.SPAWN) {
-                    if (player.tankId !== undefined) {
-                        return;
-                    }
-
+                if (status === PlayerSpawnStatus.SPAWN && player.tankId === null) {
                     const position = this.gameObjectService.getRandomSpawnPosition();
                     const tank = new Tank({
                         position,
@@ -130,13 +127,9 @@ export default class GameServer {
                     });
                     this.gameObjectService.registerObject(tank);
                     this.playerService.setPlayerTankId(playerId, tank.id);
-                } else {
-                    if (player.tankId === undefined) {
-                        return;
-                    }
-
+                } else if (player.tankId !== null) {
                     this.gameObjectService.unregisterObject(player.tankId);
-                    this.playerService.setPlayerTankId(playerId, undefined);
+                    this.playerService.setPlayerTankId(playerId, null);
                 }
             });
 
@@ -266,10 +259,7 @@ export default class GameServer {
                 destroyBullet(bulletId);
 
                 const tank = this.tankService.getTank(tankId);
-                if (tank.playerId !== undefined) {
-                    this.playerService.setPlayerTankId(tank.playerId, undefined);
-                }
-                this.gameObjectService.unregisterObject(tankId);
+                this.playerService.setPlayerRequestedSpawnStatus(tank.playerId, PlayerSpawnStatus.DESPAWN);
             });
 
         this.collisionService.emitter.on(CollisionEventType.BULLET_HIT_BULLET,
