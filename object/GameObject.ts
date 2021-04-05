@@ -109,7 +109,7 @@ export default class GameObject {
         }
 
         const spriteSets = GameObjectProperties.findSpriteSets(this);
-        if (!spriteSets) {
+        if (spriteSets.length === 0) {
             this._sprite = undefined;
         } else {
             const sprite = GameObjectProperties.findSprite(this);
@@ -125,11 +125,12 @@ export default class GameObject {
 
     get audioEffect(): IAudioEffect | null | undefined {
         if (this._audioEffect !== null) {
+            console.log(this._audioEffect);
             return this._audioEffect;
         }
 
         const audioEffects = GameObjectProperties.findAudioEffects(this);
-        if (!audioEffects) {
+        if (audioEffects.length === 0) {
             this._audioEffect = undefined;
         } else {
             const audioEffect =  GameObjectProperties.findAudioEffect(this);
