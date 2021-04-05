@@ -12,7 +12,6 @@ export interface GameObjectOptions {
     direction?: Direction;
     movementSpeed?: number;
     movementDirection?: Direction | null;
-    spawnTime?: number;
 }
 
 export type PartialGameObjectOptions = Partial<GameObject>;
@@ -41,7 +40,7 @@ export default class GameObject {
         this._direction = options.direction ?? Direction.UP;
         this.movementSpeed = options.movementSpeed ?? 0;
         this.movementDirection = options.movementDirection ?? null;
-        this.spawnTime = options.spawnTime ?? Date.now();
+        this.spawnTime = Date.now();
     }
 
     toOptions(): GameObjectOptions {
@@ -52,7 +51,6 @@ export default class GameObject {
             direction: this.direction,
             movementSpeed: this.movementSpeed,
             movementDirection: this.movementDirection,
-            spawnTime: this.spawnTime,
         };
     }
 
