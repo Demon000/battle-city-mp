@@ -66,6 +66,7 @@ export default class GameClient {
     onObjectUnregisteredOnServer(objectId: number): void {
         this.gameObjectService.unregisterObject(objectId);
         this.collisionService.unregisterObjectCollisions(objectId);
+        this.gameRenderService.removeRenderer(objectId);
     }
 
     onPlayersAddedOnServer(players: Player[]): void {

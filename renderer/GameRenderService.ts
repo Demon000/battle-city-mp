@@ -117,6 +117,10 @@ export default class GameRenderService {
         return renderer;
     }
 
+    removeRenderer(objectId: number): void {
+        this.rendererRepository.remove(objectId);
+    }
+
     renderObjectsPass(objects: GameObject[], point: Point, pass: number): GameObject[] {
         const canvasX = point.x - this.gameWidth / 2;
         const canvasY = point.y - this.gameHeight / 2;
