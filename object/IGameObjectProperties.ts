@@ -23,17 +23,20 @@ export interface ISprite {
     canvasRenderedHeight?: number;
 }
 
-export type ResourceMeta = Record<string, string | number | boolean>;
+// eslint-disable-next-line
+export type ResourceMeta = Record<string, any>;
+
+export interface ISpriteSetPositionMatching {
+    mod: number,
+    divide: number,
+    equals: Point[];
+}
 
 export interface ISpriteSet {
     duration?: number;
     direction?: Direction;
     loop?: boolean;
-    position?: {
-        mod: number,
-        divide: number,
-        equals: Point[];
-    };
+    position?: ISpriteSetPositionMatching;
     meta?: ResourceMeta;
     steps: ISprite[];
 }

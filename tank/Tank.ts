@@ -1,5 +1,5 @@
 import { BulletPower } from '@/bullet/BulletPower';
-import { ISprite, ResourceMeta } from '@/object/IGameObjectProperties';
+import { ResourceMeta } from '@/object/IGameObjectProperties';
 import GameObject, { GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
@@ -140,14 +140,6 @@ export default class Tank extends GameObject {
         }
     }
 
-    get sprite(): ISprite | null | undefined {
-        if (this.movementSpeed > 0) {
-            this._sprite = null;
-        }
-
-        return super.sprite;
-    }
-
     get maxMovementSpeed(): number {
         let speed = tierToMaxSpeedMap[this.tier];
         if (this.isSlipping) {
@@ -195,15 +187,11 @@ export default class Tank extends GameObject {
         return tierToBulletCooldownMap[this.tier];
     }
 
-    isMatchingMeta(meta: ResourceMeta): boolean {
-        if (meta.isMoving === undefined && meta.isMoving !== this.movementSpeed > 0) {
-            return false;
-        }
-
-        if (meta.tier !== this.tier) {
-            return false;
-        }
-
-        return true;
+    get metas(): ResourceMeta[] {
+        return [{
+            ...super.metas[0],
+            isMoving: this.isMoving,
+            tier: this.tier,
+        }];
     }
 }

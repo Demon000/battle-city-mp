@@ -1,11 +1,9 @@
 import { BulletPower } from '@/bullet/BulletPower';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
-import Point from '@/physics/point/Point';
 import { TankTier } from '@/tank/TankTier';
-import GameObject from './GameObject';
 import { GameObjectType, GameShortObjectType } from './GameObjectType';
-import IGameObjectProperties, { IAudioEffect, ISprite, ISpriteSet, RenderPass, ResourceMeta } from './IGameObjectProperties';
+import IGameObjectProperties, { ISpriteSet, RenderPass, ResourceMeta } from './IGameObjectProperties';
 
 const generateTankTierSpriteSet = (direction: Direction, tier: TankTier,
     frames: number, totalDuration?: number, meta?: ResourceMeta): ISpriteSet => {
@@ -44,6 +42,7 @@ const generateTankTierSpriteSets = (tier: TankTier): ISpriteSet[] => {
                 isMoving: true,
             }),
             generateTankTierSpriteSet(direction, tier, 1, undefined, {
+                tier,
                 isMoving: false,
             }),
         );
@@ -171,15 +170,15 @@ const properties: IGameObjectProperties[] = [
         height: 16,
         directionAxisSnapping: 4,
         spriteSets: generateTankSpriteSets(),
-        audioEffects: [
-            {
-                filename: 'tank_moving.wav',
-                loop: true,
-                meta: {
-                    isMoving: true,
-                },
-            },
-        ],
+        // audioEffects: [
+        //     {
+        //         filename: 'tank_moving.wav',
+        //         loop: true,
+        //         meta: {
+        //             isMoving: true,
+        //         },
+        //     },
+        // ],
     },
     {
         type: GameObjectType.BULLET,
@@ -341,9 +340,10 @@ const properties: IGameObjectProperties[] = [
         type: GameObjectType.EXPLOSION,
         width: 0,
         height: 0,
+        automaticDestroyTime: 240,
         spriteSets: [
             {
-                duration: 180,
+                duration: 240,
                 loop: false,
                 meta: {
                     explosionType: ExplosionType.SMALL,
@@ -351,7 +351,7 @@ const properties: IGameObjectProperties[] = [
                 steps: [
                     {
                         filename: 'explosion_small_frame_1.png',
-                        duration: 60,
+                        duration: 80,
                         offset: {
                             y: -8,
                             x: -8,
@@ -362,7 +362,7 @@ const properties: IGameObjectProperties[] = [
                     },
                     {
                         filename: 'explosion_small_frame_2.png',
-                        duration: 60,
+                        duration: 80,
                         offset: {
                             y: -8,
                             x: -8,
@@ -373,7 +373,7 @@ const properties: IGameObjectProperties[] = [
                     },
                     {
                         filename: 'explosion_small_frame_3.png',
-                        duration: 60,
+                        duration: 80,
                         offset: {
                             y: -8,
                             x: -8,
@@ -500,120 +500,26 @@ export default class GameObjectProperties {
         return properties;
     }
 
-    static findSpriteSets(object: GameObject): ISpriteSet[] {
-        const properties = this.getTypeProperties(object.type);
-        if (properties.spriteSets === undefined) {
-            return [];
-        }
+    // static findAudioEffects(object: GameObject): IAudioEffect[] {
+    //     const properties = this.getTypeProperties(object.type);
+    //     if (properties.audioEffects === undefined) {
+    //         return [];
+    //     }
 
-        return properties.spriteSets;
-    }
+    //     return properties.audioEffects;
+    // }
 
-    static isSpriteSetMatchingPosition(set: ISpriteSet, position: Point): boolean {
-        if (set.position === undefined) {
-            return true;
-        }
+    // static findAudioEffect(object: GameObject): IAudioEffect | undefined {
+    //     const audioEffects = this.findAudioEffects(object);
 
-        const x = position.x % set.position.mod / set.position.divide;
-        const y = position.y % set.position.mod / set.position.divide;
+    //     for (const audioEffect of audioEffects) {
+    //         if (audioEffect.meta !== undefined && !object.isMatchingMeta(audioEffect.meta)) {
+    //             continue;
+    //         }
 
-        for (const point of set.position.equals) {
-            if (point.x === x && point.y === y) {
-                return true;
-            }
-        }
+    //         return audioEffect;
+    //     }
 
-        return false;
-    }
-
-    static isSpriteSetMatchingDirection(set: ISpriteSet, direction: Direction): boolean {
-        if (set.direction === undefined) {
-            return true;
-        }
-
-        return set.direction === direction;
-    }
-
-    static findSpriteSet(object: GameObject): ISpriteSet | undefined {
-        const sets = this.findSpriteSets(object);
-        for (const set of sets) {
-            if (!this.isSpriteSetMatchingDirection(set, object.direction)) {
-                continue;
-            }
-
-            if (!this.isSpriteSetMatchingPosition(set, object.position)) {
-                continue;
-            }
-
-            if (set.meta !== undefined && !object.isMatchingMeta(set.meta)) {
-                continue;
-            }
-
-            return set;
-        }
-
-        return undefined;
-    }
-
-    static findAnimationSprite(set: ISpriteSet, referenceTime: number): ISprite | undefined {
-        if (set.duration === undefined) {
-            throw new Error('Invalid call to find animation sprite when sprite set is not animated');
-        }
-
-        let currentAnimationTime = (Date.now() - referenceTime);
-        if (set.loop === undefined || set.loop === true) {
-            currentAnimationTime %= set.duration;
-        }
-
-        let iterationAnimationTime = 0;
-        for (const step of set.steps) {
-            if (step.duration === undefined) {
-                return step;
-            }
-
-            if (currentAnimationTime < iterationAnimationTime + step.duration) {
-                return step;
-            }
-
-            iterationAnimationTime += step.duration;
-        }
-
-        return undefined;
-    }
-
-    static findSprite(object: GameObject): ISprite | undefined {
-        const spriteSet = this.findSpriteSet(object);
-        if (spriteSet === undefined) {
-            return undefined;
-        }
-
-        if (spriteSet.duration === undefined) {
-            return spriteSet.steps[0];
-        }
-
-        return this.findAnimationSprite(spriteSet, object.spawnTime);
-    }
-
-    static findAudioEffects(object: GameObject): IAudioEffect[] {
-        const properties = this.getTypeProperties(object.type);
-        if (properties.audioEffects === undefined) {
-            return [];
-        }
-
-        return properties.audioEffects;
-    }
-
-    static findAudioEffect(object: GameObject): IAudioEffect | undefined {
-        const audioEffects = this.findAudioEffects(object);
-
-        for (const audioEffect of audioEffects) {
-            if (audioEffect.meta !== undefined && !object.isMatchingMeta(audioEffect.meta)) {
-                continue;
-            }
-
-            return audioEffect;
-        }
-
-        return undefined;
-    }
+    //     return undefined;
+    // }
 }

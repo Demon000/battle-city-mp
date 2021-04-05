@@ -3,7 +3,7 @@ import Point from '@/physics/point/Point';
 import { Direction } from '../physics/Direction';
 import GameObjectProperties from './GameObjectProperties';
 import { GameObjectType } from './GameObjectType';
-import IGameObjectProperties, { IAudioEffect, ISprite, ResourceMeta } from './IGameObjectProperties';
+import IGameObjectProperties, { IAudioEffect, ResourceMeta } from './IGameObjectProperties';
 
 export interface GameObjectOptions {
     id?: number;
@@ -30,7 +30,6 @@ export default class GameObject {
     destroyed = false;
     audioEffectPanner: PannerNode | null = null;
     audioEffectBufferSource: AudioBufferSourceNode | null = null;
-    _sprite?: ISprite | null = null;
     _audioEffect?: IAudioEffect | null = null;
 
     constructor(options: GameObjectOptions) {
@@ -78,7 +77,6 @@ export default class GameObject {
 
     set direction(direction: Direction) {
         this._direction = direction;
-        this._sprite = null;
     }
 
     get direction(): Direction {
@@ -87,11 +85,14 @@ export default class GameObject {
 
     set position(position: Point) {
         this._position = position;
-        this._sprite = null;
     }
 
     get position(): Point {
         return this._position;
+    }
+
+    get isMoving(): boolean {
+        return this.movementSpeed > 0;
     }
 
     get centerPosition(): Point {
@@ -117,52 +118,35 @@ export default class GameObject {
         return 0;
     }
 
-    get sprite(): ISprite | null | undefined {
-        if (this._sprite !== null) {
-            return this._sprite;
-        }
+    // get audioEffect(): IAudioEffect | null | undefined {
+    //     if (this._audioEffect !== null) {
+    //         return this._audioEffect;
+    //     }
 
-        const spriteSets = GameObjectProperties.findSpriteSets(this);
-        if (spriteSets.length === 0) {
-            this._sprite = undefined;
-        } else {
-            const sprite = GameObjectProperties.findSprite(this);
-            if (sprite === undefined) {
-                return null;
-            }
-    
-            this._sprite = sprite;
-        }
+    //     const audioEffects = GameObjectProperties.findAudioEffects(this);
+    //     if (audioEffects.length === 0) {
+    //         this._audioEffect = undefined;
+    //     } else {
+    //         const audioEffect =  GameObjectProperties.findAudioEffect(this);
+    //         if (audioEffect === undefined) {
+    //             return null;
+    //         }
 
-        return this._sprite;
-    }
+    //         this._audioEffect = audioEffect;
+    //     }
 
-    get audioEffect(): IAudioEffect | null | undefined {
-        if (this._audioEffect !== null) {
-            return this._audioEffect;
-        }
-
-        const audioEffects = GameObjectProperties.findAudioEffects(this);
-        if (audioEffects.length === 0) {
-            this._audioEffect = undefined;
-        } else {
-            const audioEffect =  GameObjectProperties.findAudioEffect(this);
-            if (audioEffect === undefined) {
-                return null;
-            }
-
-            this._audioEffect = audioEffect;
-        }
-
-        return this._audioEffect;
-    }
+    //     return this._audioEffect;
+    // }
 
     get automaticDestroyTime(): number | undefined {
         return this.properties.automaticDestroyTime;
     }
 
-    isMatchingMeta(_meta: ResourceMeta): boolean {
-        return false;
+    get metas(): ResourceMeta[] {
+        return [{
+            direction: this.direction,
+            position: this.position,
+        }];
     }
 
     getBoundingBox(position=this.position): BoundingBox {

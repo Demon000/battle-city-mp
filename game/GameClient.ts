@@ -2,10 +2,11 @@ import { CLIENT_CONFIG_VISIBLE_GAME_SIZE } from '@/config';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import GameAudioService from '@/renderer/GameAudioService';
 import GameCamera from '@/renderer/GameCamera';
+import GameObjectRenderer from '@/object/GameObjectRenderer';
 import GameRenderService from '@/renderer/GameRenderService';
 import MapRepository from '@/utils/MapRepository';
 import Ticker, { TickerEvent } from '@/utils/Ticker';
-import GameObject, { GameObjectOptions, PartialGameObjectOptions } from '../object/GameObject';
+import GameObject, { PartialGameObjectOptions } from '../object/GameObject';
 import GameObjectService, { GameObjectServiceEvent } from '../object/GameObjectService';
 import BoundingBoxRepository from '../physics/bounding-box/BoundingBoxRepository';
 import CollisionService from '../physics/collisions/CollisionService';
@@ -20,8 +21,9 @@ export default class GameClient {
     private boundingBoxRepository;
     private collisionService;
     private gameCamera;
+    private rendererRepository;
     private gameRenderService;
-    private gameAudioService;
+    // private gameAudioService;
     ticker;
 
     constructor(canvas: HTMLCanvasElement) {
@@ -30,8 +32,9 @@ export default class GameClient {
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
         this.gameCamera = new GameCamera();
-        this.gameRenderService = new GameRenderService(canvas, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
-        this.gameAudioService = new GameAudioService();
+        this.rendererRepository = new MapRepository<number, GameObjectRenderer>();
+        this.gameRenderService = new GameRenderService(this.rendererRepository, canvas, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
+        // this.gameAudioService = new GameAudioService();
         this.ticker = new Ticker();
 
         this.playerRepository = new MapRepository<string, Player>();
@@ -107,7 +110,7 @@ export default class GameClient {
         const viewableObjectIds = this.collisionService.getOverlappingObjects(box);
         const viewableObjects = this.gameObjectService.getMultipleObjects(viewableObjectIds);
         this.gameRenderService.renderObjects(viewableObjects, position);
-        this.gameAudioService.playObjectSounds(viewableObjects, position);
+        // this.gameAudioService.playObjectSounds(viewableObjects, position);
     }
 
     onWindowResize(): void {

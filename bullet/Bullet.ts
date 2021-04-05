@@ -43,11 +43,10 @@ export default class Bullet extends GameObject {
         }
     }
 
-    isMatchingMeta(meta: ResourceMeta): boolean {
-        if (meta.power !== this.power) {
-            return false;
-        }
-
-        return true;
+    get metas(): ResourceMeta[] {
+        return [{
+            ...super.metas[0],
+            power: this.power,
+        }];
     }
 }
