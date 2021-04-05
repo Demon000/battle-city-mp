@@ -113,19 +113,19 @@ export default class GameAudioService {
                 continue;
             }
 
+            // Try to stop any ongoing effect if the current audio effect is different
+            const stoppedAudioEffect = this.stopObjectAudioEffectIfDifferent(object, audioEffect);
+
+            // The object has no current audio effect
+            if (audioEffect === null) {
+                continue;
+            }
+
             if (object.audioEffectPanner === null) {
                 object.audioEffectPanner = this.createObjectAudioEffectPanner();
             }
 
             this.setCartesianPositions(object.audioEffectPanner, object.centerPosition);
-
-            // Try to stop any ongoing effect if the current audio effect is different
-            const stoppedAudioEffect = this.stopObjectAudioEffectIfDifferent(object, audioEffect);
-
-            // The objects has no current audio effect
-            if (audioEffect === null) {
-                continue;
-            }
 
             // If we stopped the old audio effect, it means that it differed
             // Load and play the new audio effect
