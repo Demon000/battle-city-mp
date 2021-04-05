@@ -141,7 +141,6 @@ export default class GameObject {
 
     get audioEffect(): IAudioEffect | null | undefined {
         if (this._audioEffect !== null) {
-            console.log(this._audioEffect);
             return this._audioEffect;
         }
 
