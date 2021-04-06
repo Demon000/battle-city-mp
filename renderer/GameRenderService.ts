@@ -113,16 +113,16 @@ export default class GameRenderService {
     }
 
     getSpriteMatcher(object: GameObject): GameObjectSpriteMatcher {
-        let renderer = this.spriteMatcherRepository.find(object.id);
-        if (renderer === undefined) {
-            renderer = GameObjectSpriteMatcherFactory.buildFromObject(object);
-            this.spriteMatcherRepository.add(object.id, renderer);
+        let spriteMatcher = this.spriteMatcherRepository.find(object.id);
+        if (spriteMatcher === undefined) {
+            spriteMatcher = GameObjectSpriteMatcherFactory.buildFromObject(object);
+            this.spriteMatcherRepository.add(object.id, spriteMatcher);
         }
 
-        return renderer;
+        return spriteMatcher;
     }
 
-    removeRenderer(objectId: number): void {
+    removeSpriteMatcher(objectId: number): void {
         this.spriteMatcherRepository.remove(objectId);
     }
 
@@ -164,10 +164,10 @@ export default class GameRenderService {
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
         let renderObjectSprites = objects.map(object => {
-            const renderer = this.getSpriteMatcher(object);
+            const spriteMatcher = this.getSpriteMatcher(object);
             return {
                 object,
-                sprites: renderer.sprites,
+                sprites: spriteMatcher.sprites,
             };
         });
         let pass = 0;
