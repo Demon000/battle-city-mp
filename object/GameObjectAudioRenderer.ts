@@ -131,8 +131,6 @@ export default class GameObjectAudioRenderer {
             this.destroyBufferSource();
         }
 
-        console.log(Date.now(), this.audioEffect);
-
         if (this.audioEffect === null || this.audioEffect.buffer === undefined) {
             return;
         }
