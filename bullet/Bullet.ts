@@ -43,9 +43,9 @@ export default class Bullet extends GameObject {
         }
     }
 
-    get metas(): ResourceMeta[] {
+    get graphicsMeta(): ResourceMeta[] {
         return [{
-            ...super.metas[0],
+            ...super.graphicsMeta[0],
             power: this.power,
         }];
     }

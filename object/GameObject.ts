@@ -142,7 +142,7 @@ export default class GameObject {
         return this.properties.automaticDestroyTime;
     }
 
-    get metas(): ResourceMeta[] {
+    get graphicsMeta(): ResourceMeta[] {
         return [{
             direction: this.direction,
             position: this.position,

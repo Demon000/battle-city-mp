@@ -43,11 +43,9 @@ export default class Explosion extends GameObject {
         }
     }
 
-    get metas(): ResourceMeta[] {
+    get graphicsMeta(): ResourceMeta[] {
         return [{
-            ...super.metas[0],
             explosionType: this.explosionType,
-            destroyedObjectType: this.destroyedObjectType,
         }];
     }
 }

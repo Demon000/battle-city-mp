@@ -187,11 +187,15 @@ export default class Tank extends GameObject {
         return tierToBulletCooldownMap[this.tier];
     }
 
-    get metas(): ResourceMeta[] {
-        return [{
-            ...super.metas[0],
-            isMoving: this.isMoving,
-            tier: this.tier,
-        }];
+    get graphicsMeta(): ResourceMeta[] {
+        return [
+            {
+                isMoving: this.isMoving,
+                tier: this.tier,
+            },
+            {
+                smoke: TankSmoke.BIG,
+            },
+        ];
     }
 }

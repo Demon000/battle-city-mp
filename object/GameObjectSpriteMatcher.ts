@@ -165,7 +165,7 @@ export default class GameObjectSpriteMatcher {
             return;
         }
 
-        const metas = this.object.metas;
+        const metas = this.object.graphicsMeta;
         if (!this.isMetasMatchingSpriteSets(metas)) {
             const hasAnySprite = this.updateSpriteSets(metas);
             if (!hasAnySprite) {

@@ -19,14 +19,14 @@ export default class GameRenderService {
     private canvas;
     private targetGameSize;
     private context;
-    private rendererRepository;
+    private spriteMatcherRepository;
 
     constructor(
-        rendererRepository: MapRepository<number, GameObjectSpriteMatcher>,
+        spriteMatcherRepository: MapRepository<number, GameObjectSpriteMatcher>,
         canvas: HTMLCanvasElement,
         targetGameSize: number,
     ) {
-        this.rendererRepository = rendererRepository;
+        this.spriteMatcherRepository = spriteMatcherRepository;
         this.canvas = canvas;
         this.targetGameSize = targetGameSize;
 
@@ -112,18 +112,18 @@ export default class GameRenderService {
         this.context.drawImage(sprite.canvas, objectRenderX, objectRenderY);
     }
 
-    getRenderer(object: GameObject): GameObjectSpriteMatcher {
-        let renderer = this.rendererRepository.find(object.id);
+    getSpriteMatcher(object: GameObject): GameObjectSpriteMatcher {
+        let renderer = this.spriteMatcherRepository.find(object.id);
         if (renderer === undefined) {
             renderer = GameObjectSpriteMatcherFactory.buildFromObject(object);
-            this.rendererRepository.add(object.id, renderer);
+            this.spriteMatcherRepository.add(object.id, renderer);
         }
 
         return renderer;
     }
 
     removeRenderer(objectId: number): void {
-        this.rendererRepository.remove(objectId);
+        this.spriteMatcherRepository.remove(objectId);
     }
 
     isSpritePass(sprite: ISprite, pass: number): boolean {
@@ -164,7 +164,7 @@ export default class GameRenderService {
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
         let renderObjectSprites = objects.map(object => {
-            const renderer = this.getRenderer(object);
+            const renderer = this.getSpriteMatcher(object);
             return {
                 object,
                 sprites: renderer.sprites,
