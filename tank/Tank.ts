@@ -190,6 +190,7 @@ export default class Tank extends GameObject {
     get graphicsMeta(): ResourceMeta[] {
         return [
             {
+                ...super.graphicsMeta[0],
                 isMoving: this.isMoving,
                 tier: this.tier,
             },
