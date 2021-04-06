@@ -115,19 +115,19 @@ export default class GameObjectAudioRenderer {
 
         if (objectMeta === null) {
             this.audioEffect = null;
-            return;
+            return null;
         }
 
         if (this.audioEffect !== null
             && this.isAudioEffectMatchingMeta(this.audioEffect, objectMeta)) {
-            return;
+            return this.audioEffect;
         }
 
         this.audioEffect = this.findAudioEffectMatchingMeta(this.object.type, objectMeta);
         return this.audioEffect;
     }
 
-    render(): void {
+    play(): void {
         if (this.audioEffect === undefined) {
             return;
         }

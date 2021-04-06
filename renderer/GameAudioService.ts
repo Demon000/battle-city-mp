@@ -85,7 +85,7 @@ export default class GameAudioService {
             const audioEffect = audioRenderer.update();
             if (audioEffect !== undefined && audioEffect !== null) {
                 this.loadAudioEffectBuffer(audioEffect);
-                audioRenderer.render();
+                audioRenderer.play();
                 this.objectsPlayingAudioEffects.add(object);
             } else {
                 audioRenderer.stop();
