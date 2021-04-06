@@ -221,15 +221,15 @@ const properties: IGameObjectProperties[] = [
                 ],
             },
         ],
-        // audioEffects: [
-        //     {
-        //         filename: 'tank_moving.wav',
-        //         loop: true,
-        //         meta: {
-        //             isMoving: true,
-        //         },
-        //     },
-        // ],
+        audioEffects: [
+            {
+                filename: 'tank_moving.wav',
+                loop: true,
+                meta: {
+                    isMoving: true,
+                },
+            },
+        ],
     },
     {
         type: GameObjectType.BULLET,
