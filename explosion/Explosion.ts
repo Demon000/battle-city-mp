@@ -48,4 +48,10 @@ export default class Explosion extends GameObject {
             explosionType: this.explosionType,
         }];
     }
+
+    get audioMeta(): ResourceMeta {
+        return {
+            destroyedObjectType: this.destroyedObjectType,
+        };
+    }
 }

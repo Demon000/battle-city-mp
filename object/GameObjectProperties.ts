@@ -1,6 +1,7 @@
 import { BulletPower } from '@/bullet/BulletPower';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
+import { TankSmoke } from '@/tank/TankSmoke';
 import { TankTier } from '@/tank/TankTier';
 import { GameObjectType, GameShortObjectType } from './GameObjectType';
 import IGameObjectProperties, { ISpriteSet, RenderPass, ResourceMeta } from './IGameObjectProperties';
@@ -169,7 +170,57 @@ const properties: IGameObjectProperties[] = [
         width: 16,
         height: 16,
         directionAxisSnapping: 4,
-        spriteSets: generateTankSpriteSets(),
+        spriteSets: [
+            ...generateTankSpriteSets(),
+            {
+                meta: {
+                    smoke: TankSmoke.SMALL,
+                },
+                duration: 480,
+                loop: true,
+                steps: [
+                    {
+                        filename: 'smoke_small_0.png',
+                        duration: 160,
+                        renderPass: RenderPass.SMOKE,
+                    },
+                    {
+                        filename: 'smoke_small_1.png',
+                        duration: 160,
+                        renderPass: RenderPass.SMOKE,
+                    },
+                    {
+                        filename: 'smoke_small_2.png',
+                        duration: 160,
+                        renderPass: RenderPass.SMOKE,
+                    },
+                ],
+            },
+            {
+                meta: {
+                    smoke: TankSmoke.BIG,
+                },
+                duration: 480,
+                loop: true,
+                steps: [
+                    {
+                        filename: 'smoke_big_0.png',
+                        duration: 160,
+                        renderPass: RenderPass.SMOKE,
+                    },
+                    {
+                        filename: 'smoke_big_1.png',
+                        duration: 160,
+                        renderPass: RenderPass.SMOKE,
+                    },
+                    {
+                        filename: 'smoke_big_2.png',
+                        duration: 160,
+                        renderPass: RenderPass.SMOKE,
+                    },
+                ],
+            },
+        ],
         // audioEffects: [
         //     {
         //         filename: 'tank_moving.wav',
@@ -499,27 +550,4 @@ export default class GameObjectProperties {
         }
         return properties;
     }
-
-    // static findAudioEffects(object: GameObject): IAudioEffect[] {
-    //     const properties = this.getTypeProperties(object.type);
-    //     if (properties.audioEffects === undefined) {
-    //         return [];
-    //     }
-
-    //     return properties.audioEffects;
-    // }
-
-    // static findAudioEffect(object: GameObject): IAudioEffect | undefined {
-    //     const audioEffects = this.findAudioEffects(object);
-
-    //     for (const audioEffect of audioEffects) {
-    //         if (audioEffect.meta !== undefined && !object.isMatchingMeta(audioEffect.meta)) {
-    //             continue;
-    //         }
-
-    //         return audioEffect;
-    //     }
-
-    //     return undefined;
-    // }
 }

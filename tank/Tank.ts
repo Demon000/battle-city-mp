@@ -2,6 +2,7 @@ import { BulletPower } from '@/bullet/BulletPower';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 import GameObject, { GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
+// import { TankSmoke } from './TankSmoke';
 import { TankTier } from './TankTier';
 
 const tierToMaxSpeedMap = {
@@ -194,9 +195,15 @@ export default class Tank extends GameObject {
                 isMoving: this.isMoving,
                 tier: this.tier,
             },
-            {
-                smoke: TankSmoke.BIG,
-            },
+            // {
+            //     smoke: TankSmoke.BIG,
+            // },
         ];
+    }
+
+    get audioMeta(): ResourceMeta | undefined {
+        return {
+            isMoving: this.isMoving,
+        };
     }
 }

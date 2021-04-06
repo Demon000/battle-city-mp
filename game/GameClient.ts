@@ -1,9 +1,9 @@
 import { CLIENT_CONFIG_VISIBLE_GAME_SIZE } from '@/config';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
-// import GameAudioService from '@/renderer/GameAudioService';
+import GameAudioService from '@/renderer/GameAudioService';
 import GameCamera from '@/renderer/GameCamera';
-import GameObjectSpriteMatcher from '@/object/GameObjectSpriteMatcher';
-import GameRenderService from '@/renderer/GameRenderService';
+import GameObjectGraphicsRenderer from '@/object/GameObjectGraphicsRenderer';
+import GameGraphicsService from '@/renderer/GameGraphicsService';
 import MapRepository from '@/utils/MapRepository';
 import Ticker, { TickerEvent } from '@/utils/Ticker';
 import GameObject, { PartialGameObjectOptions } from '../object/GameObject';
@@ -12,6 +12,7 @@ import BoundingBoxRepository from '../physics/bounding-box/BoundingBoxRepository
 import CollisionService from '../physics/collisions/CollisionService';
 import Player from '../player/Player';
 import PlayerService from '../player/PlayerService';
+import GameObjectAudioRenderer from '@/object/GameObjectAudioRenderer';
 
 export default class GameClient {
     private playerRepository;
@@ -21,9 +22,10 @@ export default class GameClient {
     private boundingBoxRepository;
     private collisionService;
     private gameCamera;
-    private spriteMatcherRepository;
-    private gameRenderService;
-    // private gameAudioService;
+    private objectGraphicsRendererRepository;
+    private gameGraphicsService;
+    private objectAudioRendererRepository;
+    private gameAudioService;
     ticker;
 
     constructor(canvas: HTMLCanvasElement) {
@@ -32,9 +34,10 @@ export default class GameClient {
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
         this.gameCamera = new GameCamera();
-        this.spriteMatcherRepository = new MapRepository<number, GameObjectSpriteMatcher>();
-        this.gameRenderService = new GameRenderService(this.spriteMatcherRepository, canvas, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
-        // this.gameAudioService = new GameAudioService();
+        this.objectGraphicsRendererRepository = new MapRepository<number, GameObjectGraphicsRenderer>();
+        this.gameGraphicsService = new GameGraphicsService(this.objectGraphicsRendererRepository, canvas, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
+        this.objectAudioRendererRepository = new MapRepository<number, GameObjectAudioRenderer>();
+        this.gameAudioService = new GameAudioService(this.objectAudioRendererRepository);
         this.ticker = new Ticker();
 
         this.playerRepository = new MapRepository<string, Player>();
@@ -66,7 +69,7 @@ export default class GameClient {
     onObjectUnregisteredOnServer(objectId: number): void {
         this.gameObjectService.unregisterObject(objectId);
         this.collisionService.unregisterObjectCollisions(objectId);
-        this.gameRenderService.removeSpriteMatcher(objectId);
+        this.gameGraphicsService.removeObjectRenderer(objectId);
     }
 
     onPlayersAddedOnServer(players: Player[]): void {
@@ -103,19 +106,19 @@ export default class GameClient {
             return;
         }
 
-        const box = this.gameRenderService.getViewableMapBoundingBox(position);
+        const box = this.gameGraphicsService.getViewableMapBoundingBox(position);
         if (box === undefined) {
             return;
         }
 
         const viewableObjectIds = this.collisionService.getOverlappingObjects(box);
         const viewableObjects = this.gameObjectService.getMultipleObjects(viewableObjectIds);
-        this.gameRenderService.renderObjects(viewableObjects, position);
-        // this.gameAudioService.playObjectSounds(viewableObjects, position);
+        this.gameGraphicsService.renderObjects(viewableObjects, position);
+        this.gameAudioService.playObjectsAudioEffect(viewableObjects, position, box);
     }
 
     onWindowResize(): void {
-        this.gameRenderService.calculateDimensions();
+        this.gameGraphicsService.calculateDimensions();
     }
 
     clear(): void {

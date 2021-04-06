@@ -3,7 +3,7 @@ import Point from '@/physics/point/Point';
 import { Direction } from '../physics/Direction';
 import GameObjectProperties from './GameObjectProperties';
 import { GameObjectType } from './GameObjectType';
-import IGameObjectProperties, { IAudioEffect, ResourceMeta } from './IGameObjectProperties';
+import IGameObjectProperties, { ResourceMeta } from './IGameObjectProperties';
 
 export interface GameObjectOptions {
     id?: number;
@@ -28,9 +28,6 @@ export default class GameObject {
     spawnTime: number;
 
     destroyed = false;
-    audioEffectPanner: PannerNode | null = null;
-    audioEffectBufferSource: AudioBufferSourceNode | null = null;
-    _audioEffect?: IAudioEffect | null = null;
 
     constructor(options: GameObjectOptions) {
         this.id = options.id ?? GameObject.globalId++;
@@ -118,26 +115,6 @@ export default class GameObject {
         return 0;
     }
 
-    // get audioEffect(): IAudioEffect | null | undefined {
-    //     if (this._audioEffect !== null) {
-    //         return this._audioEffect;
-    //     }
-
-    //     const audioEffects = GameObjectProperties.findAudioEffects(this);
-    //     if (audioEffects.length === 0) {
-    //         this._audioEffect = undefined;
-    //     } else {
-    //         const audioEffect =  GameObjectProperties.findAudioEffect(this);
-    //         if (audioEffect === undefined) {
-    //             return null;
-    //         }
-
-    //         this._audioEffect = audioEffect;
-    //     }
-
-    //     return this._audioEffect;
-    // }
-
     get automaticDestroyTime(): number | undefined {
         return this.properties.automaticDestroyTime;
     }
@@ -147,6 +124,10 @@ export default class GameObject {
             direction: this.direction,
             position: this.position,
         }];
+    }
+
+    get audioMeta(): ResourceMeta | undefined {
+        return undefined;
     }
 
     getBoundingBox(position=this.position): BoundingBox {

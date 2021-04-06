@@ -49,4 +49,9 @@ export default class Bullet extends GameObject {
             power: this.power,
         }];
     }
+
+
+    get audioMeta(): ResourceMeta | undefined {
+        return {};
+    }
 }

@@ -5,7 +5,7 @@ import { ISprite, ISpriteSet, ISpriteSetPositionMatching, ResourceMeta } from '@
 import { Direction } from '@/physics/Direction';
 import Point from '@/physics/point/Point';
 
-export default class GameObjectSpriteMatcher {
+export default class GameObjectGraphicsRenderer {
     object: GameObject;
     sets: ISpriteSet[] | undefined = [];
 

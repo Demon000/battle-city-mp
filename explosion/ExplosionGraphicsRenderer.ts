@@ -1,7 +1,7 @@
 import { ResourceMeta } from '@/object/IGameObjectProperties';
-import GameObjectSpriteMatcher from '../object/GameObjectSpriteMatcher';
+import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
 
-export default class ExplosionSpriteMatcher extends GameObjectSpriteMatcher {
+export default class ExplosionGraphicsRenderer extends GameObjectGraphicsRenderer {
     isSpriteSetMetaEqual(setMeta: ResourceMeta, objectMeta: ResourceMeta): boolean {
         if (objectMeta.explosionType !== setMeta.explosionType) {
             return false;

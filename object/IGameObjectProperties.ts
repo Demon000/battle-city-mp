@@ -7,6 +7,7 @@ export enum RenderPass {
     BULLET = 1,
     BUSHES = 2,
     EXPLOSIONS = 3,
+    SMOKE = 3,
 }
 
 export interface ISprite {
