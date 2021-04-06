@@ -19,7 +19,6 @@ export interface ISprite {
     height?: number;
     renderPass?: number;
     canvas?: OffscreenCanvas;
-    context?: OffscreenCanvasRenderingContext2D;
     canvasRenderedWidth?: number;
     canvasRenderedHeight?: number;
 }

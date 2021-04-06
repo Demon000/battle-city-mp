@@ -1,16 +1,10 @@
 import { CLIENT_SPRITES_RELATIVE_URL } from '@/config';
 import GameObject from '@/object/GameObject';
-import { ISprite } from '@/object/IGameObjectProperties';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import Point from '@/physics/point/Point';
 import MapRepository from '@/utils/MapRepository';
 import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
 import GameObjectGraphicsRendererFactory from '../object/GameObjectGraphicsRendererFactory';
-
-interface GameObjectSprites {
-    object: GameObject,
-    sprites: ISprite[] | undefined,
-}
 
 export default class GameGraphicsService {
     private gameToRenderSizeScale = 0;
@@ -47,75 +41,19 @@ export default class GameGraphicsService {
 
         const minRenderSize = Math.max(this.canvas.width, this.canvas.height);
         this.gameToRenderSizeScale = Math.ceil(minRenderSize / this.targetGameSize);
+        this.context.scale(this.gameToRenderSizeScale, this.gameToRenderSizeScale);
         this.gameWidth = this.canvas.width / this.gameToRenderSizeScale;
         this.gameWidth -= this.gameWidth % 2;
         this.gameHeight = this.canvas.height / this.gameToRenderSizeScale;
         this.gameHeight -= this.gameHeight % 2;
-    }
-
-    renderSprite(
-        object: GameObject,
-        sprite: ISprite,
-        canvasX: number,
-        canvasY: number,
-    ): void {
-        if (sprite.image === undefined) {
-            sprite.image = new Image();
-            sprite.image.src = `${CLIENT_SPRITES_RELATIVE_URL}/${sprite.filename}`;
-        }
-
-        if (!sprite.image.complete) {
-            return;
-        }
-
-        let objectRelativeX = Math.floor(object.position.x) - canvasX;
-        if (sprite.offset !== undefined) {
-            objectRelativeX += sprite.offset.x;
-        }
-
-        let objectRelativeY = Math.floor(object.position.y) - canvasY;
-        if (sprite.offset !== undefined) {
-            objectRelativeY += sprite.offset.y;
-        }
-
-        let objectWidth;
-        if (sprite.width === undefined) {
-            objectWidth = object.properties.width;
-        } else {
-            objectWidth = sprite.width;
-        }
-
-        let objectHeight;
-        if (sprite.height === undefined) {
-            objectHeight = object.properties.height;
-        } else {
-            objectHeight = sprite.height;
-        }
-
-        const objectRenderX = objectRelativeX * this.gameToRenderSizeScale;
-        const objectRenderY = objectRelativeY * this.gameToRenderSizeScale;
-        const objectRenderWidth = objectWidth * this.gameToRenderSizeScale;
-        const objectRenderHeight = objectHeight * this.gameToRenderSizeScale;
-
-        if (sprite.canvas === undefined || sprite.canvas.width !== objectRenderWidth
-            || sprite.canvas.height !== objectRenderHeight) {
-            sprite.canvas = new OffscreenCanvas(objectRenderWidth, objectRenderHeight);
-            const context = sprite.canvas.getContext('2d');
-            if (context === null) {
-                throw new Error('Failed to create offscreen canvas context');
-            }
-            context.imageSmoothingEnabled = false;
-            context.drawImage(sprite.image, 0, 0, objectRenderWidth, objectRenderHeight);
-            sprite.context = context;
-        }
-
-        this.context.drawImage(sprite.canvas, objectRenderX, objectRenderY);
+        this.objectGraphicsRendererRepository.clear();
     }
 
     getObjectRenderer(object: GameObject): GameObjectGraphicsRenderer {
         let objectRenderer = this.objectGraphicsRendererRepository.find(object.id);
         if (objectRenderer === undefined) {
-            objectRenderer = GameObjectGraphicsRendererFactory.buildFromObject(object);
+            objectRenderer = GameObjectGraphicsRendererFactory
+                .buildFromObject(object, this.context);
             this.objectGraphicsRendererRepository.add(object.id, objectRenderer);
         }
 
@@ -126,35 +64,34 @@ export default class GameGraphicsService {
         this.objectGraphicsRendererRepository.remove(objectId);
     }
 
-    isSpritePass(sprite: ISprite, pass: number): boolean {
-        return (sprite.renderPass === undefined && pass === 0)
-        || (sprite.renderPass !== undefined && sprite.renderPass === pass);
-    }
-
-    renderObjectsPass(objectsSprites: GameObjectSprites[], point: Point, pass: number): GameObjectSprites[] {
-        const canvasX = point.x - this.gameWidth / 2;
-        const canvasY = point.y - this.gameHeight / 2;
-
-        return objectsSprites.filter(objectSprites => {
-            if (objectSprites.sprites === undefined) {
+    renderObjectsPrepare(objects: GameObject[]): GameObject[] {
+        return objects.filter(object => {
+            const renderer = this.getObjectRenderer(object);
+            const sprites = renderer.update();
+            if (sprites === undefined || sprites === null || sprites.length === 0) {
                 return false;
             }
 
-            const renderedSprites = objectSprites.sprites
-                .filter(sprite => this.isSpritePass(sprite, pass));
-            renderedSprites.forEach(sprite => {
-                this.renderSprite(objectSprites.object, sprite, canvasX, canvasY);
+            sprites.forEach(sprite => {
+                if (sprite.image === undefined) {
+                    sprite.image = new Image();
+                    sprite.image.src = `${CLIENT_SPRITES_RELATIVE_URL}/${sprite.filename}`;
+                }
             });
 
-            if (renderedSprites.length === objectSprites.sprites.length) {
-                return false;
-            }
-
-            const unrenderedSprites = objectSprites.sprites
-                .filter(sprite => !this.isSpritePass(sprite, pass));
-            objectSprites.sprites = unrenderedSprites;
-
             return true;
+        });
+    }
+
+    renderObjectsPass(
+        objects: GameObject[],
+        pass: number,
+        canvasX: number,
+        canvasY: number,
+    ): GameObject[] {
+        return objects.filter(object => {
+            const renderer = this.getObjectRenderer(object);
+            return renderer.renderPass(pass, canvasX, canvasY);
         });
     }
 
@@ -163,16 +100,12 @@ export default class GameGraphicsService {
         this.context.fillStyle = 'black';
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        let renderObjectSprites = objects.map(object => {
-            const objectRenderer = this.getObjectRenderer(object);
-            return {
-                object,
-                sprites: objectRenderer.sprites,
-            };
-        });
+        const canvasX = point.x - this.gameWidth / 2;
+        const canvasY = point.y - this.gameHeight / 2;
+        let renderObjects = this.renderObjectsPrepare(objects);
         let pass = 0;
-        while (renderObjectSprites.length) {
-            renderObjectSprites = this.renderObjectsPass(renderObjectSprites, point, pass);
+        while (renderObjects.length) {
+            renderObjects = this.renderObjectsPass(renderObjects, pass, canvasX, canvasY);
             pass++;
         }
     }

@@ -43,15 +43,15 @@ export default class Bullet extends GameObject {
         }
     }
 
-    get graphicsMeta(): ResourceMeta[] {
+    get graphicsMeta(): ResourceMeta[] | undefined | null {
         return [{
-            ...super.graphicsMeta[0],
+            direction: this.direction,
             power: this.power,
         }];
     }
 
 
-    get audioMeta(): ResourceMeta | undefined {
+    get audioMeta(): ResourceMeta | undefined | null {
         return {};
     }
 }

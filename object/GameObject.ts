@@ -119,14 +119,14 @@ export default class GameObject {
         return this.properties.automaticDestroyTime;
     }
 
-    get graphicsMeta(): ResourceMeta[] {
+    get graphicsMeta(): ResourceMeta[] | undefined | null {
         return [{
             direction: this.direction,
             position: this.position,
         }];
     }
 
-    get audioMeta(): ResourceMeta | undefined {
+    get audioMeta(): ResourceMeta | undefined | null {
         return undefined;
     }
 

@@ -76,19 +76,19 @@ export default class GameAudioService {
             }
 
             const audioRenderer = this.getAudioRenderer(object);
-            audioRenderer.stopAudioEffect();
+            audioRenderer.stop();
             this.objectsPlayingAudioEffects.delete(object);
         }
 
         for (const object of objects) {
             const audioRenderer = this.getAudioRenderer(object);
-            const audioEffect = audioRenderer.updateAudioEffect();
+            const audioEffect = audioRenderer.update();
             if (audioEffect !== undefined && audioEffect !== null) {
                 this.loadAudioEffectBuffer(audioEffect);
-                audioRenderer.updatePlayingAudioEffect();
+                audioRenderer.render();
                 this.objectsPlayingAudioEffects.add(object);
             } else {
-                audioRenderer.stopAudioEffect();
+                audioRenderer.stop();
             }
         }
     }

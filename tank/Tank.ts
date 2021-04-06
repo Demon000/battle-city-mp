@@ -188,10 +188,10 @@ export default class Tank extends GameObject {
         return tierToBulletCooldownMap[this.tier];
     }
 
-    get graphicsMeta(): ResourceMeta[] {
+    get graphicsMeta(): ResourceMeta[] | undefined | null {
         return [
             {
-                ...super.graphicsMeta[0],
+                direction: this.direction,
                 isMoving: this.isMoving,
                 tier: this.tier,
             },
@@ -201,7 +201,7 @@ export default class Tank extends GameObject {
         ];
     }
 
-    get audioMeta(): ResourceMeta | undefined {
+    get audioMeta(): ResourceMeta | undefined | null {
         return {
             isMoving: this.isMoving,
         };

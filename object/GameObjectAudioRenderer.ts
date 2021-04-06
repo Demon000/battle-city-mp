@@ -20,7 +20,7 @@ export default class GameObjectAudioRenderer {
         this.maxAudibleDistance = maxAudibleDistance;
     }
 
-    isAudioEffectMetaEqual(_audioEffectMeta: ResourceMeta, _objectMeta: ResourceMeta): boolean {
+    protected isAudioEffectMetaEqual(_audioEffectMeta: ResourceMeta, _objectMeta: ResourceMeta): boolean {
         return true;
     }
 
@@ -37,11 +37,7 @@ export default class GameObjectAudioRenderer {
         return properties.audioEffects;
     }
 
-    private findAudioEffect(type: GameObjectType, objectMeta: ResourceMeta | undefined): IAudioEffect | undefined | null {
-        if (objectMeta === undefined) {
-            return undefined;
-        }
-
+    private findAudioEffectMatchingMeta(type: GameObjectType, objectMeta: ResourceMeta): IAudioEffect | undefined | null {
         const audioEffects = this.findAudioEffects(type);
         if (audioEffects === undefined) {
             return undefined;
@@ -56,7 +52,7 @@ export default class GameObjectAudioRenderer {
         return null;
     }
 
-    updatePannerPosition(): void {
+    private updatePannerPosition(): void {
         if (this.panner === undefined) {
             throw new Error('Inconsistent audio effect panner');
         }
@@ -64,7 +60,7 @@ export default class GameObjectAudioRenderer {
         CartesianUtils.setCartesianPositions(this.panner, this.object.centerPosition);
     }
 
-    createPanner(): PannerNode {
+    private createPanner(): PannerNode {
         this.panner = new PannerNode(this.context, {
             panningModel: 'HRTF',
             distanceModel: 'linear',
@@ -74,7 +70,7 @@ export default class GameObjectAudioRenderer {
         return this.panner;
     }
 
-    createBufferSource(): void {
+    private createBufferSource(): void {
         if (this.audioEffect === undefined || this.audioEffect === null) {
             return;
         }
@@ -95,7 +91,7 @@ export default class GameObjectAudioRenderer {
         this.bufferSource.start();
     }
 
-    destroyBufferSource(): boolean {
+    private destroyBufferSource(): boolean {
         if (this.bufferSource === undefined) {
             throw new Error('Audio effect panner is inconsistent');
         }
@@ -106,22 +102,32 @@ export default class GameObjectAudioRenderer {
         return true;
     }
 
-    updateAudioEffect(): IAudioEffect | null | undefined {
+    update(): IAudioEffect | null | undefined {
         if (this.audioEffect === undefined) {
             return;
         }
 
-        const audioEffect =  this.findAudioEffect(this.object.type, this.object.audioMeta);
-        if (audioEffect === undefined) {
+        const objectMeta = this.object.audioMeta;
+        if (objectMeta === undefined) {
             this.audioEffect = undefined;
             return;
         }
 
-        this.audioEffect = audioEffect;
+        if (objectMeta === null) {
+            this.audioEffect = null;
+            return;
+        }
+
+        if (this.audioEffect !== null
+            && this.isAudioEffectMatchingMeta(this.audioEffect, objectMeta)) {
+            return;
+        }
+
+        this.audioEffect = this.findAudioEffectMatchingMeta(this.object.type, objectMeta);
         return this.audioEffect;
     }
 
-    updatePlayingAudioEffect(): void {
+    render(): void {
         if (this.audioEffect === undefined) {
             return;
         }
@@ -149,7 +155,7 @@ export default class GameObjectAudioRenderer {
         this.createBufferSource();
     }
 
-    stopAudioEffect(): void {
+    stop(): void {
         if (this.bufferSource !== undefined) {
             this.destroyBufferSource();
         }

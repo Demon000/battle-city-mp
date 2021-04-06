@@ -6,11 +6,14 @@ import { Direction } from '@/physics/Direction';
 import Point from '@/physics/point/Point';
 
 export default class GameObjectGraphicsRenderer {
-    object: GameObject;
-    sets: ISpriteSet[] | undefined = [];
+    object;
+    context;
+    sets?: ISpriteSet[] | null = [];
+    sprites?: ISprite[] | null;
 
-    constructor(object: GameObject) {
+    constructor(object: GameObject, context: CanvasRenderingContext2D) {
         this.object = object;
+        this.context = context;
     }
 
     isSpriteSetMetaEqual(_setMeta: ResourceMeta, _objectMeta: ResourceMeta): boolean {
@@ -61,7 +64,7 @@ export default class GameObjectGraphicsRenderer {
         return true;
     }
 
-    private findSpriteSet(type: GameObjectType, meta: ResourceMeta): ISpriteSet | undefined | null {
+    private findSpriteSetMatchingMeta(type: GameObjectType, meta: ResourceMeta): ISpriteSet | undefined | null {
         const sets = this.findSpriteSets(type);
         if (sets === undefined) {
             return undefined;
@@ -74,6 +77,59 @@ export default class GameObjectGraphicsRenderer {
         }
 
         return null;
+    }
+
+    private findSpriteSetsMatchingMetas(type: GameObjectType, metas: ResourceMeta[]): ISpriteSet[] | undefined {
+        const sets = [];
+
+        for (const meta of metas) {
+            const set = this.findSpriteSetMatchingMeta(type, meta);
+            if (set !== undefined && set !== null) {
+                sets.push(set);
+            } else if (set === undefined) {
+                return undefined;
+            }
+        }
+
+        return sets;
+    }
+
+    private isSpriteSetsMatchingMetas(sets: ISpriteSet[], metas: ResourceMeta[]): boolean {
+        if (metas.length !== sets.length) {
+            return false;
+        }
+
+        for (let i = 0; i < metas.length; i++) {
+            if (!this.isSpriteSetMatchingMeta(sets[i], metas[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private updateSpriteSets(): void {
+        if (this.sets === undefined) {
+            return;
+        }
+
+        const metas = this.object.graphicsMeta;
+        if (metas === undefined) {
+            this.sets = undefined;
+            return;
+        }
+
+        if (metas === null) {
+            this.sets = null;
+            return;
+        }
+
+        if (this.sets !== null
+            && this.isSpriteSetsMatchingMetas(this.sets, metas)) {
+            return;
+        }
+
+        this.sets = this.findSpriteSetsMatchingMetas(this.object.type, metas);
     }
 
     private getStaticSprite(set: ISpriteSet): ISprite {
@@ -114,45 +170,9 @@ export default class GameObjectGraphicsRenderer {
         return this.getAnimationSprite(set, this.object.spawnTime);
     }
 
-    private isMetasMatchingSpriteSets(metas: ResourceMeta[]): boolean {
-        if (metas === undefined || this.sets === undefined) {
-            return false;
-        }
-
-        if (metas.length !== this.sets.length) {
-            return false;
-        }
-
-        for (let i = 0; i < metas.length; i++) {
-            if (!this.isSpriteSetMatchingMeta(this.sets[i], metas[i])) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private updateSpriteSets(metas: ResourceMeta[]): boolean {
-        this.sets = [];
-        let hasAnySprite = false;
-
-        for (const meta of metas) {
-            const set = this.findSpriteSet(this.object.type, meta);
-            if (set !== undefined && set !== null) {
-                this.sets.push(set);
-            }
-
-            if (set !== undefined) {
-                hasAnySprite = true;
-            }
-        }
-
-        return hasAnySprite;
-    }
-
-    private getSprites(): ISprite[] {
-        if (this.sets === undefined) {
-            throw new Error('Inconsistent sprite sets');
+    private getSprites(): ISprite[] | undefined | null {
+        if (this.sets === undefined || this.sets === null) {
+            return this.sets;
         }
 
         return this.sets
@@ -160,20 +180,73 @@ export default class GameObjectGraphicsRenderer {
             .filter(sprite => sprite !== undefined && sprite !== null) as ISprite[];
     }
 
-    get sprites(): ISprite[] | undefined {
-        if (this.sets === undefined) {
+    private updateSprites(): ISprite[] | undefined | null {
+        if (this.sets === undefined || this.sets === null) {
+            return this.sets;
+        }
+
+        this.sprites = this.getSprites();
+        return this.sprites;
+    }
+
+    isSpritePass(sprite: ISprite, pass: number): boolean {
+        return (sprite.renderPass === undefined && pass === 0)
+        || (sprite.renderPass !== undefined && sprite.renderPass === pass);
+    }
+
+    update(): ISprite[] | undefined | null {
+        this.updateSpriteSets();
+        return this.updateSprites();
+    }
+
+    renderSprite(sprite: ISprite, objectRelativeX: number, objectRelativeY: number): void {
+        if (sprite.image === undefined) {
             return;
         }
 
-        const metas = this.object.graphicsMeta;
-        if (!this.isMetasMatchingSpriteSets(metas)) {
-            const hasAnySprite = this.updateSpriteSets(metas);
-            if (!hasAnySprite) {
-                this.sets = undefined;
-                return;
-            }
+        let objectWidth;
+        if (sprite.width === undefined) {
+            objectWidth = this.object.properties.width;
+        } else {
+            objectWidth = sprite.width;
         }
+
+        let objectHeight;
+        if (sprite.height === undefined) {
+            objectHeight = this.object.properties.height;
+        } else {
+            objectHeight = sprite.height;
+        }
+
+        if (sprite.offset !== undefined) {
+            objectRelativeX += sprite.offset.x;
+        }
+
+        if (sprite.offset !== undefined) {
+            objectRelativeY += sprite.offset.y;
+        }
+
+        this.context.drawImage(sprite.image, objectRelativeX,
+            objectRelativeY, objectWidth, objectHeight);
+    }
+
+    renderPass(pass: number, canvasX: number, canvasY: number): boolean {
+        if (!this.sprites) {
+            return false;
+        }
+
+        const objectRelativeX = Math.floor(this.object.position.x) - canvasX;
+        const objectRelativeY = Math.floor(this.object.position.y) - canvasY;
+        this.sprites = this.sprites.filter(sprite => {
+            if (!this.isSpritePass(sprite, pass)) {
+                return true;
+            }
     
-        return this.getSprites();
+            this.renderSprite(sprite, objectRelativeX, objectRelativeY);
+
+            return false;
+        });
+
+        return this.sprites.length !== 0;
     }
 }

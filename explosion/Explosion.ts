@@ -43,13 +43,14 @@ export default class Explosion extends GameObject {
         }
     }
 
-    get graphicsMeta(): ResourceMeta[] {
+    get graphicsMeta(): ResourceMeta[] | undefined | null {
         return [{
+            direction: this.direction,
             explosionType: this.explosionType,
         }];
     }
 
-    get audioMeta(): ResourceMeta {
+    get audioMeta(): ResourceMeta | undefined | null {
         return {
             destroyedObjectType: this.destroyedObjectType,
         };
