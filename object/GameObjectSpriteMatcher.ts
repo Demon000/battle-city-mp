@@ -5,7 +5,7 @@ import { ISprite, ISpriteSet, ISpriteSetPositionMatching, ResourceMeta } from '@
 import { Direction } from '@/physics/Direction';
 import Point from '@/physics/point/Point';
 
-export default class GameObjectRenderer {
+export default class GameObjectSpriteMatcher {
     object: GameObject;
     sets: ISpriteSet[] | undefined = [];
 
@@ -173,7 +173,7 @@ export default class GameObjectRenderer {
                 return;
             }
         }
-
+    
         return this.getSprites();
     }
 }

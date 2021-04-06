@@ -1,9 +1,8 @@
 import { ResourceMeta } from '@/object/IGameObjectProperties';
-import GameObjectRenderer from '../object/GameObjectRenderer';
+import GameObjectSpriteMatcher from '../object/GameObjectSpriteMatcher';
 
-export class TankRenderer extends GameObjectRenderer {
+export class TankSpriteMatcher extends GameObjectSpriteMatcher {
     isSpriteSetMetaEqual(setMeta: ResourceMeta, objectMeta: ResourceMeta): boolean {
-
         if (setMeta.isMoving !== undefined && objectMeta.isMoving !== setMeta.isMoving) {
             return false;
         }

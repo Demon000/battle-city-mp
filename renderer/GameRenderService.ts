@@ -4,8 +4,13 @@ import { ISprite } from '@/object/IGameObjectProperties';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import Point from '@/physics/point/Point';
 import MapRepository from '@/utils/MapRepository';
-import GameObjectRenderer from '../object/GameObjectRenderer';
-import GameObjectRendererFactory from '../object/GameObjectRendererFactory';
+import GameObjectSpriteMatcher from '../object/GameObjectSpriteMatcher';
+import GameObjectSpriteMatcherFactory from '../object/GameObjectSpriteMatcherFactory';
+
+interface GameObjectSprites {
+    object: GameObject,
+    sprites: ISprite[] | undefined,
+}
 
 export default class GameRenderService {
     private gameToRenderSizeScale = 0;
@@ -17,7 +22,7 @@ export default class GameRenderService {
     private rendererRepository;
 
     constructor(
-        rendererRepository: MapRepository<number, GameObjectRenderer>,
+        rendererRepository: MapRepository<number, GameObjectSpriteMatcher>,
         canvas: HTMLCanvasElement,
         targetGameSize: number,
     ) {
@@ -107,10 +112,10 @@ export default class GameRenderService {
         this.context.drawImage(sprite.canvas, objectRenderX, objectRenderY);
     }
 
-    getRenderer(object: GameObject): GameObjectRenderer {
+    getRenderer(object: GameObject): GameObjectSpriteMatcher {
         let renderer = this.rendererRepository.find(object.id);
         if (renderer === undefined) {
-            renderer = GameObjectRendererFactory.buildFromObject(object);
+            renderer = GameObjectSpriteMatcherFactory.buildFromObject(object);
             this.rendererRepository.add(object.id, renderer);
         }
 
@@ -121,27 +126,35 @@ export default class GameRenderService {
         this.rendererRepository.remove(objectId);
     }
 
-    renderObjectsPass(objects: GameObject[], point: Point, pass: number): GameObject[] {
+    isSpritePass(sprite: ISprite, pass: number): boolean {
+        return (sprite.renderPass === undefined && pass === 0)
+        || (sprite.renderPass !== undefined && sprite.renderPass === pass);
+    }
+
+    renderObjectsPass(objectsSprites: GameObjectSprites[], point: Point, pass: number): GameObjectSprites[] {
         const canvasX = point.x - this.gameWidth / 2;
         const canvasY = point.y - this.gameHeight / 2;
 
-        return objects.filter(object => {
-            const renderer = this.getRenderer(object);
-            const sprites = renderer.sprites;
-            if (sprites === undefined) {
+        return objectsSprites.filter(objectSprites => {
+            if (objectSprites.sprites === undefined) {
                 return false;
             }
 
-            const renderedSprites = sprites.filter(sprite => {
-                return (sprite.renderPass === undefined && pass === 0)
-                    || (sprite.renderPass !== undefined && sprite.renderPass === pass);
-            });
-
+            const renderedSprites = objectSprites.sprites
+                .filter(sprite => this.isSpritePass(sprite, pass));
             renderedSprites.forEach(sprite => {
-                this.renderSprite(object, sprite, canvasX, canvasY);
+                this.renderSprite(objectSprites.object, sprite, canvasX, canvasY);
             });
 
-            return renderedSprites.length !== sprites.length;
+            if (renderedSprites.length === objectSprites.sprites.length) {
+                return false;
+            }
+
+            const unrenderedSprites = objectSprites.sprites
+                .filter(sprite => !this.isSpritePass(sprite, pass));
+            objectSprites.sprites = unrenderedSprites;
+
+            return true;
         });
     }
 
@@ -150,10 +163,16 @@ export default class GameRenderService {
         this.context.fillStyle = 'black';
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        let renderSprites = objects;
+        let renderObjectSprites = objects.map(object => {
+            const renderer = this.getRenderer(object);
+            return {
+                object,
+                sprites: renderer.sprites,
+            };
+        });
         let pass = 0;
-        while (renderSprites.length) {
-            renderSprites = this.renderObjectsPass(renderSprites, point, pass);
+        while (renderObjectSprites.length) {
+            renderObjectSprites = this.renderObjectsPass(renderObjectSprites, point, pass);
             pass++;
         }
     }

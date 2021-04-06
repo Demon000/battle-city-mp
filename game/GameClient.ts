@@ -2,7 +2,7 @@ import { CLIENT_CONFIG_VISIBLE_GAME_SIZE } from '@/config';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import GameAudioService from '@/renderer/GameAudioService';
 import GameCamera from '@/renderer/GameCamera';
-import GameObjectRenderer from '@/object/GameObjectRenderer';
+import GameObjectSpriteMatcher from '@/object/GameObjectSpriteMatcher';
 import GameRenderService from '@/renderer/GameRenderService';
 import MapRepository from '@/utils/MapRepository';
 import Ticker, { TickerEvent } from '@/utils/Ticker';
@@ -21,7 +21,7 @@ export default class GameClient {
     private boundingBoxRepository;
     private collisionService;
     private gameCamera;
-    private rendererRepository;
+    private spriteMatcherRepository;
     private gameRenderService;
     // private gameAudioService;
     ticker;
@@ -32,8 +32,8 @@ export default class GameClient {
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
         this.gameCamera = new GameCamera();
-        this.rendererRepository = new MapRepository<number, GameObjectRenderer>();
-        this.gameRenderService = new GameRenderService(this.rendererRepository, canvas, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
+        this.spriteMatcherRepository = new MapRepository<number, GameObjectSpriteMatcher>();
+        this.gameRenderService = new GameRenderService(this.spriteMatcherRepository, canvas, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
         // this.gameAudioService = new GameAudioService();
         this.ticker = new Ticker();
 
