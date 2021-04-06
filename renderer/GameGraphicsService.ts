@@ -19,14 +19,14 @@ export default class GameGraphicsService {
     private canvas;
     private targetGameSize;
     private context;
-    private objectRendererRepository;
+    private objectGraphicsRendererRepository;
 
     constructor(
-        objectRendererRepository: MapRepository<number, GameObjectGraphicsRenderer>,
+        objectGraphicsRendererRepository: MapRepository<number, GameObjectGraphicsRenderer>,
         canvas: HTMLCanvasElement,
         targetGameSize: number,
     ) {
-        this.objectRendererRepository = objectRendererRepository;
+        this.objectGraphicsRendererRepository = objectGraphicsRendererRepository;
         this.canvas = canvas;
         this.targetGameSize = targetGameSize;
 
@@ -113,17 +113,17 @@ export default class GameGraphicsService {
     }
 
     getObjectRenderer(object: GameObject): GameObjectGraphicsRenderer {
-        let objectRenderer = this.objectRendererRepository.find(object.id);
+        let objectRenderer = this.objectGraphicsRendererRepository.find(object.id);
         if (objectRenderer === undefined) {
             objectRenderer = GameObjectGraphicsRendererFactory.buildFromObject(object);
-            this.objectRendererRepository.add(object.id, objectRenderer);
+            this.objectGraphicsRendererRepository.add(object.id, objectRenderer);
         }
 
         return objectRenderer;
     }
 
-    removeObjectRenderer(objectId: number): void {
-        this.objectRendererRepository.remove(objectId);
+    removeObjectGraphicsRenderer(objectId: number): void {
+        this.objectGraphicsRendererRepository.remove(objectId);
     }
 
     isSpritePass(sprite: ISprite, pass: number): boolean {
