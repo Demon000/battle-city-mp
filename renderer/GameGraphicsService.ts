@@ -1,4 +1,3 @@
-import { CLIENT_SPRITES_RELATIVE_URL } from '@/config';
 import GameObject from '@/object/GameObject';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import Point from '@/physics/point/Point';
@@ -41,7 +40,6 @@ export default class GameGraphicsService {
 
         const minRenderSize = Math.max(this.canvas.width, this.canvas.height);
         this.gameToRenderSizeScale = Math.ceil(minRenderSize / this.targetGameSize);
-        this.context.scale(this.gameToRenderSizeScale, this.gameToRenderSizeScale);
         this.gameWidth = this.canvas.width / this.gameToRenderSizeScale;
         this.gameWidth -= this.gameWidth % 2;
         this.gameHeight = this.canvas.height / this.gameToRenderSizeScale;
@@ -53,7 +51,7 @@ export default class GameGraphicsService {
         let objectRenderer = this.objectGraphicsRendererRepository.find(object.id);
         if (objectRenderer === undefined) {
             objectRenderer = GameObjectGraphicsRendererFactory
-                .buildFromObject(object, this.context);
+                .buildFromObject(object, this.gameToRenderSizeScale);
             this.objectGraphicsRendererRepository.add(object.id, objectRenderer);
         }
 
@@ -67,19 +65,8 @@ export default class GameGraphicsService {
     renderObjectsPrepare(objects: GameObject[]): GameObject[] {
         return objects.filter(object => {
             const renderer = this.getObjectRenderer(object);
-            const sprites = renderer.update();
-            if (sprites === undefined || sprites === null || sprites.length === 0) {
-                return false;
-            }
-
-            sprites.forEach(sprite => {
-                if (sprite.image === undefined) {
-                    sprite.image = new Image();
-                    sprite.image.src = `${CLIENT_SPRITES_RELATIVE_URL}/${sprite.filename}`;
-                }
-            });
-
-            return true;
+            renderer.update();
+            return renderer.isRenderable();
         });
     }
 
@@ -91,7 +78,7 @@ export default class GameGraphicsService {
     ): GameObject[] {
         return objects.filter(object => {
             const renderer = this.getObjectRenderer(object);
-            return renderer.renderPass(pass, canvasX, canvasY);
+            return renderer.renderPass(this.context, pass, canvasX, canvasY);
         });
     }
 

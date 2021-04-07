@@ -150,7 +150,7 @@ export default class App extends Vue {
         }
     }
 
-    onFullscreenButtonClick(event: MouseEvent): void {
+    onFullscreenButtonClick(): void {
         if (screenfull.isEnabled) {
             screenfull.toggle();
         }

@@ -65,6 +65,7 @@ export default class GameAudioService {
 
     removeObjectAudioRenderer(objectId: number): void {
         this.objectAudioRendererRepository.remove(objectId);
+        // TODO: this.objectsPlayingAudioEffects.delete(objectId);
     }
 
     playObjectsAudioEffect(objects: GameObject[], point: Point, box: BoundingBox): void {

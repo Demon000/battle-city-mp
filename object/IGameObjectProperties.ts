@@ -1,5 +1,4 @@
-import { Direction } from '@/physics/Direction';
-import Point from '@/physics/point/Point';
+import IDrawable from '@/drawable/IDrawable';
 
 export enum RenderPass {
     ALL = 0,
@@ -10,36 +9,8 @@ export enum RenderPass {
     SMOKE = 3,
 }
 
-export interface ISprite {
-    filename: string;
-    image?: HTMLImageElement;
-    duration?: number;
-    offset?: Point;
-    width?: number;
-    height?: number;
-    renderPass?: number;
-    canvas?: OffscreenCanvas;
-    canvasRenderedWidth?: number;
-    canvasRenderedHeight?: number;
-}
-
 // eslint-disable-next-line
 export type ResourceMeta = Record<string, any>;
-
-export interface ISpriteSetPositionMatching {
-    mod: number,
-    divide: number,
-    equals: Point[];
-}
-
-export interface ISpriteSet {
-    duration?: number;
-    direction?: Direction;
-    loop?: boolean;
-    position?: ISpriteSetPositionMatching;
-    meta?: ResourceMeta;
-    steps: ISprite[];
-}
 
 export enum AudioEffectLoadingState {
     LOADING = 'loading',
@@ -63,6 +34,6 @@ export default interface IGameObjectProperties {
     directionAxisSnapping?: number;
     automaticDestroyTime?: number;
 
-    spriteSets?: ISpriteSet[];
+    drawables?: IDrawable[];
     audioEffects?: IAudioEffect[];
 }

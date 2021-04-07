@@ -2,12 +2,16 @@ import { ResourceMeta } from '@/object/IGameObjectProperties';
 import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
 
 export default class TankGraphicsRenderer extends GameObjectGraphicsRenderer {
-    isSpriteSetMetaEqual(setMeta: ResourceMeta, objectMeta: ResourceMeta): boolean {
-        if (setMeta.isMoving !== undefined && objectMeta.isMoving !== setMeta.isMoving) {
+    isDrawableMetaEqual(drawableMeta: ResourceMeta, objectMeta: ResourceMeta): boolean {
+        if (!super.isDrawableMetaEqual(drawableMeta, objectMeta)) {
             return false;
         }
 
-        if (setMeta.tier !== undefined && objectMeta.tier !== setMeta.tier) {
+        if (drawableMeta.isMoving !== undefined && objectMeta.isMoving !== drawableMeta.isMoving) {
+            return false;
+        }
+
+        if (drawableMeta.tier !== undefined && objectMeta.tier !== drawableMeta.tier) {
             return false;
         }
 
