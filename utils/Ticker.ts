@@ -16,6 +16,8 @@ export default class Ticker {
     running = false;
     emitter = new EventEmitter<TickerEvents>();
     useRequestAnimationFrame;
+    timeoutWrapper: () => void;
+    requestAnimationFrameWrapper: (currentTickTime: number) => void;
 
     constructor(tickRate?: number) {
         if (tickRate === undefined) {
@@ -23,6 +25,9 @@ export default class Ticker {
         } else {
             this.tickTime = 1000 / tickRate;
         }
+
+        this.timeoutWrapper = this._timeoutWrapper.bind(this);
+        this.requestAnimationFrameWrapper = this._requestAnimationFrameWrapper.bind(this);
     }
 
     tick(currentTickTime: number): void {
@@ -40,16 +45,20 @@ export default class Ticker {
         this.callTick();
     }
 
+    _requestAnimationFrameWrapper(currentTickTime: number): void {
+        this.tick(currentTickTime);
+    }
+
+    _timeoutWrapper(): void {
+        const currentTickTime = now();
+        this.tick(currentTickTime);
+    }
+
     callTick(): void {
         if (this.useRequestAnimationFrame) {
-            requestAnimationFrame((currentTickTime) => {
-                this.tick(currentTickTime);
-            });
+            requestAnimationFrame(this.requestAnimationFrameWrapper);
         } else {
-            setTimeout(() => {
-                const currentTickTime = now();
-                this.tick(currentTickTime);
-            }, this.tickTime);
+            setTimeout(this.timeoutWrapper, this.tickTime);
         }
     }
 
