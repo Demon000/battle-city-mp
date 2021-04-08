@@ -52,7 +52,7 @@ import GameClient from '@/game/GameClient';
 import { io, Socket } from 'socket.io-client';
 import ActionFactory from '@/actions/ActionFactory';
 import DirectionalJoystickWrapper, { DirectionalJoystickEvent } from '../DirectionalJoystickWrapper';
-import screenfull = require('screenfull');
+import screenfull from 'screenfull';
 
 export default class App extends Vue {
     socket?: Socket;
