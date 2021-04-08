@@ -5,7 +5,7 @@ import { GameObjectOptions } from '../object/GameObject';
 import GameObjectFactory from '../object/GameObjectFactory';
 import Player, { PlayerOptions } from '../player/Player';
 import GameClient from './GameClient';
-import { GameEvent } from './GameEvent';
+import { BatchGameEvent, GameEvent } from './GameEvent';
 
 export default class GameClientSocket {
     socket;
@@ -64,31 +64,31 @@ export default class GameClientSocket {
         this.gameClient.onObjectUnregisteredOnServer(objectId);
     }
 
-    onEvent([name, ...args]: any): void {
-        switch (name) {
+    onEvent(batch: BatchGameEvent): void {
+        switch (batch[0]) {
             case GameEvent.PLAYERS_ADDED:
-                this.onPlayersAdded(args[0]);
+                this.onPlayersAdded(batch[1]);
                 break;
             case GameEvent.PLAYER_ADDED:
-                this.onPlayerAdded(args[0]);
+                this.onPlayerAdded(batch[1]);
                 break;
             case GameEvent.PLAYER_CHANGED:
-                this.onPlayerChanged(args[0]);
+                this.onPlayerChanged(batch[1]);
                 break;
             case GameEvent.PLAYER_REMOVED:
-                this.onPlayerRemoved(args[0]);
+                this.onPlayerRemoved(batch[1]);
                 break;
             case GameEvent.OBJECTS_REGISTERD:
-                this.onObjectsRegistered(args[0]);
+                this.onObjectsRegistered(batch[1]);
                 break;
             case GameEvent.OBJECT_REGISTERED:
-                this.onObjectRegistered(args[0]);
+                this.onObjectRegistered(batch[1]);
                 break;
             case GameEvent.OBJECT_CHANGED:
-                this.onObjectChanged(args[0], args[1]);
+                this.onObjectChanged(batch[1], batch[2]);
                 break;
             case GameEvent.OBJECT_UNREGISTERED:
-                this.onObjectUnregistered(args[0]);
+                this.onObjectUnregistered(batch[1]);
                 break;
             default:
                 throw new Error('Invalid event');
