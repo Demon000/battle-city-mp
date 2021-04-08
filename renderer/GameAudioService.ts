@@ -73,6 +73,7 @@ export default class GameAudioService {
             return;
         }
 
+        audioRenderer.stop();
         this.objectsPlayingAudioEffects.delete(audioRenderer.object);
         this.objectAudioRendererRepository.remove(objectId);
     }
