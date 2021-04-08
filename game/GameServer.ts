@@ -267,6 +267,11 @@ export default class GameServer {
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_TANK,
             (bulletId: number, _position: Point, tankId: number) => {
+                const bullet = this.bulletService.getBullet(bulletId);
+                if (bullet.tankId === tankId) {
+                    return;
+                }
+
                 spawnExplosion(bulletId, ExplosionType.SMALL);
                 spawnExplosion(tankId, ExplosionType.BIG, GameObjectType.TANK);
                 destroyBullet(bulletId);
