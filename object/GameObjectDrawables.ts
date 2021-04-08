@@ -77,10 +77,10 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                     height: 16,
                     overlays: [
                         new Drawable(`tank_${tier}_${direction}_${frame}_highlights.png`, {}, {
-                            compositionType: 'screen',
+                            compositionType: 'lighter',
                         }),
                         new Drawable(`tank_${tier}_${direction}_${frame}_shadows.png`, {}, {
-                            compositionType: 'multiply',
+                            compositionType: 'difference',
                         }),
                     ],
                 });
