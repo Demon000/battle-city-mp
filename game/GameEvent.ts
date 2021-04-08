@@ -10,6 +10,8 @@ export enum GameEvent {
     PLAYER_CHANGED = 'player-changed',
 
     PLAYER_ACTION = 'player-action',
+    PLAYER_REQUEST_TANK_COLOR = 'player-request-tank-color',
+    PLAYER_REQUEST_TANK_TIER = 'player-request-tank-tier',
     PLAYER_REQUEST_TANK_SPAWN = 'player-request-tank-spawn',
     PLAYER_REQUEST_TANK_DESPAWN = 'player-request-tank-despawn',
     PLAYER_REQUEST_GAME_OBJECTS = 'player-request-game-objects',

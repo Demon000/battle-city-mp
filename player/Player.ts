@@ -1,3 +1,4 @@
+import { Color } from '@/drawable/Color';
 import { Direction } from '@/physics/Direction';
 import { TankTier } from '@/tank/TankTier';
 import ButtonPressAction, { ButtonType } from '../actions/ButtonPressAction';
@@ -21,6 +22,7 @@ export default class Player {
     requestedGameObjects = false;
     requestedPlayers = false;
     requestedTankTier = TankTier.LIGHT;
+    requestedTankColor?: Color;
     disconnected = false;
     isOwnPlayer = false;
     tankId: number | null;

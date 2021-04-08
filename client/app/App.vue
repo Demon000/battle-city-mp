@@ -5,12 +5,49 @@
             ref="canvas"
         ></canvas>
         <div id="game-overlay">
-            <button
-                @click="onSpawnButtonClick"
-            >Spawn</button>
-            <button
-                @click="onDespawnButtonClick"
-            >Despawn</button>
+            <div id="game-controls">
+                <button
+                    @click="onSpawnButtonClick"
+                >Spawn</button>
+                <button
+                    @click="onDespawnButtonClick"
+                >Despawn</button>
+                <span>
+                    R
+                    <input
+                        type="range" min="0" max="255"
+                        v-model="playerColor[0]"
+                        @change="onPlayerColorChanged"
+                    >
+                </span>
+
+                <span>
+                    G
+                    <input
+                        type="range" min="0" max="255"
+                        v-model="playerColor[1]"
+                        @change="onPlayerColorChanged"
+                    >
+                </span>
+
+                <span>
+                    B
+                    <input
+                        type="range" min="0" max="255"
+                        v-model="playerColor[2]"
+                        @change="onPlayerColorChanged"
+                    >
+                </span>
+
+                <button
+                    v-for="tier in Object.values(TankTier)"
+                    :key="tier"
+                    @click="onPlayerTierClick(tier)"
+                >
+                    {{ tier }}
+                </button>
+            </div>
+
             <div id="fullscreen-controls">
                 <img
                     class="image-button"
@@ -53,6 +90,7 @@ import { io, Socket } from 'socket.io-client';
 import ActionFactory from '@/actions/ActionFactory';
 import DirectionalJoystickWrapper, { DirectionalJoystickEvent } from '../DirectionalJoystickWrapper';
 import screenfull from 'screenfull';
+import { TankTier } from '@/tank/TankTier';
 
 export default class App extends Vue {
     socket?: Socket;
@@ -61,6 +99,8 @@ export default class App extends Vue {
     joystick?: DirectionalJoystickWrapper;
     isFullscreen = false;
     CLIENT_SPRITES_RELATIVE_URL = CLIENT_SPRITES_RELATIVE_URL;
+    TankTier = TankTier;
+    playerColor = [0, 0, 0];
 
     mounted(): void {
         const canvas = this.$refs.canvas as HTMLCanvasElement;
@@ -159,6 +199,19 @@ export default class App extends Vue {
         }
     }
 
+    onPlayerColorChanged(): void {
+        if (this.gameClientSocket !== undefined) {
+            this.gameClientSocket.requestPlayerTankColor(this.playerColor[0],
+                this.playerColor[1], this.playerColor[2]);
+        }
+    }
+
+    onPlayerTierClick(tier: TankTier): void {
+        if (this.gameClientSocket !== undefined) {
+            this.gameClientSocket.requestPlayerTankTier(tier);
+        }
+    }
+
     onFullscreenButtonClick(): void {
         if (screenfull.isEnabled) {
             screenfull.toggle();
@@ -194,6 +247,14 @@ export default class App extends Vue {
     cursor: pointer;
 }
 
+#game-controls {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.25);
+
+    color: #ffffff;
+}
 
 #fullscreen-controls {
     position: absolute;

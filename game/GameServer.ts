@@ -1,6 +1,7 @@
 import Bullet from '@/bullet/Bullet';
 import { BulletPower } from '@/bullet/BulletPower';
 import BulletService, { BulletServiceEvent } from '@/bullet/BulletService';
+import { Color } from '@/drawable/Color';
 import Explosion from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { GameObjectType } from '@/object/GameObjectType';
@@ -8,6 +9,7 @@ import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import { Direction } from '@/physics/Direction';
 import Tank from '@/tank/Tank';
 import TankService, { TankServiceEvent } from '@/tank/TankService';
+import { TankTier } from '@/tank/TankTier';
 import MapRepository from '@/utils/MapRepository';
 import Ticker, { TickerEvent } from '@/utils/Ticker';
 import EventEmitter from 'eventemitter3';
@@ -135,6 +137,7 @@ export default class GameServer {
                     const tank = new Tank({
                         position,
                         playerId,
+                        color: player.requestedTankColor,
                         tier: player.requestedTankTier,
                     });
                     this.gameObjectService.registerObject(tank);
@@ -324,5 +327,13 @@ export default class GameServer {
     onPlayerDisconnectedFromClient(playerId: string): void {
         this.playerService.setPlayerRequestedSpawnStatus(playerId, PlayerSpawnStatus.DESPAWN);
         this.playerService.setPlayerRequestedDisconnect(playerId);
+    }
+
+    onPlayerRequestTankColorFromClient(playerId: string, color: Color): void {
+        this.playerService.setPlayerRequestedTankColor(playerId, color);
+    }
+
+    onPlayerRequestTankTierFromClient(playerId: string, tier: TankTier): void {
+        this.playerService.setPlayerRequestedTankTier(playerId, tier);
     }
 }

@@ -1,3 +1,4 @@
+import { Color } from '@/drawable/Color';
 import { TankTier } from '@/tank/TankTier';
 import MapRepository from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
@@ -108,6 +109,11 @@ export default class PlayerService {
     setPlayerRequestedTankTier(playerId: string, tier: TankTier): void {
         const player = this.repository.get(playerId);
         player.requestedTankTier = tier;
+    }
+
+    setPlayerRequestedTankColor(playerId: string, color: Color): void {
+        const player = this.repository.get(playerId);
+        player.requestedTankColor = color;
     }
 
     addPlayerButtonPressAction(playerId: string, action: ButtonPressAction): void {

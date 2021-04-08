@@ -8,7 +8,7 @@ import { ActionOptions } from '@/actions/Action';
 import ActionFactory from '@/actions/ActionFactory';
 import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import GameServer from '@/game/GameServer';
-import Player from '@/player/Player';
+import Player, { PlayerSpawnStatus } from '@/player/Player';
 import yargs from 'yargs';
 
 dotenv.config();
@@ -66,6 +66,14 @@ io.on('connection', (socket: IO.Socket) => {
 
     socket.on(GameEvent.PLAYER_REQUEST_TANK_DESPAWN, () => {
         gameServer.onPlayerRequestSpawnStatusFromClient(socket.id, PlayerSpawnStatus.DESPAWN);
+    });
+
+    socket.on(GameEvent.PLAYER_REQUEST_TANK_COLOR, (r, g, b) => {
+        gameServer.onPlayerRequestTankColorFromClient(socket.id, [r, g, b]);
+    });
+
+    socket.on(GameEvent.PLAYER_REQUEST_TANK_TIER, tier => {
+        gameServer.onPlayerRequestTankTierFromClient(socket.id, tier);
     });
 });
 

@@ -1,4 +1,5 @@
 import Action from '@/actions/Action';
+import { TankTier } from '@/tank/TankTier';
 import { Socket } from 'socket.io-client';
 import { GameObjectOptions } from '../object/GameObject';
 import GameObjectFactory from '../object/GameObjectFactory';
@@ -81,8 +82,16 @@ export default class GameClientSocket {
         this.socket.emit(GameEvent.PLAYER_REQUEST_TANK_SPAWN);
     }
 
+    requestPlayerTankColor(r: number, g: number, b: number): void {
+        this.socket.emit(GameEvent.PLAYER_REQUEST_TANK_COLOR, r, g, b);
+    }
+
     requestPlayerTankDespawn(): void {
         this.socket.emit(GameEvent.PLAYER_REQUEST_TANK_DESPAWN);
+    }
+
+    requestPlayerTankTier(tier: TankTier): void {
+        this.socket.emit(GameEvent.PLAYER_REQUEST_TANK_TIER, tier);
     }
 
     requestPlayerAction(action: Action): void {

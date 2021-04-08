@@ -107,7 +107,7 @@ export default class Tank extends GameObject {
         this.lastBulletShotTime = options.lastBulletShotTime ?? 0;
         this.lastSlippingTime = options.lastSlippingTime ?? 0;
         this.bulletIds = options.bulletIds ?? new Array<number>();
-        this.color = options.color ?? [255, 0, 0];
+        this.color = options.color ?? [231, 156, 33];
     }
 
     toOptions(): TankOptions {
