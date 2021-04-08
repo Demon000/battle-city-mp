@@ -107,6 +107,7 @@ export default class App extends Vue {
 
         this.socket = io(CLIENT_CONFIG_SOCKET_BASE_URL, {
             transports: ['websocket'],
+            autoConnect: false,
         });
         this.gameClient = new GameClient(canvas);
         this.gameClientSocket = new GameClientSocket(this.socket, this.gameClient);

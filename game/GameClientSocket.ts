@@ -76,6 +76,8 @@ export default class GameClientSocket {
         this.socket.on(GameEvent.OBJECT_UNREGISTERED, (objectId: number) => {
             this.gameClient.onObjectUnregisteredOnServer(objectId);
         });
+
+        this.socket.connect();
     }
 
     requestPlayerTankSpawn(): void {
