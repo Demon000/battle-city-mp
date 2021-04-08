@@ -24,9 +24,9 @@ const tierToDecelerationFactorMap = {
 };
 
 const tierToBulletSpeedMap = {
-    [TankTier.NORMAL]: 128,
-    [TankTier.LIGHT]: 160,
-    [TankTier.HEAVY]: 192,
+    [TankTier.NORMAL]: 64,
+    [TankTier.LIGHT]: 64,
+    [TankTier.HEAVY]: 64,
 };
 
 const tierToMaxBulletsMap = {
@@ -173,7 +173,7 @@ export default class Tank extends GameObject {
     }
 
     get bulletSpeed(): number {
-        return tierToBulletSpeedMap[this.tier];
+        return tierToBulletSpeedMap[this.tier] + this.movementSpeed;
     }
 
     get bulletPower(): BulletPower {
