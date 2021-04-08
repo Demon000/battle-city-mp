@@ -52,7 +52,7 @@ export default class GameAudioService {
         return false;
     }
 
-    getAudioRenderer(object: GameObject): GameObjectAudioRenderer {
+    getOrCreateAudioRenderer(object: GameObject): GameObjectAudioRenderer {
         let audioRenderer = this.objectAudioRendererRepository.find(object.id);
         if (audioRenderer === undefined) {
             audioRenderer = GameObjectAudioRendererFactory.buildFromObject(
@@ -63,9 +63,18 @@ export default class GameAudioService {
         return audioRenderer;
     }
 
+    findAudioRenderer(objectId: number): GameObjectAudioRenderer | undefined {
+        return this.objectAudioRendererRepository.find(objectId);
+    }
+
     removeObjectAudioRenderer(objectId: number): void {
+        const audioRenderer = this.findAudioRenderer(objectId);
+        if (audioRenderer === undefined) {
+            return;
+        }
+
+        this.objectsPlayingAudioEffects.delete(audioRenderer.object);
         this.objectAudioRendererRepository.remove(objectId);
-        // TODO: this.objectsPlayingAudioEffects.delete(objectId);
     }
 
     playObjectsAudioEffect(objects: GameObject[], point: Point, box: BoundingBox): void {
@@ -76,13 +85,13 @@ export default class GameAudioService {
                 continue;
             }
 
-            const audioRenderer = this.getAudioRenderer(object);
+            const audioRenderer = this.getOrCreateAudioRenderer(object);
             audioRenderer.stop();
             this.objectsPlayingAudioEffects.delete(object);
         }
 
         for (const object of objects) {
-            const audioRenderer = this.getAudioRenderer(object);
+            const audioRenderer = this.getOrCreateAudioRenderer(object);
             const audioEffect = audioRenderer.update();
             if (audioEffect !== undefined && audioEffect !== null) {
                 this.loadAudioEffectBuffer(audioEffect);

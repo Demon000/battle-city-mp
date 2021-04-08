@@ -5,13 +5,13 @@ import { GameObjectType } from './GameObjectType';
 import { IAudioEffect, ResourceMeta } from './IGameObjectProperties';
 
 export default class GameObjectAudioRenderer {
-    private object;
     private context;
     private finalNode;
     private panner?: PannerNode;
     private bufferSource?: AudioBufferSourceNode;
     private audioEffect?: IAudioEffect | null = null;
     private maxAudibleDistance;
+    object;
 
     constructor(object: GameObject, context: AudioContext, finalNode: AudioNode, maxAudibleDistance: number) {
         this.object = object;
