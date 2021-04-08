@@ -1,6 +1,7 @@
 import Bullet from '@/bullet/Bullet';
 import { BulletPower } from '@/bullet/BulletPower';
 import BulletService, { BulletServiceEvent } from '@/bullet/BulletService';
+import { SERVER_CONFIG_TPS } from '@/config';
 import { Color } from '@/drawable/Color';
 import Explosion from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
@@ -64,7 +65,7 @@ export default class GameServer {
         this.gameMapService = new GameMapService();
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.playerRepository);
-        this.ticker = new Ticker(128);
+        this.ticker = new Ticker(SERVER_CONFIG_TPS);
 
         /**
          * GameMapService event handlers
