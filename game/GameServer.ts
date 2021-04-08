@@ -17,7 +17,7 @@ import EventEmitter from 'eventemitter3';
 import Action, { ActionType } from '../actions/Action';
 import ButtonPressAction from '../actions/ButtonPressAction';
 import GameMapService, { GameMapServiceEvent } from '../maps/GameMapService';
-import GameObject, { GameObjectOptions, PartialGameObjectOptions } from '../object/GameObject';
+import GameObject, { GameObjectOptions } from '../object/GameObject';
 import GameObjectService, { GameObjectServiceEvent } from '../object/GameObjectService';
 import BoundingBoxRepository from '../physics/bounding-box/BoundingBoxRepository';
 import { rules } from '../physics/collisions/CollisionRules';
@@ -26,17 +26,12 @@ import { CollisionEvent } from '../physics/collisions/ICollisionRule';
 import Point from '../physics/point/Point';
 import Player, { PlayerSpawnStatus } from '../player/Player';
 import PlayerService, { PlayerServiceEvent } from '../player/PlayerService';
-import { GameEvent } from './GameEvent';
+import { BroadcastBatchGameEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
+import GameEventBatcher, { GameEventBatcherEvent } from './GameEventBatcher';
 
 export interface GameServerEvents {
-    [GameEvent.PLAYER_OBJECTS_REGISTERD]: (playerId: string, objects: GameObject[]) => void,
-    [GameEvent.PLAYER_PLAYERS_ADDED]: (playerId: string, players: Player[]) => void,
-    [GameEvent.PLAYER_ADDED]: (player: Player) => void,
-    [GameEvent.PLAYER_CHANGED]: (player: Player) => void,
-    [GameEvent.PLAYER_REMOVED]: (playerId: string) => void,
-    [GameEvent.OBJECT_REGISTERED]: (object: GameObject) => void,
-    [GameEvent.OBJECT_CHANGED]: (objectId: number, options: PartialGameObjectOptions) => void,
-    [GameEvent.OBJECT_UNREGISTERED]: (objectId: number) => void,
+    [GameEvent.BROADCAST_BATCH]: (events: BroadcastBatchGameEvent[]) => void,
+    [GameEvent.PLAYER_BATCH]: (playerId: string, events: UnicastBatchGameEvent[]) => void,
 }
 
 export default class GameServer {
@@ -50,6 +45,7 @@ export default class GameServer {
     private boundingBoxRepository;
     private collisionRules;
     private collisionService;
+    private gameEventBatcher;
     ticker;
 
     emitter = new EventEmitter<GameServerEvents>();
@@ -65,6 +61,7 @@ export default class GameServer {
         this.gameMapService = new GameMapService();
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.playerRepository);
+        this.gameEventBatcher = new GameEventBatcher();
         this.ticker = new Ticker(SERVER_CONFIG_TPS);
 
         /**
@@ -80,29 +77,29 @@ export default class GameServer {
          */
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_GAME_OBJECTS,
             (playerId: string) => {
-                const objects = this.gameObjectService.getObjects();
-                this.emitter.emit(GameEvent.PLAYER_OBJECTS_REGISTERD, playerId, objects);
+                const objects = this.gameObjectService.getObjects().map(object => object.toOptions());
+                this.gameEventBatcher.addPlayerEvent(playerId, [GameEvent.OBJECTS_REGISTERD, objects]);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_PLAYERS,
             (playerId: string) => {
-                const players = this.playerService.getPlayers();
-                this.emitter.emit(GameEvent.PLAYER_PLAYERS_ADDED, playerId, players);
+                const players = this.playerService.getPlayers().map(player => player.toOptions());
+                this.gameEventBatcher.addPlayerEvent(playerId, [GameEvent.PLAYERS_ADDED, players]);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_ADDED,
             (player: Player) => {
-                this.emitter.emit(GameEvent.PLAYER_ADDED, player);
+                this.gameEventBatcher.addBroadcastEvent([GameEvent.PLAYER_ADDED, player.toOptions()]);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_CHANGED,
             (player: Player) => {
-                this.emitter.emit(GameEvent.PLAYER_CHANGED, player);
+                this.gameEventBatcher.addBroadcastEvent([GameEvent.PLAYER_CHANGED, player.toOptions()]);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REMOVED,
             (playerId: string) => {
-                this.emitter.emit(GameEvent.PLAYER_REMOVED, playerId);
+                this.gameEventBatcher.addBroadcastEvent([GameEvent.PLAYER_REMOVED, playerId]);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_SHOOT,
@@ -170,18 +167,18 @@ export default class GameServer {
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REGISTERED,
             (object: GameObject) => {
                 this.collisionService.registerObjectCollisions(object.id);
-                this.emitter.emit(GameEvent.OBJECT_REGISTERED, object);
+                this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_REGISTERED, object.toOptions()]);
             });
 
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_UNREGISTERED,
             (objectId: number) => {
                 this.collisionService.unregisterObjectCollisions(objectId);
-                this.emitter.emit(GameEvent.OBJECT_UNREGISTERED, objectId);
+                this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_UNREGISTERED, objectId]);
             });
 
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_CHANGED,
             (objectId: number, objectOptions: GameObjectOptions) => {
-                this.emitter.emit(GameEvent.OBJECT_CHANGED, objectId, objectOptions);
+                this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_CHANGED, objectId, objectOptions]);
             });
 
         /**
@@ -291,6 +288,19 @@ export default class GameServer {
             });
 
         /**
+         * Game Event Batcher events
+         */
+        this.gameEventBatcher.emitter.on(GameEventBatcherEvent.BROADCAST_BATCH,
+            (events: BroadcastBatchGameEvent[]) => {
+                this.emitter.emit(GameEvent.BROADCAST_BATCH, events);
+            });
+
+         this.gameEventBatcher.emitter.on(GameEventBatcherEvent.PLAYER_BATCH,
+            (playerId: string, events: UnicastBatchGameEvent[]) => {
+                this.emitter.emit(GameEvent.PLAYER_BATCH, playerId, events);
+            });
+
+        /**
          * Ticker event handlers
          */
         this.ticker.emitter.on(TickerEvent.TICK,
@@ -298,6 +308,7 @@ export default class GameServer {
                 this.playerService.processPlayersStatus();
                 this.tankService.processTanksStatus();
                 this.gameObjectService.processObjectsStatus(deltaSeconds);
+                this.gameEventBatcher.flush();
             });
 
         this.gameMapService.loadFromFile('./maps/simple.json');
@@ -319,6 +330,8 @@ export default class GameServer {
 
     onPlayerConnectedFromClient(playerId: string): void {
         this.playerService.createPlayer(playerId);
+        this.playerService.setPlayerRequestedGameObjects(playerId);
+        this.playerService.setPlayerRequestedPlayers(playerId);
     }
 
     onPlayerRequestSpawnStatusFromClient(playerId: string, spawnStatus: PlayerSpawnStatus): void {
