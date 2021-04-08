@@ -1,4 +1,5 @@
 import { BulletPower } from '@/bullet/BulletPower';
+import { Color } from '@/drawable/Color';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 import GameObject, { GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
@@ -79,6 +80,7 @@ export interface TankOptions extends GameObjectOptions {
     lastSlippingTime?: number;
     lastBulletShotTime?: number;
     bulletIds?: number[];
+    color?: Color;
 }
 
 export type PartialTankOptions = Partial<TankOptions>;
@@ -91,6 +93,7 @@ export default class Tank extends GameObject {
     lastSlippingTime: number;
     lastBulletShotTime: number;
     bulletIds: number[];
+    color: Color;
 
     constructor(options: TankOptions) {
         options.type = GameObjectType.TANK;
@@ -104,6 +107,7 @@ export default class Tank extends GameObject {
         this.lastBulletShotTime = options.lastBulletShotTime ?? 0;
         this.lastSlippingTime = options.lastSlippingTime ?? 0;
         this.bulletIds = options.bulletIds ?? new Array<number>();
+        this.color = options.color ?? [255, 0, 0];
     }
 
     toOptions(): TankOptions {
@@ -114,6 +118,7 @@ export default class Tank extends GameObject {
             lastSlippingTime: this.lastSlippingTime,
             lastBulletShotTime: this.lastBulletShotTime,
             bulletIds: this.bulletIds,
+            color: this.color,
         });
     }
 
@@ -138,6 +143,10 @@ export default class Tank extends GameObject {
 
         if (options.bulletIds !== undefined) {
             this.bulletIds = options.bulletIds;
+        }
+
+        if (options.color !== undefined) {
+            this.color = options.color;
         }
     }
 

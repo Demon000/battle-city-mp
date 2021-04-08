@@ -60,18 +60,45 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
     ],
     [GameObjectType.TANK]: [
         ...((): IDrawable[] => {
+            const generateTankTierDirectionFrame = (
+                tier: TankTier,
+                direction: Direction,
+                frame: number,
+                isMoving: boolean,
+            ) => {
+                return new Drawable(`tank_${tier}_${direction}_${frame}.png`, {
+                    isTankDrawable: true,
+                    isMoving,
+                    direction,
+                    tier,
+                }, {
+                    renderPass: RenderPass.TANK,
+                    width: 16,
+                    height: 16,
+                    overlays: [
+                        new Drawable(`tank_${tier}_${direction}_${frame}_highlights.png`, {}, {
+                            compositionType: 'screen',
+                        }),
+                        new Drawable(`tank_${tier}_${direction}_${frame}_shadows.png`, {}, {
+                            compositionType: 'multiply',
+                        }),
+                    ],
+                });
+            };
+
             const drawables = [];
 
             for (const tier of Object.values(TankTier)) {
                 for (const direction of Object.values(Direction)) {
                     drawables.push(
                         new AnimatedDrawable([
-                            new Drawable(`tank_${tier}_${direction}_0.png`),
-                            new Drawable(`tank_${tier}_${direction}_1.png`),
+                            generateTankTierDirectionFrame(tier, direction, 0, true),
+                            generateTankTierDirectionFrame(tier, direction, 1, true),
                         ], [
                             62.5,
                             62.5,
                         ], {
+                            isTankDrawable: true,
                             isMoving: true,
                             direction,
                             tier,
@@ -82,15 +109,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                         }),
                     );
                     drawables.push(
-                        new Drawable(`tank_${tier}_${direction}_0.png`, {
-                            isMoving: false,
-                            direction,
-                            tier,
-                        }, {
-                            renderPass: RenderPass.TANK,
-                            width: 16,
-                            height: 16,
-                        }),
+                        generateTankTierDirectionFrame(tier, direction, 0, false),
                     );
                 }
             }

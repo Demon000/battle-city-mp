@@ -1,7 +1,9 @@
+import IDrawable from '@/drawable/IDrawable';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
+import Tank from './Tank';
 
-export default class TankGraphicsRenderer extends GameObjectGraphicsRenderer {
+export default class TankGraphicsRenderer extends GameObjectGraphicsRenderer<Tank> {
     isDrawableMetaEqual(drawableMeta: ResourceMeta, objectMeta: ResourceMeta): boolean {
         if (!super.isDrawableMetaEqual(drawableMeta, objectMeta)) {
             return false;
@@ -16,5 +18,13 @@ export default class TankGraphicsRenderer extends GameObjectGraphicsRenderer {
         }
 
         return true;
+    }
+
+    protected _processDrawable(drawable: IDrawable): IDrawable {
+        drawable = super._processDrawable(drawable);
+        if (drawable.meta && drawable.meta.isTankDrawable) {
+            drawable = drawable.color(this.object.color);
+        }
+        return drawable;
     }
 }

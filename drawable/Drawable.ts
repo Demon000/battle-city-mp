@@ -39,7 +39,10 @@ export default class Drawable {
     }
 
     checkSourceComplete(): void {
-        if (this.source instanceof HTMLImageElement && !this.source.complete) {
+        if (this.source instanceof HTMLImageElement
+            && (!this.source.complete
+                || this.source.naturalHeight === 0
+                || this.source.naturalWidth === 0)) {
             throw new Error('Source incomplete');
         }
     }
@@ -99,6 +102,7 @@ export default class Drawable {
             ...this.properties,
             width: undefined,
             height: undefined,
+            overlays: this.properties.overlays?.map(overlay => overlay.resize(width, height)),
         });
     }
 
@@ -123,6 +127,7 @@ export default class Drawable {
             height: this.properties.height === undefined ? undefined : this.properties.height * scaleY,
             offsetX: this.properties.offsetX === undefined ? undefined : this.properties.offsetX * scaleX,
             offsetY: this.properties.offsetY === undefined ? undefined : this.properties.offsetY * scaleY,
+            overlays: this.properties.overlays?.map(overlay => overlay.scale(scaleX, scaleY)),
         });
         return drawable;
     }

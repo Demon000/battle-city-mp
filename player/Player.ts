@@ -20,7 +20,7 @@ export default class Player {
     requestedSpawnStatus = PlayerSpawnStatus.NONE;
     requestedGameObjects = false;
     requestedPlayers = false;
-    requestedTankTier = TankTier.HEAVY;
+    requestedTankTier = TankTier.LIGHT;
     disconnected = false;
     isOwnPlayer = false;
     tankId: number | null;

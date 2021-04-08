@@ -9,14 +9,16 @@ import { Direction } from '@/physics/Direction';
 import Point from '@/physics/point/Point';
 import GameObjectDrawables from './GameObjectDrawables';
 
-export default class GameObjectGraphicsRenderer {
+export default class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
     object;
     scale;
     drawables?: IDrawable[] | null = null;
+    processDrawable: (drawable: IDrawable) => IDrawable;
 
-    constructor(object: GameObject, scale: number) {
+    constructor(object: O, scale: number) {
         this.object = object;
         this.scale = scale;
+        this.processDrawable = this._processDrawable.bind(this);
     }
 
     private isMatchingPosition(positionMatching: DrawablePositionMatching, position: Point): boolean {
@@ -98,6 +100,10 @@ export default class GameObjectGraphicsRenderer {
         return true;
     }
 
+    protected _processDrawable(drawable: IDrawable): IDrawable {
+        return drawable.scale(this.scale);
+    }
+
     update(): void {
         if (this.drawables === undefined) {
             return;
@@ -124,7 +130,7 @@ export default class GameObjectGraphicsRenderer {
          * TODO: keep current drawable across scaling operations?
          */
         if (this.drawables !== undefined) {
-            this.drawables = this.drawables.map(drawable => drawable.scale(this.scale));
+            this.drawables = this.drawables.map(this.processDrawable);
         }
 
         if (this.drawables === undefined) {
