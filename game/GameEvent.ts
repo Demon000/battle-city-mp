@@ -11,6 +11,7 @@ export enum GameEvent {
 
     PLAYER_ACTION = 'player-action',
     PLAYER_REQUEST_TANK_SPAWN = 'player-request-tank-spawn',
+    PLAYER_REQUEST_TANK_DESPAWN = 'player-request-tank-despawn',
     PLAYER_REQUEST_GAME_OBJECTS = 'player-request-game-objects',
     PLAYER_REQUEST_PLAYERS = 'player-request-players',
 

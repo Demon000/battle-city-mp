@@ -81,6 +81,10 @@ export default class GameClientSocket {
         this.socket.emit(GameEvent.PLAYER_REQUEST_TANK_SPAWN);
     }
 
+    requestPlayerTankDespawn(): void {
+        this.socket.emit(GameEvent.PLAYER_REQUEST_TANK_DESPAWN);
+    }
+
     requestPlayerAction(action: Action): void {
         this.socket.emit(GameEvent.PLAYER_ACTION, action.toOptions());
     }

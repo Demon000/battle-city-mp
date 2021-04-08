@@ -317,8 +317,8 @@ export default class GameServer {
         this.playerService.createPlayer(playerId);
     }
 
-    onPlayerRequestSpawnStatusFromClient(playerId: string): void {
-        this.playerService.setPlayerRequestedSpawnStatus(playerId, PlayerSpawnStatus.SPAWN);
+    onPlayerRequestSpawnStatusFromClient(playerId: string, spawnStatus: PlayerSpawnStatus): void {
+        this.playerService.setPlayerRequestedSpawnStatus(playerId, spawnStatus);
     }
 
     onPlayerDisconnectedFromClient(playerId: string): void {

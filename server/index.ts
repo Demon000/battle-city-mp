@@ -61,7 +61,11 @@ io.on('connection', (socket: IO.Socket) => {
     });
 
     socket.on(GameEvent.PLAYER_REQUEST_TANK_SPAWN, () => {
-        gameServer.onPlayerRequestSpawnStatusFromClient(socket.id);
+        gameServer.onPlayerRequestSpawnStatusFromClient(socket.id, PlayerSpawnStatus.SPAWN);
+    });
+
+    socket.on(GameEvent.PLAYER_REQUEST_TANK_DESPAWN, () => {
+        gameServer.onPlayerRequestSpawnStatusFromClient(socket.id, PlayerSpawnStatus.DESPAWN);
     });
 });
 

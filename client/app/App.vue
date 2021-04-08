@@ -8,6 +8,9 @@
             <button
                 @click="onSpawnButtonClick"
             >Spawn</button>
+            <button
+                @click="onDespawnButtonClick"
+            >Despawn</button>
             <div id="fullscreen-controls">
                 <img
                     class="image-button"
@@ -147,6 +150,12 @@ export default class App extends Vue {
     onSpawnButtonClick(): void {
         if (this.gameClientSocket !== undefined) {
             this.gameClientSocket.requestPlayerTankSpawn();
+        }
+    }
+
+    onDespawnButtonClick(): void {
+        if (this.gameClientSocket !== undefined) {
+            this.gameClientSocket.requestPlayerTankDespawn();
         }
     }
 
