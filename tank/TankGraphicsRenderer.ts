@@ -20,8 +20,8 @@ export default class TankGraphicsRenderer extends GameObjectGraphicsRenderer<Tan
         return true;
     }
 
-    protected _processDrawable(drawable: IDrawable): IDrawable {
-        drawable = super._processDrawable(drawable);
+    protected processDrawable(drawable: IDrawable): IDrawable {
+        drawable = super.processDrawable(drawable);
         if (drawable.meta && drawable.meta.isTankDrawable) {
             drawable = drawable.color(this.object.color);
         }

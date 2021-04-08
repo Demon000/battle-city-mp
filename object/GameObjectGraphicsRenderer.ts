@@ -13,12 +13,14 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
     object;
     scale;
     drawables?: IDrawable[] | null = null;
-    processDrawable: (drawable: IDrawable) => IDrawable;
+    context?: CanvasRenderingContext2D;
+    objectDrawX = 0;
+    objectDrawY = 0;
+    pass = 0;
 
     constructor(object: O, scale: number) {
         this.object = object;
         this.scale = scale;
-        this.processDrawable = this._processDrawable.bind(this);
     }
 
     private isMatchingPosition(positionMatching: DrawablePositionMatching, position: Point): boolean {
@@ -56,8 +58,8 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         return true;
     }
 
-    private findDrawableMatchingMeta(type: GameObjectType, meta: ResourceMeta): IDrawable | undefined | null {
-        const drawables = GameObjectDrawables.getTypeDrawables(type);
+    private findDrawableMatchingMeta(meta: ResourceMeta): IDrawable | undefined | null {
+        const drawables = GameObjectDrawables.getTypeDrawables(this.object.type);
         if (drawables === undefined) {
             return undefined;
         }
@@ -72,16 +74,18 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         return drawable;
     }
 
+    private findDrawablesMatchingMetasFilter(drawable: IDrawable | undefined | null): boolean {
+        return drawable !== undefined && drawable !== null;
+    }
+
     private findDrawablesMatchingMetas(type: GameObjectType, metas: ResourceMeta[]): IDrawable[] | undefined {
-        const drawables = metas
-            .map(meta => this.findDrawableMatchingMeta(type, meta));
+        const drawables = metas.map(this.findDrawableMatchingMeta, this);
 
         if (drawables[0] === undefined) {
             return undefined;
         }
 
-        return drawables.filter(drawable => drawable !== undefined
-            && drawable !== null) as IDrawable[];
+        return drawables.filter(this.findDrawablesMatchingMetasFilter) as IDrawable[];
     }
 
     private isDrawablesMatchingMetas(drawables: IDrawable[], metas: ResourceMeta[]): boolean {
@@ -100,7 +104,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         return true;
     }
 
-    protected _processDrawable(drawable: IDrawable): IDrawable {
+    protected processDrawable(drawable: IDrawable): IDrawable {
         return drawable.scale(this.scale);
     }
 
@@ -130,7 +134,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
          * TODO: keep current drawable across scaling operations?
          */
         if (this.drawables !== undefined) {
-            this.drawables = this.drawables.map(this.processDrawable);
+            this.drawables = this.drawables.map(this.processDrawable, this);
         }
 
         if (this.drawables === undefined) {
@@ -148,6 +152,21 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         return this.drawables !== undefined && this.drawables !== null && this.drawables.length !== 0;
     }
 
+    renderPassFilter(drawable: IDrawable): boolean {
+        if (this.context === undefined) {
+            return true;
+        }
+
+        const isRenderPass = drawable.isRenderPass(this.pass);
+        if (!isRenderPass) {
+            return true;
+        }
+
+        drawable.draw(this.context, this.objectDrawX, this.objectDrawY);
+
+        return false;
+    }
+
     renderPass(context: CanvasRenderingContext2D, pass: number, canvasX: number, canvasY: number): boolean {
         if (!this.drawables) {
             return false;
@@ -157,16 +176,12 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         const objectRelativeY = Math.floor(this.object.position.y) - canvasY;
         const objectDrawX = objectRelativeX * this.scale;
         const objectDrawY = objectRelativeY * this.scale;
-        this.drawables = this.drawables.filter(drawable => {
-            const isRenderPass = drawable.isRenderPass(pass);
-            if (!isRenderPass) {
-                return true;
-            }
+        this.context = context;
+        this.objectDrawX = objectDrawX;
+        this.objectDrawY = objectDrawY;
+        this.pass = pass;
 
-            drawable.draw(context, objectDrawX, objectDrawY);
-
-            return false;
-        });
+        this.drawables = this.drawables.filter(this.renderPassFilter, this);
 
         return this.drawables.length !== 0;
     }

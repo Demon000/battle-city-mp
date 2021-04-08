@@ -10,6 +10,9 @@ export default class GameGraphicsService {
     private gameWidth = 0;
     private gameHeight = 0;
     private canvas;
+    private canvasX = 0;
+    private canvasY = 0;
+    private pass = 0;
     private targetGameSize;
     private context;
     private objectGraphicsRendererRepository;
@@ -62,24 +65,19 @@ export default class GameGraphicsService {
         this.objectGraphicsRendererRepository.remove(objectId);
     }
 
-    renderObjectsPrepare(objects: GameObject[]): GameObject[] {
-        return objects.filter(object => {
-            const renderer = this.getObjectRenderer(object);
-            renderer.update();
-            return renderer.isRenderable();
-        });
+    renderObjectsPrepareFilter(object: GameObject): boolean {
+        const renderer = this.getObjectRenderer(object);
+        renderer.update();
+        return renderer.isRenderable();
     }
 
-    renderObjectsPass(
-        objects: GameObject[],
-        pass: number,
-        canvasX: number,
-        canvasY: number,
-    ): GameObject[] {
-        return objects.filter(object => {
-            const renderer = this.getObjectRenderer(object);
-            return renderer.renderPass(this.context, pass, canvasX, canvasY);
-        });
+    renderObjectsPrepare(objects: GameObject[]): GameObject[] {
+        return objects.filter(this.renderObjectsPrepareFilter, this);
+    }
+
+    renderObjectsPassFilter(object: GameObject): boolean {
+        const renderer = this.getObjectRenderer(object);
+        return renderer.renderPass(this.context, this.pass, this.canvasX, this.canvasY);
     }
 
     renderObjects(objects: GameObject[], point: Point): void {
@@ -87,13 +85,13 @@ export default class GameGraphicsService {
         this.context.fillStyle = 'black';
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        const canvasX = point.x - this.gameWidth / 2;
-        const canvasY = point.y - this.gameHeight / 2;
+        this.canvasX = point.x - this.gameWidth / 2;
+        this.canvasY = point.y - this.gameHeight / 2;
+        this.pass = 0;
         let renderObjects = this.renderObjectsPrepare(objects);
-        let pass = 0;
         while (renderObjects.length) {
-            renderObjects = this.renderObjectsPass(renderObjects, pass, canvasX, canvasY);
-            pass++;
+            renderObjects = renderObjects.filter(this.renderObjectsPassFilter, this);
+            this.pass++;
         }
     }
 

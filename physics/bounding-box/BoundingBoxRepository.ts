@@ -6,15 +6,17 @@ export default class BoundingBoxRepository<V> {
     tree = new BoundingBoxTree<V>();
     map = new Map<V, BoundingBoxNode<V>>();
 
+    getOverlappingValuesMap(node: BoundingBoxNode<V>): V {
+        if (node.value === undefined) {
+            throw new Error('Overlapping node does not contain a value');
+        }
+
+        return node.value;
+    }
+
     getBoxOverlappingValues(box: BoundingBox): V[] {
         const nodes = this.tree.getOverlappingNodes(box);
-        return nodes.map(n =>  {
-            if (n.value === undefined) {
-                throw new Error('Overlapping node does not contain a value');
-            }
-
-            return n.value;
-        });
+        return nodes.map(this.getOverlappingValuesMap);
     }
 
     addBoxValue(value: V, box: BoundingBox): void {
