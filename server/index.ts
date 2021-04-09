@@ -8,9 +8,8 @@ import IO from 'socket.io';
 import { BatchGameEvent, GameEvent, UnicastBatchGameEvent } from '@/game/GameEvent';
 import { ActionOptions } from '@/actions/Action';
 import ActionFactory from '@/actions/ActionFactory';
-import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import GameServer from '@/game/GameServer';
-import Player, { PlayerSpawnStatus } from '@/player/Player';
+import { PlayerSpawnStatus } from '@/player/Player';
 import yargs from 'yargs';
 
 const argv = yargs(process.argv.slice(2))

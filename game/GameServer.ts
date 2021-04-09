@@ -300,7 +300,7 @@ export default class GameServer {
                 this.emitter.emit(GameEvent.BROADCAST_BATCH, events);
             });
 
-         this.gameEventBatcher.emitter.on(GameEventBatcherEvent.PLAYER_BATCH,
+        this.gameEventBatcher.emitter.on(GameEventBatcherEvent.PLAYER_BATCH,
             (playerId: string, events: UnicastBatchGameEvent[]) => {
                 this.emitter.emit(GameEvent.PLAYER_BATCH, playerId, events);
             });
