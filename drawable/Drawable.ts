@@ -1,6 +1,6 @@
 import { CLIENT_SPRITES_RELATIVE_URL } from '@/config';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
-import { Memoize } from 'typescript-memoize';
+import { Memoize } from '@/utils/memoize-decorator';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
 import { DrawableProperties } from './IDrawable';

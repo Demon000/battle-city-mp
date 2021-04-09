@@ -1,5 +1,5 @@
 import { ResourceMeta } from '@/object/IGameObjectProperties';
-import { Memoize } from 'typescript-memoize';
+import { Memoize } from '@/utils/memoize-decorator';
 import { Color } from './Color';
 import Drawable from './Drawable';
 import { DrawableType } from './DrawableType';
