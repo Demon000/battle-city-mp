@@ -88,14 +88,22 @@ export default class GameObject {
         return this._position;
     }
 
+    get width(): number {
+        return this.properties.width;
+    }
+
+    get height(): number {
+        return this.properties.height;
+    }
+
     get isMoving(): boolean {
         return this.movementSpeed > 0;
     }
 
     get centerPosition(): Point {
         return {
-            x: this.position.x + this.properties.width / 2,
-            y: this.position.y + this.properties.height / 2,
+            x: this.position.x + this.width / 2,
+            y: this.position.y + this.height / 2,
         };
     }
 

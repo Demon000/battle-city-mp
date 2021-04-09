@@ -4,10 +4,11 @@ import MapRepository from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import BoundingBox from '../bounding-box/BoundingBox';
 import BoundingBoxRepository from '../bounding-box/BoundingBoxRepository';
+import BoundingBoxUtils from '../bounding-box/BoundingBoxUtils';
 import { Direction } from '../Direction';
 import Point from '../point/Point';
 import DirectionUtils from './DirectionUtils';
-import ICollisionRule, { CollisionEvents, CollisionResultEvent } from './ICollisionRule';
+import ICollisionRule, { CollisionEvent, CollisionEvents, CollisionResultEvent } from './ICollisionRule';
 
 export enum CollisionServiceEvent {
     OBJECT_POSITION_ALLOWED = 'object-position-allowed',
@@ -89,23 +90,88 @@ export default class CollisionService {
         return this.boundingBoxRepository.getBoxOverlappingValues(box);
     }
 
-    validateObjectMovement(objectId: number, position: Point): boolean {
+    objectsCompareLtr(first: GameObject, second: GameObject): number {
+        return first.position.x - second.position.x;
+    }
+
+    objectsCompareRtl(first: GameObject, second: GameObject): number {
+        return second.position.x - first.position.x;
+    }
+
+    objectsCompareUtd(first: GameObject, second: GameObject): number {
+        return first.position.y - second.position.y;
+    }
+
+    objectsCompareDtu(first: GameObject, second: GameObject): number {
+        return second.position.y - first.position.y;
+    }
+
+    isPositionCloserToDirection(newPosition: Point, oldPosition: Point, direction: Direction): boolean {
+        switch (direction) {
+            case Direction.UP:
+                if (newPosition.y > oldPosition.y) {
+                    return true;
+                }
+                break;
+            case Direction.RIGHT:
+                if (newPosition.x < oldPosition.x) {
+                    return true;
+                }
+                break;
+            case Direction.DOWN:
+                if (newPosition.y < oldPosition.y) {
+                    return true;
+                }
+                break;
+            case Direction.LEFT:
+                if (newPosition.x > oldPosition.x) {
+                    return true;
+                }
+                break;
+        }
+
+        return false;
+    }
+
+    snapObjectToBoundingBoxEdge(
+        object: GameObject,
+        position: Point,
+        box: BoundingBox,
+        direction: Direction,
+    ): void {
+        switch (direction) {
+            case Direction.UP:
+                position.y = box.br.y;
+                break;
+            case Direction.RIGHT:
+                position.x = box.tl.x - object.width;
+                break;
+            case Direction.DOWN:
+                position.y = box.tl.y - object.height;
+                break;
+            case Direction.LEFT:
+                position.x = box.br.x;
+                break;
+        }
+    }
+
+    validateObjectMovement(objectId: number, position: Point): void {
         if (this.rulesMap === undefined) {
             throw new Error('Cannot validate object movement when rules map is not set');
         }
 
-        let preventMovement = false;
-
         const movingObject = this.gameObjectRepository.get(objectId);
+        const movingDirection = movingObject.direction;
+        const originalBoundingBox = movingObject.getBoundingBox();
         const movedBoundingBox = movingObject.getBoundingBox(position);
-        const overlappingObjectIds = this.getOverlappingObjects(movedBoundingBox);
-        for (const overlappingObjectId of overlappingObjectIds) {
-            if (objectId === overlappingObjectId) {
-                continue;
-            }
+        const mergedBoundingBox = BoundingBoxUtils.combine(originalBoundingBox, movedBoundingBox);
+        const overlappingObjectIds = this.getOverlappingObjects(mergedBoundingBox);
+        const overlappingObjects = this.gameObjectRepository.getMultiple(overlappingObjectIds);
 
-            const overlappingObject = this.gameObjectRepository.get(overlappingObjectId);
-            if (overlappingObject.destroyed) {
+        let movementPreventingObject;
+        const notifications = new Array<[CollisionEvent, GameObject]>();
+        for (const overlappingObject of overlappingObjects) {
+            if (objectId === overlappingObject.id) {
                 continue;
             }
 
@@ -116,20 +182,32 @@ export default class CollisionService {
 
             for (const result of rule.result) {
                 if (result.type === CollisionResultEvent.PREVENT_MOVEMENT) {
-                    preventMovement = true;
+                    if (movementPreventingObject === undefined
+                        || this.isPositionCloserToDirection(overlappingObject.position,
+                            movementPreventingObject.position, movingDirection)) {
+                        movementPreventingObject = overlappingObject;
+                    }
                 } else if (result.type === CollisionResultEvent.NOTIFY) {
-                    this.emitter.emit(result.name, objectId, position, overlappingObjectId);
+                    notifications.push([result.name, overlappingObject]);
                 }
             }
         }
 
-        if (preventMovement) {
-            return true;
+        if (movementPreventingObject !== undefined) {
+            const preventingBoundingBox = movementPreventingObject.getBoundingBox();
+            this.snapObjectToBoundingBoxEdge(movingObject, position,
+                preventingBoundingBox, movingDirection);
         }
 
         this.emitter.emit(CollisionServiceEvent.OBJECT_POSITION_ALLOWED, objectId, position);
 
-        return false;
+        const preventedBoundingBox = movingObject.getBoundingBox(position);
+        for (const [name, overlappingObject] of notifications) {
+            const overlappingBoundingBox = overlappingObject.getBoundingBox();
+            if (BoundingBoxUtils.overlapsEqual(preventedBoundingBox, overlappingBoundingBox)) {
+                this.emitter.emit(name, objectId, position, overlappingObject.id);
+            }
+        }
     }
 
     calculateSnappedCoordinates(value: number, snapping: number): number {
