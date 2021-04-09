@@ -18,12 +18,15 @@ export default class Ticker {
     useRequestAnimationFrame;
     timeoutWrapper: () => void;
     requestAnimationFrameWrapper: (currentTickTime: number) => void;
+    callTick: () => void;
 
     constructor(tickRate?: number) {
         if (tickRate === undefined) {
             this.useRequestAnimationFrame = true;
+            this.callTick = this.callRequestAnimationFrame;
         } else {
             this.tickTime = 1000 / tickRate;
+            this.callTick = this.callSetTimeout;
         }
 
         this.timeoutWrapper = this._timeoutWrapper.bind(this);
@@ -54,12 +57,12 @@ export default class Ticker {
         this.tick(currentTickTime);
     }
 
-    callTick(): void {
-        if (this.useRequestAnimationFrame) {
-            requestAnimationFrame(this.requestAnimationFrameWrapper);
-        } else {
-            setTimeout(this.timeoutWrapper, this.tickTime);
-        }
+    callRequestAnimationFrame(): void {
+        requestAnimationFrame(this.requestAnimationFrameWrapper);
+    }
+
+    callSetTimeout(): void {
+        setTimeout(this.timeoutWrapper, this.tickTime);
     }
 
     start(): void {
