@@ -187,8 +187,8 @@ export default class GameObjectService {
                 continue;
             }
 
-            this.processObjectMovement(object, delta);
             this.processObjectDirection(object);
+            this.processObjectMovement(object, delta);
         }
     }
 }
