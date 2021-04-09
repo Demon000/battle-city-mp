@@ -36,6 +36,9 @@ export const rules: ICollisionRule[] = [
                 type: CollisionResultEvent.NOTIFY,
                 name: CollisionEvent.BULLET_HIT_LEVEL_BORDER,
             },
+            {
+                type: CollisionResultEvent.PREVENT_MOVEMENT,
+            },
         ],
     },
     {
@@ -59,6 +62,9 @@ export const rules: ICollisionRule[] = [
                 type: CollisionResultEvent.NOTIFY,
                 name: CollisionEvent.BULLET_HIT_STEEL_WALL,
             },
+            {
+                type: CollisionResultEvent.PREVENT_MOVEMENT,
+            },
         ],
     },
     {
@@ -78,6 +84,9 @@ export const rules: ICollisionRule[] = [
             {
                 type: CollisionResultEvent.NOTIFY,
                 name: CollisionEvent.BULLET_HIT_BULLET,
+            },
+            {
+                type: CollisionResultEvent.PREVENT_MOVEMENT,
             },
         ],
     },
