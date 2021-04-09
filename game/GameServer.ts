@@ -253,8 +253,8 @@ export default class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BRICK_WALL,
-            (bulletId: number, _position: Point, brickWallId: number) => {
-                const destroyBox = this.bulletService.getBulletBrickWallDestroyBox(bulletId, brickWallId);
+            (bulletId: number, position: Point, brickWallId: number) => {
+                const destroyBox = this.bulletService.getBulletBrickWallDestroyBox(bulletId, position, brickWallId);
                 const objectsIds = this.collisionService.getOverlappingObjects(destroyBox);
                 const objects = this.gameObjectService.getMultipleObjects(objectsIds);
                 const brickWalls = objects.filter(o => o.type === GameObjectType.BRICK_WALL);
