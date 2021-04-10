@@ -1,31 +1,28 @@
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 import { Memoize } from '@/utils/memoize-decorator';
-import BaseDrawable from './BaseDrawable';
 import { Color } from './Color';
-import ImageDrawable from './ImageDrawable';
 import { DrawableType } from './DrawableType';
-import { DrawableProperties } from './ImageDrawable';
+import { IImageDrawable, ImageDrawableProperties } from './IImageDrawable';
 
-export default class AnimatedImageDrawable extends BaseDrawable {
-    readonly type = DrawableType.ANIMATED;
-    properties;
+export default class AnimatedImageDrawable implements IImageDrawable {
+    readonly type = DrawableType.ANIMATED_IMAGE;
+    inheritedProperties: ImageDrawableProperties = {};
+    ownProperties: ImageDrawableProperties;
     meta;
 
     drawables;
     durations;
-    currentDrawable?: ImageDrawable;
+    currentDrawable?: IImageDrawable;
     totalDuration;
     loop;
 
     constructor(
-        drawables: ImageDrawable[],
+        drawables: IImageDrawable[],
         durations: number[],
         meta: ResourceMeta = {},
         loop = true,
-        properties: DrawableProperties = {},
+        properties: ImageDrawableProperties = {},
     ) {
-        super();
-
         if (drawables.length !== durations.length) {
             throw new Error('Timings do not match animated drawables');
         }
@@ -35,14 +32,11 @@ export default class AnimatedImageDrawable extends BaseDrawable {
         this.loop = loop;
         this.totalDuration = durations.reduce((sum, timing) => sum + timing, 0);
         this.meta = meta;
-        this.properties = properties;
-
-        for (const drawable of drawables) {
-            drawable.setDefaultProperties(properties);
-        }
+        this.ownProperties = properties;
+        this.updateDrawablesInheritedProperties();
     }
 
-    private findCurrentDrawable(referenceTime: number): ImageDrawable | undefined {
+    private findCurrentDrawable(referenceTime: number): IImageDrawable | undefined {
         let currentAnimationTime = (Date.now() - referenceTime);
         if (this.loop === true) {
             currentAnimationTime %= this.totalDuration;
@@ -63,6 +57,17 @@ export default class AnimatedImageDrawable extends BaseDrawable {
         return undefined;
     }
 
+    private updateDrawablesInheritedProperties(): void {
+        for (const drawable of this.drawables) {
+            drawable.setInheritedProperties(this.ownProperties);
+        }
+    }
+
+    setInheritedProperties(properties: ImageDrawableProperties): void {
+        this.ownProperties = properties;
+        this.updateDrawablesInheritedProperties();
+    }
+
     updateCurrentDrawable(referenceTime: number): void {
         this.currentDrawable = this.findCurrentDrawable(referenceTime);
     }
@@ -81,8 +86,8 @@ export default class AnimatedImageDrawable extends BaseDrawable {
         }
     }
 
-    private copy(drawables: ImageDrawable[]) {
-        return new AnimatedImageDrawable(
+    private copy(drawables: IImageDrawable[]): this {
+        return this.constructor(
             drawables,
             this.durations,
             this.meta,
@@ -91,20 +96,20 @@ export default class AnimatedImageDrawable extends BaseDrawable {
     }
 
     @Memoize(true)
-    resize(width: number, height: number): AnimatedImageDrawable {
+    resize(width: number, height: number): this {
         return this.copy(this.drawables.map(drawable =>
             drawable.resize(width, height)));
     }
 
     @Memoize(true)
-    scale(scaleX: number, scaleY: number = scaleX): AnimatedImageDrawable {
+    scale(scaleX: number, scaleY: number = scaleX): this {
         return this.copy(this.drawables.map(drawable =>
             drawable.scale(scaleX, scaleY)));
     }
 
     @Memoize(true)
-    color(color: Color): AnimatedImageDrawable {
+    colorMask(color: Color): this {
         return this.copy(this.drawables.map(drawable =>
-            drawable.color(color)));
+            drawable.colorMask(color)));
     }
 }

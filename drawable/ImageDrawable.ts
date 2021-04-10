@@ -1,24 +1,16 @@
 import { CLIENT_SPRITES_RELATIVE_URL } from '@/config';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 import { Memoize } from '@/utils/memoize-decorator';
-import BaseDrawable, { BaseDrawableProperties } from './BaseDrawable';
+import BaseDrawable from './BaseDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
-import IDrawable from './IDrawable';
-
-export interface DrawableProperties extends BaseDrawableProperties {
-    offsetX?: number;
-    offsetY?: number;
-    width?: number;
-    height?: number;
-    compositionType?: string;
-    overlays?: IDrawable[];
-}
+import { IImageDrawable, ImageDrawableProperties } from './IImageDrawable';
 
 type Source = HTMLImageElement | HTMLCanvasElement | OffscreenCanvas;
-export default class ImageDrawable extends BaseDrawable {
-    readonly type = DrawableType.SIMPLE;
-    properties;
+export default class ImageDrawable extends BaseDrawable implements IImageDrawable {
+    readonly type = DrawableType.IMAGE;
+    inheritedProperties: ImageDrawableProperties = {};
+    ownProperties: ImageDrawableProperties;
     meta;
 
     source;
@@ -26,7 +18,7 @@ export default class ImageDrawable extends BaseDrawable {
     constructor(
         source: Source | string,
         meta: ResourceMeta = {},
-        properties: DrawableProperties = {},
+        properties: ImageDrawableProperties = {},
     ) {
         super();
 
@@ -38,17 +30,11 @@ export default class ImageDrawable extends BaseDrawable {
         }
 
         this.meta = meta;
-        this.properties = properties;
+        this.ownProperties = properties;
     }
 
-    setDefaultProperties(properties: DrawableProperties = {}): void {
-        this.properties.offsetX = this.properties.offsetX ?? properties.offsetX;
-        this.properties.offsetY = this.properties.offsetY ?? properties.offsetY;
-        this.properties.renderPass = this.properties.renderPass ?? properties.renderPass;
-        this.properties.compositionType = this.properties.compositionType ?? properties.compositionType;
-        this.properties.overlays = this.properties.overlays ?? properties.overlays;
-        this.properties.width = this.properties.width ?? properties.width;
-        this.properties.height = this.properties.height ?? properties.height;
+    setInheritedProperties(properties: ImageDrawableProperties = {}): void {
+        this.inheritedProperties = properties;
     }
 
     checkSourceComplete(): void {
@@ -61,11 +47,11 @@ export default class ImageDrawable extends BaseDrawable {
     }
 
     applyOverlays(context: CanvasRenderingContext2D, drawX: number, drawY: number): void {
-        if (this.properties.overlays === undefined) {
+        if (this.ownProperties.overlays === undefined) {
             return;
         }
 
-        for (const overlay of this.properties.overlays) {
+        for (const overlay of this.ownProperties.overlays) {
             overlay.draw(context, drawX, drawY);
         }
     }
@@ -74,18 +60,18 @@ export default class ImageDrawable extends BaseDrawable {
         this.checkSourceComplete();
 
         let drawable;
-        if (this.properties.width !== undefined && this.properties.height !== undefined) {
-            drawable = this.resize(this.properties.width, this.properties.height);
+        if (this.ownProperties.width !== undefined && this.ownProperties.height !== undefined) {
+            drawable = this.resize(this.ownProperties.width, this.ownProperties.height);
             drawable.draw(context, drawX, drawY);
             return;
         }
 
-        drawX += this.properties.offsetX ?? 0;
-        drawY += this.properties.offsetY ?? 0;
+        drawX += this.ownProperties.offsetX ?? 0;
+        drawY += this.ownProperties.offsetY ?? 0;
 
         context.save();
-        if (this.properties.compositionType !== undefined) {
-            context.globalCompositeOperation = this.properties.compositionType;
+        if (this.ownProperties.compositionType !== undefined) {
+            context.globalCompositeOperation = this.ownProperties.compositionType;
         }
         context.drawImage(this.source, drawX, drawY);
         context.restore();
@@ -94,7 +80,7 @@ export default class ImageDrawable extends BaseDrawable {
     }
 
     @Memoize(true)
-    resize(width: number, height: number): ImageDrawable {
+    resize(width: number, height: number): this {
         this.checkSourceComplete();
 
         const offscreenCanvas = new OffscreenCanvas(width, height);
@@ -105,16 +91,16 @@ export default class ImageDrawable extends BaseDrawable {
 
         context.imageSmoothingEnabled = false;
         context.drawImage(this.source, 0, 0, width, height);
-        return new ImageDrawable(offscreenCanvas, this.meta, {
-            ...this.properties,
+        return this.constructor(offscreenCanvas, this.meta, {
+            ...this.ownProperties,
             width: undefined,
             height: undefined,
-            overlays: this.properties.overlays?.map(overlay => overlay.resize(width, height)),
+            overlays: this.ownProperties.overlays?.map(overlay => overlay.resize(width, height)),
         });
     }
 
     @Memoize(true)
-    scale(scaleX: number, scaleY: number = scaleX): ImageDrawable {
+    scale(scaleX: number, scaleY: number = scaleX): this {
         this.checkSourceComplete();
 
         const newWidth = this.source.width * scaleX;
@@ -128,19 +114,19 @@ export default class ImageDrawable extends BaseDrawable {
 
         context.imageSmoothingEnabled = false;
         context.drawImage(this.source, 0, 0, newWidth, newHeight);
-        const drawable = new ImageDrawable(offscreenCanvas, this.meta, {
-            ...this.properties,
-            width: this.properties.width === undefined ? undefined : this.properties.width * scaleX,
-            height: this.properties.height === undefined ? undefined : this.properties.height * scaleY,
-            offsetX: this.properties.offsetX === undefined ? undefined : this.properties.offsetX * scaleX,
-            offsetY: this.properties.offsetY === undefined ? undefined : this.properties.offsetY * scaleY,
-            overlays: this.properties.overlays?.map(overlay => overlay.scale(scaleX, scaleY)),
+        const drawable = this.constructor(offscreenCanvas, this.meta, {
+            ...this.ownProperties,
+            width: this.ownProperties.width === undefined ? undefined : this.ownProperties.width * scaleX,
+            height: this.ownProperties.height === undefined ? undefined : this.ownProperties.height * scaleY,
+            offsetX: this.ownProperties.offsetX === undefined ? undefined : this.ownProperties.offsetX * scaleX,
+            offsetY: this.ownProperties.offsetY === undefined ? undefined : this.ownProperties.offsetY * scaleY,
+            overlays: this.ownProperties.overlays?.map(overlay => overlay.scale(scaleX, scaleY)),
         });
         return drawable;
     }
 
     @Memoize(true)
-    color(color: Color): ImageDrawable {
+    colorMask(color: Color): this {
         this.checkSourceComplete();
 
         const offscreenCanvas = new OffscreenCanvas(this.source.width, this.source.height);
@@ -156,8 +142,8 @@ export default class ImageDrawable extends BaseDrawable {
         context.fillRect(0, 0, this.source.width, this.source.height);
         context.restore();
 
-        return new ImageDrawable(offscreenCanvas, this.meta, {
-            ...this.properties,
+        return this.constructor(offscreenCanvas, this.meta, {
+            ...this.ownProperties,
         });
     }
 }

@@ -1,23 +1,19 @@
 import { ResourceMeta } from '@/object/IGameObjectProperties';
-import { Color } from './Color';
-import IDrawable, { IDrawableProperties } from './IDrawable';
+import IBaseDrawable, { BaseDrawableProperties } from './IBaseDrawable';
 
-export interface BaseDrawableProperties extends IDrawableProperties {
-    renderPass?: number;
-}
-
-export default abstract class BaseDrawable implements IDrawable {
+export default abstract class BaseDrawable implements IBaseDrawable {
     abstract type: string;
     abstract meta: ResourceMeta;
-    abstract properties: BaseDrawableProperties;
+    abstract inheritedProperties: BaseDrawableProperties;
+    abstract ownProperties: BaseDrawableProperties;
 
+    abstract setInheritedProperties(properties: BaseDrawableProperties): void;
     abstract draw(context: CanvasRenderingContext2D, drawX: number, drawY: number): void;
-    abstract scale(scaleX: number, scaleY?: number): IDrawable;
-    abstract resize(width: number, height: number): IDrawable;
-    abstract color(color: Color): IDrawable;
+    abstract scale(scaleX: number, scaleY?: number): this;
+    abstract resize(width: number, height: number): this;
 
     isRenderPass(pass: number): boolean {
-        const renderPass = this.properties.renderPass;
+        const renderPass = this.ownProperties.renderPass;
         return (renderPass === undefined && pass === 0)
             || (renderPass !== undefined && renderPass === pass);
     }

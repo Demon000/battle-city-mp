@@ -8,8 +8,9 @@ import { TankSmoke } from '@/tank/TankSmoke';
 import { TankTier } from '@/tank/TankTier';
 import { GameObjectType } from './GameObjectType';
 import { RenderPass } from './IGameObjectProperties';
+import IBaseDrawable from '@/drawable/IBaseDrawable';
 
-const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
+const drawables: Partial<Record<GameObjectType, IBaseDrawable[]>> = {
     [GameObjectType.STEEL_WALL]: [
         new ImageDrawable('steel_wall.png'),
     ],
@@ -59,7 +60,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
         }),
     ],
     [GameObjectType.TANK]: [
-        ...((): IDrawable[] => {
+        ...((): IBaseDrawable[] => {
             const generateTankTierDirectionFrame = (
                 tier: TankTier,
                 direction: Direction,
@@ -116,7 +117,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
 
             return drawables;
         })(),
-        ...((): IDrawable[] => {
+        ...((): IBaseDrawable[] => {
             const drawables = [];
 
             for (const smoke of Object.values(TankSmoke)) {
@@ -141,7 +142,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
         })(),
     ],
     [GameObjectType.BULLET]: [
-        ...((): IDrawable[] => {
+        ...((): IBaseDrawable[] => {
             const drawables = [];
 
             for (const power of Object.values(BulletPower)) {
@@ -199,7 +200,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
 };
 
 export default class GameObjectDrawables {
-    static getTypeDrawables(type: GameObjectType): IDrawable[] | undefined {
+    static getTypeDrawables(type: GameObjectType): IBaseDrawable[] | undefined {
         return drawables[type];
     }
 }

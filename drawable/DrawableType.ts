@@ -1,4 +1,5 @@
 export enum DrawableType {
-    SIMPLE = 'simple',
-    ANIMATED = 'animated',
+    IMAGE = 'image',
+    ANIMATED_IMAGE = 'animated-image',
+    TEXT = 'text',
 }

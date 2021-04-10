@@ -1,6 +1,7 @@
 import AnimatedImageDrawable from '@/drawable/AnimatedImageDrawable';
 import DrawablePositionMatching from '@/drawable/DrawablePositionMatching';
 import { DrawableType } from '@/drawable/DrawableType';
+import IBaseDrawable from '@/drawable/IBaseDrawable';
 import IDrawable from '@/drawable/IDrawable';
 import GameObject from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
@@ -12,7 +13,7 @@ import GameObjectDrawables from './GameObjectDrawables';
 export default class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
     object;
     scale;
-    drawables?: IDrawable[] | null = null;
+    drawables?: IBaseDrawable[] | null = null;
     context?: CanvasRenderingContext2D;
     objectDrawX = 0;
     objectDrawY = 0;
@@ -59,7 +60,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         return true;
     }
 
-    private findDrawableMatchingMeta(meta: ResourceMeta): IDrawable | undefined | null {
+    private findDrawableMatchingMeta(meta: ResourceMeta): IBaseDrawable | undefined | null {
         const drawables = GameObjectDrawables.getTypeDrawables(this.object.type);
         if (drawables === undefined) {
             return undefined;
@@ -75,21 +76,21 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         return drawable;
     }
 
-    private findDrawablesMatchingMetasFilter(drawable: IDrawable | undefined | null): boolean {
+    private findDrawablesMatchingMetasFilter(drawable: IBaseDrawable | undefined | null): boolean {
         return drawable !== undefined && drawable !== null;
     }
 
-    private findDrawablesMatchingMetas(type: GameObjectType, metas: ResourceMeta[]): IDrawable[] | undefined {
+    private findDrawablesMatchingMetas(type: GameObjectType, metas: ResourceMeta[]): IBaseDrawable[] | undefined {
         const drawables = metas.map(this.findDrawableMatchingMeta, this);
 
         if (drawables[0] === undefined) {
             return undefined;
         }
 
-        return drawables.filter(this.findDrawablesMatchingMetasFilter) as IDrawable[];
+        return drawables.filter(this.findDrawablesMatchingMetasFilter) as IBaseDrawable[];
     }
 
-    private isDrawablesMatchingMetas(drawables: IDrawable[], metas: ResourceMeta[]): boolean {
+    private isDrawablesMatchingMetas(drawables: IBaseDrawable[], metas: ResourceMeta[]): boolean {
         if (metas.length !== drawables.length) {
             return false;
         }
@@ -105,7 +106,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         return true;
     }
 
-    protected processDrawable(drawable: IDrawable): IDrawable {
+    protected processDrawable(drawable: IBaseDrawable): IBaseDrawable {
         return drawable.scale(this.scale);
     }
 
@@ -143,7 +144,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         }
 
         this.drawables.forEach(drawable => {
-            if (drawable.type === DrawableType.ANIMATED) {
+            if (drawable.type === DrawableType.ANIMATED_IMAGE) {
                 (drawable as AnimatedImageDrawable).updateCurrentDrawable(this.object.spawnTime);
             }
         });
@@ -153,7 +154,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         return this.drawables !== undefined && this.drawables !== null && this.drawables.length !== 0;
     }
 
-    renderPassFilter(drawable: IDrawable): boolean {
+    renderPassFilter(drawable: IBaseDrawable): boolean {
         if (this.context === undefined) {
             return true;
         }
