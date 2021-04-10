@@ -2,7 +2,6 @@ import AnimatedImageDrawable from '@/drawable/AnimatedImageDrawable';
 import DrawablePositionMatching from '@/drawable/DrawablePositionMatching';
 import { DrawableType } from '@/drawable/DrawableType';
 import IBaseDrawable from '@/drawable/IBaseDrawable';
-import IDrawable from '@/drawable/IDrawable';
 import GameObject from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 import { ResourceMeta } from '@/object/IGameObjectProperties';

@@ -1,7 +1,6 @@
 import { BulletPower } from '@/bullet/BulletPower';
 import AnimatedImageDrawable from '@/drawable/AnimatedImageDrawable';
 import ImageDrawable from '@/drawable/ImageDrawable';
-import IDrawable from '@/drawable/IDrawable';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
 import { TankSmoke } from '@/tank/TankSmoke';

@@ -91,7 +91,7 @@ export default class ImageDrawable extends BaseDrawable implements IImageDrawabl
 
         context.imageSmoothingEnabled = false;
         context.drawImage(this.source, 0, 0, width, height);
-        return this.constructor(offscreenCanvas, this.meta, {
+        return new (<any>this.constructor)(offscreenCanvas, this.meta, {
             ...this.ownProperties,
             width: undefined,
             height: undefined,
@@ -114,7 +114,7 @@ export default class ImageDrawable extends BaseDrawable implements IImageDrawabl
 
         context.imageSmoothingEnabled = false;
         context.drawImage(this.source, 0, 0, newWidth, newHeight);
-        const drawable = this.constructor(offscreenCanvas, this.meta, {
+        const drawable = new (<any>this.constructor)(offscreenCanvas, this.meta, {
             ...this.ownProperties,
             width: this.ownProperties.width === undefined ? undefined : this.ownProperties.width * scaleX,
             height: this.ownProperties.height === undefined ? undefined : this.ownProperties.height * scaleY,
@@ -142,7 +142,7 @@ export default class ImageDrawable extends BaseDrawable implements IImageDrawabl
         context.fillRect(0, 0, this.source.width, this.source.height);
         context.restore();
 
-        return this.constructor(offscreenCanvas, this.meta, {
+        return new (<any>this.constructor)(offscreenCanvas, this.meta, {
             ...this.ownProperties,
         });
     }

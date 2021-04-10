@@ -87,7 +87,7 @@ export default class AnimatedImageDrawable implements IImageDrawable {
     }
 
     private copy(drawables: IImageDrawable[]): this {
-        return this.constructor(
+        return new (<any>this.constructor)(
             drawables,
             this.durations,
             this.meta,
