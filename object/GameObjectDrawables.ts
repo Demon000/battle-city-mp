@@ -1,6 +1,6 @@
 import { BulletPower } from '@/bullet/BulletPower';
-import AnimatedDrawable from '@/drawable/AnimatedDrawable';
-import Drawable from '@/drawable/Drawable';
+import AnimatedImageDrawable from '@/drawable/AnimatedImageDrawable';
+import ImageDrawable from '@/drawable/ImageDrawable';
 import IDrawable from '@/drawable/IDrawable';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
@@ -11,21 +11,21 @@ import { RenderPass } from './IGameObjectProperties';
 
 const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
     [GameObjectType.STEEL_WALL]: [
-        new Drawable('steel_wall.png'),
+        new ImageDrawable('steel_wall.png'),
     ],
     [GameObjectType.BUSH]: [
-        new Drawable('bush.png', {}, {
+        new ImageDrawable('bush.png', {}, {
             renderPass: RenderPass.BUSHES,
         }),
     ],
     [GameObjectType.LEVEL_BORDER]: [
-        new Drawable('level_border.png'),
+        new ImageDrawable('level_border.png'),
     ],
     [GameObjectType.ICE]: [
-        new Drawable('ice.png'),
+        new ImageDrawable('ice.png'),
     ],
     [GameObjectType.BRICK_WALL]: [
-        new Drawable('brick_wall_even.png', {
+        new ImageDrawable('brick_wall_even.png', {
             position: {
                 mod: 8,
                 divide: 4,
@@ -41,7 +41,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                 ],
             },
         }),
-        new Drawable('brick_wall_odd.png', {
+        new ImageDrawable('brick_wall_odd.png', {
             position: {
                 mod: 8,
                 divide: 4,
@@ -66,7 +66,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                 frame: number,
                 isMoving: boolean,
             ) => {
-                return new Drawable(`tank_${tier}_${direction}_${frame}.png`, {
+                return new ImageDrawable(`tank_${tier}_${direction}_${frame}.png`, {
                     isTankDrawable: true,
                     isMoving,
                     direction,
@@ -76,10 +76,10 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                     width: 16,
                     height: 16,
                     overlays: [
-                        new Drawable(`tank_${tier}_${direction}_${frame}_highlights.png`, {}, {
+                        new ImageDrawable(`tank_${tier}_${direction}_${frame}_highlights.png`, {}, {
                             compositionType: 'lighter',
                         }),
-                        new Drawable(`tank_${tier}_${direction}_${frame}_shadows.png`, {}, {
+                        new ImageDrawable(`tank_${tier}_${direction}_${frame}_shadows.png`, {}, {
                             compositionType: 'difference',
                         }),
                     ],
@@ -91,7 +91,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             for (const tier of Object.values(TankTier)) {
                 for (const direction of Object.values(Direction)) {
                     drawables.push(
-                        new AnimatedDrawable([
+                        new AnimatedImageDrawable([
                             generateTankTierDirectionFrame(tier, direction, 0, true),
                             generateTankTierDirectionFrame(tier, direction, 1, true),
                         ], [
@@ -121,10 +121,10 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
 
             for (const smoke of Object.values(TankSmoke)) {
                 drawables.push(
-                    new AnimatedDrawable([
-                        new Drawable(`smoke_${smoke}_0.png`),
-                        new Drawable(`smoke_${smoke}_1.png`),
-                        new Drawable(`smoke_${smoke}_2.png`),
+                    new AnimatedImageDrawable([
+                        new ImageDrawable(`smoke_${smoke}_0.png`),
+                        new ImageDrawable(`smoke_${smoke}_1.png`),
+                        new ImageDrawable(`smoke_${smoke}_2.png`),
                     ], [
                         160,
                         160,
@@ -147,7 +147,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             for (const power of Object.values(BulletPower)) {
                 for (const direction of Object.values(Direction)) {
                     drawables.push(
-                        new Drawable(`bullet_${power}_${direction}.png`, {
+                        new ImageDrawable(`bullet_${power}_${direction}.png`, {
                             direction,
                             power,
                         }, {
@@ -165,10 +165,10 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
         })(),
     ],
     [GameObjectType.EXPLOSION]: [
-        new AnimatedDrawable([
-            new Drawable('explosion_small_0.png'),
-            new Drawable('explosion_small_1.png'),
-            new Drawable('explosion_small_2.png'),
+        new AnimatedImageDrawable([
+            new ImageDrawable('explosion_small_0.png'),
+            new ImageDrawable('explosion_small_1.png'),
+            new ImageDrawable('explosion_small_2.png'),
         ], [
             80,
             80,
@@ -180,10 +180,10 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             offsetX: -8,
             offsetY: -8,
         }),
-        new AnimatedDrawable([
-            new Drawable('explosion_big_0.png'),
-            new Drawable('explosion_big_1.png'),
-            new Drawable('explosion_big_2.png'),
+        new AnimatedImageDrawable([
+            new ImageDrawable('explosion_big_0.png'),
+            new ImageDrawable('explosion_big_1.png'),
+            new ImageDrawable('explosion_big_2.png'),
         ], [
             80,
             80,

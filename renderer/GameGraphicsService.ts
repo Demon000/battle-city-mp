@@ -54,7 +54,7 @@ export default class GameGraphicsService {
         let objectRenderer = this.objectGraphicsRendererRepository.find(object.id);
         if (objectRenderer === undefined) {
             objectRenderer = GameObjectGraphicsRendererFactory
-                .buildFromObject(object, this.gameToRenderSizeScale);
+                .buildFromObject(this.context, object, this.gameToRenderSizeScale);
             this.objectGraphicsRendererRepository.add(object.id, objectRenderer);
         }
 
@@ -77,7 +77,7 @@ export default class GameGraphicsService {
 
     renderObjectsPassFilter(object: GameObject): boolean {
         const renderer = this.getObjectRenderer(object);
-        return renderer.renderPass(this.context, this.pass, this.canvasX, this.canvasY);
+        return renderer.renderPass(this.pass, this.canvasX, this.canvasY);
     }
 
     renderObjects(objects: GameObject[], point: Point): void {

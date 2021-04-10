@@ -1,22 +1,35 @@
 import { CLIENT_SPRITES_RELATIVE_URL } from '@/config';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 import { Memoize } from '@/utils/memoize-decorator';
+import BaseDrawable, { BaseDrawableProperties } from './BaseDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
-import { DrawableProperties } from './IDrawable';
+import IDrawable from './IDrawable';
+
+export interface DrawableProperties extends BaseDrawableProperties {
+    offsetX?: number;
+    offsetY?: number;
+    width?: number;
+    height?: number;
+    compositionType?: string;
+    overlays?: IDrawable[];
+}
 
 type Source = HTMLImageElement | HTMLCanvasElement | OffscreenCanvas;
-export default class Drawable {
+export default class ImageDrawable extends BaseDrawable {
     readonly type = DrawableType.SIMPLE;
-    source;
-    properties: DrawableProperties;
+    properties;
     meta;
+
+    source;
 
     constructor(
         source: Source | string,
         meta: ResourceMeta = {},
         properties: DrawableProperties = {},
     ) {
+        super();
+
         if (typeof source === 'string') {
             this.source = new Image();
             this.source.src = `${CLIENT_SPRITES_RELATIVE_URL}/${source}`;
@@ -57,12 +70,6 @@ export default class Drawable {
         }
     }
 
-    isRenderPass(pass: number): boolean {
-        const renderPass = this.properties.renderPass;
-        return (renderPass === undefined && pass === 0)
-            || (renderPass !== undefined && renderPass === pass);
-    }
-
     draw(context: CanvasRenderingContext2D, drawX: number, drawY: number): void {
         this.checkSourceComplete();
 
@@ -87,7 +94,7 @@ export default class Drawable {
     }
 
     @Memoize(true)
-    resize(width: number, height: number): Drawable {
+    resize(width: number, height: number): ImageDrawable {
         this.checkSourceComplete();
 
         const offscreenCanvas = new OffscreenCanvas(width, height);
@@ -98,7 +105,7 @@ export default class Drawable {
 
         context.imageSmoothingEnabled = false;
         context.drawImage(this.source, 0, 0, width, height);
-        return new Drawable(offscreenCanvas, this.meta, {
+        return new ImageDrawable(offscreenCanvas, this.meta, {
             ...this.properties,
             width: undefined,
             height: undefined,
@@ -107,7 +114,7 @@ export default class Drawable {
     }
 
     @Memoize(true)
-    scale(scaleX: number, scaleY: number = scaleX): Drawable {
+    scale(scaleX: number, scaleY: number = scaleX): ImageDrawable {
         this.checkSourceComplete();
 
         const newWidth = this.source.width * scaleX;
@@ -121,7 +128,7 @@ export default class Drawable {
 
         context.imageSmoothingEnabled = false;
         context.drawImage(this.source, 0, 0, newWidth, newHeight);
-        const drawable = new Drawable(offscreenCanvas, this.meta, {
+        const drawable = new ImageDrawable(offscreenCanvas, this.meta, {
             ...this.properties,
             width: this.properties.width === undefined ? undefined : this.properties.width * scaleX,
             height: this.properties.height === undefined ? undefined : this.properties.height * scaleY,
@@ -133,7 +140,7 @@ export default class Drawable {
     }
 
     @Memoize(true)
-    color(color: Color): Drawable {
+    color(color: Color): ImageDrawable {
         this.checkSourceComplete();
 
         const offscreenCanvas = new OffscreenCanvas(this.source.width, this.source.height);
@@ -149,7 +156,7 @@ export default class Drawable {
         context.fillRect(0, 0, this.source.width, this.source.height);
         context.restore();
 
-        return new Drawable(offscreenCanvas, this.meta, {
+        return new ImageDrawable(offscreenCanvas, this.meta, {
             ...this.properties,
         });
     }

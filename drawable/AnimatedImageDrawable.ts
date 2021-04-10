@@ -1,27 +1,31 @@
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 import { Memoize } from '@/utils/memoize-decorator';
+import BaseDrawable from './BaseDrawable';
 import { Color } from './Color';
-import Drawable from './Drawable';
+import ImageDrawable from './ImageDrawable';
 import { DrawableType } from './DrawableType';
-import IDrawable, { DrawableProperties } from './IDrawable';
+import { DrawableProperties } from './ImageDrawable';
 
-export default class AnimatedDrawable implements IDrawable {
+export default class AnimatedImageDrawable extends BaseDrawable {
     readonly type = DrawableType.ANIMATED;
+    properties;
+    meta;
 
     drawables;
     durations;
-    currentDrawable?: Drawable;
+    currentDrawable?: ImageDrawable;
     totalDuration;
     loop;
-    meta;
 
     constructor(
-        drawables: Drawable[],
+        drawables: ImageDrawable[],
         durations: number[],
         meta: ResourceMeta = {},
         loop = true,
         properties: DrawableProperties = {},
     ) {
+        super();
+
         if (drawables.length !== durations.length) {
             throw new Error('Timings do not match animated drawables');
         }
@@ -31,13 +35,14 @@ export default class AnimatedDrawable implements IDrawable {
         this.loop = loop;
         this.totalDuration = durations.reduce((sum, timing) => sum + timing, 0);
         this.meta = meta;
+        this.properties = properties;
 
         for (const drawable of drawables) {
             drawable.setDefaultProperties(properties);
         }
     }
 
-    private findCurrentDrawable(referenceTime: number): Drawable | undefined {
+    private findCurrentDrawable(referenceTime: number): ImageDrawable | undefined {
         let currentAnimationTime = (Date.now() - referenceTime);
         if (this.loop === true) {
             currentAnimationTime %= this.totalDuration;
@@ -76,8 +81,8 @@ export default class AnimatedDrawable implements IDrawable {
         }
     }
 
-    private copy(drawables: Drawable[]) {
-        return new AnimatedDrawable(
+    private copy(drawables: ImageDrawable[]) {
+        return new AnimatedImageDrawable(
             drawables,
             this.durations,
             this.meta,
@@ -86,19 +91,19 @@ export default class AnimatedDrawable implements IDrawable {
     }
 
     @Memoize(true)
-    resize(width: number, height: number): AnimatedDrawable {
+    resize(width: number, height: number): AnimatedImageDrawable {
         return this.copy(this.drawables.map(drawable =>
             drawable.resize(width, height)));
     }
 
     @Memoize(true)
-    scale(scaleX: number, scaleY: number = scaleX): AnimatedDrawable {
+    scale(scaleX: number, scaleY: number = scaleX): AnimatedImageDrawable {
         return this.copy(this.drawables.map(drawable =>
             drawable.scale(scaleX, scaleY)));
     }
 
     @Memoize(true)
-    color(color: Color): AnimatedDrawable {
+    color(color: Color): AnimatedImageDrawable {
         return this.copy(this.drawables.map(drawable =>
             drawable.color(color)));
     }

@@ -7,14 +7,18 @@ import Tank from '@/tank/Tank';
 import Explosion from '@/explosion/Explosion';
 
 export default class GameObjectGraphicsRendererFactory {
-    static buildFromObject(object: GameObject, scale: number): GameObjectGraphicsRenderer {
+    static buildFromObject(
+        context: CanvasRenderingContext2D,
+        object: GameObject,
+        scale: number,
+    ): GameObjectGraphicsRenderer {
         switch (object.type) {
             case GameObjectType.TANK:
-                return new TankGraphicsRenderer(object as Tank, scale);
+                return new TankGraphicsRenderer(context, object as Tank, scale);
             case GameObjectType.EXPLOSION:
-                return new ExplosionGraphicsRenderer(object as Explosion, scale);
+                return new ExplosionGraphicsRenderer(context, object as Explosion, scale);
             default:
-                return new GameObjectGraphicsRenderer(object, scale);
+                return new GameObjectGraphicsRenderer(context, object, scale);
         }
     }
 }

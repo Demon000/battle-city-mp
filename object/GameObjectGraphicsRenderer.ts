@@ -1,4 +1,4 @@
-import AnimatedDrawable from '@/drawable/AnimatedDrawable';
+import AnimatedImageDrawable from '@/drawable/AnimatedImageDrawable';
 import DrawablePositionMatching from '@/drawable/DrawablePositionMatching';
 import { DrawableType } from '@/drawable/DrawableType';
 import IDrawable from '@/drawable/IDrawable';
@@ -18,7 +18,8 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
     objectDrawY = 0;
     pass = 0;
 
-    constructor(object: O, scale: number) {
+    constructor(context: CanvasRenderingContext2D, object: O, scale: number) {
+        this.context = context;
         this.object = object;
         this.scale = scale;
     }
@@ -143,7 +144,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
 
         this.drawables.forEach(drawable => {
             if (drawable.type === DrawableType.ANIMATED) {
-                (drawable as AnimatedDrawable).updateCurrentDrawable(this.object.spawnTime);
+                (drawable as AnimatedImageDrawable).updateCurrentDrawable(this.object.spawnTime);
             }
         });
     }
@@ -167,7 +168,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         return false;
     }
 
-    renderPass(context: CanvasRenderingContext2D, pass: number, canvasX: number, canvasY: number): boolean {
+    renderPass(pass: number, canvasX: number, canvasY: number): boolean {
         if (!this.drawables) {
             return false;
         }
@@ -176,7 +177,6 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         const objectRelativeY = Math.floor(this.object.position.y) - canvasY;
         const objectDrawX = objectRelativeX * this.scale;
         const objectDrawY = objectRelativeY * this.scale;
-        this.context = context;
         this.objectDrawX = objectDrawX;
         this.objectDrawY = objectDrawY;
         this.pass = pass;
