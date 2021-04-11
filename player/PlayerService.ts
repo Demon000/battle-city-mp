@@ -222,4 +222,8 @@ export default class PlayerService {
 
         return undefined;
     }
+
+    clear(): void {
+        this.repository.clear();
+    }
 }

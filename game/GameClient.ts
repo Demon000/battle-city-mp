@@ -123,7 +123,10 @@ export default class GameClient {
     }
 
     clear(): void {
+        this.playerService.clear();
         this.gameObjectRepository.clear();
         this.boundingBoxRepository.clear();
+        this.gameAudioService.clear();
+        this.gameGraphicsService.clear();
     }
 }

@@ -107,4 +107,8 @@ export default class GameGraphicsService {
             },
         };
     }
+
+    clear(): void {
+        this.objectGraphicsRendererRepository.clear();
+    }
 }

@@ -103,4 +103,13 @@ export default class GameAudioService {
             }
         }
     }
+
+    clear(): void {
+        for (const object of this.objectsPlayingAudioEffects) {
+            const audioRenderer = this.getOrCreateAudioRenderer(object);
+            audioRenderer.stop();
+        }
+
+        this.objectAudioRendererRepository.clear();
+    }
 }

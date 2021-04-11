@@ -139,7 +139,7 @@ export default class GameServer {
                     });
                     this.gameObjectService.registerObject(tank);
                     this.playerService.setPlayerTankId(playerId, tank.id);
-                } else if (player.tankId !== null) {
+                } else if (status === PlayerSpawnStatus.DESPAWN && player.tankId !== null) {
                     this.gameObjectService.unregisterObject(player.tankId);
                     this.playerService.setPlayerTankId(playerId, null);
                 }
