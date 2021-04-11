@@ -182,9 +182,17 @@ export default class CollisionService {
 
             for (const result of rule.result) {
                 if (result.type === CollisionResultEvent.PREVENT_MOVEMENT) {
-                    if (movementPreventingObject === undefined
-                        || this.isPositionCloserToDirection(overlappingObject.position,
-                            movementPreventingObject.position, movingDirection)) {
+                    const overlappingBoundingBox = overlappingObject.getBoundingBox();
+                    const isAlreadyInside = BoundingBoxUtils.overlaps(originalBoundingBox,
+                        overlappingBoundingBox);
+
+                    let isCloser = true;
+                    if (movementPreventingObject !== undefined) {
+                        isCloser = this.isPositionCloserToDirection(overlappingObject.position,
+                            movementPreventingObject.position, movingDirection);
+                    }
+
+                    if (!isAlreadyInside && isCloser) {
                         movementPreventingObject = overlappingObject;
                     }
                 } else if (result.type === CollisionResultEvent.NOTIFY) {
