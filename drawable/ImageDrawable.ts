@@ -11,6 +11,7 @@ export default class ImageDrawable extends BaseDrawable implements IImageDrawabl
     readonly type = DrawableType.IMAGE;
     inheritedProperties: ImageDrawableProperties = {};
     ownProperties: ImageDrawableProperties;
+    _properties?: ImageDrawableProperties;
     meta;
 
     source;
@@ -35,9 +36,14 @@ export default class ImageDrawable extends BaseDrawable implements IImageDrawabl
 
     setInheritedProperties(properties: ImageDrawableProperties = {}): void {
         this.inheritedProperties = properties;
+        this._properties = undefined;
     }
 
     get properties(): ImageDrawableProperties {
+        if (this._properties !== undefined) {
+            return this._properties;
+        }
+
         return Object.assign({}, this.inheritedProperties, this.ownProperties);
     }
 
