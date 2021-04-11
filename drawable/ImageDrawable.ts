@@ -37,6 +37,10 @@ export default class ImageDrawable extends BaseDrawable implements IImageDrawabl
         this.inheritedProperties = properties;
     }
 
+    get properties(): ImageDrawableProperties {
+        return Object.assign({}, this.inheritedProperties, this.ownProperties);
+    }
+
     checkSourceComplete(): void {
         if (this.source instanceof HTMLImageElement
             && (!this.source.complete
@@ -47,11 +51,11 @@ export default class ImageDrawable extends BaseDrawable implements IImageDrawabl
     }
 
     applyOverlays(context: CanvasRenderingContext2D, drawX: number, drawY: number): void {
-        if (this.ownProperties.overlays === undefined) {
+        if (this.properties.overlays === undefined) {
             return;
         }
 
-        for (const overlay of this.ownProperties.overlays) {
+        for (const overlay of this.properties.overlays) {
             overlay.draw(context, drawX, drawY);
         }
     }
@@ -60,18 +64,20 @@ export default class ImageDrawable extends BaseDrawable implements IImageDrawabl
         this.checkSourceComplete();
 
         let drawable;
-        if (this.ownProperties.width !== undefined && this.ownProperties.height !== undefined) {
-            drawable = this.resize(this.ownProperties.width, this.ownProperties.height);
+        if (this.properties.width !== undefined && this.properties.height !== undefined) {
+            drawable = this.resize(this.properties.width, this.properties.height);
             drawable.draw(context, drawX, drawY);
             return;
         }
 
-        drawX += this.ownProperties.offsetX ?? 0;
-        drawY += this.ownProperties.offsetY ?? 0;
+        drawX += this.properties.offsetX ?? 0;
+        drawY += this.properties.offsetY ?? 0;
+
+
 
         context.save();
-        if (this.ownProperties.compositionType !== undefined) {
-            context.globalCompositeOperation = this.ownProperties.compositionType;
+        if (this.properties.compositionType !== undefined) {
+            context.globalCompositeOperation = this.properties.compositionType;
         }
         context.drawImage(this.source, drawX, drawY);
         context.restore();
@@ -92,10 +98,10 @@ export default class ImageDrawable extends BaseDrawable implements IImageDrawabl
         context.imageSmoothingEnabled = false;
         context.drawImage(this.source, 0, 0, width, height);
         return new (<any>this.constructor)(offscreenCanvas, this.meta, {
-            ...this.ownProperties,
+            ...this.properties,
             width: undefined,
             height: undefined,
-            overlays: this.ownProperties.overlays?.map(overlay => overlay.resize(width, height)),
+            overlays: this.properties.overlays?.map(overlay => overlay.resize(width, height)),
         });
     }
 
@@ -115,12 +121,12 @@ export default class ImageDrawable extends BaseDrawable implements IImageDrawabl
         context.imageSmoothingEnabled = false;
         context.drawImage(this.source, 0, 0, newWidth, newHeight);
         const drawable = new (<any>this.constructor)(offscreenCanvas, this.meta, {
-            ...this.ownProperties,
-            width: this.ownProperties.width === undefined ? undefined : this.ownProperties.width * scaleX,
-            height: this.ownProperties.height === undefined ? undefined : this.ownProperties.height * scaleY,
-            offsetX: this.ownProperties.offsetX === undefined ? undefined : this.ownProperties.offsetX * scaleX,
-            offsetY: this.ownProperties.offsetY === undefined ? undefined : this.ownProperties.offsetY * scaleY,
-            overlays: this.ownProperties.overlays?.map(overlay => overlay.scale(scaleX, scaleY)),
+            ...this.properties,
+            width: this.properties.width === undefined ? undefined : this.properties.width * scaleX,
+            height: this.properties.height === undefined ? undefined : this.properties.height * scaleY,
+            offsetX: this.properties.offsetX === undefined ? undefined : this.properties.offsetX * scaleX,
+            offsetY: this.properties.offsetY === undefined ? undefined : this.properties.offsetY * scaleY,
+            overlays: this.properties.overlays?.map(overlay => overlay.scale(scaleX, scaleY)),
         });
         return drawable;
     }
@@ -143,7 +149,7 @@ export default class ImageDrawable extends BaseDrawable implements IImageDrawabl
         context.restore();
 
         return new (<any>this.constructor)(offscreenCanvas, this.meta, {
-            ...this.ownProperties,
+            ...this.properties,
         });
     }
 }
