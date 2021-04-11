@@ -1,13 +1,11 @@
 import { ResourceMeta } from '@/object/IGameObjectProperties';
-import { Memoize } from '@/utils/memoize-decorator';
+import BaseImageDrawable from './BaseImageDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
 import { IImageDrawable, ImageDrawableProperties } from './IImageDrawable';
 
-export default class AnimatedImageDrawable implements IImageDrawable {
+export default class AnimatedImageDrawable extends BaseImageDrawable {
     readonly type = DrawableType.ANIMATED_IMAGE;
-    inheritedProperties: ImageDrawableProperties = {};
-    ownProperties: ImageDrawableProperties;
     meta;
 
     drawables;
@@ -23,6 +21,8 @@ export default class AnimatedImageDrawable implements IImageDrawable {
         loop = true,
         properties: ImageDrawableProperties = {},
     ) {
+        super();
+
         if (drawables.length !== durations.length) {
             throw new Error('Timings do not match animated drawables');
         }
@@ -80,6 +80,10 @@ export default class AnimatedImageDrawable implements IImageDrawable {
         return this.currentDrawable.isRenderPass(pass);
     }       
 
+    isLoaded(): boolean {
+        return this.drawables.every(drawable => drawable.isLoaded());
+    }
+
     draw(context: CanvasRenderingContext2D, drawX: number, drawY: number): void {
         if (this.currentDrawable !== undefined) {
             this.currentDrawable.draw(context, drawX, drawY);
@@ -95,21 +99,17 @@ export default class AnimatedImageDrawable implements IImageDrawable {
         );
     }
 
-    @Memoize(true)
-    resize(width: number, height: number): this {
+    protected _resize(width: number, height: number): this {
         return this.copy(this.drawables.map(drawable =>
-            drawable.resize(width, height)));
+            drawable.resize(width, height)) as IImageDrawable[]);
+    }
+    protected _scale(scaleX: number, scaleY: number): this {
+        return this.copy(this.drawables.map(drawable =>
+            drawable.scale(scaleX, scaleY)) as IImageDrawable[]);
     }
 
-    @Memoize(true)
-    scale(scaleX: number, scaleY: number = scaleX): this {
+    protected _colorMask(color: Color): this {
         return this.copy(this.drawables.map(drawable =>
-            drawable.scale(scaleX, scaleY)));
-    }
-
-    @Memoize(true)
-    colorMask(color: Color): this {
-        return this.copy(this.drawables.map(drawable =>
-            drawable.colorMask(color)));
+            drawable.colorMask(color)) as IImageDrawable[]);
     }
 }

@@ -1,17 +1,13 @@
 import { CLIENT_SPRITES_RELATIVE_URL } from '@/config';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
-import { Memoize } from '@/utils/memoize-decorator';
-import BaseDrawable from './BaseDrawable';
+import BaseImageDrawable from './BaseImageDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
 import { IImageDrawable, ImageDrawableProperties } from './IImageDrawable';
 
 type Source = HTMLImageElement | HTMLCanvasElement | OffscreenCanvas;
-export default class ImageDrawable extends BaseDrawable implements IImageDrawable {
+export default class ImageDrawable extends BaseImageDrawable implements IImageDrawable {
     readonly type = DrawableType.IMAGE;
-    inheritedProperties: ImageDrawableProperties = {};
-    ownProperties: ImageDrawableProperties;
-    _properties?: ImageDrawableProperties;
     meta;
 
     source;
@@ -34,24 +30,21 @@ export default class ImageDrawable extends BaseDrawable implements IImageDrawabl
         this.ownProperties = properties;
     }
 
-    setInheritedProperties(properties: ImageDrawableProperties = {}): void {
-        this.inheritedProperties = properties;
-        this._properties = undefined;
+    get properties(): ImageDrawableProperties {
+        return super.properties;
     }
 
-    get properties(): ImageDrawableProperties {
-        if (this._properties !== undefined) {
-            return this._properties;
+    isLoaded(): boolean {
+        if (!(this.source instanceof HTMLImageElement)) {
+            return true;
         }
 
-        return Object.assign({}, this.inheritedProperties, this.ownProperties);
+        return this.source.complete && this.source.naturalHeight !== 0 &&
+            this.source.naturalWidth !== 0;
     }
 
     checkSourceComplete(): void {
-        if (this.source instanceof HTMLImageElement
-            && (!this.source.complete
-                || this.source.naturalHeight === 0
-                || this.source.naturalWidth === 0)) {
+        if (!this.isLoaded()) {
             throw new Error('Source incomplete');
         }
     }
@@ -67,19 +60,19 @@ export default class ImageDrawable extends BaseDrawable implements IImageDrawabl
     }
 
     draw(context: CanvasRenderingContext2D, drawX: number, drawY: number): void {
-        this.checkSourceComplete();
-
         let drawable;
         if (this.properties.width !== undefined && this.properties.height !== undefined) {
             drawable = this.resize(this.properties.width, this.properties.height);
+            if (drawable === undefined) {
+                return;
+            }
+
             drawable.draw(context, drawX, drawY);
             return;
         }
 
         drawX += this.properties.offsetX ?? 0;
         drawY += this.properties.offsetY ?? 0;
-
-
 
         context.save();
         if (this.properties.compositionType !== undefined) {
@@ -91,10 +84,7 @@ export default class ImageDrawable extends BaseDrawable implements IImageDrawabl
         this.applyOverlays(context, drawX, drawY);
     }
 
-    @Memoize(true)
-    resize(width: number, height: number): this {
-        this.checkSourceComplete();
-
+    _resize(width: number, height: number): this {
         const offscreenCanvas = new OffscreenCanvas(width, height);
         const context = offscreenCanvas.getContext('2d');
         if (context === null) {
@@ -111,10 +101,7 @@ export default class ImageDrawable extends BaseDrawable implements IImageDrawabl
         });
     }
 
-    @Memoize(true)
-    scale(scaleX: number, scaleY: number = scaleX): this {
-        this.checkSourceComplete();
-
+    _scale(scaleX: number, scaleY: number = scaleX): this {
         const newWidth = this.source.width * scaleX;
         const newHeight = this.source.height * scaleY;
 
@@ -137,10 +124,7 @@ export default class ImageDrawable extends BaseDrawable implements IImageDrawabl
         return drawable;
     }
 
-    @Memoize(true)
-    colorMask(color: Color): this {
-        this.checkSourceComplete();
-
+    _colorMask(color: Color): this {
         const offscreenCanvas = new OffscreenCanvas(this.source.width, this.source.height);
         const context = offscreenCanvas.getContext('2d');
         if (context === null) {

@@ -44,6 +44,7 @@
     "cors": "^2.8.5",
     "eventemitter3": "^4.0.7",
     "express": "^4.17.1",
+    "many-keys-map": "^1.0.3",
     "mem": "^8.1.0",
     "nipplejs": "^0.9.0",
     "performance-now": "^2.1.0",

@@ -1,5 +1,6 @@
 import { BulletPower } from '@/bullet/BulletPower';
 import AnimatedImageDrawable from '@/drawable/AnimatedImageDrawable';
+import IDrawable from '@/drawable/IDrawable';
 import ImageDrawable from '@/drawable/ImageDrawable';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
@@ -7,9 +8,8 @@ import { TankSmoke } from '@/tank/TankSmoke';
 import { TankTier } from '@/tank/TankTier';
 import { GameObjectType } from './GameObjectType';
 import { RenderPass } from './IGameObjectProperties';
-import IBaseDrawable from '@/drawable/IBaseDrawable';
 
-const drawables: Partial<Record<GameObjectType, IBaseDrawable[]>> = {
+const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
     [GameObjectType.STEEL_WALL]: [
         new ImageDrawable('steel_wall.png'),
     ],
@@ -59,7 +59,7 @@ const drawables: Partial<Record<GameObjectType, IBaseDrawable[]>> = {
         }),
     ],
     [GameObjectType.TANK]: [
-        ...((): IBaseDrawable[] => {
+        ...((): IDrawable[] => {
             const generateTankTierDirectionFrame = (
                 tier: TankTier,
                 direction: Direction,
@@ -116,7 +116,7 @@ const drawables: Partial<Record<GameObjectType, IBaseDrawable[]>> = {
 
             return drawables;
         })(),
-        ...((): IBaseDrawable[] => {
+        ...((): IDrawable[] => {
             const drawables = [];
 
             for (const smoke of Object.values(TankSmoke)) {
@@ -141,7 +141,7 @@ const drawables: Partial<Record<GameObjectType, IBaseDrawable[]>> = {
         })(),
     ],
     [GameObjectType.BULLET]: [
-        ...((): IBaseDrawable[] => {
+        ...((): IDrawable[] => {
             const drawables = [];
 
             for (const power of Object.values(BulletPower)) {
@@ -199,7 +199,7 @@ const drawables: Partial<Record<GameObjectType, IBaseDrawable[]>> = {
 };
 
 export default class GameObjectDrawables {
-    static getTypeDrawables(type: GameObjectType): IBaseDrawable[] | undefined {
+    static getTypeDrawables(type: GameObjectType): IDrawable[] | undefined {
         return drawables[type];
     }
 }

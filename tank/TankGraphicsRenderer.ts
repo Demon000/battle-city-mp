@@ -1,5 +1,5 @@
 import { DrawableType } from '@/drawable/DrawableType';
-import IBaseDrawable from '@/drawable/IBaseDrawable';
+import IDrawable from '@/drawable/IDrawable';
 import { IImageDrawable } from '@/drawable/IImageDrawable';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
@@ -22,9 +22,9 @@ export default class TankGraphicsRenderer extends GameObjectGraphicsRenderer<Tan
         return true;
     }
 
-    protected processDrawable(drawable: IBaseDrawable): IBaseDrawable {
+    protected processDrawable(drawable: IDrawable | undefined): IDrawable | undefined {
         drawable = super.processDrawable(drawable);
-        if (drawable.meta && drawable.meta.isTankDrawable
+        if (drawable !== undefined && drawable.meta !== undefined && drawable.meta.isTankDrawable
             && (drawable.type === DrawableType.ANIMATED_IMAGE
                 || drawable.type === DrawableType.IMAGE)) {
             drawable = (drawable as IImageDrawable).colorMask(this.object.color);

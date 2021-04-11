@@ -1,4 +1,4 @@
-import IBaseDrawable from '@/drawable/IBaseDrawable';
+import IDrawable from '@/drawable/IDrawable';
 
 export enum RenderPass {
     ALL = 0,
@@ -34,6 +34,6 @@ export default interface IGameObjectProperties {
     directionAxisSnapping?: number;
     automaticDestroyTime?: number;
 
-    drawables?: IBaseDrawable[];
+    drawables?: IDrawable[];
     audioEffects?: IAudioEffect[];
 }

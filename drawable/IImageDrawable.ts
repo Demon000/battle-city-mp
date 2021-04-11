@@ -1,7 +1,7 @@
 import { Color } from './Color';
-import IBaseDrawable, { BaseDrawableProperties } from './IBaseDrawable';
+import IDrawable, { DrawableProperties } from './IDrawable';
 
-export interface ImageDrawableProperties extends BaseDrawableProperties {
+export interface ImageDrawableProperties extends DrawableProperties {
     offsetX?: number;
     offsetY?: number;
     width?: number;
@@ -10,6 +10,6 @@ export interface ImageDrawableProperties extends BaseDrawableProperties {
     overlays?: IImageDrawable[];
 }
 
-export interface IImageDrawable extends IBaseDrawable {
-    colorMask(color: Color): this;
+export interface IImageDrawable extends IDrawable {
+    colorMask(color: Color): this | undefined;
 }
