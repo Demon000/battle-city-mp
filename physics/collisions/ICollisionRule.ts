@@ -1,5 +1,4 @@
 import { GameObjectType } from '@/object/GameObjectType';
-import { Position } from 'nipplejs';
 
 export enum CollisionResultEvent {
     PREVENT_MOVEMENT = 'prevent-movement',
@@ -15,7 +14,7 @@ export enum CollisionEvent {
     TANK_ON_ICE = 'tank-on-ice',
 }
 
-type CollisionEventHandler = (movingObjectId: number, position: Position, staticObjectId: number) => void;
+type CollisionEventHandler = (movingObjectId: number, staticObjectId: number) => void;
 
 export interface CollisionEvents {
     [CollisionEvent.BULLET_HIT_BRICK_WALL]: CollisionEventHandler,

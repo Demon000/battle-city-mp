@@ -205,7 +205,7 @@ export default class CollisionService {
         for (const [name, overlappingObject] of notifications) {
             const overlappingBoundingBox = overlappingObject.getBoundingBox();
             if (BoundingBoxUtils.overlapsEqual(preventedBoundingBox, overlappingBoundingBox)) {
-                this.emitter.emit(name, objectId, position, overlappingObject.id);
+                this.emitter.emit(name, objectId, overlappingObject.id);
             }
         }
     }
