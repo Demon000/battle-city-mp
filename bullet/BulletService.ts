@@ -4,7 +4,6 @@ import { GameObjectType } from '@/object/GameObjectType';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import DirectionUtils from '@/physics/collisions/DirectionUtils';
 import { Direction } from '@/physics/Direction';
-import Point from '@/physics/point/Point';
 import Tank from '@/tank/Tank';
 import MapRepository from '@/utils/MapRepository';
 import { EventEmitter } from 'eventemitter3';
