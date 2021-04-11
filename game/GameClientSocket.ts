@@ -6,6 +6,7 @@ import GameObjectFactory from '../object/GameObjectFactory';
 import Player, { PlayerOptions } from '../player/Player';
 import GameClient from './GameClient';
 import { BatchGameEvent, GameEvent } from './GameEvent';
+import { GameServerStatus } from './GameServerStatus';
 
 export default class GameClientSocket {
     socket;
@@ -16,7 +17,19 @@ export default class GameClientSocket {
         this.socket = socket;
         this.gameClient = gameClient;
 
-        this.listen();
+        this.socket.on(GameEvent.BATCH,
+            this.onBatch.bind(this));
+
+        this.socket.on('connect', () => {
+            this.gameClient.ticker.start();
+            console.log('Connected');
+        });
+
+        this.socket.on('disconnect', () => {
+            this.gameClient.ticker.stop();
+        });
+
+        this.socket.connect();
     }
 
     createPlayer(playerOptions: PlayerOptions): Player {
@@ -27,9 +40,12 @@ export default class GameClientSocket {
         return player;
     }
 
-    onPlayersAdded(playerOptions: PlayerOptions[]): void {
-        const players = playerOptions.map(o => this.createPlayer(o));
+    onServerStatus(serverStatus: GameServerStatus): void {
+        this.gameClient.clear();
+        const players = serverStatus.playersOptions.map(o => this.createPlayer(o));
         this.gameClient.onPlayersAddedOnServer(players);
+        const objects = serverStatus.objectsOptions.map(o => GameObjectFactory.buildFromOptions(o));
+        this.gameClient.onObjectsRegisteredOnServer(objects);
     }
 
     onPlayerAdded(playerOptions: PlayerOptions): void {
@@ -44,11 +60,6 @@ export default class GameClientSocket {
 
     onPlayerRemoved(playerId: string): void {
         this.gameClient.onPlayerRemovedOnServer(playerId);
-    }
-
-    onObjectsRegistered(objectOptions: GameObjectOptions[]): void {
-        const objects = objectOptions.map(o => GameObjectFactory.buildFromOptions(o));
-        this.gameClient.onObjectsRegisteredOnServer(objects);
     }
 
     onObjectRegistered(objectOptions: GameObjectOptions): void {
@@ -66,8 +77,8 @@ export default class GameClientSocket {
 
     onEvent(batch: BatchGameEvent): void {
         switch (batch[0]) {
-            case GameEvent.PLAYERS_ADDED:
-                this.onPlayersAdded(batch[1]);
+            case GameEvent.SERVER_STATUS:
+                this.onServerStatus(batch[1]);
                 break;
             case GameEvent.PLAYER_ADDED:
                 this.onPlayerAdded(batch[1]);
@@ -77,9 +88,6 @@ export default class GameClientSocket {
                 break;
             case GameEvent.PLAYER_REMOVED:
                 this.onPlayerRemoved(batch[1]);
-                break;
-            case GameEvent.OBJECTS_REGISTERD:
-                this.onObjectsRegistered(batch[1]);
                 break;
             case GameEvent.OBJECT_REGISTERED:
                 this.onObjectRegistered(batch[1]);
@@ -97,23 +105,6 @@ export default class GameClientSocket {
 
     onBatch(events: any[]): void {
         events.forEach(this.onEvent, this);
-    }
-
-    listen(): void {
-        this.socket.on(GameEvent.BATCH,
-            this.onBatch.bind(this));
-
-        this.socket.on('connect', () => {
-            this.gameClient.ticker.start();
-            console.log('Connected');
-        });
-
-        this.socket.on('disconnect', () => {
-            this.gameClient.ticker.stop();
-            this.gameClient.clear();
-        });
-
-        this.socket.connect();
     }
 
     requestPlayerTankSpawn(): void {

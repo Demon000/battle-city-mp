@@ -15,8 +15,7 @@ export enum PlayerServiceEvent {
     PLAYER_REQUESTED_SHOOT = 'player-requested-shoot',
     PLAYER_REQUESTED_SPAWN_STATUS = 'player-requested-spawn-status',
 
-    PLAYER_REQUESTED_GAME_OBJECTS = 'player-requested-game-objects',
-    PLAYER_REQUESTED_PLAYERS = 'player-requested-players',
+    PLAYER_REQUESTED_SERVER_STATUS = 'player-requested-server-status',
 }
 
 interface PlayerServiceEvents {
@@ -26,8 +25,7 @@ interface PlayerServiceEvents {
     [PlayerServiceEvent.PLAYER_REQUESTED_MOVE]: (playerId: string, direction: Direction | undefined) => void,
     [PlayerServiceEvent.PLAYER_REQUESTED_SHOOT]: (playerId: string, isShooting: boolean) => void,
     [PlayerServiceEvent.PLAYER_REQUESTED_SPAWN_STATUS]: (playerId: string, spawnStatus: PlayerSpawnStatus) => void,
-    [PlayerServiceEvent.PLAYER_REQUESTED_GAME_OBJECTS]: (playerId: string) => void,
-    [PlayerServiceEvent.PLAYER_REQUESTED_PLAYERS]: (playerId: string) => void,
+    [PlayerServiceEvent.PLAYER_REQUESTED_SERVER_STATUS]: (playerId: string) => void,
 }
 
 export default class PlayerService {
@@ -96,14 +94,9 @@ export default class PlayerService {
         player.disconnected = true;
     }
 
-    setPlayerRequestedGameObjects(playerId: string): void {
+    setPlayerRequestedServerStatus(playerId: string): void {
         const player = this.repository.get(playerId);
-        player.requestedGameObjects = true;
-    }
-
-    setPlayerRequestedPlayers(playerId: string): void {
-        const player = this.repository.get(playerId);
-        player.requestedPlayers = true;
+        player.requestedServerStatus = true;
     }
 
     setPlayerRequestedTankTier(playerId: string, tier: TankTier): void {
@@ -192,18 +185,11 @@ export default class PlayerService {
         this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_SHOOT, player.id, isShooting);
     }
 
-    private processPlayerGameObjectRequest(player: Player): void {
-        if (player.requestedGameObjects) {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_GAME_OBJECTS, player.id);
+    private processPlayerServerStatusRequest(player: Player): void {
+        if (player.requestedServerStatus) {
+            this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_SERVER_STATUS, player.id);
         }
-        player.requestedGameObjects = false;
-    }
-
-    private processPlayerPlayersRequest(player: Player): void {
-        if (player.requestedPlayers) {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_PLAYERS, player.id);
-        }
-        player.requestedPlayers = false;
+        player.requestedServerStatus = false;
     }
 
     processPlayersStatus(): void {
@@ -215,8 +201,7 @@ export default class PlayerService {
                 continue;
             }
 
-            this.processPlayerGameObjectRequest(player);
-            this.processPlayerPlayersRequest(player);
+            this.processPlayerServerStatusRequest(player);
             this.processPlayerMovement(player);
             this.processPlayerShooting(player);
         }

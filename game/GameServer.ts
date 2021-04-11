@@ -75,16 +75,15 @@ export default class GameServer {
         /**
          * PlayerService event handlers
          */
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_GAME_OBJECTS,
+        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_SERVER_STATUS,
             (playerId: string) => {
-                const objects = this.gameObjectService.getObjects().map(object => object.toOptions());
-                this.gameEventBatcher.addPlayerEvent(playerId, [GameEvent.OBJECTS_REGISTERD, objects]);
-            });
-
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_PLAYERS,
-            (playerId: string) => {
-                const players = this.playerService.getPlayers().map(player => player.toOptions());
-                this.gameEventBatcher.addPlayerEvent(playerId, [GameEvent.PLAYERS_ADDED, players]);
+                const objectsOptions = this.gameObjectService.getObjects().map(object => object.toOptions());
+                const playersOptions = this.playerService.getPlayers().map(player => player.toOptions());
+                this.gameEventBatcher.addPlayerEvent(playerId, [GameEvent.SERVER_STATUS, {
+                    objectsOptions,
+                    playersOptions,
+                    tps: SERVER_CONFIG_TPS,
+                }]);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_ADDED,
@@ -319,12 +318,8 @@ export default class GameServer {
         this.gameMapService.loadFromFile('./maps/simple.json');
     }
 
-    onPlayerRequestedGameObjectsFromClient(playerId: string): void {
-        this.playerService.setPlayerRequestedGameObjects(playerId);
-    }
-
-    onPlayerRequestedPlayersFromClient(playerId: string): void {
-        this.playerService.setPlayerRequestedPlayers(playerId);
+    onPlayerRequestedServerStatusFromClient(playerId: string): void {
+        this.playerService.setPlayerRequestedServerStatus(playerId);
     }
 
     onPlayerActionFromClient(playerId: string, action: Action): void {
@@ -335,8 +330,7 @@ export default class GameServer {
 
     onPlayerConnectedFromClient(playerId: string): void {
         this.playerService.createPlayer(playerId);
-        this.playerService.setPlayerRequestedGameObjects(playerId);
-        this.playerService.setPlayerRequestedPlayers(playerId);
+        this.playerService.setPlayerRequestedServerStatus(playerId);
     }
 
     onPlayerRequestSpawnStatusFromClient(playerId: string, spawnStatus: PlayerSpawnStatus): void {

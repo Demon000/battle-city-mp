@@ -19,8 +19,7 @@ export default class Player {
     lastRequestedDirection: Direction | undefined;
     lastIsShooting = false;
     requestedSpawnStatus = PlayerSpawnStatus.NONE;
-    requestedGameObjects = false;
-    requestedPlayers = false;
+    requestedServerStatus = false;
     requestedTankTier = TankTier.LIGHT;
     requestedTankColor?: Color;
     disconnected = false;

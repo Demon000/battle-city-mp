@@ -58,12 +58,8 @@ io.on('connection', (socket: IO.Socket) => {
         gameServer.onPlayerActionFromClient(socket.id, action);
     });
 
-    socket.on(GameEvent.PLAYER_REQUEST_GAME_OBJECTS, () => {
-        gameServer.onPlayerRequestedGameObjectsFromClient(socket.id);
-    });
-
-    socket.on(GameEvent.PLAYER_REQUEST_PLAYERS, () => {
-        gameServer.onPlayerRequestedPlayersFromClient(socket.id);
+    socket.on(GameEvent.PLAYER_REQUEST_SERVER_STATUS, () => {
+        gameServer.onPlayerRequestedServerStatusFromClient(socket.id);
     });
 
     socket.on(GameEvent.PLAYER_REQUEST_TANK_SPAWN, () => {
