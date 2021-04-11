@@ -9,7 +9,7 @@
     "lint-fix": "eslint . --fix --ext .ts --ext .vue",
     "server-build": "ttsc",
     "server-prod": "node build/server/index.js",
-    "server-dev": "ts-node-dev -r tsconfig-paths/register server/index.ts"
+    "server-dev": "ts-node-dev -r tsconfig-paths/register --watch .env server/index.ts"
   },
   "devDependencies": {
     "@types/express": "^4.17.11",
