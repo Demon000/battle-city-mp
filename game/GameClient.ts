@@ -51,31 +51,8 @@ export default class GameClient {
         this.ticker.emitter.on(TickerEvent.TICK, this.onTick, this);
     }
 
-    updateCameraWatchedObject(): void {
-        const player = this.playerService.getOwnPlayer();
-        if (player === undefined || player.tankId === null) {
-            return;
-        }
-
-        const tank = this.gameObjectService.findObject(player.tankId);
-        this.gameCamera.setWatchedObject(tank);
-    }
-
-    updateCameraWatchedPosition(objectId: number): void {
-        if (objectId === this.gameCamera.watchedObject?.id) {
-            this.gameCamera.updateWatchedPosition();
-        }
-    }
-
-    unsetCameraWatchedObject(objectId: number): void {
-        if (this.gameCamera.watchedObject?.id === objectId) {
-            this.gameCamera.watchedObject = undefined;
-        }
-    }
-
     onObjectChangedOnServer(objectId: number, objectOptions: PartialGameObjectOptions): void {
         this.gameObjectService.updateObject(objectId, objectOptions);
-        this.updateCameraWatchedPosition(objectId);
     }
 
     onObjectsRegisteredOnServer(objects: GameObject[]): void {
@@ -87,7 +64,6 @@ export default class GameClient {
     onObjectRegisteredOnServer(object: GameObject): void {
         this.gameObjectService.registerObject(object);
         this.collisionService.registerObjectCollisions(object.id);
-        this.updateCameraWatchedObject();
     }
 
     onObjectUnregisteredOnServer(objectId: number): void {
@@ -95,7 +71,6 @@ export default class GameClient {
         this.collisionService.unregisterObjectCollisions(objectId);
         this.gameGraphicsService.removeObjectGraphicsRenderer(objectId);
         this.gameAudioService.removeObjectAudioRenderer(objectId);
-        this.unsetCameraWatchedObject(objectId);
     }
 
     onPlayersAddedOnServer(players: Player[]): void {
@@ -104,12 +79,10 @@ export default class GameClient {
 
     onPlayerAddedOnServer(player: Player): void {
         this.playerService.addPlayer(player);
-        this.updateCameraWatchedObject();
     }
 
     onPlayerChangedOnServer(player: Player): void {
         this.playerService.updatePlayer(player);
-        this.updateCameraWatchedObject();
     }
 
     onPlayerRemovedOnServer(playerId: string): void {
@@ -117,6 +90,18 @@ export default class GameClient {
     }
 
     onTick(): void {
+        const ownPlayer = this.playerService.getOwnPlayer();
+        if (ownPlayer === undefined) {
+            return;
+        }
+
+        if (ownPlayer.tankId !== null) {
+            const tank = this.gameObjectService.findObject(ownPlayer.tankId);
+            if (tank !== undefined) {
+                this.gameCamera.setPosition(tank.centerPosition);
+            }
+        }
+
         const position = this.gameCamera.getPosition();
         if (position === undefined) {
             return;
