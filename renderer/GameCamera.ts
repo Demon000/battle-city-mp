@@ -1,56 +1,45 @@
 import GameObject from '@/object/GameObject';
-import { Direction } from '@/physics/Direction';
 import Point from '@/physics/point/Point';
 
 export default class GameCamera {
     private lastUpdateSeconds?: number;
     private lastPosition?: Point;
+    private currentPosition?: Point;
+    private interpolationSeconds = 0;
     watchedObject?: GameObject;
 
-    getCurrentSeconds(): number {
+    private getCurrentSeconds(): number {
         return Date.now() / 1000;
     }
 
-    setWatchedObject(object: GameObject | undefined): void {
-        this.watchedObject = object;
-        this.updateWatchedPosition();
+    setInterpolationTime(seconds: number): void {
+        this.interpolationSeconds = seconds;
     }
 
-    updateWatchedPosition(): void {
-        if (this.watchedObject === undefined) {
-            return;
+    setPosition(position: Point): void {
+        if (this.lastPosition === undefined) {
+            this.lastPosition = position;
+        } else {
+            this.lastPosition = this.currentPosition;
         }
-
-        this.lastPosition = this.watchedObject.centerPosition;
+        this.currentPosition = position;
         this.lastUpdateSeconds = this.getCurrentSeconds();
     }
 
     getPosition(): Point | undefined {
-        const currentSeconds = this.getCurrentSeconds();
-        if (this.lastUpdateSeconds === undefined || this.lastPosition === undefined) {
+        if (this.lastUpdateSeconds === undefined || this.lastPosition === undefined
+            || this.currentPosition === undefined) {
             return undefined;
         }
 
-        if (this.watchedObject === undefined) {
-            return this.lastPosition;
-        }
-
-        console.log(currentSeconds, this.lastUpdateSeconds);
-        const distance = this.watchedObject.movementSpeed * (currentSeconds - this.lastUpdateSeconds);
-        console.log(distance);
-        if (this.watchedObject.direction === Direction.UP) {
-            this.lastPosition.y -= distance;
-        } else if (this.watchedObject.direction === Direction.RIGHT) {
-            this.lastPosition.x += distance;
-        } else if (this.watchedObject.direction === Direction.DOWN) {
-            this.lastPosition.y += distance;
-        } else if (this.watchedObject.direction === Direction.LEFT) {
-            this.lastPosition.x -= distance;
-        }
+        const secondsDelta = this.getCurrentSeconds() - this.lastUpdateSeconds;
+        const interpolationValue = secondsDelta * this.interpolationSeconds;
+        const deltaX = interpolationValue * (this.currentPosition.x - this.lastPosition.x);
+        const deltaY = interpolationValue * (this.currentPosition.y - this.lastPosition.y);
 
         return {
-            x: Math.floor(this.lastPosition.x),
-            y: Math.floor(this.lastPosition.y),
+            x: Math.floor(this.lastPosition.x + deltaX),
+            y: Math.floor(this.lastPosition.y + deltaY),
         };
     }
 }

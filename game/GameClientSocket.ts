@@ -46,6 +46,7 @@ export default class GameClientSocket {
         this.gameClient.onPlayersAddedOnServer(players);
         const objects = serverStatus.objectsOptions.map(o => GameObjectFactory.buildFromOptions(o));
         this.gameClient.onObjectsRegisteredOnServer(objects);
+        this.gameClient.onTpsSetOnServer(serverStatus.tps);
     }
 
     onPlayerAdded(playerOptions: PlayerOptions): void {
