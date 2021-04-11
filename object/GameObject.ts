@@ -101,9 +101,13 @@ export default class GameObject {
     }
 
     get centerPosition(): Point {
+        return this.getCenterPosition();
+    }
+
+    getCenterPosition(position=this.position): Point {
         return {
-            x: this.position.x + this.width / 2,
-            y: this.position.y + this.height / 2,
+            x: position.x + this.width / 2,
+            y: position.y + this.height / 2,
         };
     }
 
