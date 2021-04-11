@@ -36,19 +36,18 @@ export default class BulletService {
         return object as Bullet;
     }
 
-    getBulletBrickWallDestroyBox(bulletId: number, position: Point, brickWallId: number): BoundingBox {
+    getBulletBrickWallDestroyBox(bulletId: number, brickWallId: number): BoundingBox {
         const bullet = this.getBullet(bulletId);
         const brickWall = this.repository.get(brickWallId);
         const box = brickWall.getBoundingBox();
 
-        const bulletCenterPositionX = position.x + bullet.width / 2;
-        const bulletCenterPositionY = position.y + bullet.height / 2;
+        const bulletCenter = bullet.centerPosition;
         const brickWallCenterPosition = brickWall.centerPosition;
 
         const brickWallWidth = brickWall.properties.width;
         const brickWallHeight = brickWall.properties.height;
         if (DirectionUtils.isHorizontalAxis(bullet.direction)) {
-            if (bulletCenterPositionY > brickWallCenterPosition.y) {
+            if (bulletCenter.y > brickWallCenterPosition.y) {
                 box.tl.y -= brickWallHeight;
                 box.br.y += brickWallHeight * 2;
             } else {
@@ -64,7 +63,7 @@ export default class BulletService {
                 }
             }
         } else {
-            if (bulletCenterPositionX > brickWallCenterPosition.x) {
+            if (bulletCenter.x > brickWallCenterPosition.x) {
                 box.tl.x -= brickWallWidth;
                 box.br.x += brickWallWidth * 2;
             } else {
