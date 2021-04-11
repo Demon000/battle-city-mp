@@ -57,5 +57,6 @@
     "vue-router": "^4.0.5",
     "vuex": "^4.0.0",
     "yargs": "^16.2.0"
-  }
+  },
+  "browserslist": "> 0.5% and not dead and not ie 11"
 }
