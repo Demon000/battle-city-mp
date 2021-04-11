@@ -35,7 +35,8 @@ export default abstract class BaseDrawable implements IDrawable {
             return this._properties;
         }
 
-        return Object.assign({}, this.inheritedProperties, this.ownProperties);
+        this._properties = Object.assign({}, this.inheritedProperties, this.ownProperties);
+        return this._properties;
     }
 
     resize(width: number, height: number): this | undefined {
