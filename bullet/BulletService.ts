@@ -83,32 +83,11 @@ export default class BulletService {
     }
 
     spawnBulletForTank(tank: Tank): void {
-        const box = tank.getBoundingBox();
         const objectCenterPosition = tank.centerPosition;
         const properties = GameObjectProperties.getTypeProperties(GameObjectType.BULLET);
 
-        let bulletY;
-        let bulletX;
-        switch (tank.direction) {
-            case Direction.UP:
-                bulletY = tank.position.y - properties.height;
-                bulletX = objectCenterPosition.x - properties.width / 2;
-                break;
-            case Direction.RIGHT:
-                bulletY = objectCenterPosition.y - properties.height / 2;
-                bulletX = box.br.x;
-                break;
-            case Direction.DOWN:
-                bulletY = box.br.y;
-                bulletX = objectCenterPosition.x - properties.width / 2;
-                break;
-            case Direction.LEFT:
-                bulletY = objectCenterPosition.y - properties.height / 2;
-                bulletX = tank.position.x - properties.width;
-                break;
-            default:
-                throw new Error('Invalid direction');
-        }
+        let bulletY = objectCenterPosition.y - properties.height / 2;
+        let bulletX = objectCenterPosition.x - properties.width / 2;
 
         const bullet = new Bullet({
             type: GameObjectType.BULLET,
