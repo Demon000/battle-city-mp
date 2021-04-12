@@ -54,9 +54,12 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
     }
 
     draw(context: CanvasRenderingContext2D, drawX: number, drawY: number): void {
+        const properties = this.properties;
+        const width = properties.width;
+        const height = properties.height;
         let drawable;
-        if (this.properties.width !== undefined && this.properties.height !== undefined) {
-            drawable = this.resize(this.properties.width, this.properties.height);
+        if (width !== undefined && height !== undefined) {
+            drawable = this.resize(width, height);
             if (drawable === undefined) {
                 return;
             }
@@ -65,12 +68,12 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
             return;
         }
 
-        drawX += this.properties.offsetX ?? 0;
-        drawY += this.properties.offsetY ?? 0;
+        drawX += properties.offsetX ?? 0;
+        drawY += properties.offsetY ?? 0;
 
         context.save();
-        if (this.properties.compositionType !== undefined) {
-            context.globalCompositeOperation = this.properties.compositionType;
+        if (properties.compositionType !== undefined) {
+            context.globalCompositeOperation = properties.compositionType;
         }
         context.drawImage(this.source, drawX, drawY);
         context.restore();
