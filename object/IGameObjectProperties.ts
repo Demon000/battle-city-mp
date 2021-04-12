@@ -1,12 +1,12 @@
 import IDrawable from '@/drawable/IDrawable';
 
 export enum RenderPass {
-    ALL = 0,
-    TANK = 1,
-    BULLET = 1,
-    BUSHES = 2,
-    EXPLOSIONS = 3,
-    SMOKE = 3,
+    ALL,
+    TANK,
+    BULLET = TANK,
+    BUSHES,
+    EXPLOSIONS,
+    SMOKE = EXPLOSIONS,
 }
 
 // eslint-disable-next-line
