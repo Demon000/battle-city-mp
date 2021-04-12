@@ -4,10 +4,11 @@ import BaseImageDrawable from './BaseImageDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
 import { IImageDrawable, ImageDrawableProperties } from './IImageDrawable';
+import ImageUtils, { Source } from './ImageUtils';
 
-type Source = HTMLImageElement | HTMLCanvasElement | OffscreenCanvas;
 export default class ImageDrawable extends BaseImageDrawable implements IImageDrawable {
     readonly type = DrawableType.IMAGE;
+    cachedSource?: Source;
     meta;
 
     source;
@@ -39,6 +40,12 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
             return true;
         }
 
+        const properties = this.properties;
+        if (properties.overlays !== undefined
+            && !properties.overlays.every(overlay => overlay.isLoaded())) {
+            return false;
+        }
+
         return this.source.complete && this.source.naturalHeight !== 0 &&
             this.source.naturalWidth !== 0;
     }
@@ -53,90 +60,89 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         }
     }
 
-    draw(context: CanvasRenderingContext2D, drawX: number, drawY: number): void {
-        const properties = this.properties;
-        const width = properties.width;
-        const height = properties.height;
-        let drawable;
-        if (width !== undefined && height !== undefined) {
-            drawable = this.resize(width, height);
-            if (drawable === undefined) {
-                return;
-            }
+    getCachedSource(): Source {
+        if (this.cachedSource !== undefined) {
+            return this.cachedSource;
+        }
 
-            drawable.draw(context, drawX, drawY);
+        const properties = this.properties;
+        let canvas = this.source;
+        if (properties.width !== undefined && properties.height !== undefined) {
+            canvas = ImageUtils.drawSourceWithSize(canvas, properties.width, properties.height);
+        }
+
+        if (properties.maskColor !== undefined) {
+            canvas = ImageUtils.maskColor(canvas, properties.maskColor);
+        }
+
+        return this.cachedSource = canvas;
+    }
+
+    draw(context: CanvasRenderingContext2D, drawX: number, drawY: number): void {
+        if (!this.isLoaded()) {
             return;
         }
+
+        const source = this.getCachedSource();
+        const properties = this.properties;
 
         drawX += properties.offsetX ?? 0;
         drawY += properties.offsetY ?? 0;
 
-        context.save();
         if (properties.compositionType !== undefined) {
+            context.save();
             context.globalCompositeOperation = properties.compositionType;
         }
-        context.drawImage(this.source, drawX, drawY);
-        context.restore();
+        context.drawImage(source, drawX, drawY);
+        if (properties.compositionType !== undefined) {
+            context.restore();
+        }
 
         this.applyOverlays(context, drawX, drawY);
     }
 
     _resize(width: number, height: number): this {
-        const offscreenCanvas = new OffscreenCanvas(width, height);
-        const context = offscreenCanvas.getContext('2d');
-        if (context === null) {
-            throw new Error('Failed to create offscreen canvas context');
-        }
+        const properties = this.properties;
+        const oldWidth = properties.width ?? this.source.width;
+        const oldHeight = properties.height ?? this.source.height;
+        const scaleX = oldWidth / this.source.width;
+        const scaleY = oldHeight / this.source.height;
+        const offsetX = properties.offsetX && properties.offsetX * scaleX;
+        const offsetY = properties.offsetY && properties.offsetY * scaleY;
 
-        context.imageSmoothingEnabled = false;
-        context.drawImage(this.source, 0, 0, width, height);
-        return new (<any>this.constructor)(offscreenCanvas, this.meta, {
+        return new (<any>this.constructor)(this.source, this.meta, {
             ...this.properties,
-            width: undefined,
-            height: undefined,
-            overlays: this.properties.overlays?.map(overlay => overlay.resize(width, height)),
+            width,
+            height,
+            offsetX,
+            offsetY,
+            overlays: properties.overlays?.map(overlay => overlay.scale(scaleX, scaleY)),
         });
     }
 
     _scale(scaleX: number, scaleY: number = scaleX): this {
-        const newWidth = this.source.width * scaleX;
-        const newHeight = this.source.height * scaleY;
+        const properties = this.properties;
+        const oldWidth = properties.width ?? this.source.width;
+        const oldHeight = properties.height ?? this.source.height;
+        const width = oldWidth * scaleX;
+        const height = oldHeight * scaleY;
+        const offsetX = properties.offsetX && properties.offsetX * scaleX;
+        const offsetY = properties.offsetY && properties.offsetY * scaleY;
 
-        const offscreenCanvas = new OffscreenCanvas(newWidth, newHeight);
-        const context = offscreenCanvas.getContext('2d');
-        if (context === null) {
-            throw new Error('Failed to create offscreen canvas context');
-        }
-
-        context.imageSmoothingEnabled = false;
-        context.drawImage(this.source, 0, 0, newWidth, newHeight);
-        const drawable = new (<any>this.constructor)(offscreenCanvas, this.meta, {
+        return new (<any>this.constructor)(this.source, this.meta, {
             ...this.properties,
-            width: this.properties.width === undefined ? undefined : this.properties.width * scaleX,
-            height: this.properties.height === undefined ? undefined : this.properties.height * scaleY,
-            offsetX: this.properties.offsetX === undefined ? undefined : this.properties.offsetX * scaleX,
-            offsetY: this.properties.offsetY === undefined ? undefined : this.properties.offsetY * scaleY,
+            width,
+            height,
+            offsetX,
+            offsetY,
             overlays: this.properties.overlays?.map(overlay => overlay.scale(scaleX, scaleY)),
         });
-        return drawable;
     }
 
-    _colorMask(color: Color): this {
-        const offscreenCanvas = new OffscreenCanvas(this.source.width, this.source.height);
-        const context = offscreenCanvas.getContext('2d');
-        if (context === null) {
-            throw new Error('Failed to create offscreen canvas context');
-        }
-
-        context.save();
-        context.drawImage(this.source, 0, 0);
-        context.globalCompositeOperation = 'source-in';
-        context.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
-        context.fillRect(0, 0, this.source.width, this.source.height);
-        context.restore();
-
-        return new (<any>this.constructor)(offscreenCanvas, this.meta, {
+    _colorMask(maskColor: Color): this {
+        return new (<any>this.constructor)(this.source, this.meta, {
             ...this.properties,
+            maskColor,
         });
     }
 }
