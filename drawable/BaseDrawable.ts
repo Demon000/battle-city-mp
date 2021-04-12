@@ -53,7 +53,6 @@ export default abstract class BaseDrawable implements IDrawable {
             return cached;
         }
 
-        console.log('miss');
         const drawable = this._resize(width, height);
         this.resizeCache.set(key, drawable);
         return drawable;
@@ -74,7 +73,6 @@ export default abstract class BaseDrawable implements IDrawable {
             return cached;
         }
 
-        console.log('miss');
         const drawble = this._scale(scaleX, scaleY);
         this.scaleCache.set(key, drawble);
         return drawble;
