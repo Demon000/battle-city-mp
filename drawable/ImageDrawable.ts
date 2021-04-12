@@ -8,7 +8,7 @@ import ImageUtils, { Source } from './ImageUtils';
 
 export default class ImageDrawable extends BaseImageDrawable implements IImageDrawable {
     readonly type = DrawableType.IMAGE;
-    cachedSource?: Source;
+    private cachedSource?: Source;
     meta;
 
     source;
