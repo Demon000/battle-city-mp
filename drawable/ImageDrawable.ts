@@ -105,8 +105,8 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         const properties = this.properties;
         const oldWidth = properties.width ?? this.source.width;
         const oldHeight = properties.height ?? this.source.height;
-        const scaleX = oldWidth / this.source.width;
-        const scaleY = oldHeight / this.source.height;
+        const scaleX = width / oldWidth;
+        const scaleY = height / oldHeight;
         const offsetX = properties.offsetX && properties.offsetX * scaleX;
         const offsetY = properties.offsetY && properties.offsetY * scaleY;
 
@@ -126,17 +126,7 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         const oldHeight = properties.height ?? this.source.height;
         const width = oldWidth * scaleX;
         const height = oldHeight * scaleY;
-        const offsetX = properties.offsetX && properties.offsetX * scaleX;
-        const offsetY = properties.offsetY && properties.offsetY * scaleY;
-
-        return new (<any>this.constructor)(this.source, this.meta, {
-            ...this.properties,
-            width,
-            height,
-            offsetX,
-            offsetY,
-            overlays: this.properties.overlays?.map(overlay => overlay.scale(scaleX, scaleY)),
-        });
+        return this._resize(width, height);
     }
 
     _colorMask(maskColor: Color): this {
