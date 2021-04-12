@@ -43,12 +43,6 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
             this.source.naturalWidth !== 0;
     }
 
-    checkSourceComplete(): void {
-        if (!this.isLoaded()) {
-            throw new Error('Source incomplete');
-        }
-    }
-
     applyOverlays(context: CanvasRenderingContext2D, drawX: number, drawY: number): void {
         if (this.properties.overlays === undefined) {
             return;
