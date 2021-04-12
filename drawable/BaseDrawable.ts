@@ -1,13 +1,12 @@
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 import IDrawable, { DrawableProperties } from './IDrawable';
-import ManyKeysMap from 'many-keys-map';
 
 export default abstract class BaseDrawable implements IDrawable {
     abstract type: string;
     abstract meta: ResourceMeta;
 
-    private resizeCache = new ManyKeysMap<[number, number], this>();
-    private scaleCache = new ManyKeysMap<[number, number], this>();
+    private resizeCache = new Map<string, this>();
+    private scaleCache = new Map<string, this>();
 
     protected inheritedProperties: DrawableProperties = {};
     protected ownProperties: DrawableProperties = {};
@@ -39,19 +38,29 @@ export default abstract class BaseDrawable implements IDrawable {
         return this._properties;
     }
 
+    getResizeKey(width: number, height: number): string {
+        return `${width},${height}`;
+    }
+
     resize(width: number, height: number): this | undefined {
         if (!this.isLoaded()) {
             return undefined;
         }
 
-        const cached = this.resizeCache.get([width, height]);
+        const key = this.getResizeKey(width, height);
+        const cached = this.resizeCache.get(key);
         if (cached !== undefined) {
             return cached;
         }
 
+        console.log('miss');
         const drawable = this._resize(width, height);
-        this.resizeCache.set([width, height], drawable);
+        this.resizeCache.set(key, drawable);
         return drawable;
+    }
+
+    getScaleKey(scaleX: number, scaleY: number): string {
+        return `${scaleX},${scaleY}`;
     }
 
     scale(scaleX: number, scaleY: number = scaleX): this | undefined {
@@ -59,13 +68,15 @@ export default abstract class BaseDrawable implements IDrawable {
             return undefined;
         }
 
-        const cached = this.scaleCache.get([scaleX, scaleY]);
+        const key = this.getScaleKey(scaleX, scaleY);
+        const cached = this.scaleCache.get(key);
         if (cached !== undefined) {
             return cached;
         }
 
+        console.log('miss');
         const drawble = this._scale(scaleX, scaleY);
-        this.scaleCache.set([scaleX, scaleY], drawble);
+        this.scaleCache.set(key, drawble);
         return drawble;
     }
 }
