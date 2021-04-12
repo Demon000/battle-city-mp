@@ -14,5 +14,4 @@ export default interface IDrawable {
 
     draw(context: CanvasRenderingContext2D, drawX: number, drawY: number): void;
     scale(scaleX: number, scaleY?: number): this | undefined;
-    resize(width: number, height: number): this | undefined;
 }

@@ -99,11 +99,6 @@ export default class AnimatedImageDrawable extends BaseImageDrawable {
         );
     }
 
-    protected _resize(width: number, height: number): this {
-        return this.copy(this.drawables.map(drawable =>
-            drawable.resize(width, height)) as IImageDrawable[]);
-    }
-
     protected _scale(scaleX: number, scaleY: number): this {
         return this.copy(this.drawables.map(drawable =>
             drawable.scale(scaleX, scaleY)) as IImageDrawable[]);

@@ -101,12 +101,12 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         this.applyOverlays(context, drawX, drawY);
     }
 
-    _resize(width: number, height: number): this {
+    _scale(scaleX: number, scaleY: number = scaleX): this {
         const properties = this.properties;
         const oldWidth = properties.width ?? this.source.width;
         const oldHeight = properties.height ?? this.source.height;
-        const scaleX = width / oldWidth;
-        const scaleY = height / oldHeight;
+        const width = oldWidth * scaleX;
+        const height = oldHeight * scaleY;
         const offsetX = properties.offsetX && properties.offsetX * scaleX;
         const offsetY = properties.offsetY && properties.offsetY * scaleY;
 
@@ -118,15 +118,6 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
             offsetY,
             overlays: properties.overlays?.map(overlay => overlay.scale(scaleX, scaleY)),
         });
-    }
-
-    _scale(scaleX: number, scaleY: number = scaleX): this {
-        const properties = this.properties;
-        const oldWidth = properties.width ?? this.source.width;
-        const oldHeight = properties.height ?? this.source.height;
-        const width = oldWidth * scaleX;
-        const height = oldHeight * scaleY;
-        return this._resize(width, height);
     }
 
     _colorMask(maskColor: Color): this {
