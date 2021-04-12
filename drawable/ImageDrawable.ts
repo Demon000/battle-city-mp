@@ -50,7 +50,7 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
             this.source.naturalWidth !== 0;
     }
 
-    applyOverlays(context: CanvasRenderingContext2D, drawX: number, drawY: number): void {
+    private applyOverlays(context: CanvasRenderingContext2D, drawX: number, drawY: number): void {
         if (this.properties.overlays === undefined) {
             return;
         }
@@ -60,7 +60,7 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         }
     }
 
-    getCachedSource(): Source {
+    private getCachedSource(): Source {
         if (this.cachedSource !== undefined) {
             return this.cachedSource;
         }
