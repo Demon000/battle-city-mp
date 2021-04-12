@@ -2,10 +2,8 @@ import { Color } from './Color';
 import IDrawable, { DrawableProperties } from './IDrawable';
 
 export interface ImageDrawableProperties extends DrawableProperties {
-    offsetX?: number;
-    offsetY?: number;
-    width?: number;
-    height?: number;
+    scaleX?: number;
+    scaleY?: number;
     compositionType?: string;
     maskColor?: Color;
     overlays?: IImageDrawable[];

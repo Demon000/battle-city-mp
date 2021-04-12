@@ -2,6 +2,8 @@ import { ResourceMeta } from '@/object/IGameObjectProperties';
 
 export interface DrawableProperties {
     renderPass?: number;
+    offsetX?: number;
+    offsetY?: number;
 }
 
 export default interface IDrawable {

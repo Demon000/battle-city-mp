@@ -66,9 +66,11 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         }
 
         const properties = this.properties;
+        const scaleX = properties.scaleX ?? 1;
+        const scaleY = properties.scaleY ?? 1;
         let canvas = this.source;
-        if (properties.width !== undefined && properties.height !== undefined) {
-            canvas = ImageUtils.drawSourceWithSize(canvas, properties.width, properties.height);
+        if (scaleX !== 1 && scaleY !== 1) {
+            canvas = ImageUtils.drawSourceWithScale(canvas, scaleX, scaleY);
         }
 
         if (properties.maskColor !== undefined) {
@@ -103,17 +105,15 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
 
     _scale(scaleX: number, scaleY: number = scaleX): this {
         const properties = this.properties;
-        const oldWidth = properties.width ?? this.source.width;
-        const oldHeight = properties.height ?? this.source.height;
-        const width = oldWidth * scaleX;
-        const height = oldHeight * scaleY;
-        const offsetX = properties.offsetX && properties.offsetX * scaleX;
-        const offsetY = properties.offsetY && properties.offsetY * scaleY;
+        const ownScaleX = (properties.scaleX ?? 1) * scaleX;
+        const ownScaleY = (properties.scaleY ?? 1) * scaleY;
+        const offsetX = properties.offsetX && properties.offsetX * ownScaleX;
+        const offsetY = properties.offsetY && properties.offsetY * ownScaleY;
 
         return new (<any>this.constructor)(this.source, this.meta, {
             ...this.properties,
-            width,
-            height,
+            scaleX: ownScaleX,
+            scaleY: ownScaleY,
             offsetX,
             offsetY,
             overlays: properties.overlays?.map(overlay => overlay.scale(scaleX, scaleY)),

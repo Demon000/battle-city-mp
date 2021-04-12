@@ -3,21 +3,19 @@ import { Color } from './Color';
 export type Source = HTMLImageElement | HTMLCanvasElement | OffscreenCanvas;
 
 export default class ImageUtils {
-    static drawSource(source: Source, context?: OffscreenCanvasRenderingContext2D | null): OffscreenCanvas {
-        return this.drawSourceWithSize(source, source.width, source.height, context);
+    static drawSource(source: Source): OffscreenCanvas {
+        return this.drawSourceWithScale(source, 1, 1);
     }
 
-    static drawSourceWithSize(
+    static drawSourceWithScale(
         source: Source,
-        width: number,
-        height: number,
-        context?: OffscreenCanvasRenderingContext2D | null,
+        scaleX: number,
+        scaleY: number,
     ): OffscreenCanvas {
-        if (context === undefined) {
-            const canvas = new OffscreenCanvas(width, height);
-            context = canvas.getContext('2d');
-        }
-
+        const width = source.width * scaleX;
+        const height = source.height * scaleY;
+        const canvas = new OffscreenCanvas(width, height);
+        const context = canvas.getContext('2d');
         if (context === null) {
             throw new Error('Failed to create offscreen canvas context');
         }
@@ -30,13 +28,9 @@ export default class ImageUtils {
     static maskColor(
         source: Source,
         color: Color,
-        context?: OffscreenCanvasRenderingContext2D | null,
     ): OffscreenCanvas {
-        if (context === undefined) {
-            const canvas = new OffscreenCanvas(source.width, source.height);
-            context = canvas.getContext('2d');
-        }
-
+        const canvas = new OffscreenCanvas(source.width, source.height);
+        const context = canvas.getContext('2d');
         if (context === null) {
             throw new Error('Failed to create offscreen canvas context');
         }

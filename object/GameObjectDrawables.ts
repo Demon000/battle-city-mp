@@ -73,18 +73,18 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                     tier,
                 }, {
                     renderPass: RenderPass.TANK,
-                    width: 16,
-                    height: 16,
+                    scaleX: 0.5,
+                    scaleY: 0.5,
                     overlays: [
                         new ImageDrawable(`tank_${tier}_${direction}_${frame}_highlights.png`, {}, {
                             compositionType: 'lighter',
-                            width: 16,
-                            height: 16,
+                            scaleX: 0.5,
+                            scaleY: 0.5,
                         }),
                         new ImageDrawable(`tank_${tier}_${direction}_${frame}_shadows.png`, {}, {
                             compositionType: 'difference',
-                            width: 16,
-                            height: 16,
+                            scaleX: 0.5,
+                            scaleY: 0.5,
                         }),
                     ],
                 });
@@ -108,8 +108,8 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                             tier,
                         }, true, {
                             renderPass: RenderPass.TANK,
-                            width: 16,
-                            height: 16,
+                            scaleX: 0.5,
+                            scaleY: 0.5,
                         }),
                     );
                     drawables.push(
@@ -158,8 +158,8 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                             renderPass: RenderPass.BULLET,
                             offsetX: -1,
                             offsetY: -1,
-                            width: 4,
-                            height: 4,
+                            scaleX: 0.5,
+                            scaleY: 0.5,
                         }),
                     );
                 }
