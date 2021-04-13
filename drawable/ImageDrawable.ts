@@ -88,8 +88,8 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         const source = this.getCachedSource();
         const properties = this.properties;
 
-        drawX += (properties.offsetX ?? 0) * (properties.scaleX ?? 1);
-        drawY += (properties.offsetY ?? 0) * (properties.scaleY ?? 1);
+        drawX += properties.offsetX ?? 0;
+        drawY += properties.offsetY ?? 0;
 
         if (properties.compositionType !== undefined) {
             context.save();
@@ -107,11 +107,15 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         const properties = this.properties;
         const ownScaleX = (properties.scaleX ?? 1) * scaleX;
         const ownScaleY = (properties.scaleY ?? 1) * scaleY;
+        const offsetX = properties.offsetX && properties.offsetX * ownScaleX;
+        const offsetY = properties.offsetY && properties.offsetY * ownScaleY;
 
         return new (<any>this.constructor)(this.source, this.meta, {
             ...this.properties,
             scaleX: ownScaleX,
             scaleY: ownScaleY,
+            offsetX,
+            offsetY,
             overlays: properties.overlays?.map(overlay => overlay.scale(scaleX, scaleY)),
         });
     }
