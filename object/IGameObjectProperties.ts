@@ -4,6 +4,7 @@ export enum RenderPass {
     ALL,
     BULLET,
     TANK,
+    TANK_NAME,
     BUSHES,
     EXPLOSIONS,
     SMOKE = EXPLOSIONS,

@@ -94,6 +94,7 @@ export default class Tank extends GameObject {
     lastBulletShotTime: number;
     bulletIds: number[];
     color: Color;
+    playerName: string;
 
     constructor(options: TankOptions) {
         options.type = GameObjectType.TANK;
@@ -108,6 +109,7 @@ export default class Tank extends GameObject {
         this.lastSlippingTime = options.lastSlippingTime ?? 0;
         this.bulletIds = options.bulletIds ?? new Array<number>();
         this.color = options.color ?? [231, 156, 33];
+        this.playerName = 'Tank';
     }
 
     toOptions(): TankOptions {
@@ -200,9 +202,13 @@ export default class Tank extends GameObject {
     get graphicsMeta(): ResourceMeta[] | undefined | null {
         return [
             {
+                isTank: true,
                 direction: this.direction,
                 isMoving: this.isMoving,
                 tier: this.tier,
+            },
+            {
+                isText: true,
             },
             // {
             //     smoke: TankSmoke.BIG,

@@ -2,9 +2,65 @@ import { Color } from './Color';
 
 export type Source = HTMLImageElement | HTMLCanvasElement | OffscreenCanvas;
 
+export interface ContentMeasurements {
+    minX: number;
+    minY: number;
+    maxX: number;
+    maxY: number;
+    width: number;
+    height: number;
+}
+
 export default class ImageUtils {
     static drawSource(source: Source): OffscreenCanvas {
         return this.drawSourceWithScale(source, 1, 1);
+    }
+
+    static measureContents(canvas: OffscreenCanvas): ContentMeasurements {
+        const context = canvas.getContext('2d');
+        if (context === null) {
+            throw new Error('Failed to create offscreen canvas context');
+        }
+
+        let minX = undefined;
+        let minY = undefined;
+        let maxX = undefined;
+        let maxY = undefined;
+
+        const contents = context.getImageData(0, 0, canvas.width, canvas.height);
+        const rowWidth = contents.width * 4;
+        for (let i = 0; i < contents.height * contents.width; i += 4) {
+            const y = Math.floor(i / rowWidth);
+            const x = (i % rowWidth) / 4;
+
+
+            if (contents.data[i + 3] !== 0) {
+                if (minX === undefined || x < minX) {
+                    minX = x;
+                }
+
+                if (maxX === undefined || x > maxX) {
+                    maxX = x;
+                }
+
+                if (minY === undefined || y < minY) {
+                    minY = y;
+                }
+
+                if (maxY === undefined || y > maxY) {
+                    maxY = y;
+                }
+            }
+        }
+
+        return {
+            height: (maxY === undefined || minY === undefined) ? 0 : maxY - minY + 1,
+            width: (maxX === undefined || minX === undefined) ? 0 : maxX - minX + 1,
+            minX: minX ?? 0,
+            maxX: maxX ?? 0,
+            minY: minY ?? 0,
+            maxY: maxY ?? 0,
+        };
     }
 
     static drawSourceWithScale(

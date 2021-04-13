@@ -2,6 +2,7 @@ import { BulletPower } from '@/bullet/BulletPower';
 import AnimatedImageDrawable from '@/drawable/AnimatedImageDrawable';
 import IDrawable from '@/drawable/IDrawable';
 import ImageDrawable from '@/drawable/ImageDrawable';
+import TextDrawable from '@/drawable/TextDrawable';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
 import { TankSmoke } from '@/tank/TankSmoke';
@@ -67,7 +68,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                 isMoving: boolean,
             ) => {
                 return new ImageDrawable(`tank_${tier}_${direction}_${frame}.png`, {
-                    isTankDrawable: true,
+                    isTank: true,
                     isMoving,
                     direction,
                     tier,
@@ -102,7 +103,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                             62.5,
                             62.5,
                         ], {
-                            isTankDrawable: true,
+                            isTank: true,
                             isMoving: true,
                             direction,
                             tier,
@@ -134,6 +135,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                         160,
                         160,
                     ], {
+                        isSmoke: true,
                         smoke,
                     }, true, {
                         renderPass: RenderPass.SMOKE,
@@ -143,6 +145,20 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
 
             return drawables;
         })(),
+        new TextDrawable('', {
+            isText: true,
+        }, {
+            renderPass: RenderPass.TANK_NAME,
+            fontFamily: 'Press Start 2P',
+            fontUrl: 'press_start_2p.ttf',
+            fontColor: [255, 255, 255],
+            fontSize: 8,
+            backgroundColor: [0, 0, 0],
+            backgroundAlpha: 0.6,
+            paddingX: 1,
+            paddingY: 1,
+            positionXReference: 'center',
+        }),
     ],
     [GameObjectType.BULLET]: [
         ...((): IDrawable[] => {

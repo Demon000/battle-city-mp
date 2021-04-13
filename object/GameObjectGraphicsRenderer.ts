@@ -37,21 +37,21 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
 
     isDrawableMetaEqual(drawableMeta: ResourceMeta, objectMeta: ResourceMeta): boolean {
         if (drawableMeta.direction !== undefined) {
-            if (drawableMeta.direction === undefined) {
+            if (objectMeta.direction === undefined) {
                 return false;
             }
 
-            if (!this.isMatchingDirection(drawableMeta.direction, objectMeta.direction as Direction)) {
+            if (!this.isMatchingDirection(drawableMeta.direction, objectMeta.direction)) {
                 return false;
             }
         }
 
         if (drawableMeta.position !== undefined) {
-            if (drawableMeta.position === undefined) {
+            if (objectMeta.position === undefined) {
                 return false;
             }
 
-            if (!this.isMatchingPosition(drawableMeta.position, objectMeta.position as Point)) {
+            if (!this.isMatchingPosition(drawableMeta.position, objectMeta.position)) {
                 return false;
             }
         }
