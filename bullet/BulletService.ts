@@ -86,8 +86,8 @@ export default class BulletService {
         const objectCenterPosition = tank.centerPosition;
         const properties = GameObjectProperties.getTypeProperties(GameObjectType.BULLET);
 
-        let bulletY = objectCenterPosition.y - properties.height / 2;
-        let bulletX = objectCenterPosition.x - properties.width / 2;
+        const bulletY = objectCenterPosition.y - properties.height / 2;
+        const bulletX = objectCenterPosition.x - properties.width / 2;
 
         const bullet = new Bullet({
             type: GameObjectType.BULLET,
