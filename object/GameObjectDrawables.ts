@@ -156,8 +156,8 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                             power,
                         }, {
                             renderPass: RenderPass.BULLET,
-                            offsetX: -1,
-                            offsetY: -1,
+                            offsetX: -2,
+                            offsetY: -2,
                             scaleX: 0.5,
                             scaleY: 0.5,
                         }),
