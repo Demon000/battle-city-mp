@@ -77,6 +77,10 @@ io.on('connection', (socket: IO.Socket) => {
     socket.on(GameEvent.PLAYER_REQUEST_TANK_TIER, tier => {
         gameServer.onPlayerRequestTankTierFromClient(socket.id, tier);
     });
+
+    socket.on(GameEvent.PLAYER_SET_NAME, name => {
+        gameServer.onPlayerSetName(socket.id, name);
+    });
 });
 
 http.listen(argv.port, argv.host, () => {

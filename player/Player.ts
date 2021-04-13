@@ -26,10 +26,15 @@ export default class Player {
     isOwnPlayer = false;
     tankId: number | null;
     id: string;
+    name?: string;
 
     constructor(options: PlayerOptions) {
         this.id = options.id;
         this.tankId = options.tankId;
+    }
+
+    get displayName(): string {
+        return this.name ?? this.id;
     }
 
     toOptions(): PlayerOptions {

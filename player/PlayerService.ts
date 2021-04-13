@@ -84,6 +84,12 @@ export default class PlayerService {
         return player.tankId;
     }
 
+    setPlayerName(playerId: string, name: string): void {
+        const player = this.repository.get(playerId);
+        player.name = name;
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player);
+    }
+
     setPlayerRequestedSpawnStatus(playerId: string, spawnStatus: PlayerSpawnStatus): void {
         const player = this.repository.get(playerId);
         player.requestedSpawnStatus = spawnStatus;

@@ -12,32 +12,18 @@
                 <button
                     @click="onDespawnButtonClick"
                 >Despawn</button>
-                <span>
-                    R
-                    <input
-                        type="range" min="0" max="255"
-                        v-model="playerColor[0]"
-                        @change="onPlayerColorChanged"
-                    >
-                </span>
-
-                <span>
-                    G
-                    <input
-                        type="range" min="0" max="255"
-                        v-model="playerColor[1]"
-                        @change="onPlayerColorChanged"
-                    >
-                </span>
-
-                <span>
-                    B
-                    <input
-                        type="range" min="0" max="255"
-                        v-model="playerColor[2]"
-                        @change="onPlayerColorChanged"
-                    >
-                </span>
+                <label>Name</label>
+                <input
+                    type="text"
+                    v-model="playerName"
+                    @change="onPlayerNameChanged"
+                >
+                <label>Color</label>
+                <input
+                    type="color"
+                    v-model="playerColor"
+                    @change="onPlayerColorChanged"
+                >
 
                 <button
                     v-for="tier in Object.values(TankTier)"
@@ -100,7 +86,8 @@ export default class App extends Vue {
     isFullscreen = false;
     CLIENT_SPRITES_RELATIVE_URL = CLIENT_SPRITES_RELATIVE_URL;
     TankTier = TankTier;
-    playerColor = [0, 0, 0];
+    playerColor = '';
+    playerName = '';
 
     mounted(): void {
         const canvas = this.$refs.canvas as HTMLCanvasElement;
@@ -201,15 +188,23 @@ export default class App extends Vue {
     }
 
     onPlayerColorChanged(): void {
+        const r = parseInt(this.playerColor.substr(1, 2), 16);
+        const g = parseInt(this.playerColor.substr(3, 2), 16);
+        const b = parseInt(this.playerColor.substr(5, 2), 16);
         if (this.gameClientSocket !== undefined) {
-            this.gameClientSocket.requestPlayerTankColor(this.playerColor[0],
-                this.playerColor[1], this.playerColor[2]);
+            this.gameClientSocket.requestPlayerTankColor(r, g, b);
         }
     }
 
     onPlayerTierClick(tier: TankTier): void {
         if (this.gameClientSocket !== undefined) {
             this.gameClientSocket.requestPlayerTankTier(tier);
+        }
+    }
+
+    onPlayerNameChanged(): void {
+        if (this.gameClientSocket !== undefined) {
+            this.gameClientSocket.setPlayerName(this.playerName);
         }
     }
 

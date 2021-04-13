@@ -126,4 +126,8 @@ export default class GameClientSocket {
     requestPlayerAction(action: Action): void {
         this.socket.emit(GameEvent.PLAYER_ACTION, action.toOptions());
     }
+
+    setPlayerName(name: string): void {
+        this.socket.emit(GameEvent.PLAYER_SET_NAME, name);
+    }
 }

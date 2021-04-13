@@ -134,6 +134,7 @@ export default class GameServer {
                     const tank = new Tank({
                         position,
                         playerId,
+                        playerName: player.displayName,
                         color: player.requestedTankColor,
                         tier: player.requestedTankTier,
                     });
@@ -331,6 +332,10 @@ export default class GameServer {
     onPlayerConnectedFromClient(playerId: string): void {
         this.playerService.createPlayer(playerId);
         this.playerService.setPlayerRequestedServerStatus(playerId);
+    }
+
+    onPlayerSetName(playerId: string, name: string): void {
+        this.playerService.setPlayerName(playerId, name);
     }
 
     onPlayerRequestSpawnStatusFromClient(playerId: string, spawnStatus: PlayerSpawnStatus): void {

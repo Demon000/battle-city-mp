@@ -75,6 +75,7 @@ const tierToSlippingDecelerationMap = {
 export interface TankOptions extends GameObjectOptions {
     tier: TankTier;
     playerId: string;
+    playerName: string;
     isShooting?: boolean;
     isOnIce?: boolean;
     lastSlippingTime?: number;
@@ -88,13 +89,13 @@ export type PartialTankOptions = Partial<TankOptions>;
 export default class Tank extends GameObject {
     tier: TankTier;
     playerId: string;
+    playerName: string;
     isShooting: boolean;
     isSlipping: boolean;
     lastSlippingTime: number;
     lastBulletShotTime: number;
     bulletIds: number[];
     color: Color;
-    playerName: string;
 
     constructor(options: TankOptions) {
         options.type = GameObjectType.TANK;
@@ -103,13 +104,13 @@ export default class Tank extends GameObject {
 
         this.tier = options.tier;
         this.playerId = options.playerId;
+        this.playerName = options.playerName;
         this.isShooting = options.isShooting ?? false;
         this.isSlipping = options.isOnIce ?? false;
         this.lastBulletShotTime = options.lastBulletShotTime ?? 0;
         this.lastSlippingTime = options.lastSlippingTime ?? 0;
         this.bulletIds = options.bulletIds ?? new Array<number>();
         this.color = options.color ?? [231, 156, 33];
-        this.playerName = 'Tank';
     }
 
     toOptions(): TankOptions {
@@ -117,6 +118,7 @@ export default class Tank extends GameObject {
         return Object.assign(gameObjectOptions, {
             tier: this.tier,
             playerId: this.playerId,
+            playerName: this.playerName,
             lastSlippingTime: this.lastSlippingTime,
             lastBulletShotTime: this.lastBulletShotTime,
             bulletIds: this.bulletIds,
@@ -133,6 +135,10 @@ export default class Tank extends GameObject {
 
         if (options.playerId !== undefined) {
             this.playerId = options.playerId;
+        }
+
+        if (options.playerName !== undefined) {
+            this.playerName = options.playerName;
         }
 
         if (options.lastSlippingTime !== undefined) {

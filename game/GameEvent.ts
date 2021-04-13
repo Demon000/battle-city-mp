@@ -19,6 +19,7 @@ export enum GameEvent {
     PLAYER_REQUEST_TANK_SPAWN = 'player-request-tank-spawn',
     PLAYER_REQUEST_TANK_DESPAWN = 'player-request-tank-despawn',
     PLAYER_REQUEST_SERVER_STATUS = 'player-request-server-status',
+    PLAYER_SET_NAME = 'player-set-name',
 
     PLAYER_SERVER_STATUS = 'player-server-status',
 
