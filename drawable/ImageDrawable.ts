@@ -122,4 +122,15 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
             maskColor,
         });
     }
+
+    _offset(offsetX: number, offsetY: number): this {
+        const properties = this.properties;
+        offsetX += properties.offsetX ?? 0;
+        offsetY += properties.offsetY ?? 0;
+        return new (<any>this.constructor)(this.source, this.meta, {
+            ...this.properties,
+            offsetX,
+            offsetY,
+        });
+    }
 }

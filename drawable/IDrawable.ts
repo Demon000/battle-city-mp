@@ -18,4 +18,5 @@ export default interface IDrawable {
 
     draw(context: CanvasRenderingContext2D, drawX: number, drawY: number): void;
     scale(scaleX: number, scaleY?: number): this | undefined;
+    offset(offsetX: number, offsetY: number): this | undefined;
 }
