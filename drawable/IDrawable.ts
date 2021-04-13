@@ -4,6 +4,8 @@ export interface DrawableProperties {
     renderPass?: number;
     offsetX?: number;
     offsetY?: number;
+    scaleX?: number;
+    scaleY?: number;
 }
 
 export default interface IDrawable {
