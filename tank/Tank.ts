@@ -6,9 +6,9 @@ import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
 
 const tierToMaxSpeedMap = {
-    [TankTier.NORMAL]: 64,
-    [TankTier.LIGHT]: 96,
-    [TankTier.HEAVY]: 48,
+    [TankTier.NORMAL]: 96,
+    [TankTier.LIGHT]: 128,
+    [TankTier.HEAVY]: 64,
 };
 
 const tierToAccelerationFactorMap = {
@@ -24,15 +24,15 @@ const tierToDecelerationFactorMap = {
 };
 
 const tierToBulletSpeedMap = {
-    [TankTier.NORMAL]: 64,
-    [TankTier.LIGHT]: 64,
-    [TankTier.HEAVY]: 64,
+    [TankTier.NORMAL]: 128,
+    [TankTier.LIGHT]: 128,
+    [TankTier.HEAVY]: 128,
 };
 
 const tierToMaxBulletsMap = {
-    [TankTier.NORMAL]: 2,
-    [TankTier.LIGHT]: 3,
-    [TankTier.HEAVY]: 4,
+    [TankTier.NORMAL]: 3,
+    [TankTier.LIGHT]: 2,
+    [TankTier.HEAVY]: 2,
 };
 
 const tierToBulletCooldownMap = {
@@ -60,7 +60,7 @@ const tierToSlippingMaxSpeedMap = {
 };
 
 const tierToSlippingAccelerationMap = {
-    [TankTier.NORMAL]: 10,
+    [TankTier.NORMAL]: 2,
     [TankTier.LIGHT]: 2,
     [TankTier.HEAVY]: 2,
 };
@@ -73,7 +73,7 @@ const tierToSlippingDecelerationMap = {
 
 const tierToMaxHealthMap = {
     [TankTier.NORMAL]: 2,
-    [TankTier.LIGHT]: 1,
+    [TankTier.LIGHT]: 2,
     [TankTier.HEAVY]: 3,
 };
 
