@@ -39,6 +39,12 @@ const properties: IGameObjectProperties[] = [
         height: 4,
     },
     {
+        type: GameObjectType.SMOKE,
+        width: 0,
+        height: 0,
+        automaticDestroyTime: 1000,
+    },
+    {
         type: GameObjectType.TANK,
         width: 16,
         height: 16,

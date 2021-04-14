@@ -190,6 +190,16 @@ export default class GameServer {
                 this.bulletService.spawnBulletForTank(tank);
             });
 
+        this.tankService.emitter.on(TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN,
+            (tankId: number) => {
+                const tank = this.tankService.getTank(tankId);
+                const smoke = new GameObject({
+                    type: GameObjectType.SMOKE,
+                    position: tank.centerPosition,
+                });
+                this.gameObjectService.registerObject(smoke);
+            });
+
         /**
          * BulletService event handlers
          */
@@ -197,7 +207,6 @@ export default class GameServer {
             (bullet: Bullet) => {
                 this.gameObjectService.registerObject(bullet);
                 this.tankService.addTankBullet(bullet.tankId, bullet.id);
-                this.tankService.setTankLastBulletShotTime(bullet.tankId, bullet.spawnTime);
             });
 
         /**
@@ -272,12 +281,16 @@ export default class GameServer {
                     return;
                 }
 
-                spawnExplosion(bulletId, ExplosionType.SMALL);
-                spawnExplosion(tankId, ExplosionType.BIG, GameObjectType.TANK);
-                destroyBullet(bulletId);
-
                 const tank = this.tankService.getTank(tankId);
-                this.playerService.setPlayerRequestedSpawnStatus(tank.playerId, PlayerSpawnStatus.DESPAWN);
+                tank.health -= bullet.damage;
+                if (tank.health <= 0) {
+                    spawnExplosion(bulletId, ExplosionType.SMALL);
+                    spawnExplosion(tankId, ExplosionType.BIG, GameObjectType.TANK);
+                    this.playerService.setPlayerRequestedSpawnStatus(tank.playerId, PlayerSpawnStatus.DESPAWN);
+                } else {
+                    spawnExplosion(bulletId, ExplosionType.SMALL, GameObjectType.NONE);
+                }
+                destroyBullet(bulletId);
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BULLET,

@@ -19,4 +19,5 @@ export enum GameObjectType {
     BULLET = 'bullet',
     EXPLOSION = 'explosion',
     ICE = 'ice',
+    SMOKE = 'smoke',
 }

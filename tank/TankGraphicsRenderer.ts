@@ -14,7 +14,6 @@ export default class TankGraphicsRenderer extends GameObjectGraphicsRenderer<Tan
         }
 
         if (drawableMeta.isTank !== objectMeta.isTank
-            || drawableMeta.isSmoke !== objectMeta.isSmoke
             || drawableMeta.isText !== objectMeta.isText) {
             return false;
         }

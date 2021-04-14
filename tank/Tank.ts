@@ -3,7 +3,6 @@ import { Color } from '@/drawable/Color';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 import GameObject, { GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
-// import { TankSmoke } from './TankSmoke';
 import { TankTier } from './TankTier';
 
 const tierToMaxSpeedMap = {
@@ -72,6 +71,17 @@ const tierToSlippingDecelerationMap = {
     [TankTier.HEAVY]: 0.5,
 };
 
+const tierToMaxHealthMap = {
+    [TankTier.NORMAL]: 2,
+    [TankTier.LIGHT]: 1,
+    [TankTier.HEAVY]: 3,
+};
+
+const tierHealthToSmokeTime = new Map([
+    [1, 500],
+    [2, 1000],
+]);
+
 export interface TankOptions extends GameObjectOptions {
     tier: TankTier;
     playerId: string;
@@ -80,8 +90,10 @@ export interface TankOptions extends GameObjectOptions {
     isOnIce?: boolean;
     lastSlippingTime?: number;
     lastBulletShotTime?: number;
+    lastSmokeSpawnTime?: number;
     bulletIds?: number[];
     color?: Color;
+    health?: number;
 }
 
 export type PartialTankOptions = Partial<TankOptions>;
@@ -94,8 +106,10 @@ export default class Tank extends GameObject {
     isSlipping: boolean;
     lastSlippingTime: number;
     lastBulletShotTime: number;
+    lastSmokeTime: number;
     bulletIds: number[];
     color: Color;
+    health: number;
 
     constructor(options: TankOptions) {
         options.type = GameObjectType.TANK;
@@ -108,9 +122,11 @@ export default class Tank extends GameObject {
         this.isShooting = options.isShooting ?? false;
         this.isSlipping = options.isOnIce ?? false;
         this.lastBulletShotTime = options.lastBulletShotTime ?? 0;
+        this.lastSmokeTime = options.lastSmokeSpawnTime ?? 0;
         this.lastSlippingTime = options.lastSlippingTime ?? 0;
         this.bulletIds = options.bulletIds ?? new Array<number>();
         this.color = options.color ?? [231, 156, 33];
+        this.health = options.health ?? tierToMaxHealthMap[this.tier];
     }
 
     toOptions(): TankOptions {
@@ -123,6 +139,7 @@ export default class Tank extends GameObject {
             lastBulletShotTime: this.lastBulletShotTime,
             bulletIds: this.bulletIds,
             color: this.color,
+            health: this.health,
         });
     }
 
@@ -149,6 +166,10 @@ export default class Tank extends GameObject {
             this.lastBulletShotTime = options.lastBulletShotTime;
         }
 
+        if (options.lastSmokeSpawnTime !== undefined) {
+            this.lastSmokeTime = options.lastSmokeSpawnTime;
+        }
+
         if (options.bulletIds !== undefined) {
             this.bulletIds = options.bulletIds;
         }
@@ -156,6 +177,22 @@ export default class Tank extends GameObject {
         if (options.color !== undefined) {
             this.color = options.color;
         }
+
+        if (options.health !== undefined) {
+            this.health = options.health;
+        }
+    }
+
+    get maxHealth(): number {
+        return tierToMaxHealthMap[this.tier];
+    }
+
+    get smokeTime(): number | undefined {
+        if (this.health === this.maxHealth) {
+            return undefined;
+        }
+
+        return tierHealthToSmokeTime.get(this.health);
     }
 
     get maxMovementSpeed(): number {
@@ -216,9 +253,6 @@ export default class Tank extends GameObject {
             {
                 isText: true,
             },
-            // {
-            //     smoke: TankSmoke.BIG,
-            // },
         ];
     }
 

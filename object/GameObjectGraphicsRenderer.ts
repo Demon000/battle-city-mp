@@ -150,21 +150,23 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         if (this.drawables === undefined) {
             return;
         }
-
-        this.drawables.forEach(drawable => {
-            if (drawable.type === DrawableType.ANIMATED_IMAGE) {
-                (drawable as AnimatedImageDrawable).updateCurrentDrawable(this.object.spawnTime);
-            }
-        });
     }
 
     isRenderable(): boolean {
         return this.drawables !== undefined && this.drawables !== null && this.drawables.length !== 0;
     }
 
-    renderPassFilter(drawable: IDrawable): boolean {
-        if (this.context === undefined) {
-            return true;
+    renderPassFilter(drawable: IDrawable | undefined): boolean {
+        if (this.context === undefined || drawable === undefined) {
+            return false;
+        }
+
+        if (drawable.type === DrawableType.ANIMATED_IMAGE) {
+            drawable = (drawable as AnimatedImageDrawable).getCurrentDrawable(this.object.spawnTime);
+        }
+
+        if (drawable === undefined) {
+            return false;
         }
 
         const isRenderPass = drawable.isRenderPass(this.pass);

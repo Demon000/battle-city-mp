@@ -6,10 +6,12 @@ import Tank from './Tank';
 
 export enum TankServiceEvent {
     TANK_REQUESTED_BULLET_SPAWN = 'tank-requested-bullet-spawn',
+    TANK_REQUESTED_SMOKE_SPAWN = 'tank-requested-smoke-spawn',
 }
 
 interface TankServiceEvents {
     [TankServiceEvent.TANK_REQUESTED_BULLET_SPAWN]: (tankId: number) => void,
+    [TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN]: (tankId: number) => void,
 }
 
 export default class TankService {
@@ -84,6 +86,29 @@ export default class TankService {
         }
 
         this.emitter.emit(TankServiceEvent.TANK_REQUESTED_BULLET_SPAWN, tank.id);
+        tank.lastBulletShotTime = Date.now();
+    }
+
+    private canTankSpawnSmoke(tank: Tank): boolean {
+        const smokeTime = tank.smokeTime;
+        if (smokeTime === undefined) {
+            return false;
+        }
+
+        if (Date.now() - tank.lastSmokeTime < smokeTime) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private processTankSmoking(tank: Tank): void {
+        if (!this.canTankSpawnSmoke(tank)) {
+            return;
+        }
+
+        this.emitter.emit(TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN, tank.id);
+        tank.lastSmokeTime = Date.now();
     }
 
     private resetTankOnIce(tank: Tank): void {
@@ -99,6 +124,7 @@ export default class TankService {
 
         for (const tank of tanks) {
             this.processTankShooting(tank);
+            this.processTankSmoking(tank);
             this.resetTankOnIce(tank);
         }
     }
@@ -112,10 +138,5 @@ export default class TankService {
         const tank = this.getTank(tankId);
         tank.isSlipping = true;
         tank.lastSlippingTime = Date.now();
-    }
-
-    setTankLastBulletShotTime(tankId: number, lastBulletShotTime: number): void {
-        const tank = this.getTank(tankId);
-        tank.lastBulletShotTime = lastBulletShotTime;
     }
 }

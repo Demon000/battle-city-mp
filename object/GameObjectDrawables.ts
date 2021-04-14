@@ -5,7 +5,6 @@ import ImageDrawable from '@/drawable/ImageDrawable';
 import TextDrawable from '@/drawable/TextDrawable';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
-import { TankSmoke } from '@/tank/TankSmoke';
 import { TankTier } from '@/tank/TankTier';
 import { GameObjectType } from './GameObjectType';
 import { RenderPass } from './IGameObjectProperties';
@@ -121,30 +120,6 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
 
             return drawables;
         })(),
-        ...((): IDrawable[] => {
-            const drawables = [];
-
-            for (const smoke of Object.values(TankSmoke)) {
-                drawables.push(
-                    new AnimatedImageDrawable([
-                        new ImageDrawable(`smoke_${smoke}_0.png`),
-                        new ImageDrawable(`smoke_${smoke}_1.png`),
-                        new ImageDrawable(`smoke_${smoke}_2.png`),
-                    ], [
-                        160,
-                        160,
-                        160,
-                    ], {
-                        isSmoke: true,
-                        smoke,
-                    }, true, {
-                        renderPass: RenderPass.SMOKE,
-                    }),
-                );
-            }
-
-            return drawables;
-        })(),
         new TextDrawable('', {
             isText: true,
         }, {
@@ -158,6 +133,21 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             paddingX: 1,
             paddingY: 1,
             positionXReference: 'center',
+        }),
+    ],
+    [GameObjectType.SMOKE]: [
+        new AnimatedImageDrawable([
+            new ImageDrawable('smoke_0.png'),
+            new ImageDrawable('smoke_1.png'),
+            new ImageDrawable('smoke_2.png'),
+        ], [
+            250,
+            250,
+            250,
+        ], {}, false, {
+            renderPass: RenderPass.SMOKE,
+            offsetX: -8,
+            offsetY: -8,
         }),
     ],
     [GameObjectType.BULLET]: [

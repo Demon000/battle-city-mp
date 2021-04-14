@@ -3,6 +3,11 @@ import { GameObjectType } from '@/object/GameObjectType';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 import { BulletPower } from './BulletPower';
 
+const bulletPowerToDamageMap = {
+    [BulletPower.LIGHT]: 1,
+    [BulletPower.HEAVY]: 2,
+};
+
 export interface BulletOptions extends GameObjectOptions {
     tankId: number;
     power: BulletPower;
@@ -41,6 +46,10 @@ export default class Bullet extends GameObject {
         if (options.power !== undefined) {
             this.power = options.power;
         }
+    }
+
+    get damage(): number {
+        return bulletPowerToDamageMap[this.power];
     }
 
     get graphicsMeta(): ResourceMeta[] | undefined | null {

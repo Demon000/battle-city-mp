@@ -10,7 +10,6 @@ export default class AnimatedImageDrawable extends BaseImageDrawable {
 
     drawables;
     durations;
-    currentDrawable?: IImageDrawable;
     totalDuration;
     loop;
 
@@ -36,7 +35,7 @@ export default class AnimatedImageDrawable extends BaseImageDrawable {
         this.updateDrawablesInheritedProperties();
     }
 
-    private findCurrentDrawable(referenceTime: number): IImageDrawable | undefined {
+    getCurrentDrawable(referenceTime: number): IImageDrawable | undefined {
         let currentAnimationTime = (Date.now() - referenceTime);
         if (this.loop === true) {
             currentAnimationTime %= this.totalDuration;
@@ -68,26 +67,16 @@ export default class AnimatedImageDrawable extends BaseImageDrawable {
         this.updateDrawablesInheritedProperties();
     }
 
-    updateCurrentDrawable(referenceTime: number): void {
-        this.currentDrawable = this.findCurrentDrawable(referenceTime);
-    }
-
-    isRenderPass(pass: number): boolean {
-        if (this.currentDrawable === undefined) {
-            return true;
-        }
-
-        return this.currentDrawable.isRenderPass(pass);
+    isRenderPass(_pass: number): boolean {
+        return true;
     }       
 
     isLoaded(): boolean {
         return this.drawables.every(drawable => drawable.isLoaded());
     }
 
-    draw(context: CanvasRenderingContext2D, drawX: number, drawY: number): void {
-        if (this.currentDrawable !== undefined) {
-            this.currentDrawable.draw(context, drawX, drawY);
-        }
+    draw(_context: CanvasRenderingContext2D, _drawX: number, _drawY: number): void {
+        // do nothing
     }
 
     private copy(drawables: IImageDrawable[]): this {
