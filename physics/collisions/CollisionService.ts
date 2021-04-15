@@ -106,31 +106,9 @@ export default class CollisionService {
         return second.position.y - first.position.y;
     }
 
-    isPositionCloserToDirection(newPosition: Point, oldPosition: Point, direction: Direction): boolean {
-        switch (direction) {
-            case Direction.UP:
-                if (newPosition.y > oldPosition.y) {
-                    return true;
-                }
-                break;
-            case Direction.RIGHT:
-                if (newPosition.x < oldPosition.x) {
-                    return true;
-                }
-                break;
-            case Direction.DOWN:
-                if (newPosition.y < oldPosition.y) {
-                    return true;
-                }
-                break;
-            case Direction.LEFT:
-                if (newPosition.x > oldPosition.x) {
-                    return true;
-                }
-                break;
-        }
-
-        return false;
+    isPositionCloserToPosition(newPosition: Point, oldPosition: Point, position: Point): boolean {
+        return Math.abs(newPosition.x - position.x) < Math.abs(oldPosition.x - position.x)
+            || Math.abs(newPosition.y - position.y) < Math.abs(oldPosition.y - position.y);
     }
 
     snapObjectToBoundingBoxEdge(
@@ -188,8 +166,8 @@ export default class CollisionService {
 
                     let isCloser = true;
                     if (movementPreventingObject !== undefined) {
-                        isCloser = this.isPositionCloserToDirection(overlappingObject.position,
-                            movementPreventingObject.position, movingDirection);
+                        isCloser = this.isPositionCloserToPosition(overlappingObject.position,
+                            movementPreventingObject.position, movingObject.position);
                     }
 
                     if (!isAlreadyInside && isCloser) {
