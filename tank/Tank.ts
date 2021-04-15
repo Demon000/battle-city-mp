@@ -6,9 +6,9 @@ import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
 
 const tierToMaxSpeedMap = {
-    [TankTier.NORMAL]: 96,
+    [TankTier.NORMAL]: 114,
     [TankTier.LIGHT]: 128,
-    [TankTier.HEAVY]: 64,
+    [TankTier.HEAVY]: 96,
 };
 
 const tierToAccelerationFactorMap = {
