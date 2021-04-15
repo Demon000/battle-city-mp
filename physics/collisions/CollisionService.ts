@@ -233,8 +233,12 @@ export default class CollisionService {
 
     validateObjectDirection(objectId: number, direction: Direction): void {
         const gameObject = this.gameObjectRepository.get(objectId);
+        const oldDirection = gameObject.direction;
+
+        this.emitter.emit(CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED, objectId, direction);
+
         if (gameObject.properties.directionAxisSnapping !== undefined &&
-                !DirectionUtils.isSameAxis(gameObject.direction, direction)) {
+                !DirectionUtils.isSameAxis(oldDirection, direction)) {
             const snappedX = this.calculateSnappedCoordinates(gameObject.position.x, gameObject.properties.directionAxisSnapping);
             const snappedY = this.calculateSnappedCoordinates(gameObject.position.y, gameObject.properties.directionAxisSnapping);
 
@@ -243,7 +247,5 @@ export default class CollisionService {
                 y: snappedY,
             });
         }
-
-        this.emitter.emit(CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED, objectId, direction);
     }
 }
