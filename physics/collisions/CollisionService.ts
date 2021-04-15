@@ -239,12 +239,19 @@ export default class CollisionService {
 
         if (gameObject.properties.directionAxisSnapping !== undefined &&
                 !DirectionUtils.isSameAxis(oldDirection, direction)) {
-            const snappedX = this.calculateSnappedCoordinates(gameObject.position.x, gameObject.properties.directionAxisSnapping);
-            const snappedY = this.calculateSnappedCoordinates(gameObject.position.y, gameObject.properties.directionAxisSnapping);
+            let x = gameObject.position.x;
+            let y = gameObject.position.y;
+            if (DirectionUtils.isHorizontalAxis(direction)) {
+                y = this.calculateSnappedCoordinates(gameObject.position.y,
+                    gameObject.properties.directionAxisSnapping);
+            } else {
+                x = this.calculateSnappedCoordinates(gameObject.position.x,
+                    gameObject.properties.directionAxisSnapping);
+            }
 
             this.validateObjectMovement(objectId, {
-                x: snappedX,
-                y: snappedY,
+                x: x,
+                y: y,
             });
         }
     }
