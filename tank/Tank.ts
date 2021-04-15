@@ -73,7 +73,7 @@ const tierToSlippingDecelerationMap = {
 
 const tierToMaxHealthMap = {
     [TankTier.NORMAL]: 2,
-    [TankTier.LIGHT]: 2,
+    [TankTier.LIGHT]: 1,
     [TankTier.HEAVY]: 3,
 };
 
