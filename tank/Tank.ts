@@ -18,7 +18,7 @@ const tierToAccelerationFactorMap = {
 };
 
 const tierToDecelerationFactorMap = {
-    [TankTier.NORMAL]: 4,
+    [TankTier.NORMAL]: 3,
     [TankTier.LIGHT]: 2,
     [TankTier.HEAVY]: 1,
 };
@@ -32,7 +32,7 @@ const tierToBulletSpeedMap = {
 const tierToMaxBulletsMap = {
     [TankTier.NORMAL]: 3,
     [TankTier.LIGHT]: 2,
-    [TankTier.HEAVY]: 2,
+    [TankTier.HEAVY]: 1,
 };
 
 const tierToBulletCooldownMap = {
@@ -48,9 +48,9 @@ const tierToBulletPowerMap = {
 };
 
 const tierToSlippingTimeMap = {
-    [TankTier.NORMAL]: 1000,
-    [TankTier.LIGHT]: 1000,
-    [TankTier.HEAVY]: 1000,
+    [TankTier.NORMAL]: 100,
+    [TankTier.LIGHT]: 100,
+    [TankTier.HEAVY]: 100,
 };
 
 const tierToSlippingMaxSpeedMap = {
