@@ -9,6 +9,7 @@ import ImageUtils, { Source } from '../utils/ImageUtils';
 export default class ImageDrawable extends BaseImageDrawable implements IImageDrawable {
     readonly type = DrawableType.IMAGE;
     private cachedSource?: Source;
+    private _isLoaded;
     meta;
 
     source;
@@ -21,9 +22,14 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         super();
 
         if (typeof source === 'string') {
+            this._isLoaded = false;
             this.source = new Image();
+            this.source.addEventListener('load', () => {
+                this._isLoaded = true;
+            });
             this.source.src = `${CLIENT_SPRITES_RELATIVE_URL}/${source}`;
         } else {
+            this._isLoaded = true;
             this.source = source;
         }
 
@@ -36,18 +42,7 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
     }
 
     isLoaded(): boolean {
-        if (!(this.source instanceof HTMLImageElement)) {
-            return true;
-        }
-
-        const properties = this.properties;
-        if (properties.overlays !== undefined
-            && !properties.overlays.every(overlay => overlay.isLoaded())) {
-            return false;
-        }
-
-        return this.source.complete && this.source.naturalHeight !== 0 &&
-            this.source.naturalWidth !== 0;
+        return this._isLoaded;
     }
 
     private applyOverlays(context: CanvasRenderingContext2D, drawX: number, drawY: number): void {
