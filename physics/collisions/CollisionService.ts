@@ -175,6 +175,10 @@ export default class CollisionService {
                 continue;
             }
 
+            if (overlappingObject.destroyed) {
+                continue;
+            }
+
             const rule = this.getRule(movingObject.type, overlappingObject.type);
             if (rule === undefined) {
                 continue;
