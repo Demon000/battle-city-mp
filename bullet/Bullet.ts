@@ -18,6 +18,7 @@ export type PartialBulletOptions = Partial<BulletOptions>;
 export default class Bullet extends GameObject {
     tankId: number;
     power: BulletPower;
+    damage: number;
 
     constructor(options: BulletOptions) {
         options.type = GameObjectType.BULLET;
@@ -26,6 +27,7 @@ export default class Bullet extends GameObject {
 
         this.tankId = options.tankId;
         this.power = options.power;
+        this.damage = bulletPowerToDamageMap[this.power];
     }
 
     toOptions(): BulletOptions {
@@ -48,17 +50,12 @@ export default class Bullet extends GameObject {
         }
     }
 
-    get damage(): number {
-        return bulletPowerToDamageMap[this.power];
-    }
-
     get graphicsMeta(): ResourceMeta[] | undefined | null {
         return [{
             direction: this.direction,
             power: this.power,
         }];
     }
-
 
     get audioMeta(): ResourceMeta | undefined | null {
         return {};

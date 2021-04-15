@@ -282,7 +282,12 @@ export default class GameServer {
                 }
 
                 const tank = this.tankService.getTank(tankId);
-                tank.health -= bullet.damage;
+                const tankHealth = tank.health;
+                const bulletDamage = bullet.damage;
+
+                tank.health -= bulletDamage;
+                bullet.damage -= tankHealth;
+
                 if (tank.health <= 0) {
                     spawnExplosion(bulletId, ExplosionType.SMALL);
                     spawnExplosion(tankId, ExplosionType.BIG, GameObjectType.TANK);
@@ -290,7 +295,10 @@ export default class GameServer {
                 } else {
                     spawnExplosion(bulletId, ExplosionType.SMALL, GameObjectType.NONE);
                 }
-                destroyBullet(bulletId);
+
+                if (bullet.damage <= 0) {
+                    destroyBullet(bulletId);
+                }
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BULLET,
