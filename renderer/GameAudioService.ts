@@ -25,9 +25,16 @@ export default class GameAudioService {
         this.compressorNode.connect(this.context.destination);
         this.finalNode = this.compressorNode;
 
-        this.context.listener.forwardX.value = -1;
-        this.context.listener.forwardY.value = 0;
-        this.context.listener.forwardZ.value = 0;
+        if (this.context.listener.forwardX !== undefined) {
+            this.context.listener.forwardX.value = -1;
+            this.context.listener.forwardY.value = 0;
+            this.context.listener.forwardZ.value = 0;
+            this.context.listener.upX.value = 0;
+            this.context.listener.upY.value = 1;
+            this.context.listener.upZ.value = 0;
+        } else {
+            this.context.listener.setOrientation(-1, 0, 0, 0, 1, 0);
+        }
     }
 
     loadAudioEffectBuffer(audioEffect: IAudioEffect): boolean {

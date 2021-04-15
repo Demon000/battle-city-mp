@@ -4,7 +4,7 @@ import BaseImageDrawable from './BaseImageDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
 import { IImageDrawable, ImageDrawableProperties } from './IImageDrawable';
-import ImageUtils, { Source } from './ImageUtils';
+import ImageUtils, { Source } from '../utils/ImageUtils';
 
 export default class ImageDrawable extends BaseImageDrawable implements IImageDrawable {
     readonly type = DrawableType.IMAGE;

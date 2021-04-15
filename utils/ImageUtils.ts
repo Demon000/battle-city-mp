@@ -1,6 +1,7 @@
-import { Color } from './Color';
+import { Color } from '../drawable/Color';
+import CanvasUtils, { Canvas } from './CanvasUtils';
 
-export type Source = HTMLImageElement | HTMLCanvasElement | OffscreenCanvas;
+export type Source = HTMLImageElement | Canvas;
 
 export interface ContentMeasurements {
     minX: number;
@@ -12,11 +13,11 @@ export interface ContentMeasurements {
 }
 
 export default class ImageUtils {
-    static drawSource(source: Source): OffscreenCanvas {
+    static drawSource(source: Source): Canvas {
         return this.drawSourceWithScale(source, 1, 1);
     }
 
-    static measureContents(canvas: OffscreenCanvas): ContentMeasurements {
+    static measureContents(canvas: Canvas): ContentMeasurements {
         const context = canvas.getContext('2d');
         if (context === null) {
             throw new Error('Failed to create offscreen canvas context');
@@ -67,10 +68,10 @@ export default class ImageUtils {
         source: Source,
         scaleX: number,
         scaleY: number,
-    ): OffscreenCanvas {
+    ): Canvas {
         const width = source.width * scaleX;
         const height = source.height * scaleY;
-        const canvas = new OffscreenCanvas(width, height);
+        const canvas = CanvasUtils.create(width, height);
         const context = canvas.getContext('2d');
         if (context === null) {
             throw new Error('Failed to create offscreen canvas context');
@@ -84,8 +85,8 @@ export default class ImageUtils {
     static maskColor(
         source: Source,
         color: Color,
-    ): OffscreenCanvas {
-        const canvas = new OffscreenCanvas(source.width, source.height);
+    ): Canvas {
+        const canvas = CanvasUtils.create(source.width, source.height);
         const context = canvas.getContext('2d');
         if (context === null) {
             throw new Error('Failed to create offscreen canvas context');

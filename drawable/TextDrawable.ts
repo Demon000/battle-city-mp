@@ -3,8 +3,9 @@ import BaseDrawable from './BaseDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
 import { DrawableProperties } from './IDrawable';
-import ImageUtils, { Source } from './ImageUtils';
+import ImageUtils, { Source } from '../utils/ImageUtils';
 import { CLIENT_FONTS_RELATIVE_URL } from '@/config';
+import CanvasUtils, { Canvas } from '@/utils/CanvasUtils';
 
 export interface FontFaceProperties {
     family: string;
@@ -31,6 +32,7 @@ export default class TextDrawable extends BaseDrawable {
     private textCache = new Map<string, this>();
     private positionXReferenceCache = new Map<string, this>();
     private positionYReferenceCache = new Map<string, this>();
+    protected ownProperties: TextDrawableProperties;
     private cachedSource?: Source;
     private fontFace?: FontFace;
     private _isLoaded = false;
@@ -50,10 +52,13 @@ export default class TextDrawable extends BaseDrawable {
 
         if (properties.fontFamily !== undefined && properties.fontUrl !== undefined) {
             this.fontFace = new FontFace(properties.fontFamily,
-                `url(${CLIENT_FONTS_RELATIVE_URL}/${properties.fontUrl})`);
+                `url('${CLIENT_FONTS_RELATIVE_URL}/${properties.fontUrl}')`);
             this.fontFace.load()
                 .then((fontFace: FontFace) => {
                     document.fonts.add(fontFace);
+                    this._isLoaded = true;
+                }).catch(_err => {
+                    this.ownProperties.fontFamily = 'Arial';
                     this._isLoaded = true;
                 });
         }
@@ -85,7 +90,7 @@ export default class TextDrawable extends BaseDrawable {
         return `rgba(${bgColor[0]}, ${bgColor[1]}, ${bgColor[2]}, ${bgAlpha})`;
     }
 
-    private drawText(): OffscreenCanvas {
+    private drawText(): Canvas {
         const properties = this.properties;
         const scaleX = properties.scaleX ?? 1;
         const scaleY = properties.scaleY ?? 1;
@@ -95,7 +100,7 @@ export default class TextDrawable extends BaseDrawable {
         const offsetX = fontSize * scaleX;
         const offsetY = fontSize * scaleY;
 
-        const canvas = new OffscreenCanvas(width, height);
+        const canvas = CanvasUtils.create(width, height);
         const context = canvas.getContext('2d');
         if (context == null) {
             throw new Error('Failed to create offscreen canvas context');
@@ -128,7 +133,7 @@ export default class TextDrawable extends BaseDrawable {
         const width = paddingX * 2 + textMeasurements.width;
         const height = paddingY * 2 + textMeasurements.height;
 
-        const canvas = new OffscreenCanvas(width, height);
+        const canvas = CanvasUtils.create(width, height);
         const context = canvas.getContext('2d');
         if (context == null) {
             throw new Error('Failed to create offscreen canvas context');
