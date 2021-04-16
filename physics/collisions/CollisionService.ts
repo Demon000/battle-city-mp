@@ -155,13 +155,13 @@ export default class CollisionService {
         }
     }
 
-    validateObjectMovement(objectId: number, position: Point): void {
+    validateObjectMovement(objectId: number, position: Point, direction?: Direction): void {
         if (this.rulesMap === undefined) {
             throw new Error('Cannot validate object movement when rules map is not set');
         }
 
         const movingObject = this.gameObjectRepository.get(objectId);
-        const movingDirection = movingObject.direction;
+        const movingDirection = direction ?? movingObject.direction;
         const originalBoundingBox = movingObject.getBoundingBox();
         const movedBoundingBox = movingObject.getBoundingBox(position);
         const mergedBoundingBox = BoundingBoxUtils.combine(originalBoundingBox, movedBoundingBox);
@@ -252,7 +252,7 @@ export default class CollisionService {
             this.validateObjectMovement(objectId, {
                 x: x,
                 y: y,
-            });
+            }, oldDirection);
         }
     }
 }
