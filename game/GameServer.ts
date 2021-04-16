@@ -212,11 +212,10 @@ export default class GameServer {
         /**
          * CollisionService event handlers
          */
-        const spawnExplosion = (objectId: number, type: ExplosionType, destroyedObjectType?: GameObjectType) => {
-            const object = this.gameObjectService.getObject(objectId);
+        const spawnExplosion = (position: Point, type: ExplosionType, destroyedObjectType?: GameObjectType) => {
             const explosion = new Explosion({
                 explosionType: type,
-                position: object.centerPosition,
+                position: position,
                 destroyedObjectType,
             });
             this.gameObjectService.registerObject(explosion);
@@ -244,30 +243,30 @@ export default class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_LEVEL_BORDER,
-            (movingObjectId: number, _staticObjectId: number) => {
-                spawnExplosion(movingObjectId, ExplosionType.SMALL, GameObjectType.NONE);
+            (movingObjectId: number, _staticObjectId: number, position: Point) => {
+                spawnExplosion(position, ExplosionType.SMALL, GameObjectType.NONE);
                 destroyBullet(movingObjectId);
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_STEEL_WALL,
-            (bulletId: number, steelWallId: number) => {
+            (bulletId: number, steelWallId: number, position: Point) => {
                 const bullet = this.bulletService.getBullet(bulletId);
                 destroyBullet(bulletId);
                 if (bullet.power === BulletPower.HEAVY) {
-                    spawnExplosion(bulletId, ExplosionType.SMALL);
+                    spawnExplosion(position, ExplosionType.SMALL);
                     this.gameObjectService.setObjectDestroyed(steelWallId);
                 } else {
-                    spawnExplosion(bulletId, ExplosionType.SMALL, GameObjectType.NONE);
+                    spawnExplosion(position, ExplosionType.SMALL, GameObjectType.NONE);
                 }
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BRICK_WALL,
-            (bulletId: number, brickWallId: number) => {
+            (bulletId: number, brickWallId: number, position: Point) => {
                 const destroyBox = this.bulletService.getBulletBrickWallDestroyBox(bulletId, brickWallId);
                 const objectsIds = this.collisionService.getOverlappingObjects(destroyBox);
                 const objects = this.gameObjectService.getMultipleObjects(objectsIds);
                 const brickWalls = objects.filter(o => o.type === GameObjectType.BRICK_WALL);
-                spawnExplosion(bulletId, ExplosionType.SMALL);
+                spawnExplosion(position, ExplosionType.SMALL);
                 destroyBullet(bulletId);
                 for (const brickWall of brickWalls) {
                     this.gameObjectService.setObjectDestroyed(brickWall.id);
@@ -275,7 +274,7 @@ export default class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_TANK,
-            (bulletId: number, tankId: number) => {
+            (bulletId: number, tankId: number, position: Point) => {
                 const bullet = this.bulletService.getBullet(bulletId);
                 if (bullet.tankId === tankId) {
                     return;
@@ -289,11 +288,11 @@ export default class GameServer {
                 bullet.damage -= tankHealth;
 
                 if (tank.health <= 0) {
-                    spawnExplosion(bulletId, ExplosionType.SMALL);
-                    spawnExplosion(tankId, ExplosionType.BIG, GameObjectType.TANK);
+                    spawnExplosion(position, ExplosionType.SMALL);
+                    spawnExplosion(tank.centerPosition, ExplosionType.BIG, GameObjectType.TANK);
                     this.playerService.setPlayerRequestedSpawnStatus(tank.playerId, PlayerSpawnStatus.DESPAWN);
                 } else {
-                    spawnExplosion(bulletId, ExplosionType.SMALL, GameObjectType.NONE);
+                    spawnExplosion(position, ExplosionType.SMALL, GameObjectType.NONE);
                 }
 
                 if (bullet.damage <= 0) {
@@ -302,8 +301,8 @@ export default class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BULLET,
-            (movingObjectId: number, staticObjectId: number) => {
-                spawnExplosion(movingObjectId, ExplosionType.SMALL);
+            (movingObjectId: number, staticObjectId: number, position: Point) => {
+                spawnExplosion(position, ExplosionType.SMALL);
                 destroyBullet(movingObjectId);
                 destroyBullet(staticObjectId);
             });

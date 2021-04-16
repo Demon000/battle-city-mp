@@ -155,7 +155,7 @@ export default class CollisionService {
         }
     }
 
-    validateObjectMovement(objectId: number, position: Point, direction?: Direction): void {
+    validateObjectMovement(objectId: number, position: Point, direction?: Direction, trySnapping=true): void {
         if (this.rulesMap === undefined) {
             throw new Error('Cannot validate object movement when rules map is not set');
         }
@@ -205,19 +205,42 @@ export default class CollisionService {
             }
         }
 
+        /*
+         * We found a movement preventing object, snap to its edge.
+         * This usually works, because we can only move towards an object.
+         * But there's an edge case where the moving object has turned in another
+         * direction, and we try to snap it so he can fit between blocks with ease,
+         * in which case we cannot try to snap it again to the edge of the movement
+         * movement preventing object.
+         */
         if (movementPreventingObject !== undefined) {
             const preventingBoundingBox = movementPreventingObject.getBoundingBox();
             this.snapObjectToBoundingBoxEdge(movingObject, position,
                 preventingBoundingBox, movingDirection);
         }
 
-        this.emitter.emit(CollisionServiceEvent.OBJECT_POSITION_ALLOWED, objectId, position);
+        /*
+         * If we can't try snapping to the movement preventing object's edge,
+         * then the position we're trying to move to is inside the movement preventing object,
+         * which means it is invalid, and we shouldn't update the object position.
+         */
+        let isValidPosition = true;
+        if (!trySnapping && movementPreventingObject !== undefined) {
+            isValidPosition = false;
+        }
+
+        if (isValidPosition) {
+            this.emitter.emit(CollisionServiceEvent.OBJECT_POSITION_ALLOWED, objectId, position);
+        }
 
         const preventedBoundingBox = movingObject.getBoundingBox(position);
         for (const [name, overlappingObject] of notifications) {
             const overlappingBoundingBox = overlappingObject.getBoundingBox();
-            if (BoundingBoxUtils.overlapsEqual(preventedBoundingBox, overlappingBoundingBox)) {
-                this.emitter.emit(name, objectId, overlappingObject.id);
+            if ((isValidPosition &&
+                BoundingBoxUtils.overlapsEqual(preventedBoundingBox, overlappingBoundingBox))
+                || (!isValidPosition &&
+                    BoundingBoxUtils.overlaps(movedBoundingBox, overlappingBoundingBox))) {
+                this.emitter.emit(name, objectId, overlappingObject.id, position);
             }
         }
     }
@@ -252,7 +275,7 @@ export default class CollisionService {
             this.validateObjectMovement(objectId, {
                 x: x,
                 y: y,
-            }, oldDirection);
+            }, oldDirection, false);
         }
     }
 }
