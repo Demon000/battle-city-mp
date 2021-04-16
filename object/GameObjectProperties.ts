@@ -46,8 +46,9 @@ const properties: IGameObjectProperties[] = [
     },
     {
         type: GameObjectType.TANK,
-        width: 13,
-        height: 13,
+        width: 16,
+        height: 16,
+        directionAxisSnapping: 4,
         // audioEffects: [
         //     {
         //         filename: 'tank_moving.wav',
