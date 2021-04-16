@@ -32,7 +32,6 @@ export default interface IGameObjectProperties {
 
     width: number;
     height: number;
-    directionAxisSnapping?: number;
     automaticDestroyTime?: number;
 
     drawables?: IDrawable[];

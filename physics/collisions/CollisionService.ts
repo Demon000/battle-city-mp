@@ -7,7 +7,6 @@ import BoundingBoxRepository from '../bounding-box/BoundingBoxRepository';
 import BoundingBoxUtils from '../bounding-box/BoundingBoxUtils';
 import { Direction } from '../Direction';
 import Point from '../point/Point';
-import DirectionUtils from './DirectionUtils';
 import ICollisionRule, { CollisionEvent, CollisionEvents, CollisionResultEvent } from './ICollisionRule';
 
 export enum CollisionServiceEvent {
@@ -155,13 +154,13 @@ export default class CollisionService {
         }
     }
 
-    validateObjectMovement(objectId: number, position: Point, direction?: Direction, trySnapping=true): void {
+    validateObjectMovement(objectId: number, position: Point): void {
         if (this.rulesMap === undefined) {
             throw new Error('Cannot validate object movement when rules map is not set');
         }
 
         const movingObject = this.gameObjectRepository.get(objectId);
-        const movingDirection = direction ?? movingObject.direction;
+        const movingDirection = movingObject.direction;
         const originalBoundingBox = movingObject.getBoundingBox();
         const movedBoundingBox = movingObject.getBoundingBox(position);
         const mergedBoundingBox = BoundingBoxUtils.combine(originalBoundingBox, movedBoundingBox);
@@ -205,77 +204,24 @@ export default class CollisionService {
             }
         }
 
-        /*
-         * We found a movement preventing object, snap to its edge.
-         * This usually works, because we can only move towards an object.
-         * But there's an edge case where the moving object has turned in another
-         * direction, and we try to snap it so he can fit between blocks with ease,
-         * in which case we cannot try to snap it again to the edge of the movement
-         * movement preventing object.
-         */
         if (movementPreventingObject !== undefined) {
             const preventingBoundingBox = movementPreventingObject.getBoundingBox();
             this.snapObjectToBoundingBoxEdge(movingObject, position,
                 preventingBoundingBox, movingDirection);
         }
 
-        /*
-         * If we can't try snapping to the movement preventing object's edge,
-         * then the position we're trying to move to is inside the movement preventing object,
-         * which means it is invalid, and we shouldn't update the object position.
-         */
-        let isValidPosition = true;
-        if (!trySnapping && movementPreventingObject !== undefined) {
-            isValidPosition = false;
-        }
-
-        if (isValidPosition) {
-            this.emitter.emit(CollisionServiceEvent.OBJECT_POSITION_ALLOWED, objectId, position);
-        }
+        this.emitter.emit(CollisionServiceEvent.OBJECT_POSITION_ALLOWED, objectId, position);
 
         const preventedBoundingBox = movingObject.getBoundingBox(position);
         for (const [name, overlappingObject] of notifications) {
             const overlappingBoundingBox = overlappingObject.getBoundingBox();
-            if ((isValidPosition &&
-                BoundingBoxUtils.overlapsEqual(preventedBoundingBox, overlappingBoundingBox))
-                || (!isValidPosition &&
-                    BoundingBoxUtils.overlaps(movedBoundingBox, overlappingBoundingBox))) {
+            if (BoundingBoxUtils.overlapsEqual(preventedBoundingBox, overlappingBoundingBox)) {
                 this.emitter.emit(name, objectId, overlappingObject.id, position);
             }
         }
     }
 
-    calculateSnappedCoordinates(value: number, snapping: number): number {
-        const overSnapping = value % snapping;
-        let snapped = value - overSnapping;
-        if (overSnapping > snapping / 2) {
-            snapped += snapping;
-        }
-        return snapped;
-    }
-
     validateObjectDirection(objectId: number, direction: Direction): void {
-        const gameObject = this.gameObjectRepository.get(objectId);
-        const oldDirection = gameObject.direction;
-
         this.emitter.emit(CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED, objectId, direction);
-
-        if (gameObject.properties.directionAxisSnapping !== undefined &&
-                !DirectionUtils.isSameAxis(oldDirection, direction)) {
-            let x = gameObject.position.x;
-            let y = gameObject.position.y;
-            if (DirectionUtils.isHorizontalAxis(direction)) {
-                y = this.calculateSnappedCoordinates(gameObject.position.y,
-                    gameObject.properties.directionAxisSnapping);
-            } else {
-                x = this.calculateSnappedCoordinates(gameObject.position.x,
-                    gameObject.properties.directionAxisSnapping);
-            }
-
-            this.validateObjectMovement(objectId, {
-                x: x,
-                y: y,
-            }, oldDirection, false);
-        }
     }
 }
