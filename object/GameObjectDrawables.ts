@@ -60,6 +60,67 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
     ],
     [GameObjectType.TANK]: [
         ...((): IDrawable[] => {
+            const tierDirectionOffsets: Record<TankTier, Record<Direction, {
+                offsetX: number,
+                offsetY: number,
+            }>> = {
+                [TankTier.NORMAL]: {
+                    [Direction.UP]: {
+                        offsetX: -3,
+                        offsetY: -3,
+                    },
+                    [Direction.RIGHT]: {
+                        offsetX: -3,
+                        offsetY: -3,
+                    },
+                    [Direction.DOWN]: {
+                        offsetX: -3,
+                        offsetY: -3,
+                    },
+                    [Direction.LEFT]: {
+                        offsetX: -3,
+                        offsetY: -3,
+                    },
+                },
+                [TankTier.LIGHT]: {
+                    [Direction.UP]: {
+                        offsetX: -3,
+                        offsetY: -5,
+                    },
+                    [Direction.RIGHT]: {
+                        offsetX: -1,
+                        offsetY: -3,
+                    },
+                    [Direction.DOWN]: {
+                        offsetX: -3,
+                        offsetY: -1,
+                    },
+                    [Direction.LEFT]: {
+                        offsetX: -5,
+                        offsetY: -3,
+                    },
+                },
+                [TankTier.HEAVY]: {
+                    [Direction.UP]: {
+                        offsetX: -3,
+                        offsetY: -3,
+                    },
+                    [Direction.RIGHT]: {
+                        offsetX: -3,
+                        offsetY: -3,
+                    },
+                    [Direction.DOWN]: {
+                        offsetX: -3,
+                        offsetY: -3,
+                    },
+                    [Direction.LEFT]: {
+                        offsetX: -3,
+                        offsetY: -3,
+                    },
+                },
+            };
+
+
             const generateTankTierDirectionFrame = (
                 tier: TankTier,
                 direction: Direction,
@@ -75,6 +136,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                     renderPass: RenderPass.TANK,
                     scaleX: 0.5,
                     scaleY: 0.5,
+                    ...tierDirectionOffsets[tier][direction],
                     overlays: [
                         new ImageDrawable(`tank_${tier}_${direction}_${frame}_highlights.png`, {}, {
                             compositionType: 'lighter',
