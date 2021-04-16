@@ -227,7 +227,7 @@ export default class Tank extends GameObject {
     }
 
     get bulletSpeed(): number {
-        return tierToBulletSpeedMap[this.tier] + this.maxMovementSpeed;
+        return tierToBulletSpeedMap[this.tier] + this.movementSpeed;
     }
 
     get bulletPower(): BulletPower {
