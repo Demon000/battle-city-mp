@@ -34,7 +34,7 @@
                 </button>
             </div>
 
-            <div id="fullscreen-controls">
+            <div id="fullscreen-controls" class="controls">
                 <img
                     class="image-button"
                     :src="`${CLIENT_SPRITES_RELATIVE_URL}/fullscreen_button.png`"
@@ -218,6 +218,11 @@ export default class App extends Vue {
     left: 0;
 }
 
+.controls {
+    background: rgba(0, 0, 0, 0.25);
+    color: #ffffff;
+}
+
 .image-button {
     padding: 8px;
     width: 32px;
@@ -230,9 +235,6 @@ export default class App extends Vue {
     position: absolute;
     top: 0;
     left: 0;
-    background: rgba(0, 0, 0, 0.25);
-
-    color: #ffffff;
 }
 
 #fullscreen-controls {
@@ -240,8 +242,9 @@ export default class App extends Vue {
     top: 0;
     right: 0;
 
-    background: rgba(0, 0, 0, 0.25);
     border-bottom-left-radius: 12px;
+
+    display: none;
 }
 
 #virtual-controls {
@@ -269,6 +272,10 @@ export default class App extends Vue {
 @media (pointer: coarse) {
     #virtual-controls {
         display: flex;
+    }
+
+    #fullscreen-controls {
+        display: block;
     }
 }
 </style>
