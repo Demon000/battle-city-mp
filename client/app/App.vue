@@ -127,20 +127,19 @@ export default class App extends Vue {
     }
 
     onKeyboardEvent(event: KeyboardEvent): void {
-        if (!this.gameClientSocket) {
-            return;
-        }
-
         if (event.repeat) {
             return;
         }
 
-        const action = ActionFactory.buildFromEvent(event);
-        if (action === undefined) {
+        const action = ActionFactory.buildFromKeyboardEvent(event);
+        if (action !== undefined) {
+            this.gameClientSocket?.requestPlayerAction(action);
             return;
         }
 
-        this.gameClientSocket.requestPlayerAction(action);
+        if (event.key.toLowerCase() === 'b' && event.type === 'keyup') {
+            this.isBuilding = !this.isBuilding;
+        }
     }
 
     onShootButtonTouchEvent(event: TouchEvent): void {
@@ -153,16 +152,12 @@ export default class App extends Vue {
     }
 
     onJoystickEvent(event: DirectionalJoystickEvent): void {
-        if (!this.gameClientSocket) {
-            return;
-        }
-
         const action = ActionFactory.buildFromJoystickEvent(event.type, event.angle);
         if (action === undefined) {
             return;
         }
 
-        this.gameClientSocket.requestPlayerAction(action);
+        this.gameClientSocket?.requestPlayerAction(action);
     }
 
     beforeUnmount(): void {
@@ -170,42 +165,30 @@ export default class App extends Vue {
     }
 
     onWindowResize(): void {
-        if (this.gameClient) {
-            this.gameClient.onWindowResize();
-        }
+        this.gameClient?.onWindowResize();
     }
 
     onSpawnButtonClick(): void {
-        if (this.gameClientSocket !== undefined) {
-            this.gameClientSocket.requestPlayerTankSpawn();
-        }
+        this.gameClientSocket?.requestPlayerTankSpawn();
     }
 
     onDespawnButtonClick(): void {
-        if (this.gameClientSocket !== undefined) {
-            this.gameClientSocket.requestPlayerTankDespawn();
-        }
+        this.gameClientSocket?.requestPlayerTankDespawn();
     }
 
     onPlayerColorChanged(): void {
         const r = parseInt(this.playerColor.substr(1, 2), 16);
         const g = parseInt(this.playerColor.substr(3, 2), 16);
         const b = parseInt(this.playerColor.substr(5, 2), 16);
-        if (this.gameClientSocket !== undefined) {
-            this.gameClientSocket.requestPlayerTankColor(r, g, b);
-        }
+        this.gameClientSocket?.requestPlayerTankColor(r, g, b);
     }
 
     onPlayerTierClick(tier: TankTier): void {
-        if (this.gameClientSocket !== undefined) {
-            this.gameClientSocket.requestPlayerTankTier(tier);
-        }
+        this.gameClientSocket?.requestPlayerTankTier(tier);
     }
 
     onPlayerNameChanged(): void {
-        if (this.gameClientSocket !== undefined) {
-            this.gameClientSocket.setPlayerName(this.playerName);
-        }
+        this.gameClientSocket?.setPlayerName(this.playerName);
     }
 
     onFullscreenButtonClick(): void {

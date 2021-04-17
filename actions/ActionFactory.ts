@@ -10,51 +10,46 @@ export default class ActionFactory {
         }
     }
 
-    static buildFromEvent(event: Event): Action | undefined {
-        if (['keydown', 'keyup'].includes(event.type)) {
-            const keyboardEvent = event as KeyboardEvent;
-            let buttonState;
-            if (keyboardEvent.type === 'keydown') {
-                buttonState = ButtonState.PRESSED;
-            } else if (keyboardEvent.type === 'keyup') {
-                buttonState = ButtonState.UNPRESSED;
-            } else {
-                throw new Error('Invalid keyboard event type');
-            }
-
-            let buttonType;
-            switch (keyboardEvent.key) {
-                case 'W':
-                case 'w':
-                    buttonType = ButtonType.UP;
-                    break;
-                case 'A':
-                case 'a':
-                    buttonType = ButtonType.LEFT;
-                    break;
-                case 'S':
-                case 's':
-                    buttonType = ButtonType.DOWN;
-                    break;
-                case 'D':
-                case 'd':
-                    buttonType = ButtonType.RIGHT;
-                    break;
-                case ' ':
-                    buttonType = ButtonType.SHOOT;
-                    break;
-                default:
-                    return undefined;
-            }
-
-            return new ButtonPressAction({
-                timestamp: event.timeStamp,
-                buttonState,
-                buttonType,
-            });
-        } else {
-            throw new Error('Invalid event type');
+    static buildFromKeyboardEvent(event: KeyboardEvent): Action | undefined {
+        if (!['keydown', 'keyup'].includes(event.type)) {
+            return undefined;
         }
+
+        let buttonState;
+        if (event.type === 'keydown') {
+            buttonState = ButtonState.PRESSED;
+        } else if (event.type === 'keyup') {
+            buttonState = ButtonState.UNPRESSED;
+        } else {
+            throw new Error('Invalid keyboard event type');
+        }
+
+        let buttonType;
+        switch (event.key.toLowerCase()) {
+            case 'w':
+                buttonType = ButtonType.UP;
+                break;
+            case 'a':
+                buttonType = ButtonType.LEFT;
+                break;
+            case 's':
+                buttonType = ButtonType.DOWN;
+                break;
+            case 'd':
+                buttonType = ButtonType.RIGHT;
+                break;
+            case ' ':
+                buttonType = ButtonType.SHOOT;
+                break;
+            default:
+                return undefined;
+        }
+
+        return new ButtonPressAction({
+            timestamp: event.timeStamp,
+            buttonState,
+            buttonType,
+        });
     }
 
     static buildFromJoystickEvent(type: string, angle: string): Action | undefined {
