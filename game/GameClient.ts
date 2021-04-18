@@ -142,11 +142,8 @@ export default class GameClient {
     }
 
     setMapEditorHoverPosition(position: Point): void {
-        const scale = this.gameGraphicsService.getRenderScale();
-        this.gameMapEditorService.setHoverPosition({
-            x: Math.floor(position.x / scale),
-            y: Math.floor(position.y / scale),
-        });
+        const worldPosition = this.gameGraphicsService.getWorldPosition(position);
+        this.gameMapEditorService.setHoverPosition(worldPosition);
     }
 
     clear(): void {

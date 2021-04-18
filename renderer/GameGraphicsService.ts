@@ -141,7 +141,10 @@ export default class GameGraphicsService {
         };
     }
 
-    getRenderScale(): number {
-        return this.scale;
+    getWorldPosition(position: Point): Point {
+        return {
+            x: Math.floor(position.x / this.scale),
+            y: Math.floor(position.y / this.scale),
+        };
     }
 }
