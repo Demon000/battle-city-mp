@@ -20,6 +20,8 @@ export enum GameEvent {
     PLAYER_REQUEST_TANK_DESPAWN = 'player-request-tank-despawn',
     PLAYER_REQUEST_SERVER_STATUS = 'player-request-server-status',
     PLAYER_SET_NAME = 'player-set-name',
+    PLAYER_MAP_EDITOR_CREATE_OBJECTS = 'player-map-editor-create-objects',
+    PLAYER_MAP_EDITOR_DESTROY_OBJECTS = 'player-map-editor-destroy-objects',
 
     PLAYER_SERVER_STATUS = 'player-server-status',
 

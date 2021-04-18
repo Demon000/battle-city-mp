@@ -5,6 +5,7 @@ import { SERVER_CONFIG_TPS } from '@/config';
 import { Color } from '@/drawable/Color';
 import Explosion from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
+import GameObjectFactory from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import { Direction } from '@/physics/Direction';
@@ -356,6 +357,15 @@ export default class GameServer {
 
     onPlayerSetName(playerId: string, name: string): void {
         this.playerService.setPlayerName(playerId, name);
+    }
+
+    onPlayerMapEditorCreateObjects(objectsOptions: GameObjectOptions[]): void {
+        const objects = objectsOptions.map(o => GameObjectFactory.buildFromOptions(o));
+        this.gameObjectService.registerObjects(objects);
+    }
+
+    onPlayerMapEditorDestroyObjects(destroyBox: BoundingBox): void {
+        // do nothing
     }
 
     onPlayerRequestSpawnStatusFromClient(playerId: string, spawnStatus: PlayerSpawnStatus): void {

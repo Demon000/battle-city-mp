@@ -16,3 +16,6 @@ export const CLIENT_CONFIG_VISIBLE_GAME_SIZE: number = Number.parseInt(process.e
 // eslint-disable-next-line
 export const SERVER_CONFIG_TPS: number = Number.parseInt(process.env
     .SERVER_TPS!);
+// eslint-disable-next-line
+export const SERVER_CONFIG_ALLOW_MAP_EDITOR: number = Number.parseInt(process.env
+    .ALLOW_MAP_EDITOR!);

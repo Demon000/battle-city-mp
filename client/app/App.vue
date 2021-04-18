@@ -152,13 +152,13 @@ export default class App extends Vue {
         window.addEventListener('resize', this.onWindowResize);
         window.addEventListener('keydown', this.onKeyboardEvent);
         window.addEventListener('keyup', this.onKeyboardEvent);
-        window.addEventListener('contextmenu', (e: Event) => e.preventDefault());
         window.addEventListener('mousemove', this.onMouseMoveEvent);
+        window.addEventListener('click', this.onMouseClickEvent);
+        window.addEventListener('contextmenu', this.onMouseRightClickEvent);
 
         const shootButton = this.$refs.shootButton as HTMLElement;
         shootButton.addEventListener('touchstart', this.onShootButtonTouchEvent);
         shootButton.addEventListener('touchend', this.onShootButtonTouchEvent);
-
 
         this.joystick.on('dirdown', this.onJoystickEvent);
         this.joystick.on('dirup', this.onJoystickEvent);
@@ -255,6 +255,15 @@ export default class App extends Vue {
 
     onMouseMoveEvent(event: MouseEvent): void {
         this.gameClient?.setMapEditorHoverPosition(event);
+    }
+
+    onMouseClickEvent(): void {
+        this.gameClient?.createMapEditorObjects();
+    }
+
+    onMouseRightClickEvent(event: MouseEvent): void {
+        this.gameClient?.destroyMapEditorObjects(event);
+        event.preventDefault();
     }
 }
 </script>

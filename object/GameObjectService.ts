@@ -5,7 +5,7 @@ import EventEmitter from 'eventemitter3';
 import { Direction } from '../physics/Direction';
 import Point from '../physics/point/Point';
 import PointUtils from '../physics/point/PointUtils';
-import GameObject, { GameObjectOptions, PartialGameObjectOptions } from './GameObject';
+import GameObject, { PartialGameObjectOptions } from './GameObject';
 import { GameObjectType } from './GameObjectType';
 
 export enum GameObjectServiceEvent {

@@ -5,7 +5,7 @@ import GameCamera from '@/renderer/GameCamera';
 import GameGraphicsService from '@/renderer/GameGraphicsService';
 import MapRepository from '@/utils/MapRepository';
 import Ticker, { TickerEvent } from '@/utils/Ticker';
-import GameObject, { PartialGameObjectOptions } from '../object/GameObject';
+import GameObject, { GameObjectOptions, PartialGameObjectOptions } from '../object/GameObject';
 import GameObjectService, { GameObjectServiceEvent } from '../object/GameObjectService';
 import BoundingBoxRepository from '../physics/bounding-box/BoundingBoxRepository';
 import CollisionService from '../physics/collisions/CollisionService';
@@ -15,6 +15,17 @@ import GameObjectAudioRenderer from '@/object/GameObjectAudioRenderer';
 import GameMapEditorService from '@/maps/GameMapEditorService';
 import { GameObjectType } from '@/object/GameObjectType';
 import Point from '@/physics/point/Point';
+import EventEmitter from 'eventemitter3';
+
+export enum GameClientEvent {
+    MAP_EDITOR_CREATE_OBJECTS = 'map-editor-create-objects',
+    MAP_EDITOR_DESTROY_OBJECTS = 'map-editor-destroy-objects',
+}
+
+export interface GameClientEvents {
+    [GameClientEvent.MAP_EDITOR_CREATE_OBJECTS]: (objectsOptions: GameObjectOptions[]) => void;
+    [GameClientEvent.MAP_EDITOR_DESTROY_OBJECTS]: (box: BoundingBox) => void;
+}
 
 export default class GameClient {
     private playerRepository;
@@ -28,6 +39,7 @@ export default class GameClient {
     private objectAudioRendererRepository;
     private gameAudioService;
     private gameMapEditorService;
+    emitter;
     ticker;
 
     constructor(canvas: HTMLCanvasElement) {
@@ -40,6 +52,7 @@ export default class GameClient {
         this.objectAudioRendererRepository = new MapRepository<number, GameObjectAudioRenderer>();
         this.gameAudioService = new GameAudioService(this.objectAudioRendererRepository);
         this.gameMapEditorService = new GameMapEditorService();
+        this.emitter = new EventEmitter<GameClientEvents>();
         this.ticker = new Ticker();
 
         this.playerRepository = new MapRepository<string, Player>();
@@ -123,7 +136,9 @@ export default class GameClient {
             this.gameGraphicsService.renderGrid(gridSize);
         }
 
-        const ghostObjects = this.gameMapEditorService.getGhostObjects(box.tl.x, box.tl.y);
+        this.gameMapEditorService.setViewPosition(box.tl);
+        this.gameMapEditorService.updateGhostObjects();
+        const ghostObjects = this.gameMapEditorService.getGhostObjects();
         if (ghostObjects.length !== 0) {
             this.gameGraphicsService.renderGhostObjects(ghostObjects, position);
         }
@@ -144,6 +159,22 @@ export default class GameClient {
     setMapEditorHoverPosition(position: Point): void {
         const worldPosition = this.gameGraphicsService.getWorldPosition(position);
         this.gameMapEditorService.setHoverPosition(worldPosition);
+    }
+
+    createMapEditorObjects(): void {
+        const objects = this.gameMapEditorService.getGhostObjects();
+        const objectsOptions = objects.map(o => o.toOptions())
+            .map(o => {
+                delete o.id;
+                return o;
+            }) as GameObjectOptions[];
+        this.emitter.emit(GameClientEvent.MAP_EDITOR_CREATE_OBJECTS, objectsOptions);
+    }
+
+    destroyMapEditorObjects(position: Point): void {
+        const worldPosition = this.gameGraphicsService.getWorldPosition(position);
+        const destroyBox = this.gameMapEditorService.getDestroyBox(worldPosition);
+        this.emitter.emit(GameClientEvent.MAP_EDITOR_DESTROY_OBJECTS, destroyBox);
     }
 
     clear(): void {

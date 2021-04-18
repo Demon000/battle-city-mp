@@ -1,10 +1,12 @@
 import Action from '@/actions/Action';
+import GameObjectProperties from '@/object/GameObjectProperties';
+import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import { TankTier } from '@/tank/TankTier';
 import { Socket } from 'socket.io-client';
 import { GameObjectOptions } from '../object/GameObject';
 import GameObjectFactory from '../object/GameObjectFactory';
 import Player, { PlayerOptions } from '../player/Player';
-import GameClient from './GameClient';
+import GameClient, { GameClientEvent } from './GameClient';
 import { BatchGameEvent, GameEvent } from './GameEvent';
 import { GameServerStatus } from './GameServerStatus';
 
@@ -28,6 +30,16 @@ export default class GameClientSocket {
         this.socket.on('disconnect', () => {
             this.gameClient.ticker.stop();
         });
+
+        this.gameClient.emitter.on(GameClientEvent.MAP_EDITOR_CREATE_OBJECTS,
+            (objectsOptions: GameObjectProperties[]) => {
+                this.socket.emit(GameEvent.PLAYER_MAP_EDITOR_CREATE_OBJECTS, objectsOptions);
+            });
+
+        this.gameClient.emitter.on(GameClientEvent.MAP_EDITOR_DESTROY_OBJECTS,
+            (destroyBox: BoundingBox) => {
+                this.socket.emit(GameEvent.PLAYER_MAP_EDITOR_DESTROY_OBJECTS, destroyBox);
+            });
 
         this.socket.connect();
     }

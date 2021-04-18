@@ -81,6 +81,14 @@ io.on('connection', (socket: IO.Socket) => {
     socket.on(GameEvent.PLAYER_SET_NAME, name => {
         gameServer.onPlayerSetName(socket.id, name);
     });
+
+    socket.on(GameEvent.PLAYER_MAP_EDITOR_CREATE_OBJECTS, objectsOptions => {
+        gameServer.onPlayerMapEditorCreateObjects(objectsOptions);
+    });
+
+    socket.on(GameEvent.PLAYER_MAP_EDITOR_DESTROY_OBJECTS, destroyBox => {
+        gameServer.onPlayerMapEditorDestroyObjects(destroyBox);
+    });
 });
 
 http.listen(argv.port, argv.host, () => {
