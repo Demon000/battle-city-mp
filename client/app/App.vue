@@ -153,6 +153,7 @@ export default class App extends Vue {
         window.addEventListener('keydown', this.onKeyboardEvent);
         window.addEventListener('keyup', this.onKeyboardEvent);
         window.addEventListener('contextmenu', (e: Event) => e.preventDefault());
+        window.addEventListener('mousemove', this.onMouseMoveEvent);
 
         const shootButton = this.$refs.shootButton as HTMLElement;
         shootButton.addEventListener('touchstart', this.onShootButtonTouchEvent);
@@ -250,6 +251,10 @@ export default class App extends Vue {
 
     onSelectedObjectTypeChanged(): void {
         this.gameClient?.setMapEditorSelectedObjectType(this.selectedObjectType);
+    }
+
+    onMouseMoveEvent(event: MouseEvent): void {
+        this.gameClient?.setMapEditorHoverPosition(event);
     }
 }
 </script>

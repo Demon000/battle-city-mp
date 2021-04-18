@@ -132,4 +132,8 @@ export default class GameGraphicsService {
             },
         };
     }
+
+    getRenderScale(): number {
+        return this.scale;
+    }
 }

@@ -14,6 +14,7 @@ import PlayerService from '../player/PlayerService';
 import GameObjectAudioRenderer from '@/object/GameObjectAudioRenderer';
 import GameMapEditorService from '@/maps/GameMapEditorService';
 import { GameObjectType } from '@/object/GameObjectType';
+import Point from '@/physics/point/Point';
 
 export default class GameClient {
     private playerRepository;
@@ -122,7 +123,7 @@ export default class GameClient {
             this.gameGraphicsService.renderGrid(gridSize);
         }
 
-        const ghostObjects = this.gameMapEditorService.getGhostObjects();
+        const ghostObjects = this.gameMapEditorService.getGhostObjects(box.tl.x, box.tl.y);
         if (ghostObjects.length !== 0) {
             this.gameGraphicsService.renderObjectsOver(ghostObjects, position);
         }
@@ -138,6 +139,14 @@ export default class GameClient {
 
     setMapEditorSelectedObjectType(type: GameObjectType): void {
         this.gameMapEditorService.setSelectedObjectType(type);
+    }
+
+    setMapEditorHoverPosition(position: Point): void {
+        const scale = this.gameGraphicsService.getRenderScale();
+        this.gameMapEditorService.setHoverPosition({
+            x: Math.floor(position.x / scale),
+            y: Math.floor(position.y / scale),
+        });
     }
 
     clear(): void {
