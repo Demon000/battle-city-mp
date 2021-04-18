@@ -372,6 +372,12 @@ export default class GameServer {
             .forEach(o => this.gameObjectService.unregisterObject(o.id));
     }
 
+    onPlayerMapEditorSave(): void {
+        const objects = this.gameObjectService.getObjects();
+        this.gameMapService.setMapObjects(objects);
+        this.gameMapService.saveToFile();
+    }
+
     onPlayerRequestSpawnStatusFromClient(playerId: string, spawnStatus: PlayerSpawnStatus): void {
         this.playerService.setPlayerRequestedSpawnStatus(playerId, spawnStatus);
     }

@@ -89,6 +89,10 @@ io.on('connection', (socket: IO.Socket) => {
     socket.on(GameEvent.PLAYER_MAP_EDITOR_DESTROY_OBJECTS, destroyBox => {
         gameServer.onPlayerMapEditorDestroyObjects(destroyBox);
     });
+
+    socket.on(GameEvent.PLAYER_MAP_EDITOR_SAVE, () => {
+        gameServer.onPlayerMapEditorSave();
+    });
 });
 
 http.listen(argv.port, argv.host, () => {

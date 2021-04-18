@@ -142,4 +142,8 @@ export default class GameClientSocket {
     setPlayerName(name: string): void {
         this.socket.emit(GameEvent.PLAYER_SET_NAME, name);
     }
+
+    saveMap(): void {
+        this.socket.emit(GameEvent.PLAYER_MAP_EDITOR_SAVE);
+    }
 }

@@ -90,6 +90,14 @@
                         {{ type }}
                     </option>
                 </select>
+
+                <br>
+
+                <button
+                    @click="onSaveButtonClick"
+                >
+                    Save
+                </button>
             </div>
 
             <div id="virtual-controls">
@@ -304,6 +312,10 @@ export default class App extends Vue {
                 y: event.offsetY,
             });
         }
+    }
+
+    onSaveButtonClick(): void {
+        this.gameClientSocket?.saveMap();
     }
 }
 </script>

@@ -22,6 +22,7 @@ export enum GameEvent {
     PLAYER_SET_NAME = 'player-set-name',
     PLAYER_MAP_EDITOR_CREATE_OBJECTS = 'player-map-editor-create-objects',
     PLAYER_MAP_EDITOR_DESTROY_OBJECTS = 'player-map-editor-destroy-objects',
+    PLAYER_MAP_EDITOR_SAVE = 'player-map-editor-save',
 
     PLAYER_SERVER_STATUS = 'player-server-status',
 

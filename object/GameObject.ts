@@ -3,7 +3,7 @@ import Point from '@/physics/point/Point';
 import { Direction } from '../physics/Direction';
 import GameObjectGraphicsRenderer from './GameObjectGraphicsRenderer';
 import GameObjectProperties from './GameObjectProperties';
-import { GameObjectType } from './GameObjectType';
+import { GameObjectType, SavableGameObjectTypes } from './GameObjectType';
 import IGameObjectProperties, { ResourceMeta } from './IGameObjectProperties';
 
 export interface GameObjectOptions {
@@ -13,9 +13,10 @@ export interface GameObjectOptions {
     direction?: Direction;
     movementSpeed?: number;
     movementDirection?: Direction | null;
+    spawnTime?: number;
 }
 
-export type PartialGameObjectOptions = Partial<GameObject>;
+export type PartialGameObjectOptions = Partial<GameObjectOptions>;
 
 export default class GameObject {
     static globalId = 0;
@@ -50,6 +51,17 @@ export default class GameObject {
             direction: this.direction,
             movementSpeed: this.movementSpeed,
             movementDirection: this.movementDirection,
+        };
+    }
+
+    toSaveOptions(): PartialGameObjectOptions | undefined {
+        if (!SavableGameObjectTypes.includes(this.type)) {
+            return undefined;
+        }
+
+        return {
+            type: this.type,
+            position: this._position,
         };
     }
 

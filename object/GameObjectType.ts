@@ -21,3 +21,12 @@ export enum GameObjectType {
     ICE = 'ice',
     SMOKE = 'smoke',
 }
+
+export const SavableGameObjectTypes = [
+    GameObjectType.BRICK_WALL,
+    GameObjectType.STEEL_WALL,
+    GameObjectType.BUSH,
+    GameObjectType.LEVEL_BORDER,
+    GameObjectType.PLAYER_SPAWN,
+    GameObjectType.ICE,
+];

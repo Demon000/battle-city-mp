@@ -1,6 +1,5 @@
-import GameObject from '@/object/GameObject';
+import GameObject, { PartialGameObjectOptions } from '@/object/GameObject';
 import EventEmitter from 'eventemitter3';
-import fs from 'fs';
 import GameMap, { GameMapOptions } from './GameMap';
 
 export enum GameMapServiceEvent {
@@ -16,15 +15,31 @@ export default class GameMapService {
     emitter = new EventEmitter<GameMapServiceEvents>();
 
     loadFromFile(path: string): void {
-        const fileBuffer = fs.readFileSync(path);
-        const fileData = fileBuffer.toString();
-        const options = JSON.parse(fileData) as GameMapOptions;
-
-        this.map = new GameMap(options);
+        this.map = new GameMap(path);
         const objects = this.map.getObjects();
 
         this.emitter.emit(GameMapServiceEvent.OBJECTS_SPAWNED, objects);
 
         console.log(`Loaded map from ${path} with ${objects.length} objects`);
+    }
+
+    setMapObjects(objects: GameObject[]): void {
+        if (this.map === undefined) {
+            return;
+        }
+
+        const objectsOptions = objects.map(o => o.toSaveOptions())
+            .filter(o => o !== undefined) as PartialGameObjectOptions[];
+        this.map.setObjectsFromBlocks([]);
+        this.map.setObjectsFromOptions(objectsOptions);
+
+    }
+
+    saveToFile(path?: string): void {
+        if (this.map === undefined) {
+            return;
+        }
+
+        this.map.write(path);
     }
 }
