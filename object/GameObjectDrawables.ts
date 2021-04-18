@@ -11,7 +11,9 @@ import { RenderPass } from './IGameObjectProperties';
 
 const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
     [GameObjectType.STEEL_WALL]: [
-        new ImageDrawable('steel_wall.png'),
+        new ImageDrawable('steel_wall.png', {}, {
+            renderPass: RenderPass.WALL,
+        }),
     ],
     [GameObjectType.BUSH]: [
         new ImageDrawable('bush.png', {}, {
@@ -19,10 +21,14 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
         }),
     ],
     [GameObjectType.LEVEL_BORDER]: [
-        new ImageDrawable('level_border.png'),
+        new ImageDrawable('level_border.png', {}, {
+            renderPass: RenderPass.WALL,
+        }),
     ],
     [GameObjectType.ICE]: [
-        new ImageDrawable('ice.png'),
+        new ImageDrawable('ice.png', {}, {
+            renderPass: RenderPass.GROUND,
+        }),
     ],
     [GameObjectType.BRICK_WALL]: [
         new ImageDrawable('brick_wall_even.png', {
@@ -40,6 +46,8 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                     },
                 ],
             },
+        }, {
+            renderPass: RenderPass.WALL,
         }),
         new ImageDrawable('brick_wall_odd.png', {
             position: {
@@ -56,6 +64,8 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                     },
                 ],
             },
+        }, {
+            renderPass: RenderPass.WALL,
         }),
     ],
     [GameObjectType.TANK]: [

@@ -2,6 +2,8 @@ import IDrawable from '@/drawable/IDrawable';
 
 export enum RenderPass {
     ALL,
+    GROUND,
+    WALL,
     BULLET,
     TANK,
     TANK_NAME,
