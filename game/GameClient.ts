@@ -148,6 +148,10 @@ export default class GameClient {
         this.gameGraphicsService.calculateDimensions();
     }
 
+    setMapEditorEnabled(enabled: boolean): void {
+        this.gameMapEditorService.setEnabled(enabled);
+    }
+
     setMapEditorGridSize(gridSize: number): void {
         this.gameMapEditorService.setGridSize(gridSize);
     }

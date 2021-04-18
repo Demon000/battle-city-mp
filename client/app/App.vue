@@ -190,6 +190,7 @@ export default class App extends Vue {
 
         if (event.key.toLowerCase() === 'b' && event.type === 'keyup') {
             this.isBuilding = !this.isBuilding;
+            this.gameClient?.setMapEditorEnabled(this.isBuilding);
         }
     }
 

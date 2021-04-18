@@ -6,6 +6,7 @@ import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import Point from '@/physics/point/Point';
 
 export default class GameMapEditorService {
+    private enabled = false;
     private gridSize = 0;
     private selectedType = GameObjectType.NONE;
     private hoverPosition?: Point;
@@ -15,7 +16,8 @@ export default class GameMapEditorService {
     updateGhostObjects(): void {
         this.ghostObjects = [];
 
-        if (this.selectedType === GameObjectType.NONE
+        if (!this.enabled
+            || this.selectedType === GameObjectType.NONE
             || this.gridSize === 0
             || this.hoverPosition === undefined
             || this.viewPosition === undefined) {
@@ -41,6 +43,10 @@ export default class GameMapEditorService {
         }
     }
 
+    setEnabled(enabled: boolean): void {
+        this.enabled = enabled;
+    }
+
     setGridSize(gridSize: number): void {
         this.gridSize = gridSize;
     }
@@ -58,6 +64,10 @@ export default class GameMapEditorService {
     }
 
     getGridSize(): number {
+        if (!this.enabled || this.gridSize === 1) {
+            return 0;
+        }
+
         return this.gridSize;
     }
 

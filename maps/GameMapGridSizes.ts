@@ -1,1 +1,1 @@
-export const GameMapGridSizes = [0, 4, 8, 16];
+export const GameMapGridSizes = [0, 1, 4, 8, 16];
