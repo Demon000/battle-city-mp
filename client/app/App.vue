@@ -245,11 +245,11 @@ export default class App extends Vue {
     }
 
     onGridSizeChanged(): void {
-        this.gameClient?.setGridSize(this.gridSize);
+        this.gameClient?.setMapEditorGridSize(this.gridSize);
     }
 
     onSelectedObjectTypeChanged(): void {
-        this.gameClient?.setSelectedObjectType(this.selectedObjectType);
+        this.gameClient?.setMapEditorSelectedObjectType(this.selectedObjectType);
     }
 }
 </script>

@@ -132,11 +132,11 @@ export default class GameClient {
         this.gameGraphicsService.calculateDimensions();
     }
 
-    setGridSize(gridSize: number): void {
+    setMapEditorGridSize(gridSize: number): void {
         this.gameMapEditorService.setGridSize(gridSize);
     }
 
-    setSelectedObjectType(type: GameObjectType): void {
+    setMapEditorSelectedObjectType(type: GameObjectType): void {
         this.gameMapEditorService.setSelectedObjectType(type);
     }
 
