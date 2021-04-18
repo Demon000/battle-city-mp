@@ -3,7 +3,9 @@
         <canvas
             id="game-canvas"
             ref="canvas"
+            tabindex="1"
         ></canvas>
+
         <div id="game-overlay">
             <div id="game-controls">
                 <button
@@ -150,11 +152,12 @@ export default class App extends Vue {
         });
 
         window.addEventListener('resize', this.onWindowResize);
-        window.addEventListener('keydown', this.onKeyboardEvent);
-        window.addEventListener('keyup', this.onKeyboardEvent);
-        window.addEventListener('mousemove', this.onMouseMoveEvent);
-        window.addEventListener('click', this.onMouseClickEvent);
-        window.addEventListener('contextmenu', this.onMouseRightClickEvent);
+        canvas.addEventListener('keydown', this.onKeyboardEvent);
+        canvas.addEventListener('keyup', this.onKeyboardEvent);
+        canvas.addEventListener('mousemove', this.onMouseMoveEvent);
+        canvas.addEventListener('click', this.onMouseClickEvent);
+        canvas.addEventListener('contextmenu', this.onMouseRightClickEvent);
+        canvas.focus();
 
         const shootButton = this.$refs.shootButton as HTMLElement;
         shootButton.addEventListener('touchstart', this.onShootButtonTouchEvent);
@@ -253,17 +256,47 @@ export default class App extends Vue {
         this.gameClient?.setMapEditorSelectedObjectType(this.selectedObjectType);
     }
 
+    focusCanvas(): boolean {
+        const canvas = this.$refs.canvas as HTMLCanvasElement;
+        if (document.activeElement !== canvas) {
+            canvas.focus();
+            return true;
+        }
+
+        return false;
+    }
+
     onMouseMoveEvent(event: MouseEvent): void {
+        const canvasFocused = this.focusCanvas();
+        if (canvasFocused) {
+            return;
+        }
+
         this.gameClient?.setMapEditorHoverPosition(event);
     }
 
     onMouseClickEvent(): void {
-        this.gameClient?.createMapEditorObjects();
+        const canvasFocused = this.focusCanvas();
+        if (canvasFocused) {
+            return;
+        }
+
+        if (this.isBuilding) {
+            this.gameClient?.createMapEditorObjects();
+        }
     }
 
     onMouseRightClickEvent(event: MouseEvent): void {
-        this.gameClient?.destroyMapEditorObjects(event);
         event.preventDefault();
+
+        const canvasFocused = this.focusCanvas();
+        if (canvasFocused) {
+            return;
+        }
+
+        if (this.isBuilding) {
+            this.gameClient?.destroyMapEditorObjects(event);
+        }
     }
 }
 </script>
@@ -272,6 +305,7 @@ export default class App extends Vue {
 #app-content {
     width: 100%;
     height: 100%;
+    user-select: none;
 }
 
 #game-canvas {
@@ -285,6 +319,12 @@ export default class App extends Vue {
     height: 100%;
     top: 0;
     left: 0;
+
+    pointer-events: none;
+}
+
+#game-overlay > * {
+    pointer-events: all;
 }
 
 .controls {
