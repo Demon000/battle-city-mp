@@ -13,6 +13,22 @@ export default class GameMapEditorService {
     private viewPosition?: Point;
     private ghostObjects = new Array<GameObject>();
 
+    getSnappedRelativePosition(position: Point): Point | undefined {
+        if (this.viewPosition === undefined) {
+            return undefined;
+        }
+
+        const worldX = this.viewPosition.x + position.x;
+        const worldY = this.viewPosition.y + position.y;
+        const snappedX = Math.floor(worldX / this.gridSize) * this.gridSize;
+        const snappedY = Math.floor(worldY / this.gridSize) * this.gridSize;
+
+        return {
+            x: snappedX,
+            y: snappedY,
+        };
+    }
+
     updateGhostObjects(): void {
         this.ghostObjects = [];
 
@@ -25,18 +41,17 @@ export default class GameMapEditorService {
         }
 
         const properties = GameObjectProperties.getTypeProperties(this.selectedType);
-
-        const worldX = this.viewPosition.x + this.hoverPosition.x;
-        const worldY = this.viewPosition.y + this.hoverPosition.y;
-        const snappedX = Math.floor(worldX / this.gridSize) * this.gridSize;
-        const snappedY = Math.floor(worldY / this.gridSize) * this.gridSize;
+        const snappedPosition = this.getSnappedRelativePosition(this.hoverPosition);
+        if (snappedPosition === undefined) {
+            return;
+        }
 
         for (let y = 0; y < this.gridSize; y += properties.height) {
             for (let x = 0; x < this.gridSize; x += properties.width) {
                 this.ghostObjects.push(
                     GameObjectFactory.buildFromType(this.selectedType, {
-                        x: x + snappedX,
-                        y: y + snappedY,
+                        x: x + snappedPosition.x,
+                        y: y + snappedPosition.y,
                     }),
                 );
             }
@@ -71,12 +86,17 @@ export default class GameMapEditorService {
         return this.gridSize;
     }
 
-    getDestroyBox(position: Point): BoundingBox {
+    getDestroyBox(position: Point): BoundingBox | undefined {
+        const snappedPosition = this.getSnappedRelativePosition(position);
+        if (snappedPosition === undefined) {
+            return undefined;
+        }
+
         return {
-            tl: position,
+            tl: snappedPosition,
             br: {
-                x: position.x + this.gridSize,
-                y: position.y + this.gridSize,
+                x: snappedPosition.x + this.gridSize,
+                y: snappedPosition.y + this.gridSize,
             },
         };
     }

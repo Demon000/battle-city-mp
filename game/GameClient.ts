@@ -178,6 +178,10 @@ export default class GameClient {
     destroyMapEditorObjects(position: Point): void {
         const worldPosition = this.gameGraphicsService.getWorldPosition(position);
         const destroyBox = this.gameMapEditorService.getDestroyBox(worldPosition);
+        if (destroyBox === undefined) {
+            return;
+        }
+
         this.emitter.emit(GameClientEvent.MAP_EDITOR_DESTROY_OBJECTS, destroyBox);
     }
 

@@ -365,7 +365,8 @@ export default class GameServer {
     }
 
     onPlayerMapEditorDestroyObjects(destroyBox: BoundingBox): void {
-        // do nothing
+        const objects = this.collisionService.getOverlappingObjects(destroyBox);
+        objects.forEach(o => this.gameObjectService.unregisterObject(o));
     }
 
     onPlayerRequestSpawnStatusFromClient(playerId: string, spawnStatus: PlayerSpawnStatus): void {
