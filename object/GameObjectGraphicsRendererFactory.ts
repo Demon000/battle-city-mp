@@ -10,19 +10,17 @@ import BulletGraphicsRenderer from '@/bullet/BulletGraphicsRenderer';
 
 export default class GameObjectGraphicsRendererFactory {
     static buildFromObject(
-        context: CanvasRenderingContext2D,
         object: GameObject,
-        scale: number,
     ): GameObjectGraphicsRenderer {
         switch (object.type) {
             case GameObjectType.TANK:
-                return new TankGraphicsRenderer(context, object as Tank, scale);
+                return new TankGraphicsRenderer(object as Tank);
             case GameObjectType.BULLET:
-                return new BulletGraphicsRenderer(context, object as Bullet, scale);
+                return new BulletGraphicsRenderer(object as Bullet);
             case GameObjectType.EXPLOSION:
-                return new ExplosionGraphicsRenderer(context, object as Explosion, scale);
+                return new ExplosionGraphicsRenderer(object as Explosion);
             default:
-                return new GameObjectGraphicsRenderer(context, object, scale);
+                return new GameObjectGraphicsRenderer(object);
         }
     }
 }

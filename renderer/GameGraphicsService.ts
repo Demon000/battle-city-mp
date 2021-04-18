@@ -1,7 +1,6 @@
 import GameObject from '@/object/GameObject';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import Point from '@/physics/point/Point';
-import MapRepository from '@/utils/MapRepository';
 import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
 import GameObjectGraphicsRendererFactory from '../object/GameObjectGraphicsRendererFactory';
 
@@ -15,14 +14,11 @@ export default class GameGraphicsService {
     private pass = 0;
     private targetGameSize;
     private context;
-    private objectGraphicsRendererRepository;
 
     constructor(
-        objectGraphicsRendererRepository: MapRepository<number, GameObjectGraphicsRenderer>,
         canvas: HTMLCanvasElement,
         targetGameSize: number,
     ) {
-        this.objectGraphicsRendererRepository = objectGraphicsRendererRepository;
         this.canvas = canvas;
         this.targetGameSize = targetGameSize;
 
@@ -47,27 +43,20 @@ export default class GameGraphicsService {
         this.gameWidth -= this.gameWidth % 2;
         this.gameHeight = this.canvas.height / this.gameToRenderSizeScale;
         this.gameHeight -= this.gameHeight % 2;
-        this.objectGraphicsRendererRepository.clear();
     }
 
     getObjectRenderer(object: GameObject): GameObjectGraphicsRenderer {
-        let objectRenderer = this.objectGraphicsRendererRepository.find(object.id);
-        if (objectRenderer === undefined) {
-            objectRenderer = GameObjectGraphicsRendererFactory
-                .buildFromObject(this.context, object, this.gameToRenderSizeScale);
-            this.objectGraphicsRendererRepository.add(object.id, objectRenderer);
+        if (object.graphicsRenderer === undefined) {
+            object.graphicsRenderer = GameObjectGraphicsRendererFactory
+                .buildFromObject(object);
         }
 
-        return objectRenderer;
-    }
-
-    removeObjectGraphicsRenderer(objectId: number): void {
-        this.objectGraphicsRendererRepository.remove(objectId);
+        return object.graphicsRenderer;
     }
 
     renderObjectsPrepareFilter(object: GameObject): boolean {
         const renderer = this.getObjectRenderer(object);
-        renderer.update();
+        renderer.update(this.gameToRenderSizeScale);
         return renderer.isRenderable();
     }
 
@@ -77,7 +66,23 @@ export default class GameGraphicsService {
 
     renderObjectsPassFilter(object: GameObject): boolean {
         const renderer = this.getObjectRenderer(object);
-        return renderer.renderPass(this.pass, this.canvasX, this.canvasY);
+        const objectRelativeX = Math.floor(object.position.x) - this.canvasX;
+        const objectRelativeY = Math.floor(object.position.y) - this.canvasY;
+        const objectDrawX = objectRelativeX * this.gameToRenderSizeScale;
+        const objectDrawY = objectRelativeY * this.gameToRenderSizeScale;
+        return renderer.renderPass(this.context, this.pass, objectDrawX, objectDrawY);
+    }
+
+    renderObjectsOver(objects: GameObject[], point: Point): void {
+        this.canvasX = point.x - this.gameWidth / 2;
+        this.canvasY = point.y - this.gameHeight / 2;
+
+        this.pass = 0;
+        let renderObjects = this.renderObjectsPrepare(objects);
+        while (renderObjects.length) {
+            renderObjects = renderObjects.filter(this.renderObjectsPassFilter, this);
+            this.pass++;
+        }
     }
 
     renderObjects(objects: GameObject[], point: Point): void {
@@ -85,14 +90,7 @@ export default class GameGraphicsService {
         this.context.fillStyle = 'black';
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        this.canvasX = point.x - this.gameWidth / 2;
-        this.canvasY = point.y - this.gameHeight / 2;
-        this.pass = 0;
-        let renderObjects = this.renderObjectsPrepare(objects);
-        while (renderObjects.length) {
-            renderObjects = renderObjects.filter(this.renderObjectsPassFilter, this);
-            this.pass++;
-        }
+        this.renderObjectsOver(objects, point);
     }
 
     getViewableMapBoundingBox(position: Point): BoundingBox | undefined {
@@ -106,9 +104,5 @@ export default class GameGraphicsService {
                 y: position.y + this.gameHeight / 2,
             },
         };
-    }
-
-    clear(): void {
-        this.objectGraphicsRendererRepository.clear();
     }
 }

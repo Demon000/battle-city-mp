@@ -9,19 +9,26 @@ import { Direction } from '@/physics/Direction';
 import Point from '@/physics/point/Point';
 import GameObjectDrawables from './GameObjectDrawables';
 
+export interface RenderPassFilterContext<O> {
+    object: O;
+    context: CanvasRenderingContext2D;
+    drawX: number;
+    drawY: number;
+    pass: number;
+}
+
+export interface ProcessDrawableContext<O> {
+    object: O;
+    scale: number;
+}
+
 export default class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
     object;
-    scale;
     drawables?: IDrawable[] | null = null;
-    context?: CanvasRenderingContext2D;
-    objectDrawX = 0;
-    objectDrawY = 0;
-    pass = 0;
+    processedDrawables?: IDrawable[];
 
-    constructor(context: CanvasRenderingContext2D, object: O, scale: number) {
-        this.context = context;
+    constructor(object: O) {
         this.object = object;
-        this.scale = scale;
     }
 
     private isMatchingPosition(positionMatching: DrawablePositionMatching, position: Point): boolean {
@@ -66,8 +73,8 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         }
 
         const drawable = drawables
-            .find(drawable => drawable.meta === undefined
-                || this.isDrawableMetaEqual(drawable.meta, meta));
+            .find(d => d.meta === undefined
+                || this.isDrawableMetaEqual(d.meta, meta));
         if (drawable === undefined) {
             return null;
         }
@@ -105,7 +112,10 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         return true;
     }
 
-    protected processDrawable(drawable: IDrawable | undefined): IDrawable | undefined {
+    protected processDrawable(
+        this: ProcessDrawableContext<O>,
+        drawable: IDrawable | undefined,
+    ): IDrawable | undefined {
         if (drawable !== undefined) {
             drawable = drawable.scale(this.scale);
         }
@@ -113,12 +123,14 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         return drawable;
     }
 
-    protected processDrawables(drawables: (IDrawable | undefined)[]): IDrawable[] {
-        return drawables.map(this.processDrawable, this)
-            .filter(this.filterOutMissingDrawable) as IDrawable[];
+    protected processDrawables(drawables: (IDrawable | undefined)[], scale: number): IDrawable[] {
+        return drawables.map(this.processDrawable, {
+            object: this.object,
+            scale,
+        }).filter(this.filterOutMissingDrawable) as IDrawable[];
     }
 
-    update(): void {
+    update(scale: number): void {
         if (this.drawables === undefined) {
             return;
         }
@@ -144,20 +156,16 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
          * TODO: keep current drawable across scaling operations?
          */
         if (this.drawables !== undefined) {
-            this.drawables = this.processDrawables(this.drawables);
-        }
-
-        if (this.drawables === undefined) {
-            return;
+            this.processedDrawables = this.processDrawables(this.drawables, scale);
         }
     }
 
     isRenderable(): boolean {
-        return this.drawables !== undefined && this.drawables !== null && this.drawables.length !== 0;
+        return this.processedDrawables !== undefined && this.processedDrawables.length !== 0;
     }
 
-    renderPassFilter(drawable: IDrawable | undefined): boolean {
-        if (this.context === undefined || drawable === undefined) {
+    renderPassFilter(this: RenderPassFilterContext<O>, drawable: IDrawable | undefined): boolean {
+        if (drawable === undefined) {
             return false;
         }
 
@@ -174,26 +182,29 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
             return true;
         }
 
-        drawable.draw(this.context, this.objectDrawX, this.objectDrawY);
+        drawable.draw(this.context, this.drawX, this.drawY);
 
         return false;
     }
 
-    renderPass(pass: number, canvasX: number, canvasY: number): boolean {
-        if (!this.drawables) {
+    renderPass(
+        context: CanvasRenderingContext2D,
+        pass: number,
+        drawX: number,
+        drawY: number,
+    ): boolean {
+        if (this.processedDrawables === undefined) {
             return false;
         }
 
-        const objectRelativeX = Math.floor(this.object.position.x) - canvasX;
-        const objectRelativeY = Math.floor(this.object.position.y) - canvasY;
-        const objectDrawX = objectRelativeX * this.scale;
-        const objectDrawY = objectRelativeY * this.scale;
-        this.objectDrawX = objectDrawX;
-        this.objectDrawY = objectDrawY;
-        this.pass = pass;
+        this.processedDrawables = this.processedDrawables.filter(this.renderPassFilter, {
+            object: this.object,
+            context,
+            drawX,
+            drawY,
+            pass,
+        });
 
-        this.drawables = this.drawables.filter(this.renderPassFilter, this);
-
-        return this.drawables.length !== 0;
+        return this.processedDrawables.length !== 0;
     }
 }

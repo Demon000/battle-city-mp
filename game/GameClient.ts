@@ -2,7 +2,6 @@ import { CLIENT_CONFIG_VISIBLE_GAME_SIZE } from '@/config';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import GameAudioService from '@/renderer/GameAudioService';
 import GameCamera from '@/renderer/GameCamera';
-import GameObjectGraphicsRenderer from '@/object/GameObjectGraphicsRenderer';
 import GameGraphicsService from '@/renderer/GameGraphicsService';
 import MapRepository from '@/utils/MapRepository';
 import Ticker, { TickerEvent } from '@/utils/Ticker';
@@ -22,7 +21,6 @@ export default class GameClient {
     private boundingBoxRepository;
     private collisionService;
     private gameCamera;
-    private objectGraphicsRendererRepository;
     private gameGraphicsService;
     private objectAudioRendererRepository;
     private gameAudioService;
@@ -34,8 +32,7 @@ export default class GameClient {
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
         this.gameCamera = new GameCamera();
-        this.objectGraphicsRendererRepository = new MapRepository<number, GameObjectGraphicsRenderer>();
-        this.gameGraphicsService = new GameGraphicsService(this.objectGraphicsRendererRepository, canvas, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
+        this.gameGraphicsService = new GameGraphicsService(canvas, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
         this.objectAudioRendererRepository = new MapRepository<number, GameObjectAudioRenderer>();
         this.gameAudioService = new GameAudioService(this.objectAudioRendererRepository);
         this.ticker = new Ticker();
@@ -69,7 +66,6 @@ export default class GameClient {
     onObjectUnregisteredOnServer(objectId: number): void {
         this.gameObjectService.unregisterObject(objectId);
         this.collisionService.unregisterObjectCollisions(objectId);
-        this.gameGraphicsService.removeObjectGraphicsRenderer(objectId);
         this.gameAudioService.removeObjectAudioRenderer(objectId);
     }
 
@@ -127,6 +123,5 @@ export default class GameClient {
         this.gameObjectRepository.clear();
         this.boundingBoxRepository.clear();
         this.gameAudioService.clear();
-        this.gameGraphicsService.clear();
     }
 }

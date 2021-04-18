@@ -4,7 +4,7 @@ import { IImageDrawable } from '@/drawable/IImageDrawable';
 import TextDrawable, { TextPositionReference } from '@/drawable/TextDrawable';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 import { Direction } from '@/physics/Direction';
-import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
+import GameObjectGraphicsRenderer, { ProcessDrawableContext } from '../object/GameObjectGraphicsRenderer';
 import Tank from './Tank';
 
 export default class TankGraphicsRenderer extends GameObjectGraphicsRenderer<Tank> {
@@ -29,8 +29,11 @@ export default class TankGraphicsRenderer extends GameObjectGraphicsRenderer<Tan
         return true;
     }
 
-    protected processDrawable(drawable: IDrawable | undefined): IDrawable | undefined {
-        drawable = super.processDrawable(drawable);
+    protected processDrawable(
+        this: ProcessDrawableContext<Tank>,
+        drawable: IDrawable | undefined,
+    ): IDrawable | undefined {
+        drawable = super.processDrawable.call(this, drawable);
         if (drawable === undefined || drawable.meta === undefined) {
             return drawable;
         }

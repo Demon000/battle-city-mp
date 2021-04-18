@@ -1,6 +1,7 @@
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import Point from '@/physics/point/Point';
 import { Direction } from '../physics/Direction';
+import GameObjectGraphicsRenderer from './GameObjectGraphicsRenderer';
 import GameObjectProperties from './GameObjectProperties';
 import { GameObjectType } from './GameObjectType';
 import IGameObjectProperties, { ResourceMeta } from './IGameObjectProperties';
@@ -28,6 +29,8 @@ export default class GameObject {
     spawnTime: number;
 
     destroyed = false;
+
+    graphicsRenderer?: GameObjectGraphicsRenderer<this>;
 
     constructor(options: GameObjectOptions) {
         this.id = options.id ?? GameObject.globalId++;
