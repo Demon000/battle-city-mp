@@ -71,7 +71,7 @@ export default class GameObjectService {
         object.position = position;
         this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
             position,
-        } as GameObjectOptions);
+        } as PartialGameObjectOptions);
         this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, objectId, object.getBoundingBox());
     }
 
@@ -80,7 +80,7 @@ export default class GameObjectService {
         object.direction = direction;
         this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
             direction,
-        } as GameObjectOptions);
+        } as PartialGameObjectOptions);
     }
 
     setObjectDestroyed(objectId: number): void {
@@ -102,7 +102,7 @@ export default class GameObjectService {
         object.movementDirection = direction;
         this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
             movementDirection: direction,
-        } as GameObjectOptions);
+        } as PartialGameObjectOptions);
     }
 
     processObjectDirection(object: GameObject): void {
@@ -140,7 +140,7 @@ export default class GameObjectService {
             object.movementSpeed = newMovementSpeed;
             this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
                 movementSpeed: newMovementSpeed,
-            } as GameObjectOptions);
+            } as PartialGameObjectOptions);
         }
 
         const distance = object.movementSpeed * delta;
