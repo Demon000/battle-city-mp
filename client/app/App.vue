@@ -273,7 +273,10 @@ export default class App extends Vue {
             return;
         }
 
-        this.gameClient?.setMapEditorHoverPosition(event);
+        this.gameClient?.setMapEditorHoverPosition({
+            x: event.offsetX,
+            y: event.offsetY,
+        });
     }
 
     onMouseClickEvent(): void {
@@ -296,7 +299,10 @@ export default class App extends Vue {
         }
 
         if (this.isBuilding) {
-            this.gameClient?.destroyMapEditorObjects(event);
+            this.gameClient?.destroyMapEditorObjects({
+                x: event.offsetX,
+                y: event.offsetY,
+            });
         }
     }
 }
