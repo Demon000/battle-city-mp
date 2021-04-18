@@ -51,6 +51,45 @@
                     @click="onFullscreenButtonClick"
                 >
             </div>
+
+            <div
+                id="building-controls"
+                class="controls"
+                v-if="isBuilding"
+            >
+                <label>Grid size</label>
+                <br>
+                <select
+                    @change="onGridSizeChanged"
+                    v-model="gridSize"
+                >
+                    <option
+                        v-for="size in GameMapGridSizes"
+                        :key="size"
+                        :value="size"
+                    >
+                        {{ size }}
+                    </option>
+                </select>
+
+                <br>
+
+                <label>Block type</label>
+                <br>
+                <select
+                    @change="onSelectedObjectTypeChanged"
+                    v-model="selectedObjectType"
+                >
+                    <option
+                        v-for="type in Object.keys(GameShortObjectType)"
+                        :key="type"
+                        :value="GameObjectType[type]"
+                    >
+                        {{ type }}
+                    </option>
+                </select>
+            </div>
+
             <div id="virtual-controls">
                 <div
                     ref="dpad"
@@ -77,6 +116,8 @@ import ActionFactory from '@/actions/ActionFactory';
 import DirectionalJoystickWrapper, { DirectionalJoystickEvent } from '../DirectionalJoystickWrapper';
 import screenfull from 'screenfull';
 import { TankTier } from '@/tank/TankTier';
+import { GameMapGridSizes } from '@/maps/GameMapGridSizes';
+import { GameObjectType, GameShortObjectType } from '@/object/GameObjectType';
 
 export default class App extends Vue {
     socket?: Socket;
@@ -85,9 +126,15 @@ export default class App extends Vue {
     joystick?: DirectionalJoystickWrapper;
     isFullscreen = false;
     CLIENT_SPRITES_RELATIVE_URL = CLIENT_SPRITES_RELATIVE_URL;
+    GameMapGridSizes = GameMapGridSizes;
+    GameShortObjectType = GameShortObjectType;
+    GameObjectType = GameObjectType;
     TankTier = TankTier;
     playerColor = '';
     playerName = '';
+    isBuilding = false;
+    gridSize = 0;
+    selectedObjectType = GameObjectType.NONE;
 
     mounted(): void {
         const canvas = this.$refs.canvas as HTMLCanvasElement;
@@ -196,6 +243,14 @@ export default class App extends Vue {
             screenfull.toggle();
         }
     }
+
+    onGridSizeChanged(): void {
+        this.gameClient?.setGridSize(this.gridSize);
+    }
+
+    onSelectedObjectTypeChanged(): void {
+        this.gameClient?.setSelectedObjectType(this.selectedObjectType);
+    }
 }
 </script>
 
@@ -267,6 +322,15 @@ export default class App extends Vue {
 #virtual-shoot-button {
     width: 50%;
     height: 100%;
+}
+
+#building-controls {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    top: 0;
+
+    padding: 8px;
 }
 
 @media (pointer: coarse) {

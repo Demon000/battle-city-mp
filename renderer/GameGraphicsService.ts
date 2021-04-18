@@ -93,6 +93,33 @@ export default class GameGraphicsService {
         this.renderObjectsOver(objects, point);
     }
 
+    renderGrid(gridSize: number): void {
+        this.context.strokeStyle = '#ffffff';
+        const canvasOffsetX = this.canvasX % gridSize;
+        const canvasOffsetY = this.canvasY % gridSize;
+
+        let scaledY;
+        let scaledX;
+
+        scaledY = this.gameHeight * this.gameToRenderSizeScale;
+        for (let x = -canvasOffsetX; x < this.gameWidth; x +=  gridSize) {
+            scaledX = x * this.gameToRenderSizeScale;
+            this.context.beginPath();
+            this.context.moveTo(scaledX, 0);
+            this.context.lineTo(scaledX, scaledY);
+            this.context.stroke();
+        }
+
+        scaledX = this.gameWidth * this.gameToRenderSizeScale;
+        for (let y = -canvasOffsetY; y < this.gameHeight; y += gridSize) {
+            scaledY = y * this.gameToRenderSizeScale;
+            this.context.beginPath();
+            this.context.moveTo(0, scaledY);
+            this.context.lineTo(scaledX, scaledY);
+            this.context.stroke();
+        }
+    }
+
     getViewableMapBoundingBox(position: Point): BoundingBox | undefined {
         return {
             tl: {

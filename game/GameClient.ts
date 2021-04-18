@@ -12,6 +12,8 @@ import CollisionService from '../physics/collisions/CollisionService';
 import Player from '../player/Player';
 import PlayerService from '../player/PlayerService';
 import GameObjectAudioRenderer from '@/object/GameObjectAudioRenderer';
+import GameMapEditorService from '@/maps/GameMapEditorService';
+import { GameObjectType } from '@/object/GameObjectType';
 
 export default class GameClient {
     private playerRepository;
@@ -24,6 +26,7 @@ export default class GameClient {
     private gameGraphicsService;
     private objectAudioRendererRepository;
     private gameAudioService;
+    private gameMapEditorService;
     ticker;
 
     constructor(canvas: HTMLCanvasElement) {
@@ -35,6 +38,7 @@ export default class GameClient {
         this.gameGraphicsService = new GameGraphicsService(canvas, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
         this.objectAudioRendererRepository = new MapRepository<number, GameObjectAudioRenderer>();
         this.gameAudioService = new GameAudioService(this.objectAudioRendererRepository);
+        this.gameMapEditorService = new GameMapEditorService();
         this.ticker = new Ticker();
 
         this.playerRepository = new MapRepository<string, Player>();
@@ -112,10 +116,28 @@ export default class GameClient {
         const viewableObjects = this.gameObjectService.getMultipleObjects(viewableObjectIds);
         this.gameGraphicsService.renderObjects(viewableObjects, position);
         this.gameAudioService.playObjectsAudioEffect(viewableObjects, position, box);
+
+        const gridSize = this.gameMapEditorService.getGridSize();
+        if (gridSize !== 0) {
+            this.gameGraphicsService.renderGrid(gridSize);
+        }
+
+        const ghostObjects = this.gameMapEditorService.getGhostObjects();
+        if (ghostObjects.length !== 0) {
+            this.gameGraphicsService.renderObjectsOver(ghostObjects, position);
+        }
     }
 
     onWindowResize(): void {
         this.gameGraphicsService.calculateDimensions();
+    }
+
+    setGridSize(gridSize: number): void {
+        this.gameMapEditorService.setGridSize(gridSize);
+    }
+
+    setSelectedObjectType(type: GameObjectType): void {
+        this.gameMapEditorService.setSelectedObjectType(type);
     }
 
     clear(): void {
