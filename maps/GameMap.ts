@@ -1,6 +1,7 @@
 import GameObject from '@/object/GameObject';
 import GameObjectFactory from '@/object/GameObjectFactory';
 import GameObjectProperties from '@/object/GameObjectProperties';
+import { GameShortObjectType } from '@/object/GameObjectType';
 
 export interface GameMapOptions {
     resolution: number;
@@ -38,7 +39,7 @@ export default class GameMap {
                 const properties = GameObjectProperties.getShortTypeProperties(shortType);
                 for (let smallY = bigY; smallY < bigY + this.resolution; smallY += properties.height) {
                     for (let smallX = bigX; smallX < bigX + this.resolution; smallX += properties.width) {
-                        const object = GameObjectFactory.buildFromShortType(shortType, {
+                        const object = GameObjectFactory.buildFromShortType(shortType as GameShortObjectType, {
                             y: smallY,
                             x: smallX,
                         });
