@@ -125,7 +125,7 @@ export default class GameClient {
 
         const ghostObjects = this.gameMapEditorService.getGhostObjects(box.tl.x, box.tl.y);
         if (ghostObjects.length !== 0) {
-            this.gameGraphicsService.renderObjectsOver(ghostObjects, position);
+            this.gameGraphicsService.renderGhostObjects(ghostObjects, position);
         }
     }
 

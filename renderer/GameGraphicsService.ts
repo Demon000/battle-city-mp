@@ -93,6 +93,14 @@ export default class GameGraphicsService {
         this.renderObjectsOver(objects, point);
     }
 
+    renderGhostObjects(objects: GameObject[], point: Point): void {
+        this.context.globalAlpha = 0.5;
+
+        this.renderObjectsOver(objects, point);
+
+        this.context.globalAlpha = 1;
+    }
+
     renderGrid(gridSize: number): void {
         this.context.strokeStyle = '#ffffff';
         const canvasOffsetX = this.canvasX % gridSize;
