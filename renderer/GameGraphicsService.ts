@@ -5,7 +5,7 @@ import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
 import GameObjectGraphicsRendererFactory from '../object/GameObjectGraphicsRendererFactory';
 
 export default class GameGraphicsService {
-    private gameToRenderSizeScale = 0;
+    private scale = 0;
     private gameWidth = 0;
     private gameHeight = 0;
     private canvas;
@@ -38,10 +38,10 @@ export default class GameGraphicsService {
         this.canvas.height = window.innerHeight;
 
         const minRenderSize = Math.max(this.canvas.width, this.canvas.height);
-        this.gameToRenderSizeScale = Math.ceil(minRenderSize / this.targetGameSize);
-        this.gameWidth = this.canvas.width / this.gameToRenderSizeScale;
+        this.scale = Math.ceil(minRenderSize / this.targetGameSize);
+        this.gameWidth = this.canvas.width / this.scale;
         this.gameWidth -= this.gameWidth % 2;
-        this.gameHeight = this.canvas.height / this.gameToRenderSizeScale;
+        this.gameHeight = this.canvas.height / this.scale;
         this.gameHeight -= this.gameHeight % 2;
     }
 
@@ -56,7 +56,7 @@ export default class GameGraphicsService {
 
     renderObjectsPrepareFilter(object: GameObject): boolean {
         const renderer = this.getObjectRenderer(object);
-        renderer.update(this.gameToRenderSizeScale);
+        renderer.update(this.scale);
         return renderer.isRenderable();
     }
 
@@ -68,8 +68,8 @@ export default class GameGraphicsService {
         const renderer = this.getObjectRenderer(object);
         const objectRelativeX = Math.floor(object.position.x) - this.canvasX;
         const objectRelativeY = Math.floor(object.position.y) - this.canvasY;
-        const objectDrawX = objectRelativeX * this.gameToRenderSizeScale;
-        const objectDrawY = objectRelativeY * this.gameToRenderSizeScale;
+        const objectDrawX = objectRelativeX * this.scale;
+        const objectDrawY = objectRelativeY * this.scale;
         return renderer.renderPass(this.context, this.pass, objectDrawX, objectDrawY);
     }
 
@@ -101,18 +101,18 @@ export default class GameGraphicsService {
         let scaledY;
         let scaledX;
 
-        scaledY = this.gameHeight * this.gameToRenderSizeScale;
+        scaledY = this.gameHeight * this.scale;
         for (let x = -canvasOffsetX; x < this.gameWidth; x +=  gridSize) {
-            scaledX = x * this.gameToRenderSizeScale;
+            scaledX = x * this.scale;
             this.context.beginPath();
             this.context.moveTo(scaledX, 0);
             this.context.lineTo(scaledX, scaledY);
             this.context.stroke();
         }
 
-        scaledX = this.gameWidth * this.gameToRenderSizeScale;
+        scaledX = this.gameWidth * this.scale;
         for (let y = -canvasOffsetY; y < this.gameHeight; y += gridSize) {
-            scaledY = y * this.gameToRenderSizeScale;
+            scaledY = y * this.scale;
             this.context.beginPath();
             this.context.moveTo(0, scaledY);
             this.context.lineTo(scaledX, scaledY);
