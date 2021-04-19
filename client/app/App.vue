@@ -160,6 +160,7 @@ export default class App extends Vue {
         });
 
         window.addEventListener('resize', this.onWindowResize);
+        canvas.addEventListener('blur', this.onCanvasBlurEvent);
         canvas.addEventListener('keydown', this.onKeyboardEvent);
         canvas.addEventListener('keyup', this.onKeyboardEvent);
         canvas.addEventListener('mousemove', this.onMouseMoveEvent);
@@ -226,6 +227,11 @@ export default class App extends Vue {
 
     onWindowResize(): void {
         this.gameClient?.onWindowResize();
+    }
+
+    onCanvasBlurEvent(): void {
+        const action = ActionFactory.buildAllUnpressEvent();
+        this.gameClientSocket?.requestPlayerAction(action);
     }
 
     onSpawnButtonClick(): void {

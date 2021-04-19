@@ -117,7 +117,12 @@ export default class PlayerService {
 
     addPlayerButtonPressAction(playerId: string, action: ButtonPressAction): void {
         const player = this.repository.get(playerId);
-        player.map.set(action.buttonType, action);
+        if (action.buttonType === ButtonType.ALL
+            && action.buttonState === ButtonState.UNPRESSED) {
+            player.map.clear();
+        } else {
+            player.map.set(action.buttonType, action);
+        }
     }
     
     private getPlayerDominantMovementDirection(player: Player): Direction | undefined {

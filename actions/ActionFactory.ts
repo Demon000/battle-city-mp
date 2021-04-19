@@ -109,4 +109,12 @@ export default class ActionFactory {
             buttonType: ButtonType.SHOOT,
         });
     }
+
+    static buildAllUnpressEvent(): ButtonPressAction {
+        return new ButtonPressAction({
+            timestamp: Date.now(),
+            buttonState: ButtonState.UNPRESSED,
+            buttonType: ButtonType.ALL,
+        });
+    }
 }
