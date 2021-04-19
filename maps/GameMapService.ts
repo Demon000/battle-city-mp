@@ -1,6 +1,6 @@
 import GameObject, { PartialGameObjectOptions } from '@/object/GameObject';
 import EventEmitter from 'eventemitter3';
-import GameMap, { GameMapOptions } from './GameMap';
+import GameMap from './GameMap';
 
 export enum GameMapServiceEvent {
     OBJECTS_SPAWNED = 'objects-spawned',
