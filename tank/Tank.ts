@@ -177,7 +177,7 @@ export default class Tank extends GameObject {
         return tierHealthToSmokeTime.get(this.health);
     }
 
-    private get isSlipping(): boolean {
+    private get isOnIce(): boolean {
         if (this.collisionTracker === undefined) {
             return false;
         }
@@ -187,7 +187,7 @@ export default class Tank extends GameObject {
 
     get maxMovementSpeed(): number {
         let speed = tierToMaxSpeedMap[this.tier];
-        if (this.isSlipping) {
+        if (this.isOnIce) {
             speed *= tierToIceMaxSpeedFactorMap[this.tier];
         }
 
@@ -196,7 +196,7 @@ export default class Tank extends GameObject {
 
     get accelerationFactor(): number {
         let factor = tierToAccelerationFactorMap[this.tier];
-        if (this.isSlipping) {
+        if (this.isOnIce) {
             factor *= tierToIceAccelerationFactorMap[this.tier];
         }
 
@@ -205,7 +205,7 @@ export default class Tank extends GameObject {
 
     get decelerationFactor(): number {
         let factor = tierToDecelerationFactorMap[this.tier];
-        if (this.isSlipping) {
+        if (this.isOnIce) {
             factor *= tierToIceDecelerationFactorMap[this.tier];
         }
 
