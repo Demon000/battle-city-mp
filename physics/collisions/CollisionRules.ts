@@ -24,8 +24,7 @@ export const rules: ICollisionRule[] = [
         ],
         result: [
             {
-                type: CollisionResultEvent.NOTIFY,
-                name: CollisionEvent.TANK_ON_ICE,
+                type: CollisionResultEvent.TRACK,
             },
         ],
     },

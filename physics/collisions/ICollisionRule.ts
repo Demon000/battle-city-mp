@@ -4,6 +4,7 @@ import Point from '../point/Point';
 export enum CollisionResultEvent {
     PREVENT_MOVEMENT = 'prevent-movement',
     NOTIFY = 'notify',
+    TRACK = 'track',
 }
 
 export enum CollisionEvent {
@@ -12,7 +13,6 @@ export enum CollisionEvent {
     BULLET_HIT_TANK = 'bullet-hit-tank',
     BULLET_HIT_BULLET = 'bullet-hit-bullet',
     BULLET_HIT_LEVEL_BORDER = 'bullet-hit-level-border',
-    TANK_ON_ICE = 'tank-on-ice',
 }
 
 type CollisionEventHandler = (movingObjectId: number, staticObjectId: number, position: Point) => void;
@@ -23,11 +23,12 @@ export interface CollisionEvents {
     [CollisionEvent.BULLET_HIT_TANK]: CollisionEventHandler,
     [CollisionEvent.BULLET_HIT_BULLET]: CollisionEventHandler,
     [CollisionEvent.BULLET_HIT_LEVEL_BORDER]: CollisionEventHandler,
-    [CollisionEvent.TANK_ON_ICE]: CollisionEventHandler,
 }
 
 export type ICollisionResult = {
     type: CollisionResultEvent.PREVENT_MOVEMENT;
+} | {
+    type: CollisionResultEvent.TRACK;
 } | {
     type: CollisionResultEvent.NOTIFY;
     name: CollisionEvent;

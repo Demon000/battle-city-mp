@@ -47,12 +47,6 @@ const tierToBulletPowerMap = {
     [TankTier.HEAVY]: BulletPower.HEAVY,
 };
 
-const tierToSlippingTimeMap = {
-    [TankTier.NORMAL]: 100,
-    [TankTier.LIGHT]: 100,
-    [TankTier.HEAVY]: 100,
-};
-
 const tierToSlippingMaxSpeedMap = {
     [TankTier.NORMAL]: 1.5,
     [TankTier.LIGHT]: 1.5,
@@ -87,8 +81,6 @@ export interface TankOptions extends GameObjectOptions {
     playerId: string;
     playerName: string;
     isShooting?: boolean;
-    isOnIce?: boolean;
-    lastSlippingTime?: number;
     lastBulletShotTime?: number;
     lastSmokeSpawnTime?: number;
     bulletIds?: number[];
@@ -103,8 +95,6 @@ export default class Tank extends GameObject {
     playerId: string;
     playerName: string;
     isShooting: boolean;
-    isSlipping: boolean;
-    lastSlippingTime: number;
     lastBulletShotTime: number;
     lastSmokeTime: number;
     bulletIds: number[];
@@ -120,10 +110,8 @@ export default class Tank extends GameObject {
         this.playerId = options.playerId;
         this.playerName = options.playerName;
         this.isShooting = options.isShooting ?? false;
-        this.isSlipping = options.isOnIce ?? false;
         this.lastBulletShotTime = options.lastBulletShotTime ?? 0;
         this.lastSmokeTime = options.lastSmokeSpawnTime ?? 0;
-        this.lastSlippingTime = options.lastSlippingTime ?? 0;
         this.bulletIds = options.bulletIds ?? new Array<number>();
         this.color = options.color ?? [231, 156, 33];
         this.health = options.health ?? tierToMaxHealthMap[this.tier];
@@ -135,7 +123,6 @@ export default class Tank extends GameObject {
             tier: this.tier,
             playerId: this.playerId,
             playerName: this.playerName,
-            lastSlippingTime: this.lastSlippingTime,
             lastBulletShotTime: this.lastBulletShotTime,
             bulletIds: this.bulletIds,
             color: this.color,
@@ -158,10 +145,6 @@ export default class Tank extends GameObject {
             this.playerName = options.playerName;
         }
 
-        if (options.lastSlippingTime !== undefined) {
-            this.lastSlippingTime = options.lastSlippingTime;
-        }
-
         if (options.lastBulletShotTime !== undefined) {
             this.lastBulletShotTime = options.lastBulletShotTime;
         }
@@ -182,7 +165,6 @@ export default class Tank extends GameObject {
             this.health = options.health;
         }
     }
-
     get maxHealth(): number {
         return tierToMaxHealthMap[this.tier];
     }
@@ -193,6 +175,14 @@ export default class Tank extends GameObject {
         }
 
         return tierHealthToSmokeTime.get(this.health);
+    }
+
+    private get isSlipping(): boolean {
+        if (this.collisionTracker === undefined) {
+            return false;
+        }
+
+        return this.collisionTracker.isCollidingWithType(GameObjectType.ICE);
     }
 
     get maxMovementSpeed(): number {
@@ -220,10 +210,6 @@ export default class Tank extends GameObject {
         }
 
         return factor;
-    }
-
-    get slippingTime(): number {
-        return tierToSlippingTimeMap[this.tier];
     }
 
     get bulletSpeed(): number {

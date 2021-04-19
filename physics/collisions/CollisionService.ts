@@ -7,6 +7,7 @@ import BoundingBoxRepository from '../bounding-box/BoundingBoxRepository';
 import BoundingBoxUtils from '../bounding-box/BoundingBoxUtils';
 import { Direction } from '../Direction';
 import Point from '../point/Point';
+import CollisionTracker from './CollisionTracker';
 import DirectionUtils from './DirectionUtils';
 import ICollisionRule, { CollisionEvent, CollisionEvents, CollisionResultEvent } from './ICollisionRule';
 
@@ -155,6 +156,25 @@ export default class CollisionService {
         }
     }
 
+    isObjectOverlapping(
+        isValidPosition: boolean,
+        preventedBoundingBox: BoundingBox,
+        movedBoundingBox: BoundingBox,
+        overlappingBoundingBox: BoundingBox,
+    ): boolean {
+        if (isValidPosition && BoundingBoxUtils.overlapsEqual(preventedBoundingBox,
+            overlappingBoundingBox)) {
+            return true;
+        }
+
+        if (!isValidPosition && BoundingBoxUtils.overlaps(movedBoundingBox,
+            overlappingBoundingBox)) {
+            return true;
+        }
+
+        return false;
+    }
+
     validateObjectMovement(objectId: number, position: Point, direction?: Direction, trySnapping=true): void {
         if (this.rulesMap === undefined) {
             throw new Error('Cannot validate object movement when rules map is not set');
@@ -170,6 +190,7 @@ export default class CollisionService {
 
         let movementPreventingObject;
         const collidingObjectNotifications = new Array<[CollisionEvent, GameObject]>();
+        const overlappingObjectTrackings = new Array<GameObject>();
         for (const overlappingObject of overlappingObjects) {
             if (objectId === overlappingObject.id) {
                 continue;
@@ -199,6 +220,8 @@ export default class CollisionService {
                     if (!isAlreadyInside && isCloser) {
                         movementPreventingObject = overlappingObject;
                     }
+                } else if (result.type === CollisionResultEvent.TRACK) {
+                    overlappingObjectTrackings.push(overlappingObject);
                 } else if (result.type === CollisionResultEvent.NOTIFY) {
                     collidingObjectNotifications.push([result.name, overlappingObject]);
                 }
@@ -236,11 +259,26 @@ export default class CollisionService {
         const preventedBoundingBox = movingObject.getBoundingBox(position);
         for (const [name, overlappingObject] of collidingObjectNotifications) {
             const overlappingBoundingBox = overlappingObject.getBoundingBox();
-            if ((isValidPosition &&
-                BoundingBoxUtils.overlapsEqual(preventedBoundingBox, overlappingBoundingBox))
-                || (!isValidPosition &&
-                    BoundingBoxUtils.overlaps(movedBoundingBox, overlappingBoundingBox))) {
+            if (this.isObjectOverlapping(isValidPosition, preventedBoundingBox, movedBoundingBox,
+                overlappingBoundingBox)) {
                 this.emitter.emit(name, objectId, overlappingObject.id, position);
+            }
+        }
+
+        if (overlappingObjectTrackings.length > 0) {
+            if (movingObject.collisionTracker === undefined) {
+                movingObject.collisionTracker = new CollisionTracker();
+            } else {
+                movingObject.collisionTracker.clear();
+            }
+
+            for (const overlappingObject of overlappingObjectTrackings) {
+                const overlappingBoundingBox = overlappingObject.getBoundingBox();
+                if (this.isObjectOverlapping(isValidPosition, preventedBoundingBox, movedBoundingBox,
+                    overlappingBoundingBox)) {
+                    movingObject.collisionTracker.markTypeObject(overlappingObject.type,
+                        overlappingObject.id);
+                }
             }
         }
     }

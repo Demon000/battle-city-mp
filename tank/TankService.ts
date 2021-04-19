@@ -111,32 +111,17 @@ export default class TankService {
         tank.lastSmokeTime = Date.now();
     }
 
-    private resetTankOnIce(tank: Tank): void {
-        if (!tank.isSlipping || Date.now() - tank.lastSlippingTime < tank.slippingTime) {
-            return;
-        }
-
-        tank.isSlipping = false;
-    }
-
     processTanksStatus(): void {
         const tanks = this.getTanks();
 
         for (const tank of tanks) {
             this.processTankShooting(tank);
             this.processTankSmoking(tank);
-            this.resetTankOnIce(tank);
         }
     }
 
     setTankShooting(tankId: number, isShooting: boolean): void {
         const tank = this.getTank(tankId);
         tank.isShooting = isShooting;
-    }
-
-    setTankOnIce(tankId: number): void {
-        const tank = this.getTank(tankId);
-        tank.isSlipping = true;
-        tank.lastSlippingTime = Date.now();
     }
 }

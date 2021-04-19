@@ -1,4 +1,5 @@
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
+import CollisionTracker from '@/physics/collisions/CollisionTracker';
 import Point from '@/physics/point/Point';
 import { Direction } from '../physics/Direction';
 import GameObjectProperties from './GameObjectProperties';
@@ -31,6 +32,7 @@ export default class GameObject {
     destroyed = false;
 
     graphicsRenderer?: any;
+    collisionTracker?: CollisionTracker;
 
     constructor(options: GameObjectOptions) {
         this.id = options.id ?? GameObject.globalId++;

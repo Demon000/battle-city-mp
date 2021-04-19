@@ -330,11 +330,6 @@ export default class GameServer {
                 this.gameObjectService.setObjectDestroyed(staticBulletId);
             });
 
-        this.collisionService.emitter.on(CollisionEvent.TANK_ON_ICE,
-            (tankId: number, _iceId: number) => {
-                this.tankService.setTankOnIce(tankId);
-            });
-
         /**
          * Game Event Batcher events
          */
