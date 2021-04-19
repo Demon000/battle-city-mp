@@ -128,9 +128,10 @@ import screenfull from 'screenfull';
 import { TankTier } from '@/tank/TankTier';
 import { GameMapGridSizes } from '@/maps/GameMapGridSizes';
 import { GameObjectType, GameShortObjectType } from '@/object/GameObjectType';
+import { GameSocketEvents } from '@/game/GameSocketEvent';
 
 export default class App extends Vue {
-    socket?: Socket;
+    socket?: Socket<GameSocketEvents>;
     gameClient?: GameClient;
     gameClientSocket?: GameClientSocket;
     joystick?: DirectionalJoystickWrapper;

@@ -9,17 +9,18 @@ import Player, { PlayerOptions } from '../player/Player';
 import GameClient, { GameClientEvent } from './GameClient';
 import { BatchGameEvent, GameEvent } from './GameEvent';
 import { GameServerStatus } from './GameServerStatus';
+import { GameSocketEvent, GameSocketEvents } from './GameSocketEvent';
 
 export default class GameClientSocket {
     socket;
     gameClient;
     initialized = false;
 
-    constructor(socket: Socket, gameClient: GameClient) {
+    constructor(socket: Socket<GameSocketEvents>, gameClient: GameClient) {
         this.socket = socket;
         this.gameClient = gameClient;
 
-        this.socket.on(GameEvent.BATCH,
+        this.socket.on(GameSocketEvent.BATCH,
             this.onBatch.bind(this));
 
         this.socket.on('connect', () => {
@@ -33,12 +34,12 @@ export default class GameClientSocket {
 
         this.gameClient.emitter.on(GameClientEvent.MAP_EDITOR_CREATE_OBJECTS,
             (objectsOptions: GameObjectProperties[]) => {
-                this.socket.emit(GameEvent.PLAYER_MAP_EDITOR_CREATE_OBJECTS, objectsOptions);
+                this.socket.emit(GameSocketEvent.PLAYER_MAP_EDITOR_CREATE_OBJECTS, objectsOptions);
             });
 
         this.gameClient.emitter.on(GameClientEvent.MAP_EDITOR_DESTROY_OBJECTS,
             (destroyBox: BoundingBox) => {
-                this.socket.emit(GameEvent.PLAYER_MAP_EDITOR_DESTROY_OBJECTS, destroyBox);
+                this.socket.emit(GameSocketEvent.PLAYER_MAP_EDITOR_DESTROY_OBJECTS, destroyBox);
             });
 
         this.socket.connect();
@@ -115,35 +116,35 @@ export default class GameClientSocket {
         }
     }
 
-    onBatch(events: any[]): void {
+    onBatch(events: BatchGameEvent[]): void {
         events.forEach(this.onEvent, this);
     }
 
     requestPlayerTankSpawn(): void {
-        this.socket.emit(GameEvent.PLAYER_REQUEST_TANK_SPAWN);
+        this.socket.emit(GameSocketEvent.PLAYER_REQUEST_TANK_SPAWN);
     }
 
     requestPlayerTankColor(r: number, g: number, b: number): void {
-        this.socket.emit(GameEvent.PLAYER_REQUEST_TANK_COLOR, r, g, b);
+        this.socket.emit(GameSocketEvent.PLAYER_REQUEST_TANK_COLOR, [r, g, b]);
     }
 
     requestPlayerTankDespawn(): void {
-        this.socket.emit(GameEvent.PLAYER_REQUEST_TANK_DESPAWN);
+        this.socket.emit(GameSocketEvent.PLAYER_REQUEST_TANK_DESPAWN);
     }
 
     requestPlayerTankTier(tier: TankTier): void {
-        this.socket.emit(GameEvent.PLAYER_REQUEST_TANK_TIER, tier);
+        this.socket.emit(GameSocketEvent.PLAYER_REQUEST_TANK_TIER, tier);
     }
 
     requestPlayerAction(action: Action): void {
-        this.socket.emit(GameEvent.PLAYER_ACTION, action.toOptions());
+        this.socket.emit(GameSocketEvent.PLAYER_ACTION, action.toOptions());
     }
 
     setPlayerName(name: string): void {
-        this.socket.emit(GameEvent.PLAYER_SET_NAME, name);
+        this.socket.emit(GameSocketEvent.PLAYER_SET_NAME, name);
     }
 
     saveMap(): void {
-        this.socket.emit(GameEvent.PLAYER_MAP_EDITOR_SAVE);
+        this.socket.emit(GameSocketEvent.PLAYER_MAP_EDITOR_SAVE);
     }
 }

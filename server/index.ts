@@ -4,13 +4,15 @@ dotenv.config();
 import Express from 'express';
 import Cors from 'cors';
 import Http from 'http';
-import IO from 'socket.io';
+import { Socket, Server } from 'socket.io';
 import { BatchGameEvent, GameEvent, UnicastBatchGameEvent } from '@/game/GameEvent';
 import { ActionOptions } from '@/actions/Action';
 import ActionFactory from '@/actions/ActionFactory';
 import GameServer from '@/game/GameServer';
 import { PlayerSpawnStatus } from '@/player/Player';
 import yargs from 'yargs';
+import { GameSocketEvent } from '@/game/GameSocketEvent';
+import { Color } from '@/drawable/Color';
 
 const argv = yargs(process.argv.slice(2))
     .usage('Usage: $0 [options]')
@@ -30,7 +32,7 @@ const argv = yargs(process.argv.slice(2))
 
 const app = Express();
 const http = new Http.Server(app);
-const io = new IO.Server(http, {
+const io = new Server(http, {
     cors: {
         origin: '*',
     },
@@ -38,13 +40,13 @@ const io = new IO.Server(http, {
 const gameServer = new GameServer();
 
 gameServer.emitter.on(GameEvent.BROADCAST_BATCH, (events: BatchGameEvent[]) => {
-    io.emit(GameEvent.BATCH, events);
+    io.emit(GameSocketEvent.BATCH, events);
 });
 gameServer.emitter.on(GameEvent.PLAYER_BATCH, (playerId: string, events: UnicastBatchGameEvent[]) => {
-    io.to(playerId).emit(GameEvent.BATCH, events);
+    io.to(playerId).emit(GameSocketEvent.BATCH, events);
 });
 
-io.on('connection', (socket: IO.Socket) => {
+io.on('connection', (socket: Socket) => {
     console.log('New user connected', socket.id);
     gameServer.onPlayerConnectedFromClient(socket.id);
 
@@ -53,44 +55,44 @@ io.on('connection', (socket: IO.Socket) => {
         gameServer.onPlayerDisconnectedFromClient(socket.id);
     });
 
-    socket.on(GameEvent.PLAYER_ACTION, (options: ActionOptions) => {
+    socket.on(GameSocketEvent.PLAYER_ACTION, (options: ActionOptions) => {
         const action = ActionFactory.buildFromOptions(options);
         gameServer.onPlayerActionFromClient(socket.id, action);
     });
 
-    socket.on(GameEvent.PLAYER_REQUEST_SERVER_STATUS, () => {
+    socket.on(GameSocketEvent.PLAYER_REQUEST_SERVER_STATUS, () => {
         gameServer.onPlayerRequestedServerStatusFromClient(socket.id);
     });
 
-    socket.on(GameEvent.PLAYER_REQUEST_TANK_SPAWN, () => {
+    socket.on(GameSocketEvent.PLAYER_REQUEST_TANK_SPAWN, () => {
         gameServer.onPlayerRequestSpawnStatusFromClient(socket.id, PlayerSpawnStatus.SPAWN);
     });
 
-    socket.on(GameEvent.PLAYER_REQUEST_TANK_DESPAWN, () => {
+    socket.on(GameSocketEvent.PLAYER_REQUEST_TANK_DESPAWN, () => {
         gameServer.onPlayerRequestSpawnStatusFromClient(socket.id, PlayerSpawnStatus.DESPAWN);
     });
 
-    socket.on(GameEvent.PLAYER_REQUEST_TANK_COLOR, (r, g, b) => {
-        gameServer.onPlayerRequestTankColorFromClient(socket.id, [r, g, b]);
+    socket.on(GameSocketEvent.PLAYER_REQUEST_TANK_COLOR, (color: Color) => {
+        gameServer.onPlayerRequestTankColorFromClient(socket.id, color);
     });
 
-    socket.on(GameEvent.PLAYER_REQUEST_TANK_TIER, tier => {
+    socket.on(GameSocketEvent.PLAYER_REQUEST_TANK_TIER, tier => {
         gameServer.onPlayerRequestTankTierFromClient(socket.id, tier);
     });
 
-    socket.on(GameEvent.PLAYER_SET_NAME, name => {
+    socket.on(GameSocketEvent.PLAYER_SET_NAME, name => {
         gameServer.onPlayerSetName(socket.id, name);
     });
 
-    socket.on(GameEvent.PLAYER_MAP_EDITOR_CREATE_OBJECTS, objectsOptions => {
+    socket.on(GameSocketEvent.PLAYER_MAP_EDITOR_CREATE_OBJECTS, objectsOptions => {
         gameServer.onPlayerMapEditorCreateObjects(objectsOptions);
     });
 
-    socket.on(GameEvent.PLAYER_MAP_EDITOR_DESTROY_OBJECTS, destroyBox => {
+    socket.on(GameSocketEvent.PLAYER_MAP_EDITOR_DESTROY_OBJECTS, destroyBox => {
         gameServer.onPlayerMapEditorDestroyObjects(destroyBox);
     });
 
-    socket.on(GameEvent.PLAYER_MAP_EDITOR_SAVE, () => {
+    socket.on(GameSocketEvent.PLAYER_MAP_EDITOR_SAVE, () => {
         gameServer.onPlayerMapEditorSave();
     });
 });
