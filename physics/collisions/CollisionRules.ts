@@ -21,6 +21,7 @@ export const rules: ICollisionRule[] = [
         movingTypes: [GameObjectType.TANK],
         staticTypes: [
             GameObjectType.ICE,
+            GameObjectType.SAND,
         ],
         result: [
             {

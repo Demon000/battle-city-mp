@@ -47,6 +47,24 @@ const tierToBulletPowerMap = {
     [TankTier.HEAVY]: BulletPower.HEAVY,
 };
 
+const tierToSandMaxSpeedFactorMap = {
+    [TankTier.NORMAL]: 0.5,
+    [TankTier.LIGHT]: 0.25,
+    [TankTier.HEAVY]: 0.25,
+};
+
+const tierToSandAccelerationFactorMap = {
+    [TankTier.NORMAL]: 1,
+    [TankTier.LIGHT]: 1,
+    [TankTier.HEAVY]: 1,
+};
+
+const tierToSandDecelrationFactorMap = {
+    [TankTier.NORMAL]: 2,
+    [TankTier.LIGHT]: 2,
+    [TankTier.HEAVY]: 2,
+};
+
 const tierToIceMaxSpeedFactorMap = {
     [TankTier.NORMAL]: 1.5,
     [TankTier.LIGHT]: 1.5,
@@ -177,18 +195,31 @@ export default class Tank extends GameObject {
         return tierHealthToSmokeTime.get(this.health);
     }
 
-    private get isOnIce(): boolean {
+    private isOnType(type: GameObjectType): boolean {
         if (this.collisionTracker === undefined) {
             return false;
         }
 
-        return this.collisionTracker.isCollidingWithType(GameObjectType.ICE);
+        return this.collisionTracker.isCollidingWithType(type);
+    }
+
+    private get isOnIce(): boolean {
+        return this.isOnType(GameObjectType.ICE);
+    }
+
+    private get isOnSand(): boolean {
+        return this.isOnType(GameObjectType.SAND);
     }
 
     get maxMovementSpeed(): number {
         let speed = tierToMaxSpeedMap[this.tier];
+
         if (this.isOnIce) {
             speed *= tierToIceMaxSpeedFactorMap[this.tier];
+        }
+
+        if (this.isOnSand) {
+            speed *= tierToSandMaxSpeedFactorMap[this.tier];
         }
 
         return speed;
@@ -196,8 +227,13 @@ export default class Tank extends GameObject {
 
     get accelerationFactor(): number {
         let factor = tierToAccelerationFactorMap[this.tier];
+
         if (this.isOnIce) {
             factor *= tierToIceAccelerationFactorMap[this.tier];
+        }
+
+        if (this.isOnSand) {
+            factor *= tierToSandAccelerationFactorMap[this.tier];
         }
 
         return factor;
@@ -205,8 +241,13 @@ export default class Tank extends GameObject {
 
     get decelerationFactor(): number {
         let factor = tierToDecelerationFactorMap[this.tier];
+
         if (this.isOnIce) {
             factor *= tierToIceDecelerationFactorMap[this.tier];
+        }
+
+        if (this.isOnSand) {
+            factor *= tierToSandDecelrationFactorMap[this.tier];
         }
 
         return factor;
