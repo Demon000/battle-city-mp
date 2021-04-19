@@ -29,8 +29,8 @@ export interface CollisionEvents {
 export type ICollisionResult = {
     type: CollisionResultEvent.PREVENT_MOVEMENT;
 } | {
-    type: CollisionResultEvent.NOTIFY,
-    name: CollisionEvent,
+    type: CollisionResultEvent.NOTIFY;
+    name: CollisionEvent;
 };
 
 export default interface ICollisionRule {
