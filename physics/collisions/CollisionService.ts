@@ -169,7 +169,7 @@ export default class CollisionService {
         const overlappingObjects = this.gameObjectRepository.getMultiple(overlappingObjectIds);
 
         let movementPreventingObject;
-        const notifications = new Array<[CollisionEvent, GameObject]>();
+        const collidingObjectNotifications = new Array<[CollisionEvent, GameObject]>();
         for (const overlappingObject of overlappingObjects) {
             if (objectId === overlappingObject.id) {
                 continue;
@@ -200,7 +200,7 @@ export default class CollisionService {
                         movementPreventingObject = overlappingObject;
                     }
                 } else if (result.type === CollisionResultEvent.NOTIFY) {
-                    notifications.push([result.name, overlappingObject]);
+                    collidingObjectNotifications.push([result.name, overlappingObject]);
                 }
             }
         }
@@ -234,7 +234,7 @@ export default class CollisionService {
         }
 
         const preventedBoundingBox = movingObject.getBoundingBox(position);
-        for (const [name, overlappingObject] of notifications) {
+        for (const [name, overlappingObject] of collidingObjectNotifications) {
             const overlappingBoundingBox = overlappingObject.getBoundingBox();
             if ((isValidPosition &&
                 BoundingBoxUtils.overlapsEqual(preventedBoundingBox, overlappingBoundingBox))
