@@ -7,7 +7,7 @@
         ></canvas>
 
         <div id="game-overlay">
-            <div id="game-controls">
+            <div id="game-controls" class="controls">
                 <button
                     @click="onSpawnButtonClick"
                 >Spawn</button>
