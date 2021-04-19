@@ -10,7 +10,7 @@ export default class ActionFactory {
         }
     }
 
-    static buildFromKeyboardEvent(event: KeyboardEvent): Action | undefined {
+    static buildFromKeyboardEvent(event: KeyboardEvent): ButtonPressAction | undefined {
         if (!['keydown', 'keyup'].includes(event.type)) {
             return undefined;
         }
@@ -52,7 +52,7 @@ export default class ActionFactory {
         });
     }
 
-    static buildFromJoystickEvent(type: string, angle: string): Action | undefined {
+    static buildFromJoystickEvent(type: string, angle: string): ButtonPressAction | undefined {
         let buttonState;
         switch (type) {
             case 'dirup':
@@ -90,7 +90,7 @@ export default class ActionFactory {
         });
     }
 
-    static buildFromShootButtonTouchEvent(type: string): Action | undefined {
+    static buildFromShootButtonTouchEvent(type: string): ButtonPressAction | undefined {
         let buttonState;
         switch (type) {
             case 'touchend':
