@@ -41,9 +41,9 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             new ImageDrawable('water_1.png'),
             new ImageDrawable('water_2.png'),
         ], [
-            500,
-            500,
-            500,
+            1000,
+            1000,
+            1000,
         ], {}, true, {
             renderPass: RenderPass.GROUND,
         }),
