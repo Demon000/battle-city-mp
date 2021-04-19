@@ -33,6 +33,12 @@ const properties: IGameObjectProperties[] = [
         height: 8,
     },
     {
+        type: GameObjectType.SAND,
+        shortType: GameShortObjectType.SAND,
+        width: 8,
+        height: 8,
+    },
+    {
         type: GameObjectType.WATER,
         shortType: GameShortObjectType.WATER,
         width: 8,

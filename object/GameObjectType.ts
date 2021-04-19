@@ -6,6 +6,7 @@ export enum GameShortObjectType {
     LEVEL_BORDER = '#',
     ICE = 'I',
     WATER = 'W',
+    SAND = 'A',
 }
 
 export enum GameObjectType {
@@ -22,6 +23,7 @@ export enum GameObjectType {
     ICE = 'ice',
     SMOKE = 'smoke',
     WATER = 'water',
+    SAND = 'sand',
 }
 
 export const SavableGameObjectTypes = [
@@ -32,4 +34,5 @@ export const SavableGameObjectTypes = [
     GameObjectType.PLAYER_SPAWN,
     GameObjectType.ICE,
     GameObjectType.WATER,
+    GameObjectType.SAND,
 ];
