@@ -30,6 +30,19 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             renderPass: RenderPass.GROUND,
         }),
     ],
+    [GameObjectType.WATER]: [
+        new AnimatedImageDrawable([
+            new ImageDrawable('water_0.png'),
+            new ImageDrawable('water_1.png'),
+            new ImageDrawable('water_2.png'),
+        ], [
+            500,
+            500,
+            500,
+        ], {}, true, {
+            renderPass: RenderPass.GROUND,
+        }),
+    ],
     [GameObjectType.BRICK_WALL]: [
         new ImageDrawable('brick_wall_even.png', {
             position: {
