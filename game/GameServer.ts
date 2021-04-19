@@ -140,10 +140,8 @@ export default class GameServer {
                         tier: player.requestedTankTier,
                     });
                     this.gameObjectService.registerObject(tank);
-                    this.playerService.setPlayerTankId(playerId, tank.id);
                 } else if (status === PlayerSpawnStatus.DESPAWN && player.tankId !== null) {
                     this.gameObjectService.unregisterObject(player.tankId);
-                    this.playerService.setPlayerTankId(playerId, null);
                 }
             });
 
@@ -169,6 +167,19 @@ export default class GameServer {
             (object: GameObject) => {
                 this.collisionService.registerObjectCollisions(object.id);
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_REGISTERED, object.toOptions()]);
+
+                switch (object.type) {
+                    case GameObjectType.TANK: {
+                        const tank = object as Tank;
+                        this.playerService.setPlayerTankId(tank.playerId, tank.id);
+                        break;
+                    }
+                    case GameObjectType.BULLET: {
+                        const bullet = object as Bullet;
+                        this.tankService.addTankBullet(bullet.tankId, bullet.id);
+                        break;
+                    }
+                }
             });
 
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_UNREGISTERED,
@@ -180,6 +191,29 @@ export default class GameServer {
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_CHANGED,
             (objectId: number, objectOptions: GameObjectOptions) => {
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_CHANGED, objectId, objectOptions]);
+            });
+
+        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BEFORE_UNREGISTER,
+            (objectId: number) => {
+                const object = this.gameObjectService.getObject(objectId);
+
+                switch (object.type) {
+                    case GameObjectType.TANK: {
+                        const tank = object as Tank;
+                        this.playerService.setPlayerTankId(tank.playerId, null);
+                        break;
+                    }
+                    case GameObjectType.BULLET: {
+                        const bullet = object as Bullet;
+                        const tank = this.tankService.findTank(bullet.tankId);
+                        if (tank === undefined) {
+                            break;
+                        }
+
+                        this.tankService.removeTankBullet(bullet.tankId, objectId);
+                        break;
+                    }
+                }
             });
 
         /**
@@ -207,7 +241,6 @@ export default class GameServer {
         this.bulletService.emitter.on(BulletServiceEvent.BULLET_SPAWNED,
             (bullet: Bullet) => {
                 this.gameObjectService.registerObject(bullet);
-                this.tankService.addTankBullet(bullet.tankId, bullet.id);
             });
 
         /**
@@ -222,17 +255,6 @@ export default class GameServer {
             this.gameObjectService.registerObject(explosion);
         };
 
-        const destroyBullet = (bulletId: number) => {
-            const bullet = this.bulletService.getBullet(bulletId);
-            this.gameObjectService.setObjectDestroyed(bulletId);
-            const tank = this.tankService.findTank(bullet.tankId);
-            if (tank === undefined) {
-                return;
-            }
-
-            this.tankService.removeTankBullet(bullet.tankId, bulletId);
-        };
-
         this.collisionService.emitter.on(CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED,
             (objectId: number, direction: Direction) => {
                 this.gameObjectService.setObjectDirection(objectId, direction);
@@ -244,15 +266,15 @@ export default class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_LEVEL_BORDER,
-            (movingObjectId: number, _staticObjectId: number, position: Point) => {
+            (bulletId: number, _staticObjectId: number, position: Point) => {
                 spawnExplosion(position, ExplosionType.SMALL, GameObjectType.NONE);
-                destroyBullet(movingObjectId);
+                this.gameObjectService.setObjectDestroyed(bulletId);
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_STEEL_WALL,
             (bulletId: number, steelWallId: number, position: Point) => {
                 const bullet = this.bulletService.getBullet(bulletId);
-                destroyBullet(bulletId);
+                this.gameObjectService.setObjectDestroyed(bulletId);
                 if (bullet.power === BulletPower.HEAVY) {
                     spawnExplosion(position, ExplosionType.SMALL);
                     this.gameObjectService.setObjectDestroyed(steelWallId);
@@ -268,7 +290,7 @@ export default class GameServer {
                 const objects = this.gameObjectService.getMultipleObjects(objectsIds);
                 const brickWalls = objects.filter(o => o.type === GameObjectType.BRICK_WALL);
                 spawnExplosion(position, ExplosionType.SMALL);
-                destroyBullet(bulletId);
+                this.gameObjectService.setObjectDestroyed(bulletId);
                 for (const brickWall of brickWalls) {
                     this.gameObjectService.setObjectDestroyed(brickWall.id);
                 }
@@ -297,15 +319,15 @@ export default class GameServer {
                 }
 
                 if (bullet.damage <= 0) {
-                    destroyBullet(bulletId);
+                    this.gameObjectService.setObjectDestroyed(bulletId);
                 }
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BULLET,
-            (movingObjectId: number, staticObjectId: number, position: Point) => {
+            (movingBulletId: number, staticBulletId: number, position: Point) => {
                 spawnExplosion(position, ExplosionType.SMALL);
-                destroyBullet(movingObjectId);
-                destroyBullet(staticObjectId);
+                this.gameObjectService.setObjectDestroyed(movingBulletId);
+                this.gameObjectService.setObjectDestroyed(staticBulletId);
             });
 
         this.collisionService.emitter.on(CollisionEvent.TANK_ON_ICE,

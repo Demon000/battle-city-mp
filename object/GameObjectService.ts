@@ -14,6 +14,7 @@ export enum GameObjectServiceEvent {
     OBJECT_CHANGED = 'object-changed',
     OBJECT_BOUNDING_BOX_CHANGED = 'object-bounding-box-changed',
     OBJECT_REGISTERED = 'object-registered',
+    OBJECT_BEFORE_UNREGISTER = 'object-before-unregister',
     OBJECT_UNREGISTERED = 'object-unregistered',
 }
 
@@ -23,6 +24,7 @@ interface GameObjectServiceEvents {
     [GameObjectServiceEvent.OBJECT_CHANGED]: (objectId: number, options: PartialGameObjectOptions) => void,
     [GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED]: (objectId: number, box: BoundingBox) => void,
     [GameObjectServiceEvent.OBJECT_REGISTERED]: (object: GameObject) => void,
+    [GameObjectServiceEvent.OBJECT_BEFORE_UNREGISTER]: (objectId: number) => void,
     [GameObjectServiceEvent.OBJECT_UNREGISTERED]: (objectId: number) => void,
 }
 
@@ -62,6 +64,12 @@ export default class GameObjectService {
     }
 
     unregisterObject(objectId: number): void {
+        const object = this.findObject(objectId);
+        if (object === undefined) {
+            return;
+        }
+
+        this.emitter.emit(GameObjectServiceEvent.OBJECT_BEFORE_UNREGISTER, objectId);
         this.repository.remove(objectId);
         this.emitter.emit(GameObjectServiceEvent.OBJECT_UNREGISTERED, objectId);
     }
