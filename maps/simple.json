@@ -16442,7 +16442,70 @@
             "type": "brick-wall",
             "position": {
                 "y": 352,
+                "x": 640
+            }
+        },
+        {
+            "type": "brick-wall",
+            "position": {
+                "y": 352,
+                "x": 644
+            }
+        },
+        {
+            "type": "brick-wall",
+            "position": {
+                "y": 352,
+                "x": 648
+            }
+        },
+        {
+            "type": "brick-wall",
+            "position": {
+                "y": 352,
                 "x": 652
+            }
+        },
+        {
+            "type": "brick-wall",
+            "position": {
+                "y": 360,
+                "x": 640
+            }
+        },
+        {
+            "type": "brick-wall",
+            "position": {
+                "y": 360,
+                "x": 644
+            }
+        },
+        {
+            "type": "brick-wall",
+            "position": {
+                "y": 360,
+                "x": 648
+            }
+        },
+        {
+            "type": "brick-wall",
+            "position": {
+                "y": 356,
+                "x": 640
+            }
+        },
+        {
+            "type": "brick-wall",
+            "position": {
+                "y": 356,
+                "x": 644
+            }
+        },
+        {
+            "type": "brick-wall",
+            "position": {
+                "y": 356,
+                "x": 648
             }
         },
         {
