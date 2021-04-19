@@ -47,19 +47,19 @@ const tierToBulletPowerMap = {
     [TankTier.HEAVY]: BulletPower.HEAVY,
 };
 
-const tierToSlippingMaxSpeedMap = {
+const tierToIceMaxSpeedFactorMap = {
     [TankTier.NORMAL]: 1.5,
     [TankTier.LIGHT]: 1.5,
     [TankTier.HEAVY]: 1.5,
 };
 
-const tierToSlippingAccelerationMap = {
+const tierToIceAccelerationFactorMap = {
     [TankTier.NORMAL]: 2,
     [TankTier.LIGHT]: 2,
     [TankTier.HEAVY]: 2,
 };
 
-const tierToSlippingDecelerationMap = {
+const tierToIceDecelerationFactorMap = {
     [TankTier.NORMAL]: 0.5,
     [TankTier.LIGHT]: 0.5,
     [TankTier.HEAVY]: 0.5,
@@ -188,7 +188,7 @@ export default class Tank extends GameObject {
     get maxMovementSpeed(): number {
         let speed = tierToMaxSpeedMap[this.tier];
         if (this.isSlipping) {
-            speed *= tierToSlippingMaxSpeedMap[this.tier];
+            speed *= tierToIceMaxSpeedFactorMap[this.tier];
         }
 
         return speed;
@@ -197,7 +197,7 @@ export default class Tank extends GameObject {
     get accelerationFactor(): number {
         let factor = tierToAccelerationFactorMap[this.tier];
         if (this.isSlipping) {
-            factor *= tierToSlippingAccelerationMap[this.tier];
+            factor *= tierToIceAccelerationFactorMap[this.tier];
         }
 
         return factor;
@@ -206,7 +206,7 @@ export default class Tank extends GameObject {
     get decelerationFactor(): number {
         let factor = tierToDecelerationFactorMap[this.tier];
         if (this.isSlipping) {
-            factor *= tierToSlippingDecelerationMap[this.tier];
+            factor *= tierToIceDecelerationFactorMap[this.tier];
         }
 
         return factor;
