@@ -213,7 +213,7 @@ export default class Tank extends GameObject {
         return factor;
     }
 
-    get delecerationFactor(): number {
+    get decelerationFactor(): number {
         let factor = tierToDecelerationFactorMap[this.tier];
         if (this.isSlipping) {
             factor *= tierToSlippingDecelerationMap[this.tier];

@@ -133,7 +133,7 @@ export default class GameObject {
         return 0;
     }
 
-    get delecerationFactor(): number {
+    get decelerationFactor(): number {
         return 0;
     }
 
