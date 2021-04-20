@@ -265,11 +265,13 @@ export default class CollisionService {
             }
         }
 
+        if (movingObject.collisionTracker !== undefined) {
+            movingObject.collisionTracker.clear();
+        }
+
         if (overlappingObjectTrackings.length > 0) {
             if (movingObject.collisionTracker === undefined) {
                 movingObject.collisionTracker = new CollisionTracker();
-            } else {
-                movingObject.collisionTracker.clear();
             }
 
             for (const overlappingObject of overlappingObjectTrackings) {
