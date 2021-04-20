@@ -99,6 +99,9 @@ export interface TankOptions extends GameObjectOptions {
     playerId: string;
     playerName: string;
     isShooting?: boolean;
+    isOnIce?: boolean;
+    isOnSand?: boolean;
+    isUnderBush?: boolean;
     lastBulletShotTime?: number;
     lastSmokeTime?: number;
     bulletIds?: number[];
@@ -113,6 +116,9 @@ export default class Tank extends GameObject {
     playerId: string;
     playerName: string;
     isShooting: boolean;
+    isOnIce?: boolean;
+    isOnSand?: boolean;
+    isUnderBush?: boolean;
     lastBulletShotTime: number;
     lastSmokeTime: number;
     bulletIds: number[];
@@ -128,6 +134,9 @@ export default class Tank extends GameObject {
         this.playerId = options.playerId;
         this.playerName = options.playerName;
         this.isShooting = options.isShooting ?? false;
+        this.isOnIce = options.isOnIce ?? false;
+        this.isOnSand = options.isOnSand ?? false;
+        this.isUnderBush = options.isUnderBush ?? false;
         this.lastBulletShotTime = options.lastBulletShotTime ?? 0;
         this.lastSmokeTime = options.lastSmokeTime ?? 0;
         this.bulletIds = options.bulletIds ?? new Array<number>();
@@ -154,12 +163,17 @@ export default class Tank extends GameObject {
         this.tier = options.tier ?? this.tier;
         this.playerId = options.playerId ?? this.playerId;
         this.playerName = options.playerName ?? this.playerName;
+        this.isShooting = options.isShooting ?? this.isShooting;
+        this.isOnIce = options.isOnIce ?? this.isOnIce;
+        this.isOnSand = options.isOnSand ?? this.isOnSand;
+        this.isUnderBush = options.isUnderBush ?? this.isUnderBush;
         this.lastBulletShotTime = options.lastBulletShotTime ?? this.lastBulletShotTime;
         this.lastSmokeTime = options.lastSmokeTime ?? this.lastSmokeTime;
         this.bulletIds = options.bulletIds ?? this.bulletIds;
         this.color = options.color ?? this.color;
         this.health = options.health ?? this.health;
     }
+
     get maxHealth(): number {
         return tierToMaxHealthMap[this.tier];
     }
@@ -170,22 +184,6 @@ export default class Tank extends GameObject {
         }
 
         return tierHealthToSmokeTime.get(this.health);
-    }
-
-    private isOnType(type: GameObjectType): boolean {
-        if (this.collisionTracker === undefined) {
-            return false;
-        }
-
-        return this.collisionTracker.isCollidingWithType(type);
-    }
-
-    private get isOnIce(): boolean {
-        return this.isOnType(GameObjectType.ICE);
-    }
-
-    private get isOnSand(): boolean {
-        return this.isOnType(GameObjectType.SAND);
     }
 
     get maxMovementSpeed(): number {
@@ -247,17 +245,24 @@ export default class Tank extends GameObject {
     }
 
     get graphicsMeta(): ResourceMeta[] | undefined | null {
-        return [
-            {
-                isTank: true,
-                direction: this.direction,
-                isMoving: this.isMoving,
-                tier: this.tier,
-            },
-            {
-                isText: true,
-            },
-        ];
+        const tankGraphicsMeta = {
+            isTank: true,
+            direction: this.direction,
+            isMoving: this.isMoving,
+            tier: this.tier,
+        };
+
+        const textGraphicsMeta = {
+            isText: true,
+        };
+
+        const metas: ResourceMeta[] = [tankGraphicsMeta];
+
+        if (!this.isUnderBush) {
+            metas.push(textGraphicsMeta);
+        }
+
+        return metas;
     }
 
     get audioMeta(): ResourceMeta | undefined | null {

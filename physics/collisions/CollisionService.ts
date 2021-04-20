@@ -12,11 +12,13 @@ import DirectionUtils from './DirectionUtils';
 import ICollisionRule, { CollisionEvent, CollisionEvents, CollisionResultEvent } from './ICollisionRule';
 
 export enum CollisionServiceEvent {
+    OBJECT_TRACKED_COLLISIONS = 'object-tracked-collisions',
     OBJECT_POSITION_ALLOWED = 'object-position-allowed',
     OBJECT_DIRECTION_ALLOWED = 'object-direction-allowed',
 }
 
 interface CollisionServiceEvents extends CollisionEvents {
+    [CollisionServiceEvent.OBJECT_TRACKED_COLLISIONS]: (movingObjectId: number, tracker: CollisionTracker) => void;
     [CollisionServiceEvent.OBJECT_POSITION_ALLOWED]: (movingObjectId: number, position: Point) => void;
     [CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED]: (movingObjectId: number, direction: Direction) => void;
 }
@@ -190,7 +192,7 @@ export default class CollisionService {
 
         let movementPreventingObject;
         const collidingObjectNotifications = new Array<[CollisionEvent, GameObject]>();
-        const overlappingObjectTrackings = new Array<GameObject>();
+        const collidingObjectTrackings = new Array<GameObject>();
         for (const overlappingObject of overlappingObjects) {
             if (objectId === overlappingObject.id) {
                 continue;
@@ -221,7 +223,7 @@ export default class CollisionService {
                         movementPreventingObject = overlappingObject;
                     }
                 } else if (result.type === CollisionResultEvent.TRACK) {
-                    overlappingObjectTrackings.push(overlappingObject);
+                    collidingObjectTrackings.push(overlappingObject);
                 } else if (result.type === CollisionResultEvent.NOTIFY) {
                     collidingObjectNotifications.push([result.name, overlappingObject]);
                 }
@@ -265,24 +267,17 @@ export default class CollisionService {
             }
         }
 
-        if (movingObject.collisionTracker !== undefined) {
-            movingObject.collisionTracker.clear();
-        }
-
-        if (overlappingObjectTrackings.length > 0) {
-            if (movingObject.collisionTracker === undefined) {
-                movingObject.collisionTracker = new CollisionTracker();
-            }
-
-            for (const overlappingObject of overlappingObjectTrackings) {
-                const overlappingBoundingBox = overlappingObject.getBoundingBox();
-                if (this.isObjectOverlapping(isValidPosition, preventedBoundingBox, movedBoundingBox,
-                    overlappingBoundingBox)) {
-                    movingObject.collisionTracker.markTypeObject(overlappingObject.type,
-                        overlappingObject.id);
-                }
+        const collisionTracker = new CollisionTracker();
+        for (const overlappingObject of collidingObjectTrackings) {
+            const overlappingBoundingBox = overlappingObject.getBoundingBox();
+            if (this.isObjectOverlapping(isValidPosition, preventedBoundingBox, movedBoundingBox,
+                overlappingBoundingBox)) {
+                collisionTracker.markTypeObject(overlappingObject.type, overlappingObject.id);
             }
         }
+
+        this.emitter.emit(CollisionServiceEvent.OBJECT_TRACKED_COLLISIONS,
+            objectId, collisionTracker);
     }
 
     calculateSnappedCoordinates(value: number, snapping: number): number {

@@ -8,8 +8,9 @@ import { ExplosionType } from '@/explosion/ExplosionType';
 import GameObjectFactory from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
+import CollisionTracker from '@/physics/collisions/CollisionTracker';
 import { Direction } from '@/physics/Direction';
-import Tank from '@/tank/Tank';
+import Tank, { PartialTankOptions } from '@/tank/Tank';
 import TankService, { TankServiceEvent } from '@/tank/TankService';
 import { TankTier } from '@/tank/TankTier';
 import MapRepository from '@/utils/MapRepository';
@@ -235,6 +236,11 @@ export default class GameServer {
                 this.gameObjectService.registerObject(smoke);
             });
 
+        this.tankService.emitter.on(TankServiceEvent.TANK_UPDATED,
+            (tankId: number, tankOptions: PartialTankOptions) => {
+                this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_CHANGED, tankId, tankOptions]);
+            });
+
         /**
          * BulletService event handlers
          */
@@ -263,6 +269,17 @@ export default class GameServer {
         this.collisionService.emitter.on(CollisionServiceEvent.OBJECT_POSITION_ALLOWED,
             (objectId: number, position: Point) => {
                 this.gameObjectService.setObjectPosition(objectId, position);
+            });
+
+        this.collisionService.emitter.on(CollisionServiceEvent.OBJECT_TRACKED_COLLISIONS,
+            (objectId: number, tracker: CollisionTracker) => {
+                const object = this.gameObjectService.getObject(objectId);
+
+                switch (object.type) {
+                    case GameObjectType.TANK:
+                        this.tankService.updateTankCollisions(objectId, tracker);
+                        break;
+                }
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_LEVEL_BORDER,

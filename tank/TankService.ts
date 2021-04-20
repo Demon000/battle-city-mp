@@ -1,17 +1,20 @@
 import GameObject from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
+import CollisionTracker from '@/physics/collisions/CollisionTracker';
 import MapRepository from '@/utils/MapRepository';
 import { EventEmitter } from 'eventemitter3';
-import Tank from './Tank';
+import Tank, { PartialTankOptions } from './Tank';
 
 export enum TankServiceEvent {
     TANK_REQUESTED_BULLET_SPAWN = 'tank-requested-bullet-spawn',
     TANK_REQUESTED_SMOKE_SPAWN = 'tank-requested-smoke-spawn',
+    TANK_UPDATED = 'tank-updated',
 }
 
 interface TankServiceEvents {
     [TankServiceEvent.TANK_REQUESTED_BULLET_SPAWN]: (tankId: number) => void,
     [TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN]: (tankId: number) => void,
+    [TankServiceEvent.TANK_UPDATED]: (tankId: number, options: PartialTankOptions) => void,
 }
 
 export default class TankService {
@@ -109,6 +112,18 @@ export default class TankService {
 
         this.emitter.emit(TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN, tank.id);
         tank.lastSmokeTime = Date.now();
+    }
+
+    updateTankCollisions(tankId: number, tracker: CollisionTracker): void {
+        const tank = this.getTank(tankId);
+
+        tank.isOnIce = tracker.isCollidingWithType(GameObjectType.ICE);
+        tank.isOnSand = tracker.isCollidingWithType(GameObjectType.SAND);
+        tank.isUnderBush = tracker.isCollidingWithType(GameObjectType.BUSH);
+
+        this.emitter.emit(TankServiceEvent.TANK_UPDATED, tankId, {
+            isUnderBush: tank.isUnderBush,
+        });
     }
 
     processTanksStatus(): void {
