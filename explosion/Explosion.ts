@@ -33,14 +33,8 @@ export default class Explosion extends GameObject {
 
     setOptions(options: PartialExplosionOptions): void {
         super.setOptions(options);
-
-        if (options.explosionType !== undefined) {
-            this.explosionType = options.explosionType;
-        }
-
-        if (options.destroyedObjectType !== undefined) {
-            this.destroyedObjectType = options.destroyedObjectType;
-        }
+        this.explosionType = options.explosionType ?? this.explosionType;
+        this.destroyedObjectType = options.destroyedObjectType ?? this.destroyedObjectType;
     }
 
     get graphicsMeta(): ResourceMeta[] | undefined | null {

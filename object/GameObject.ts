@@ -67,25 +67,11 @@ export default class GameObject {
     }
 
     setOptions(options: PartialGameObjectOptions): void {
-        if (options.position !== undefined) {
-            this.position = options.position;
-        }
-
-        if (options.direction !== undefined) {
-            this.direction = options.direction;
-        }
-
-        if (options.movementSpeed !== undefined) {
-            this.movementSpeed = options.movementSpeed;
-        }
-
-        if (options.movementDirection !== undefined) {
-            this.movementDirection = options.movementDirection;
-        }
-
-        if (options.spawnTime !== undefined) {
-            this.spawnTime = options.spawnTime;
-        }
+        this.position = options.position ?? this.position;
+        this.direction = options.direction ?? this.direction;
+        this.movementSpeed = options.movementSpeed ?? this.movementSpeed;
+        this.movementDirection = options.movementDirection ?? this.movementDirection;
+        this.spawnTime = options.spawnTime ?? this.spawnTime;
     }
 
     set direction(direction: Direction) {

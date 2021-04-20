@@ -40,14 +40,8 @@ export default class Bullet extends GameObject {
 
     setOptions(options: PartialBulletOptions): void {
         super.setOptions(options);
-
-        if (options.tankId !== undefined) {
-            this.tankId = options.tankId;
-        }
-
-        if (options.power !== undefined) {
-            this.power = options.power;
-        }
+        this.tankId = options.tankId ?? this.tankId;
+        this.power = options.power ?? this.power;
     }
 
     get graphicsMeta(): ResourceMeta[] | undefined | null {

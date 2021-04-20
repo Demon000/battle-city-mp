@@ -151,37 +151,14 @@ export default class Tank extends GameObject {
     setOptions(options: PartialTankOptions): void {
         super.setOptions(options);
 
-        if (options.tier !== undefined) {
-            this.tier = options.tier;
-        }
-
-        if (options.playerId !== undefined) {
-            this.playerId = options.playerId;
-        }
-
-        if (options.playerName !== undefined) {
-            this.playerName = options.playerName;
-        }
-
-        if (options.lastBulletShotTime !== undefined) {
-            this.lastBulletShotTime = options.lastBulletShotTime;
-        }
-
-        if (options.lastSmokeTime !== undefined) {
-            this.lastSmokeTime = options.lastSmokeTime;
-        }
-
-        if (options.bulletIds !== undefined) {
-            this.bulletIds = options.bulletIds;
-        }
-
-        if (options.color !== undefined) {
-            this.color = options.color;
-        }
-
-        if (options.health !== undefined) {
-            this.health = options.health;
-        }
+        this.tier = options.tier ?? this.tier;
+        this.playerId = options.playerId ?? this.playerId;
+        this.playerName = options.playerName ?? this.playerName;
+        this.lastBulletShotTime = options.lastBulletShotTime ?? this.lastBulletShotTime;
+        this.lastSmokeTime = options.lastSmokeTime ?? this.lastSmokeTime;
+        this.bulletIds = options.bulletIds ?? this.bulletIds;
+        this.color = options.color ?? this.color;
+        this.health = options.health ?? this.health;
     }
     get maxHealth(): number {
         return tierToMaxHealthMap[this.tier];
