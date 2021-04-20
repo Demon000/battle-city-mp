@@ -100,7 +100,7 @@ export interface TankOptions extends GameObjectOptions {
     playerName: string;
     isShooting?: boolean;
     lastBulletShotTime?: number;
-    lastSmokeSpawnTime?: number;
+    lastSmokeTime?: number;
     bulletIds?: number[];
     color?: Color;
     health?: number;
@@ -129,7 +129,7 @@ export default class Tank extends GameObject {
         this.playerName = options.playerName;
         this.isShooting = options.isShooting ?? false;
         this.lastBulletShotTime = options.lastBulletShotTime ?? 0;
-        this.lastSmokeTime = options.lastSmokeSpawnTime ?? 0;
+        this.lastSmokeTime = options.lastSmokeTime ?? 0;
         this.bulletIds = options.bulletIds ?? new Array<number>();
         this.color = options.color ?? [231, 156, 33];
         this.health = options.health ?? tierToMaxHealthMap[this.tier];
@@ -167,8 +167,8 @@ export default class Tank extends GameObject {
             this.lastBulletShotTime = options.lastBulletShotTime;
         }
 
-        if (options.lastSmokeSpawnTime !== undefined) {
-            this.lastSmokeTime = options.lastSmokeSpawnTime;
+        if (options.lastSmokeTime !== undefined) {
+            this.lastSmokeTime = options.lastSmokeTime;
         }
 
         if (options.bulletIds !== undefined) {
