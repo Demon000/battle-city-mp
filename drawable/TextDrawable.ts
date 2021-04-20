@@ -58,7 +58,7 @@ export default class TextDrawable extends BaseDrawable {
                     document.fonts.add(fontFace);
                     this._isLoaded = true;
                 }).catch(_err => {
-                    this.ownProperties.fontFamily = 'Arial';
+                    this.ownProperties.fontFamily = undefined;
                     this._isLoaded = true;
                 });
         }
@@ -70,17 +70,6 @@ export default class TextDrawable extends BaseDrawable {
 
     isLoaded(): boolean {
         return this._isLoaded;
-    }
-
-    private getContextFont(): string {
-        const properties = this.properties;
-        return `${properties.fontSize}px '${properties.fontFamily}'`;
-    }
-
-    private getContextFontFillStyle(): string {
-        const properties = this.properties;
-        const color = properties.fontColor ?? [255, 255, 255];
-        return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
     }
 
     private getContextBackgroundFillStyle(): string {
@@ -97,8 +86,6 @@ export default class TextDrawable extends BaseDrawable {
         const fontSize = (properties.fontSize ?? 16) * scaleY;
         const width = (fontSize * (this.text.length + 2)) * scaleX;
         const height = (fontSize * 4) * scaleY;
-        const offsetX = fontSize * scaleX;
-        const offsetY = fontSize * scaleY;
 
         const canvas = CanvasUtils.create(width, height);
         const context = canvas.getContext('2d');
@@ -106,9 +93,17 @@ export default class TextDrawable extends BaseDrawable {
             throw new Error('Failed to create offscreen canvas context');
         }
 
-        context.font = this.getContextFont();
-        context.fillStyle = this.getContextFontFillStyle();
+
+        const fontFamily = properties.fontFamily ?? 'Arial';
+        context.font = `${fontSize}px '${fontFamily}'`;
+
+        const color = properties.fontColor ?? [255, 255, 255];
+        context.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+
+        const offsetX = fontSize * scaleX;
+        const offsetY = fontSize * scaleY;
         context.fillText(this.text, offsetX, offsetY);
+
         return canvas;
     }
 

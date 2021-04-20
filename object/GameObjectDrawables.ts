@@ -155,7 +155,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             fontFamily: 'Press Start 2P',
             fontUrl: 'press_start_2p.ttf',
             fontColor: [255, 255, 255],
-            fontSize: 8,
+            fontSize: 2,
             backgroundColor: [0, 0, 0],
             backgroundAlpha: 0.6,
             paddingX: 1,
