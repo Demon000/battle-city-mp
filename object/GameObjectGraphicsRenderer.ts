@@ -104,7 +104,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         for (let i = 0; i < metas.length; i++) {
             const drawable = drawables[i];
             const meta = metas[i];
-            if (drawable.meta !== undefined && this.isDrawableMetaEqual(drawable.meta, meta)) {
+            if (drawable.meta !== undefined && !this.isDrawableMetaEqual(drawable.meta, meta)) {
                 return false;
             }
         }
