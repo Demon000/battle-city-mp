@@ -32,8 +32,8 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
     }
 
     private isMatchingPosition(positionMatching: DrawablePositionMatching, position: Point): boolean {
-        const x = Math.abs(position.x % positionMatching.mod / positionMatching.divide);
-        const y = Math.abs(position.y % positionMatching.mod / positionMatching.divide);
+        const x = Math.floor(Math.abs(position.x % positionMatching.mod / positionMatching.divide));
+        const y = Math.floor(Math.abs(position.y % positionMatching.mod / positionMatching.divide));
 
         return positionMatching.equals.some(p => p.x === x && p.y === y);
     }
