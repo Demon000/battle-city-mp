@@ -164,7 +164,9 @@ export default class App extends Vue {
         canvas.addEventListener('blur', this.onCanvasBlurEvent);
         canvas.addEventListener('keydown', this.onKeyboardEvent);
         canvas.addEventListener('keyup', this.onKeyboardEvent);
-        canvas.addEventListener('mousemove', this.onMouseMoveEvent);
+        canvas.addEventListener('mousemove', this.onMouseMoveEvent, {
+            passive: true,
+        });
         canvas.addEventListener('click', this.onMouseClickEvent);
         canvas.addEventListener('contextmenu', this.onMouseRightClickEvent);
         canvas.focus();
