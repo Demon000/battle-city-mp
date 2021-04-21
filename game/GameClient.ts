@@ -148,6 +148,10 @@ export default class GameClient {
         this.gameGraphicsService.calculateDimensions();
     }
 
+    getPlayers(): Player[] {
+        return this.playerService.getPlayers();
+    }
+
     setMapEditorEnabled(enabled: boolean): void {
         this.gameMapEditorService.setEnabled(enabled);
     }

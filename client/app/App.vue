@@ -100,6 +100,26 @@
                 </button>
             </div>
 
+            <div id="stats-container">
+                <div
+                    id="stats"
+                    class="controls"
+                    v-if="isStatsOpen"
+                >
+                    <table>
+                        <tr class="header">
+                            <td>Player name</td>
+                        </tr>
+                        <tr
+                            v-for="player of players"
+                            :key="player.id"
+                        >
+                            <td>{{ player.displayName }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
             <div id="virtual-controls">
                 <div
                     ref="dpad"
@@ -129,6 +149,7 @@ import { TankTier } from '@/tank/TankTier';
 import { GameMapGridSizes } from '@/maps/GameMapGridSizes';
 import { GameObjectType, GameShortObjectType } from '@/object/GameObjectType';
 import { GameSocketEvents } from '@/game/GameSocketEvent';
+import Player from '@/player/Player';
 
 export default class App extends Vue {
     socket?: Socket<GameSocketEvents>;
@@ -144,8 +165,10 @@ export default class App extends Vue {
     playerColor = '';
     playerName = '';
     isBuilding = false;
+    isStatsOpen = false;
     gridSize = 0;
     selectedObjectType = GameObjectType.NONE;
+    players?: Player[];
 
     mounted(): void {
         const canvas = this.$refs.canvas as HTMLCanvasElement;
@@ -161,6 +184,8 @@ export default class App extends Vue {
         });
 
         window.addEventListener('resize', this.onWindowResize);
+        window.addEventListener('keydown', this.onNonGameKeyboardEvent);
+        window.addEventListener('keyup', this.onNonGameKeyboardEvent);
         canvas.addEventListener('blur', this.onCanvasBlurEvent);
         canvas.addEventListener('keydown', this.onKeyboardEvent);
         canvas.addEventListener('keyup', this.onKeyboardEvent);
@@ -199,10 +224,28 @@ export default class App extends Vue {
             this.gameClientSocket?.requestPlayerAction(action);
             return;
         }
+    }
 
+    onNonGameKeyboardEvent(event: KeyboardEvent): void {
         if (event.key.toLowerCase() === 'b' && event.type === 'keyup') {
             this.isBuilding = !this.isBuilding;
             this.gameClient?.setMapEditorEnabled(this.isBuilding);
+            return;
+        }
+
+        if (event.key.toLowerCase() === 'tab') {
+            if (event.type === 'keydown') {
+                this.players = this.gameClient?.getPlayers();
+                this.isStatsOpen = true;
+            }
+
+            if (event.type === 'keyup') {
+                this.isStatsOpen = false;
+            }
+
+            event.preventDefault();
+
+            return;
         }
     }
 
@@ -387,6 +430,35 @@ button {
     border-bottom-left-radius: 12px;
 
     display: none;
+}
+
+#stats-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 100%;
+    padding: 16px;
+
+    pointer-events: none;
+}
+
+#stats {
+    padding: 16px;
+    font-size: 12px;
+}
+
+#stats table {
+    border-collapse: collapse;
+    border-style: hidden;
+}
+
+#stats table td {
+    padding: 4px;
+}
+
+#stats table .header td {
+  border: 1px solid #ffffff;
 }
 
 #virtual-controls {
