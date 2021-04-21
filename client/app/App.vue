@@ -469,7 +469,7 @@ button {
 }
 
 #stats table .header td {
-  border: 1px solid #ffffff;
+  border: 2px solid #ffffff;
 }
 
 #virtual-controls {
