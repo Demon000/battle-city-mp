@@ -116,6 +116,9 @@
                         <tr
                             v-for="player of players"
                             :key="player.id"
+                            :class="{
+                                'is-own-player': player.isOwnPlayer,
+                            }"
                         >
                             <td>{{ player.displayName }}</td>
                             <td>{{ player.kills }}</td>
@@ -457,6 +460,10 @@ button {
 #stats table {
     border-collapse: collapse;
     border-style: hidden;
+}
+
+#stats table tr.is-own-player {
+    background: rgba(255, 255, 255, 0.25);
 }
 
 #stats table td {
