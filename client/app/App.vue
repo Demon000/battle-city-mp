@@ -448,8 +448,6 @@ button {
 
     height: 100%;
     padding: 16px;
-
-    pointer-events: none;
 }
 
 #stats {
