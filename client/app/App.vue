@@ -336,6 +336,11 @@ export default class App extends Vue {
     user-select: none;
 }
 
+#app-content,
+button {
+    font-family: 'Press Start 2P';
+}
+
 #game-canvas {
     width: 100%;
     height: 100%;
