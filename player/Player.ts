@@ -7,6 +7,9 @@ export interface PlayerOptions {
     id: string;
     tankId: number | null;
     name?: string;
+    deaths?: number;
+    kills?: number;
+    points?: number;
 }
 
 export enum PlayerSpawnStatus {
@@ -28,11 +31,17 @@ export default class Player {
     tankId: number | null;
     id: string;
     name?: string;
+    kills: number;
+    deaths: number;
+    points: number;
 
     constructor(options: PlayerOptions) {
         this.id = options.id;
         this.tankId = options.tankId;
         this.name = options.name;
+        this.kills = options.kills ?? 0;
+        this.deaths = options.deaths ?? 0;
+        this.points = options.points ?? 0;
     }
 
     get displayName(): string {
@@ -44,11 +53,17 @@ export default class Player {
             id: this.id,
             tankId: this.tankId,
             name: this.name,
+            kills: this.kills,
+            deaths: this.deaths,
+            points: this.points,
         };
     }
 
     setOptions(options: PlayerOptions): void {
         this.tankId = options.tankId ?? this.tankId;
         this.name = options.name ?? this.name;
+        this.kills = options.kills ?? this.kills;
+        this.deaths = options.deaths ?? this.deaths;
+        this.points = options.points ?? this.points;
     }
 }

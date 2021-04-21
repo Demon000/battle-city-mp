@@ -5,6 +5,7 @@ import EventEmitter from 'eventemitter3';
 import ButtonPressAction, { MOVE_BUTTON_TYPES, ButtonState, BUTTON_TYPE_DIRECTION, ButtonType } from '../actions/ButtonPressAction';
 import { Direction } from '../physics/Direction';
 import Player, { PlayerSpawnStatus } from './Player';
+import { PlayerPoints, PlayerPointsEvent } from './PlayerPoints';
 
 export enum PlayerServiceEvent {
     PLAYER_ADDED = 'player-added',
@@ -123,6 +124,20 @@ export default class PlayerService {
         } else {
             player.map.set(action.buttonType, action);
         }
+    }
+
+    addPlayerKill(playerId: string): void {
+        const player = this.repository.get(playerId);
+        player.points += PlayerPoints[PlayerPointsEvent.KILL];
+        player.kills += 1;
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player);
+    }
+
+    addPlayerDeath(playerId: string): void {
+        const player = this.repository.get(playerId);
+        player.points += PlayerPoints[PlayerPointsEvent.DEATH];
+        player.deaths += 1;
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player);
     }
     
     private getPlayerDominantMovementDirection(player: Player): Direction | undefined {

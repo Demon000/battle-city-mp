@@ -10,6 +10,7 @@ const bulletPowerToDamageMap = {
 
 export interface BulletOptions extends GameObjectOptions {
     tankId: number;
+    playerId?: string;
     power: BulletPower;
 }
 
@@ -17,6 +18,7 @@ export type PartialBulletOptions = Partial<BulletOptions>;
 
 export default class Bullet extends GameObject {
     tankId: number;
+    playerId?: string;
     power: BulletPower;
     damage: number;
 
@@ -26,6 +28,7 @@ export default class Bullet extends GameObject {
         super(options);
 
         this.tankId = options.tankId;
+        this.playerId = options.playerId;
         this.power = options.power;
         this.damage = bulletPowerToDamageMap[this.power];
     }

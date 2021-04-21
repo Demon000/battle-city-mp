@@ -109,12 +109,18 @@
                     <table>
                         <tr class="header">
                             <td>Player name</td>
+                            <td>Kills</td>
+                            <td>Deaths</td>
+                            <td>Points</td>
                         </tr>
                         <tr
                             v-for="player of players"
                             :key="player.id"
                         >
                             <td>{{ player.displayName }}</td>
+                            <td>{{ player.kills }}</td>
+                            <td>{{ player.deaths }}</td>
+                            <td>{{ player.points }}</td>
                         </tr>
                     </table>
                 </div>
@@ -454,7 +460,7 @@ button {
 }
 
 #stats table td {
-    padding: 4px;
+    padding: 4px 8px;
 }
 
 #stats table .header td {

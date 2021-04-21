@@ -331,6 +331,10 @@ export default class GameServer {
                     spawnExplosion(position, ExplosionType.SMALL);
                     spawnExplosion(tank.centerPosition, ExplosionType.BIG, GameObjectType.TANK);
                     this.playerService.setPlayerRequestedSpawnStatus(tank.playerId, PlayerSpawnStatus.DESPAWN);
+                    this.playerService.addPlayerDeath(tank.playerId);
+                    if (bullet.playerId !== undefined) {
+                        this.playerService.addPlayerKill(bullet.playerId);
+                    }
                 } else {
                     spawnExplosion(position, ExplosionType.SMALL, GameObjectType.NONE);
                 }

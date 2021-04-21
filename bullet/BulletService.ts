@@ -99,6 +99,7 @@ export default class BulletService {
             },
             movementSpeed: tank.bulletSpeed,
             tankId: tank.id,
+            playerId: tank.playerId,
             power: tank.bulletPower,
         });
 
