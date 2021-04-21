@@ -356,7 +356,7 @@ export default class App extends Vue {
 }
 
 .controls {
-    background: rgba(0, 0, 0, 0.25);
+    background: rgba(0, 0, 0, 0.75);
     color: #ffffff;
 }
 
