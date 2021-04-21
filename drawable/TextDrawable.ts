@@ -93,7 +93,6 @@ export default class TextDrawable extends BaseDrawable {
             throw new Error('Failed to create offscreen canvas context');
         }
 
-
         const fontFamily = properties.fontFamily ?? 'Arial';
         context.font = `${fontSize}px '${fontFamily}'`;
 
