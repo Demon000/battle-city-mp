@@ -32,6 +32,7 @@ export default class Player {
     constructor(options: PlayerOptions) {
         this.id = options.id;
         this.tankId = options.tankId;
+        this.name = options.name;
     }
 
     get displayName(): string {
