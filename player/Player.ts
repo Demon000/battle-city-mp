@@ -6,6 +6,7 @@ import ButtonPressAction, { ButtonType } from '../actions/ButtonPressAction';
 export interface PlayerOptions {
     id: string;
     tankId: number | null;
+    name?: string;
 }
 
 export enum PlayerSpawnStatus {
@@ -41,10 +42,12 @@ export default class Player {
         return {
             id: this.id,
             tankId: this.tankId,
+            name: this.name,
         };
     }
 
     setOptions(options: PlayerOptions): void {
-        this.tankId = options.tankId;
+        this.tankId = options.tankId ?? this.tankId;
+        this.name = options.name ?? this.name;
     }
 }
