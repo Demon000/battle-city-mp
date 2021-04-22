@@ -100,11 +100,13 @@
                 </button>
             </div>
 
-            <div id="stats-container">
+            <div
+                id="stats-container"
+                v-if="isStatsOpen"
+            >
                 <div
                     id="stats"
                     class="controls"
-                    v-if="isStatsOpen"
                 >
                     <table>
                         <tr class="header">
