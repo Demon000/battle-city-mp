@@ -359,7 +359,7 @@ export default class App extends Vue {
         }
 
         if (this.isBuilding) {
-            this.gameClient?.createMapEditorObjects();
+            this.gameClientSocket?.mapEditorCreateObjects();
         }
     }
 
@@ -372,7 +372,7 @@ export default class App extends Vue {
         }
 
         if (this.isBuilding) {
-            this.gameClient?.destroyMapEditorObjects({
+            this.gameClientSocket?.mapEditorDestroyObjects({
                 x: event.offsetX,
                 y: event.offsetY,
             });

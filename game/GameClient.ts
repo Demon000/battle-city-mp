@@ -19,16 +19,6 @@ import EventEmitter from 'eventemitter3';
 import { GameServerStatus } from './GameServerStatus';
 import GameObjectFactory from '@/object/GameObjectFactory';
 
-export enum GameClientEvent {
-    MAP_EDITOR_CREATE_OBJECTS = 'map-editor-create-objects',
-    MAP_EDITOR_DESTROY_OBJECTS = 'map-editor-destroy-objects',
-}
-
-export interface GameClientEvents {
-    [GameClientEvent.MAP_EDITOR_CREATE_OBJECTS]: (objectsOptions: GameObjectOptions[]) => void;
-    [GameClientEvent.MAP_EDITOR_DESTROY_OBJECTS]: (box: BoundingBox) => void;
-}
-
 export default class GameClient {
     private playerRepository;
     private playerService;
@@ -41,7 +31,6 @@ export default class GameClient {
     private objectAudioRendererRepository;
     private gameAudioService;
     private gameMapEditorService;
-    emitter;
     ticker;
 
     constructor(canvas: HTMLCanvasElement) {
@@ -54,7 +43,6 @@ export default class GameClient {
         this.objectAudioRendererRepository = new MapRepository<number, GameObjectAudioRenderer>();
         this.gameAudioService = new GameAudioService(this.objectAudioRendererRepository);
         this.gameMapEditorService = new GameMapEditorService();
-        this.emitter = new EventEmitter<GameClientEvents>();
         this.ticker = new Ticker();
 
         this.playerRepository = new MapRepository<string, Player>();
@@ -182,24 +170,24 @@ export default class GameClient {
         this.gameMapEditorService.setHoverPosition(worldPosition);
     }
 
-    createMapEditorObjects(): void {
+    getMapEditorObjectsOptions(): GameObjectOptions[] {
         const objects = this.gameMapEditorService.getGhostObjects();
         const objectsOptions = objects.map(o => o.toOptions())
             .map(o => {
                 delete o.id;
                 return o;
             }) as GameObjectOptions[];
-        this.emitter.emit(GameClientEvent.MAP_EDITOR_CREATE_OBJECTS, objectsOptions);
+        return objectsOptions;
     }
 
-    destroyMapEditorObjects(position: Point): void {
+    getMapEditorDestroyBox(position: Point): BoundingBox | undefined {
         const worldPosition = this.gameGraphicsService.getWorldPosition(position);
         const destroyBox = this.gameMapEditorService.getDestroyBox(worldPosition);
         if (destroyBox === undefined) {
-            return;
+            return undefined;
         }
 
-        this.emitter.emit(GameClientEvent.MAP_EDITOR_DESTROY_OBJECTS, destroyBox);
+        return destroyBox;
     }
 
     clear(): void {
