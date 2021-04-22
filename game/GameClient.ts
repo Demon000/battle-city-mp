@@ -154,6 +154,7 @@ export default class GameClient {
 
     setMapEditorEnabled(enabled: boolean): void {
         this.gameMapEditorService.setEnabled(enabled);
+        this.gameGraphicsService.setShowInvisible(enabled);
     }
 
     setMapEditorGridSize(gridSize: number): void {

@@ -14,6 +14,7 @@ export default class GameGraphicsService {
     private pass = 0;
     private targetGameSize;
     private context;
+    private showInvisible = false;
 
     constructor(
         canvas: HTMLCanvasElement,
@@ -45,6 +46,10 @@ export default class GameGraphicsService {
         this.gameHeight -= this.gameHeight % 2;
     }
 
+    setShowInvisible(showInvisible: boolean): void {
+        this.showInvisible = showInvisible;
+    }
+
     getObjectRenderer(object: GameObject): GameObjectGraphicsRenderer {
         if (object.graphicsRenderer === undefined) {
             object.graphicsRenderer = GameObjectGraphicsRendererFactory
@@ -70,7 +75,8 @@ export default class GameGraphicsService {
         const objectRelativeY = Math.floor(object.position.y) - this.canvasY;
         const objectDrawX = objectRelativeX * this.scale;
         const objectDrawY = objectRelativeY * this.scale;
-        return renderer.renderPass(this.context, this.pass, objectDrawX, objectDrawY);
+        return renderer.renderPass(this.context, this.pass,
+            objectDrawX, objectDrawY, this.showInvisible);
     }
 
     renderObjectsOver(objects: GameObject[], point: Point): void {

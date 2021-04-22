@@ -15,6 +15,7 @@ export interface RenderPassFilterContext<O> {
     drawX: number;
     drawY: number;
     pass: number;
+    showInvisible: boolean;
 }
 
 export interface ProcessDrawableContext<O> {
@@ -182,6 +183,10 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
             return true;
         }
 
+        if (drawable.meta.isInvisible && !this.showInvisible) {
+            return false;
+        }
+
         drawable.draw(this.context, this.drawX, this.drawY);
 
         return false;
@@ -192,6 +197,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         pass: number,
         drawX: number,
         drawY: number,
+        showInvisible: boolean,
     ): boolean {
         if (this.processedDrawables === undefined) {
             return false;
@@ -203,6 +209,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
             drawX,
             drawY,
             pass,
+            showInvisible,
         });
 
         return this.processedDrawables.length !== 0;
