@@ -15,8 +15,9 @@ export default class GameClientSocket {
         this.socket = socket;
         this.gameClient = gameClient;
 
-        this.socket.on(GameSocketEvent.BATCH,
-            this.onBatch.bind(this));
+        this.socket.on(GameSocketEvent.BATCH, (events: BatchGameEvent[]) => {
+            events.forEach(this.onEvent, this);
+        });
 
         this.socket.on('connect', () => {
             this.gameClient.setOwnPlayerId(this.socket.id);
@@ -57,10 +58,6 @@ export default class GameClientSocket {
             default:
                 throw new Error('Invalid event');
         }
-    }
-
-    onBatch(events: BatchGameEvent[]): void {
-        events.forEach(this.onEvent, this);
     }
 
     requestPlayerTankSpawn(): void {
