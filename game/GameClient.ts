@@ -9,13 +9,15 @@ import GameObject, { GameObjectOptions, PartialGameObjectOptions } from '../obje
 import GameObjectService, { GameObjectServiceEvent } from '../object/GameObjectService';
 import BoundingBoxRepository from '../physics/bounding-box/BoundingBoxRepository';
 import CollisionService from '../physics/collisions/CollisionService';
-import Player from '../player/Player';
+import Player, { PartialPlayerOptions, PlayerOptions } from '../player/Player';
 import PlayerService from '../player/PlayerService';
 import GameObjectAudioRenderer from '@/object/GameObjectAudioRenderer';
 import GameMapEditorService from '@/maps/GameMapEditorService';
 import { GameObjectType } from '@/object/GameObjectType';
 import Point from '@/physics/point/Point';
 import EventEmitter from 'eventemitter3';
+import { GameServerStatus } from './GameServerStatus';
+import GameObjectFactory from '@/object/GameObjectFactory';
 
 export enum GameClientEvent {
     MAP_EDITOR_CREATE_OBJECTS = 'map-editor-create-objects',
@@ -70,13 +72,8 @@ export default class GameClient {
         this.gameObjectService.updateObject(objectId, objectOptions);
     }
 
-    onObjectsRegisteredOnServer(objects: GameObject[]): void {
-        this.gameObjectService.registerObjects(objects);
-        const objectIds = objects.map(o => o.id);
-        this.collisionService.registerObjectsCollisions(objectIds);
-    }
-
-    onObjectRegisteredOnServer(object: GameObject): void {
+    onObjectRegisteredOnServer(objectOptions: GameObjectOptions): void {
+        const object = GameObjectFactory.buildFromOptions(objectOptions);
         this.gameObjectService.registerObject(object);
         this.collisionService.registerObjectCollisions(object.id);
     }
@@ -87,20 +84,28 @@ export default class GameClient {
         this.gameAudioService.removeObjectAudioRenderer(objectId);
     }
 
-    onPlayersAddedOnServer(players: Player[]): void {
-        this.playerService.addPlayers(players);
-    }
-
-    onPlayerAddedOnServer(player: Player): void {
+    onPlayerAddedOnServer(playerOptions: PlayerOptions): void {
+        const player = new Player(playerOptions);
         this.playerService.addPlayer(player);
     }
 
-    onPlayerChangedOnServer(player: Player): void {
-        this.playerService.updatePlayer(player);
+    onPlayerChangedOnServer(playerId: string, playerOptions: PartialPlayerOptions): void {
+        this.playerService.updatePlayer(playerId, playerOptions);
     }
 
     onPlayerRemovedOnServer(playerId: string): void {
         this.playerService.removePlayer(playerId);
+    }
+
+    onServerStatus(serverStatus: GameServerStatus): void {
+        this.clear();
+        const players = serverStatus.playersOptions.map(o => new Player(o));
+        this.playerService.addPlayers(players);
+
+        const objects = serverStatus.objectsOptions.map(o => GameObjectFactory.buildFromOptions(o));
+        this.gameObjectService.registerObjects(objects);
+        const objectIds = objects.map(o => o.id);
+        this.collisionService.registerObjectsCollisions(objectIds);
     }
 
     onTick(): void {
@@ -148,8 +153,16 @@ export default class GameClient {
         this.gameGraphicsService.calculateDimensions();
     }
 
+    setOwnPlayerId(playerId: string): void {
+        this.playerService.setOwnPlayerId(playerId);
+    }
+
     getPlayers(): Player[] {
-        return this.playerService.getPlayers();
+        return this.playerService.getPlayersStats();
+    }
+
+    getOwnPlayer(): Player | undefined {
+        return this.playerService.getOwnPlayer();
     }
 
     setMapEditorEnabled(enabled: boolean): void {

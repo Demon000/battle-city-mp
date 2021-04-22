@@ -4,7 +4,7 @@ import MapRepository from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import ButtonPressAction, { MOVE_BUTTON_TYPES, ButtonState, BUTTON_TYPE_DIRECTION, ButtonType } from '../actions/ButtonPressAction';
 import { Direction } from '../physics/Direction';
-import Player, { PlayerSpawnStatus } from './Player';
+import Player, { PartialPlayerOptions, PlayerSpawnStatus } from './Player';
 import { PlayerPoints, PlayerPointsEvent } from './PlayerPoints';
 
 export enum PlayerServiceEvent {
@@ -21,7 +21,7 @@ export enum PlayerServiceEvent {
 
 interface PlayerServiceEvents {
     [PlayerServiceEvent.PLAYER_ADDED]: (player: Player) => void,
-    [PlayerServiceEvent.PLAYER_CHANGED]: (player: Player) => void,
+    [PlayerServiceEvent.PLAYER_CHANGED]: (playerId: string, playerOptions: PartialPlayerOptions) => void,
     [PlayerServiceEvent.PLAYER_REMOVED]: (playerId: string) => void,
     [PlayerServiceEvent.PLAYER_REQUESTED_MOVE]: (playerId: string, direction: Direction | undefined) => void,
     [PlayerServiceEvent.PLAYER_REQUESTED_SHOOT]: (playerId: string, isShooting: boolean) => void,
@@ -31,6 +31,7 @@ interface PlayerServiceEvents {
 
 export default class PlayerService {
     private repository;
+    private ownPlayerId?: string;
     emitter = new EventEmitter<PlayerServiceEvents>();
 
     constructor(repository: MapRepository<string, Player>) {
@@ -41,8 +42,8 @@ export default class PlayerService {
         return this.repository.get(playerId);
     }
 
-    getPlayers(): Player[] {
-        return this.repository.getAll();
+    getPlayersStats(): Player[] {
+        return this.repository.getAll().sort((a, b) => b.points - a.points);
     }
 
     addPlayer(player: Player): void {
@@ -71,13 +72,15 @@ export default class PlayerService {
     setPlayerTankId(playerId: string, tankId: number | null): void {
         const player = this.repository.get(playerId);
         player.tankId = tankId;
-        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player);
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
+            tankId,
+        });
     }
 
-    updatePlayer(newPlayer: Player): void {
-        const player = this.repository.get(newPlayer.id);
-        player.setOptions(newPlayer);
-        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player);
+    updatePlayer(playerId: string, playerOptions: PartialPlayerOptions): void {
+        const player = this.repository.get(playerId);
+        player.setOptions(playerOptions);
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, playerOptions);
     }
 
     getPlayerTankId(playerId: string): number | null {
@@ -88,7 +91,9 @@ export default class PlayerService {
     setPlayerName(playerId: string, name: string): void {
         const player = this.repository.get(playerId);
         player.name = name;
-        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player);
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
+            name,
+        });
     }
 
     setPlayerRequestedSpawnStatus(playerId: string, spawnStatus: PlayerSpawnStatus): void {
@@ -130,14 +135,20 @@ export default class PlayerService {
         const player = this.repository.get(playerId);
         player.points += PlayerPoints[PlayerPointsEvent.KILL];
         player.kills += 1;
-        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player);
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
+            points: player.points,
+            kills: player.kills,
+        });
     }
 
     addPlayerDeath(playerId: string): void {
         const player = this.repository.get(playerId);
         player.points += PlayerPoints[PlayerPointsEvent.DEATH];
         player.deaths += 1;
-        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player);
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
+            points: player.points,
+            deaths: player.deaths,
+        });
     }
     
     private getPlayerDominantMovementDirection(player: Player): Direction | undefined {
@@ -241,12 +252,16 @@ export default class PlayerService {
     getOwnPlayer(): Player | undefined {
         const players = this.repository.getAll();
         for (const player of players) {
-            if (player.isOwnPlayer) {
+            if (player.id === this.ownPlayerId) {
                 return player;
             }
         }
 
         return undefined;
+    }
+
+    setOwnPlayerId(playerId: string): void {
+        this.ownPlayerId = playerId;
     }
 
     clear(): void {

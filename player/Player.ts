@@ -12,6 +12,8 @@ export interface PlayerOptions {
     points?: number;
 }
 
+export type PartialPlayerOptions = Partial<PlayerOptions>;
+
 export enum PlayerSpawnStatus {
     NONE = 'none',
     SPAWN = 'spawn',
@@ -27,7 +29,6 @@ export default class Player {
     requestedTankTier = TankTier.LIGHT;
     requestedTankColor?: Color;
     disconnected = false;
-    isOwnPlayer = false;
     tankId: number | null;
     id: string;
     name?: string;
@@ -59,7 +60,7 @@ export default class Player {
         };
     }
 
-    setOptions(options: PlayerOptions): void {
+    setOptions(options: PartialPlayerOptions): void {
         this.tankId = options.tankId ?? this.tankId;
         this.name = options.name ?? this.name;
         this.kills = options.kills ?? this.kills;

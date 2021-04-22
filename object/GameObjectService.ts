@@ -99,7 +99,7 @@ export default class GameObjectService {
     updateObject(objectId: number, objectOptions: PartialGameObjectOptions): void {
         const object = this.repository.get(objectId);
         object.setOptions(objectOptions);
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, object.toOptions());
+        this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, objectOptions);
         if (objectOptions.position !== undefined) {
             this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, object.id, object.getBoundingBox());
         }

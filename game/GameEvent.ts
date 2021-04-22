@@ -1,5 +1,5 @@
 import { GameObjectOptions, PartialGameObjectOptions } from '@/object/GameObject';
-import { PlayerOptions } from '@/player/Player';
+import { PartialPlayerOptions, PlayerOptions } from '@/player/Player';
 import { GameServerStatus } from './GameServerStatus';
 
 export enum GameEvent {
@@ -22,7 +22,7 @@ export type UnicastBatchGameEvent =
 
 export type BroadcastBatchGameEvent =
     [name: GameEvent.PLAYER_ADDED, playerOptions: PlayerOptions] |
-    [name: GameEvent.PLAYER_CHANGED, playerOptions: PlayerOptions] |
+    [name: GameEvent.PLAYER_CHANGED, playerId: string, playerOptions: PartialPlayerOptions] |
     [name: GameEvent.PLAYER_REMOVED, playerId: string] |
 
     [name: GameEvent.OBJECT_REGISTERED, objectOptions: GameObjectOptions] |

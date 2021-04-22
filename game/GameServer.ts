@@ -19,14 +19,14 @@ import EventEmitter from 'eventemitter3';
 import Action, { ActionType } from '../actions/Action';
 import ButtonPressAction from '../actions/ButtonPressAction';
 import GameMapService, { GameMapServiceEvent } from '../maps/GameMapService';
-import GameObject, { GameObjectOptions } from '../object/GameObject';
+import GameObject, { GameObjectOptions, PartialGameObjectOptions } from '../object/GameObject';
 import GameObjectService, { GameObjectServiceEvent } from '../object/GameObjectService';
 import BoundingBoxRepository from '../physics/bounding-box/BoundingBoxRepository';
 import { rules } from '../physics/collisions/CollisionRules';
 import CollisionService, { CollisionServiceEvent } from '../physics/collisions/CollisionService';
 import { CollisionEvent } from '../physics/collisions/ICollisionRule';
 import Point from '../physics/point/Point';
-import Player, { PlayerSpawnStatus } from '../player/Player';
+import Player, { PartialPlayerOptions, PlayerSpawnStatus } from '../player/Player';
 import PlayerService, { PlayerServiceEvent } from '../player/PlayerService';
 import { BroadcastBatchGameEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
 import GameEventBatcher, { GameEventBatcherEvent } from './GameEventBatcher';
@@ -80,7 +80,7 @@ export default class GameServer {
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_SERVER_STATUS,
             (playerId: string) => {
                 const objectsOptions = this.gameObjectService.getObjects().map(object => object.toOptions());
-                const playersOptions = this.playerService.getPlayers().map(player => player.toOptions());
+                const playersOptions = this.playerService.getPlayersStats().map(player => player.toOptions());
                 this.gameEventBatcher.addPlayerEvent(playerId, [GameEvent.SERVER_STATUS, {
                     objectsOptions,
                     playersOptions,
@@ -94,8 +94,8 @@ export default class GameServer {
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_CHANGED,
-            (player: Player) => {
-                this.gameEventBatcher.addBroadcastEvent([GameEvent.PLAYER_CHANGED, player.toOptions()]);
+            (playerId: string, playerOptions: PartialPlayerOptions) => {
+                this.gameEventBatcher.addBroadcastEvent([GameEvent.PLAYER_CHANGED, playerId, playerOptions]);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REMOVED,
@@ -190,7 +190,7 @@ export default class GameServer {
             });
 
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_CHANGED,
-            (objectId: number, objectOptions: GameObjectOptions) => {
+            (objectId: number, objectOptions: PartialGameObjectOptions) => {
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_CHANGED, objectId, objectOptions]);
             });
 

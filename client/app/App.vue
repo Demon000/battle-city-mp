@@ -119,7 +119,7 @@
                             v-for="player of players"
                             :key="player.id"
                             :class="{
-                                'is-own-player': player.isOwnPlayer,
+                                'is-own-player': player.id === ownPlayer.id,
                             }"
                         >
                             <td>{{ player.displayName }}</td>
@@ -179,6 +179,7 @@ export default class App extends Vue {
     isStatsOpen = false;
     gridSize = 0;
     selectedObjectType = GameObjectType.NONE;
+    ownPlayer?: Player;
     players?: Player[];
 
     mounted(): void {
@@ -247,6 +248,7 @@ export default class App extends Vue {
         if (event.key.toLowerCase() === 'tab') {
             if (event.type === 'keydown') {
                 this.players = this.gameClient?.getPlayers();
+                this.ownPlayer = this.gameClient?.getOwnPlayer();
                 this.isStatsOpen = true;
             }
 
