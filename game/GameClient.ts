@@ -15,7 +15,6 @@ import GameObjectAudioRenderer from '@/object/GameObjectAudioRenderer';
 import GameMapEditorService from '@/maps/GameMapEditorService';
 import { GameObjectType } from '@/object/GameObjectType';
 import Point from '@/physics/point/Point';
-import EventEmitter from 'eventemitter3';
 import { GameServerStatus } from './GameServerStatus';
 import GameObjectFactory from '@/object/GameObjectFactory';
 
