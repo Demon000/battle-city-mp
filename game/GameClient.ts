@@ -68,32 +68,32 @@ export default class GameClient {
         this.ticker.emitter.on(TickerEvent.TICK, this.onTick, this);
     }
 
-    onObjectChangedOnServer(objectId: number, objectOptions: PartialGameObjectOptions): void {
+    onObjectChanged(objectId: number, objectOptions: PartialGameObjectOptions): void {
         this.gameObjectService.updateObject(objectId, objectOptions);
     }
 
-    onObjectRegisteredOnServer(objectOptions: GameObjectOptions): void {
+    onObjectRegistered(objectOptions: GameObjectOptions): void {
         const object = GameObjectFactory.buildFromOptions(objectOptions);
         this.gameObjectService.registerObject(object);
         this.collisionService.registerObjectCollisions(object.id);
     }
 
-    onObjectUnregisteredOnServer(objectId: number): void {
+    onObjectUnregistered(objectId: number): void {
         this.gameObjectService.unregisterObject(objectId);
         this.collisionService.unregisterObjectCollisions(objectId);
         this.gameAudioService.removeObjectAudioRenderer(objectId);
     }
 
-    onPlayerAddedOnServer(playerOptions: PlayerOptions): void {
+    onPlayerAdded(playerOptions: PlayerOptions): void {
         const player = new Player(playerOptions);
         this.playerService.addPlayer(player);
     }
 
-    onPlayerChangedOnServer(playerId: string, playerOptions: PartialPlayerOptions): void {
+    onPlayerChanged(playerId: string, playerOptions: PartialPlayerOptions): void {
         this.playerService.updatePlayer(playerId, playerOptions);
     }
 
-    onPlayerRemovedOnServer(playerId: string): void {
+    onPlayerRemoved(playerId: string): void {
         this.playerService.removePlayer(playerId);
     }
 

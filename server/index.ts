@@ -48,36 +48,36 @@ gameServer.emitter.on(GameEvent.PLAYER_BATCH, (playerId: string, events: Unicast
 
 io.on('connection', (socket: Socket) => {
     console.log('New user connected', socket.id);
-    gameServer.onPlayerConnectedFromClient(socket.id);
+    gameServer.onPlayerConnected(socket.id);
 
     socket.on('disconnect', () => {
         console.log('User disconnected', socket.id);
-        gameServer.onPlayerDisconnectedFromClient(socket.id);
+        gameServer.onPlayerDisconnected(socket.id);
     });
 
     socket.on(GameSocketEvent.PLAYER_ACTION, (options: ActionOptions) => {
         const action = ActionFactory.buildFromOptions(options);
-        gameServer.onPlayerActionFromClient(socket.id, action);
+        gameServer.onPlayerAction(socket.id, action);
     });
 
     socket.on(GameSocketEvent.PLAYER_REQUEST_SERVER_STATUS, () => {
-        gameServer.onPlayerRequestedServerStatusFromClient(socket.id);
+        gameServer.onPlayerRequestedServerStatus(socket.id);
     });
 
     socket.on(GameSocketEvent.PLAYER_REQUEST_TANK_SPAWN, () => {
-        gameServer.onPlayerRequestSpawnStatusFromClient(socket.id, PlayerSpawnStatus.SPAWN);
+        gameServer.onPlayerRequestSpawnStatus(socket.id, PlayerSpawnStatus.SPAWN);
     });
 
     socket.on(GameSocketEvent.PLAYER_REQUEST_TANK_DESPAWN, () => {
-        gameServer.onPlayerRequestSpawnStatusFromClient(socket.id, PlayerSpawnStatus.DESPAWN);
+        gameServer.onPlayerRequestSpawnStatus(socket.id, PlayerSpawnStatus.DESPAWN);
     });
 
     socket.on(GameSocketEvent.PLAYER_REQUEST_TANK_COLOR, (color: Color) => {
-        gameServer.onPlayerRequestTankColorFromClient(socket.id, color);
+        gameServer.onPlayerRequestTankColor(socket.id, color);
     });
 
     socket.on(GameSocketEvent.PLAYER_REQUEST_TANK_TIER, tier => {
-        gameServer.onPlayerRequestTankTierFromClient(socket.id, tier);
+        gameServer.onPlayerRequestTankTier(socket.id, tier);
     });
 
     socket.on(GameSocketEvent.PLAYER_SET_NAME, name => {
@@ -85,15 +85,15 @@ io.on('connection', (socket: Socket) => {
     });
 
     socket.on(GameSocketEvent.PLAYER_MAP_EDITOR_CREATE_OBJECTS, objectsOptions => {
-        gameServer.onPlayerMapEditorCreateObjects(objectsOptions);
+        gameServer.onMapEditorCreateObjects(objectsOptions);
     });
 
     socket.on(GameSocketEvent.PLAYER_MAP_EDITOR_DESTROY_OBJECTS, destroyBox => {
-        gameServer.onPlayerMapEditorDestroyObjects(destroyBox);
+        gameServer.onMapEditorDestroyObjects(destroyBox);
     });
 
     socket.on(GameSocketEvent.PLAYER_MAP_EDITOR_SAVE, () => {
-        gameServer.onPlayerMapEditorSave();
+        gameServer.onMapEditorSave();
     });
 });
 

@@ -48,22 +48,22 @@ export default class GameClientSocket {
                 this.gameClient.onServerStatus(batch[1]);
                 break;
             case GameEvent.PLAYER_ADDED:
-                this.gameClient.onPlayerAddedOnServer(batch[1]);
+                this.gameClient.onPlayerAdded(batch[1]);
                 break;
             case GameEvent.PLAYER_CHANGED:
-                this.gameClient.onPlayerChangedOnServer(batch[1], batch[2]);
+                this.gameClient.onPlayerChanged(batch[1], batch[2]);
                 break;
             case GameEvent.PLAYER_REMOVED:
-                this.gameClient.onPlayerRemovedOnServer(batch[1]);
+                this.gameClient.onPlayerRemoved(batch[1]);
                 break;
             case GameEvent.OBJECT_REGISTERED:
-                this.gameClient.onObjectRegisteredOnServer(batch[1]);
+                this.gameClient.onObjectRegistered(batch[1]);
                 break;
             case GameEvent.OBJECT_CHANGED:
-                this.gameClient.onObjectChangedOnServer(batch[1], batch[2]);
+                this.gameClient.onObjectChanged(batch[1], batch[2]);
                 break;
             case GameEvent.OBJECT_UNREGISTERED:
-                this.gameClient.onObjectUnregisteredOnServer(batch[1]);
+                this.gameClient.onObjectUnregistered(batch[1]);
                 break;
             default:
                 throw new Error('Invalid event');

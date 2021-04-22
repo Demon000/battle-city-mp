@@ -378,17 +378,17 @@ export default class GameServer {
         this.gameMapService.loadFromFile('./maps/simple.json');
     }
 
-    onPlayerRequestedServerStatusFromClient(playerId: string): void {
+    onPlayerRequestedServerStatus(playerId: string): void {
         this.playerService.setPlayerRequestedServerStatus(playerId);
     }
 
-    onPlayerActionFromClient(playerId: string, action: Action): void {
+    onPlayerAction(playerId: string, action: Action): void {
         if (action.type === ActionType.BUTTON_PRESS) {
             this.playerService.addPlayerButtonPressAction(playerId, action as ButtonPressAction);
         }
     }
 
-    onPlayerConnectedFromClient(playerId: string): void {
+    onPlayerConnected(playerId: string): void {
         this.playerService.createPlayer(playerId);
         this.playerService.setPlayerRequestedServerStatus(playerId);
     }
@@ -397,12 +397,12 @@ export default class GameServer {
         this.playerService.setPlayerName(playerId, name);
     }
 
-    onPlayerMapEditorCreateObjects(objectsOptions: GameObjectOptions[]): void {
+    onMapEditorCreateObjects(objectsOptions: GameObjectOptions[]): void {
         const objects = objectsOptions.map(o => GameObjectFactory.buildFromOptions(o));
         this.gameObjectService.registerObjects(objects);
     }
 
-    onPlayerMapEditorDestroyObjects(destroyBox: BoundingBox): void {
+    onMapEditorDestroyObjects(destroyBox: BoundingBox): void {
         const objectsIds = this.collisionService.getOverlappingObjects(destroyBox);
         const objects = this.gameObjectService.getMultipleObjects(objectsIds);
         objects
@@ -410,26 +410,26 @@ export default class GameServer {
             .forEach(o => this.gameObjectService.unregisterObject(o.id));
     }
 
-    onPlayerMapEditorSave(): void {
+    onMapEditorSave(): void {
         const objects = this.gameObjectService.getObjects();
         this.gameMapService.setMapObjects(objects);
         this.gameMapService.saveToFile();
     }
 
-    onPlayerRequestSpawnStatusFromClient(playerId: string, spawnStatus: PlayerSpawnStatus): void {
+    onPlayerRequestSpawnStatus(playerId: string, spawnStatus: PlayerSpawnStatus): void {
         this.playerService.setPlayerRequestedSpawnStatus(playerId, spawnStatus);
     }
 
-    onPlayerDisconnectedFromClient(playerId: string): void {
+    onPlayerDisconnected(playerId: string): void {
         this.playerService.setPlayerRequestedSpawnStatus(playerId, PlayerSpawnStatus.DESPAWN);
         this.playerService.setPlayerRequestedDisconnect(playerId);
     }
 
-    onPlayerRequestTankColorFromClient(playerId: string, color: Color): void {
+    onPlayerRequestTankColor(playerId: string, color: Color): void {
         this.playerService.setPlayerRequestedTankColor(playerId, color);
     }
 
-    onPlayerRequestTankTierFromClient(playerId: string, tier: TankTier): void {
+    onPlayerRequestTankTier(playerId: string, tier: TankTier): void {
         this.playerService.setPlayerRequestedTankTier(playerId, tier);
     }
 }
