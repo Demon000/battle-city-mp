@@ -10,13 +10,22 @@ import GameObjectService, { GameObjectServiceEvent } from '../object/GameObjectS
 import BoundingBoxRepository from '../physics/bounding-box/BoundingBoxRepository';
 import CollisionService from '../physics/collisions/CollisionService';
 import Player, { PartialPlayerOptions, PlayerOptions } from '../player/Player';
-import PlayerService from '../player/PlayerService';
+import PlayerService, { PlayerServiceEvent } from '../player/PlayerService';
 import GameObjectAudioRenderer from '@/object/GameObjectAudioRenderer';
 import GameMapEditorService from '@/maps/GameMapEditorService';
 import { GameObjectType } from '@/object/GameObjectType';
 import Point from '@/physics/point/Point';
 import { GameServerStatus } from './GameServerStatus';
 import GameObjectFactory from '@/object/GameObjectFactory';
+import EventEmitter from 'eventemitter3';
+
+export enum GameClientEvent {
+    PLAYERS_CHANGED = 'players-changed',
+}
+
+export interface GameClientEvents {
+    [GameClientEvent.PLAYERS_CHANGED]: () => void;
+}
 
 export default class GameClient {
     private playerRepository;
@@ -30,6 +39,7 @@ export default class GameClient {
     private objectAudioRendererRepository;
     private gameAudioService;
     private gameMapEditorService;
+    emitter;
     ticker;
 
     constructor(canvas: HTMLCanvasElement) {
@@ -42,6 +52,7 @@ export default class GameClient {
         this.objectAudioRendererRepository = new MapRepository<number, GameObjectAudioRenderer>();
         this.gameAudioService = new GameAudioService(this.objectAudioRendererRepository);
         this.gameMapEditorService = new GameMapEditorService();
+        this.emitter = new EventEmitter<GameClientEvents>();
         this.ticker = new Ticker();
 
         this.playerRepository = new MapRepository<string, Player>();
@@ -50,6 +61,11 @@ export default class GameClient {
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED,
             (objectId: number, box: BoundingBox) => {
                 this.collisionService.updateObjectCollisions(objectId, box);
+            });
+
+        this.playerService.emitter.on(PlayerServiceEvent.PLAYERS_CHANGED,
+            () => {
+                this.emitter.emit(GameClientEvent.PLAYERS_CHANGED);
             });
 
         this.ticker.emitter.on(TickerEvent.TICK, this.onTick, this);

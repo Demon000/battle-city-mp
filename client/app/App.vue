@@ -148,19 +148,20 @@
 </template>
 
 <script lang="ts">
-import GameClientSocket from '@/game/GameClientSocket';
-import { CLIENT_CONFIG_SOCKET_BASE_URL, CLIENT_SPRITES_RELATIVE_URL } from '../../config';
-import { Vue } from 'vue-class-component';
-import GameClient from '@/game/GameClient';
-import { io, Socket } from 'socket.io-client';
 import ActionFactory from '@/actions/ActionFactory';
-import DirectionalJoystickWrapper, { DirectionalJoystickEvent } from '../DirectionalJoystickWrapper';
-import screenfull from 'screenfull';
-import { TankTier } from '@/tank/TankTier';
+import GameClient, { GameClientEvent } from '@/game/GameClient';
+import GameClientSocket from '@/game/GameClientSocket';
+import { GameSocketEvents } from '@/game/GameSocketEvent';
 import { GameMapGridSizes } from '@/maps/GameMapGridSizes';
 import { GameObjectType, GameShortObjectType } from '@/object/GameObjectType';
-import { GameSocketEvents } from '@/game/GameSocketEvent';
 import Player from '@/player/Player';
+import { TankTier } from '@/tank/TankTier';
+import screenfull from 'screenfull';
+import { io, Socket } from 'socket.io-client';
+import { markRaw } from 'vue';
+import { Vue } from 'vue-class-component';
+import { CLIENT_CONFIG_SOCKET_BASE_URL, CLIENT_SPRITES_RELATIVE_URL } from '../../config';
+import DirectionalJoystickWrapper, { DirectionalJoystickEvent } from '../DirectionalJoystickWrapper';
 
 export default class App extends Vue {
     socket?: Socket<GameSocketEvents>;
@@ -179,8 +180,8 @@ export default class App extends Vue {
     isStatsOpen = false;
     gridSize = 0;
     selectedObjectType = GameObjectType.NONE;
-    ownPlayer?: Player;
-    players?: Player[];
+    ownPlayer: Player | null = null;
+    players: Player[] | null = null;
 
     mounted(): void {
         const canvas = this.$refs.canvas as HTMLCanvasElement;
@@ -190,6 +191,10 @@ export default class App extends Vue {
             autoConnect: false,
         });
         this.gameClient = new GameClient(canvas);
+        this.gameClient.emitter.on(GameClientEvent.PLAYERS_CHANGED, () => {
+            this.updatePlayers();
+        });
+
         this.gameClientSocket = new GameClientSocket(this.socket, this.gameClient);
         this.joystick = new DirectionalJoystickWrapper({
             zone: this.$refs.dpad as HTMLElement,
@@ -220,6 +225,22 @@ export default class App extends Vue {
         }
     }
 
+    updatePlayers(): void {
+        if (this.gameClient === undefined || !this.isStatsOpen) {
+            return;
+        }
+
+        this.players = markRaw(this.gameClient.getPlayers());
+
+        const ownPlayer = this.gameClient.getOwnPlayer();
+        this.ownPlayer = ownPlayer ? markRaw(ownPlayer) : null;
+    }
+
+    clearPlayers(): void {
+        this.players = null;
+        this.ownPlayer = null;
+    }
+
     onFullscreenChanged(): void {
         if (screenfull.isEnabled) {
             this.isFullscreen = screenfull.isFullscreen;
@@ -241,19 +262,19 @@ export default class App extends Vue {
     onNonGameKeyboardEvent(event: KeyboardEvent): void {
         if (event.key.toLowerCase() === 'b' && event.type === 'keyup') {
             this.isBuilding = !this.isBuilding;
-            this.gameClient?.setMapEditorEnabled(this.isBuilding);
+            this.gameClientSocket?.mapEditorEnable(this.isBuilding);
             return;
         }
 
         if (event.key.toLowerCase() === 'tab') {
             if (event.type === 'keydown') {
-                this.players = this.gameClient?.getPlayers();
-                this.ownPlayer = this.gameClient?.getOwnPlayer();
                 this.isStatsOpen = true;
+                this.updatePlayers();
             }
 
             if (event.type === 'keyup') {
                 this.isStatsOpen = false;
+                this.clearPlayers();
             }
 
             event.preventDefault();

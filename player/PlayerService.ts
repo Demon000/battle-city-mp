@@ -11,6 +11,7 @@ export enum PlayerServiceEvent {
     PLAYER_ADDED = 'player-added',
     PLAYER_CHANGED = 'player-changed',
     PLAYER_REMOVED = 'player-removed',
+    PLAYERS_CHANGED = 'players-changed',
 
     PLAYER_REQUESTED_MOVE = 'player-requested-move',
     PLAYER_REQUESTED_SHOOT = 'player-requested-shoot',
@@ -23,6 +24,7 @@ interface PlayerServiceEvents {
     [PlayerServiceEvent.PLAYER_ADDED]: (player: Player) => void,
     [PlayerServiceEvent.PLAYER_CHANGED]: (playerId: string, playerOptions: PartialPlayerOptions) => void,
     [PlayerServiceEvent.PLAYER_REMOVED]: (playerId: string) => void,
+    [PlayerServiceEvent.PLAYERS_CHANGED]: () => void,
     [PlayerServiceEvent.PLAYER_REQUESTED_MOVE]: (playerId: string, direction: Direction | undefined) => void,
     [PlayerServiceEvent.PLAYER_REQUESTED_SHOOT]: (playerId: string, isShooting: boolean) => void,
     [PlayerServiceEvent.PLAYER_REQUESTED_SPAWN_STATUS]: (playerId: string, spawnStatus: PlayerSpawnStatus) => void,
@@ -49,6 +51,7 @@ export default class PlayerService {
     addPlayer(player: Player): void {
         this.repository.add(player.id, player);
         this.emitter.emit(PlayerServiceEvent.PLAYER_ADDED, player);
+        this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
     }
 
     addPlayers(players: Player[]): void {
@@ -75,12 +78,14 @@ export default class PlayerService {
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
             tankId,
         });
+        this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
     }
 
     updatePlayer(playerId: string, playerOptions: PartialPlayerOptions): void {
         const player = this.repository.get(playerId);
         player.setOptions(playerOptions);
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, playerOptions);
+        this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
     }
 
     getPlayerTankId(playerId: string): number | null {
@@ -94,6 +99,7 @@ export default class PlayerService {
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
             name,
         });
+        this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
     }
 
     setPlayerRequestedSpawnStatus(playerId: string, spawnStatus: PlayerSpawnStatus): void {
@@ -139,6 +145,7 @@ export default class PlayerService {
             points: player.points,
             kills: player.kills,
         });
+        this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
     }
 
     addPlayerDeath(playerId: string): void {
@@ -149,6 +156,7 @@ export default class PlayerService {
             points: player.points,
             deaths: player.deaths,
         });
+        this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
     }
     
     private getPlayerDominantMovementDirection(player: Player): Direction | undefined {
@@ -199,6 +207,7 @@ export default class PlayerService {
 
         this.repository.remove(player.id);
         this.emitter.emit(PlayerServiceEvent.PLAYER_REMOVED, player.id);
+        this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
         return true;
     }
 
@@ -247,6 +256,7 @@ export default class PlayerService {
     removePlayer(playerId: string): void {
         this.repository.remove(playerId);
         this.emitter.emit(PlayerServiceEvent.PLAYER_REMOVED, playerId);
+        this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
     }
 
     getOwnPlayer(): Player | undefined {
