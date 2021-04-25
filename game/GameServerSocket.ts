@@ -41,46 +41,46 @@ export default class GameServerSocket {
             console.log('User disconnected', socket.id);
             this.gameServer.onPlayerDisconnected(socket.id);
         });
-    
+
         socket.on(GameSocketEvent.PLAYER_ACTION, (options: ActionOptions) => {
             const action = ActionFactory.buildFromOptions(options);
             this.gameServer.onPlayerAction(socket.id, action);
         });
-    
+
         socket.on(GameSocketEvent.PLAYER_REQUEST_SERVER_STATUS, () => {
             this.gameServer.onPlayerRequestedServerStatus(socket.id);
         });
-    
+
         socket.on(GameSocketEvent.PLAYER_REQUEST_TANK_SPAWN, () => {
             this.gameServer.onPlayerRequestSpawnStatus(socket.id, PlayerSpawnStatus.SPAWN);
         });
-    
+
         socket.on(GameSocketEvent.PLAYER_REQUEST_TANK_DESPAWN, () => {
             this.gameServer.onPlayerRequestSpawnStatus(socket.id, PlayerSpawnStatus.DESPAWN);
         });
-    
+
         socket.on(GameSocketEvent.PLAYER_REQUEST_TANK_COLOR, (color: Color) => {
             this.gameServer.onPlayerRequestTankColor(socket.id, color);
         });
-    
+
         socket.on(GameSocketEvent.PLAYER_REQUEST_TANK_TIER, tier => {
             this.gameServer.onPlayerRequestTankTier(socket.id, tier);
         });
-    
+
         socket.on(GameSocketEvent.PLAYER_SET_NAME, name => {
             this.gameServer.onPlayerSetName(socket.id, name);
         });
-    
+
         socket.on(GameSocketEvent.PLAYER_MAP_EDITOR_CREATE_OBJECTS,
             (objectsOptions: PartialGameObjectOptions[]) => {
                 this.gameServer.onMapEditorCreateObjects(objectsOptions);
             });
-    
+
         socket.on(GameSocketEvent.PLAYER_MAP_EDITOR_DESTROY_OBJECTS,
             (destroyBox: BoundingBox) => {
                 this.gameServer.onMapEditorDestroyObjects(destroyBox);
             });
-    
+
         socket.on(GameSocketEvent.PLAYER_MAP_EDITOR_SAVE, () => {
             this.gameServer.onMapEditorSave();
         });
