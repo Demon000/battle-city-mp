@@ -86,13 +86,14 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         drawX += (properties.offsetX ?? 0) * (properties.scaleX ?? 1);
         drawY += (properties.offsetY ?? 0) * (properties.scaleY ?? 1);
 
+        let oldCompositionType;
         if (properties.compositionType !== undefined) {
-            context.save();
+            oldCompositionType = context.globalCompositeOperation;
             context.globalCompositeOperation = properties.compositionType;
         }
         context.drawImage(source, drawX, drawY);
-        if (properties.compositionType !== undefined) {
-            context.restore();
+        if (properties.compositionType !== undefined && oldCompositionType !== undefined) {
+            context.globalCompositeOperation = oldCompositionType;
         }
 
         this.applyOverlays(context, drawX, drawY);
