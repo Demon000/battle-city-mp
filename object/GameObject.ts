@@ -22,8 +22,8 @@ export default class GameObject {
 
     id: number;
     type: GameObjectType;
-    _position: Point;
-    _direction: Direction;
+    position: Point;
+    direction: Direction;
     movementSpeed: number;
     movementDirection: Direction | null;
     spawnTime: number;
@@ -36,8 +36,8 @@ export default class GameObject {
     constructor(options: GameObjectOptions) {
         this.id = options.id ?? GameObject.globalId++;
         this.type = options.type ?? GameObjectType.ANY;
-        this._position = options.position ?? {x: 0, y: 0};
-        this._direction = options.direction ?? Direction.UP;
+        this.position = options.position ?? {x: 0, y: 0};
+        this.direction = options.direction ?? Direction.UP;
         this.movementSpeed = options.movementSpeed ?? 0;
         this.movementDirection = options.movementDirection ?? null;
         this.spawnTime = Date.now();
@@ -47,7 +47,7 @@ export default class GameObject {
         return {
             id: this.id,
             type: this.type,
-            position: this._position,
+            position: this.position,
             direction: this.direction,
             movementSpeed: this.movementSpeed,
             movementDirection: this.movementDirection,
@@ -61,7 +61,7 @@ export default class GameObject {
 
         return {
             type: this.type,
-            position: this._position,
+            position: this.position,
         };
     }
 
@@ -71,22 +71,6 @@ export default class GameObject {
         this.movementSpeed = options.movementSpeed ?? this.movementSpeed;
         this.movementDirection = options.movementDirection ?? this.movementDirection;
         this.spawnTime = options.spawnTime ?? this.spawnTime;
-    }
-
-    set direction(direction: Direction) {
-        this._direction = direction;
-    }
-
-    get direction(): Direction {
-        return this._direction;
-    }
-
-    set position(position: Point) {
-        this._position = position;
-    }
-
-    get position(): Point {
-        return this._position;
     }
 
     get width(): number {
