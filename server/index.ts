@@ -34,6 +34,7 @@ const serverSocket = new Server(http, {
 });
 const gameServer = new GameServer();
 new GameServerSocket(gameServer, serverSocket);
+gameServer.ticker.start();
 
 http.listen(argv.port, argv.host, () => {
     console.log(`Game server listening on ${argv.host}:${argv.port}`);

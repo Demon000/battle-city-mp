@@ -29,8 +29,6 @@ export default class GameServerSocket {
 
         this.socketServer.on('connection',
             this.onConnection.bind(this));
-
-        this.gameServer.ticker.start();
     }
 
     onConnection(socket: Socket): void {
