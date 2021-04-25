@@ -30,7 +30,6 @@ export default class ImageUtils {
             const y = Math.floor(i / rowWidth);
             const x = (i % rowWidth) / 4;
 
-
             if (contents.data[i + 3] !== 0) {
                 if (minX === undefined || x < minX) {
                     minX = x;
