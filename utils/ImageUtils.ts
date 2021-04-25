@@ -13,10 +13,6 @@ export interface ContentMeasurements {
 }
 
 export default class ImageUtils {
-    static drawSource(source: Source): Canvas {
-        return this.drawSourceWithScale(source, 1, 1);
-    }
-
     static measureContents(canvas: Canvas): ContentMeasurements {
         const context = canvas.getContext('2d');
         if (context === null) {
