@@ -16,6 +16,7 @@ export enum GameSocketEvent {
 
     PLAYER_SET_NAME = 'player-set-name',
 
+    PLAYER_MAP_EDITOR_ENABLE = 'player-map-editor-enable',
     PLAYER_MAP_EDITOR_CREATE_OBJECTS = 'player-map-editor-create-objects',
     PLAYER_MAP_EDITOR_DESTROY_OBJECTS = 'player-map-editor-destroy-objects',
     PLAYER_MAP_EDITOR_SAVE = 'player-map-editor-save',
@@ -31,6 +32,7 @@ export interface GameSocketEvents {
     [GameSocketEvent.PLAYER_REQUEST_TANK_DESPAWN]: () => void;
     [GameSocketEvent.PLAYER_REQUEST_SERVER_STATUS]: () => void;
     [GameSocketEvent.PLAYER_SET_NAME]: (name: string) => void;
+    [GameSocketEvent.PLAYER_MAP_EDITOR_ENABLE]: (enabled: boolean) => void;
     [GameSocketEvent.PLAYER_MAP_EDITOR_CREATE_OBJECTS]: (objectsOptions: PartialGameObjectOptions[]) => void;
     [GameSocketEvent.PLAYER_MAP_EDITOR_DESTROY_OBJECTS]: (destroyBox: BoundingBox) => void;
     [GameSocketEvent.PLAYER_MAP_EDITOR_SAVE]: () => void;

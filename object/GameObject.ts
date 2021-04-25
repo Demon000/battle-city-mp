@@ -28,6 +28,7 @@ export default class GameObject {
     movementDirection: Direction | null;
     spawnTime: number;
 
+    collisionsDisabled = false;
     destroyed = false;
 
     graphicsRenderer?: any;

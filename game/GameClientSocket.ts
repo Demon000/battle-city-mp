@@ -84,6 +84,11 @@ export default class GameClientSocket {
         this.socket.emit(GameSocketEvent.PLAYER_SET_NAME, name);
     }
 
+    mapEditorEnable(enabled: boolean): void {
+        this.gameClient.setMapEditorEnabled(enabled);
+        this.socket.emit(GameSocketEvent.PLAYER_MAP_EDITOR_ENABLE, enabled);
+    }
+
     mapEditorCreateObjects(): void {
         const objectsOptions = this.gameClient.getMapEditorObjectsOptions();
         this.socket.emit(GameSocketEvent.PLAYER_MAP_EDITOR_CREATE_OBJECTS, objectsOptions);

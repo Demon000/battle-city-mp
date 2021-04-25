@@ -177,12 +177,11 @@ export default class CollisionService {
         return false;
     }
 
-    validateObjectMovement(objectId: number, position: Point, direction?: Direction, trySnapping=true): void {
+    _validateObjectMovement(movingObject: GameObject, position: Point, direction?: Direction, trySnapping=true): void {
         if (this.rulesMap === undefined) {
             throw new Error('Cannot validate object movement when rules map is not set');
         }
 
-        const movingObject = this.gameObjectRepository.get(objectId);
         const movingDirection = direction ?? movingObject.direction;
         const originalBoundingBox = movingObject.getBoundingBox();
         const movedBoundingBox = movingObject.getBoundingBox(position);
@@ -194,7 +193,7 @@ export default class CollisionService {
         const collidingObjectNotifications = new Array<[CollisionEvent, GameObject]>();
         const collidingObjectTrackings = new Array<GameObject>();
         for (const overlappingObject of overlappingObjects) {
-            if (objectId === overlappingObject.id) {
+            if (movingObject.id === overlappingObject.id) {
                 continue;
             }
 
@@ -255,7 +254,8 @@ export default class CollisionService {
         }
 
         if (isValidPosition) {
-            this.emitter.emit(CollisionServiceEvent.OBJECT_POSITION_ALLOWED, objectId, position);
+            this.emitter.emit(CollisionServiceEvent.OBJECT_POSITION_ALLOWED,
+                movingObject.id, position);
         }
 
         const preventedBoundingBox = movingObject.getBoundingBox(position);
@@ -263,7 +263,7 @@ export default class CollisionService {
             const overlappingBoundingBox = overlappingObject.getBoundingBox();
             if (this.isObjectOverlapping(isValidPosition, preventedBoundingBox, movedBoundingBox,
                 overlappingBoundingBox)) {
-                this.emitter.emit(name, objectId, overlappingObject.id, position);
+                this.emitter.emit(name, movingObject.id, overlappingObject.id, position);
             }
         }
 
@@ -277,7 +277,18 @@ export default class CollisionService {
         }
 
         this.emitter.emit(CollisionServiceEvent.OBJECT_TRACKED_COLLISIONS,
-            objectId, collisionTracker);
+            movingObject.id, collisionTracker);
+    }
+
+    validateObjectMovement(objectId: number, position: Point, direction?: Direction, trySnapping=true): void {
+        const movingObject = this.gameObjectRepository.get(objectId);
+        if (movingObject.collisionsDisabled) {
+            this.emitter.emit(CollisionServiceEvent.OBJECT_POSITION_ALLOWED,
+                movingObject.id, position);
+            return;
+        }
+
+        this._validateObjectMovement(movingObject, position, direction, trySnapping);
     }
 
     calculateSnappedCoordinates(value: number, snapping: number): number {

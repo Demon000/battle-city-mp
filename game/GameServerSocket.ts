@@ -71,6 +71,10 @@ export default class GameServerSocket {
             this.gameServer.onPlayerSetName(socket.id, name);
         });
 
+        socket.on(GameSocketEvent.PLAYER_MAP_EDITOR_ENABLE, enabled => {
+            this.gameServer.onMapEditorEnable(socket.id, enabled);
+        });
+
         socket.on(GameSocketEvent.PLAYER_MAP_EDITOR_CREATE_OBJECTS,
             (objectsOptions: PartialGameObjectOptions[]) => {
                 this.gameServer.onMapEditorCreateObjects(objectsOptions);

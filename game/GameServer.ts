@@ -397,6 +397,20 @@ export default class GameServer {
         this.playerService.setPlayerName(playerId, name);
     }
 
+    onMapEditorEnable(playerId: string, enabled: boolean): void {
+        const player = this.playerService.getPlayer(playerId);
+        if (player.tankId === null) {
+            return;
+        }
+
+        const tank = this.tankService.getTank(player.tankId);
+        if (tank === undefined) {
+            return;
+        }
+
+        tank.collisionsDisabled = enabled;
+    }
+
     onMapEditorCreateObjects(objectsOptions: GameObjectOptions[]): void {
         const objects = objectsOptions.map(o => GameObjectFactory.buildFromOptions(o));
         this.gameObjectService.registerObjects(objects);
