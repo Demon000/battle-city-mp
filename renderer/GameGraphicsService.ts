@@ -65,16 +65,6 @@ export default class GameGraphicsService {
         return object.graphicsRenderer;
     }
 
-    *renderObjectsPrepare(objects: Iterable<GameObject>): Generator<GameObject, void, void> {
-        for (const object of objects) {
-            const renderer = this.getObjectRenderer(object);
-            renderer.update(this.scale);
-            if (renderer.isRenderable()) {
-                yield object;
-            }
-        }
-    }
-
     renderObject(object: GameObject): void {
         const renderer = this.getObjectRenderer(object);
         const objectRelativeX = Math.floor(object.position.x) - this.canvasX;
@@ -86,9 +76,12 @@ export default class GameGraphicsService {
     }
 
     renderObjectsOver(objects: Iterable<GameObject>): void {
-        const renderObjects = this.renderObjectsPrepare(objects);
-        for (const object of renderObjects) {
-            this.renderObject(object);
+        for (const object of objects) {
+            const renderer = this.getObjectRenderer(object);
+            renderer.update(this.scale);
+            if (renderer.isRenderable()) {
+                this.renderObject(object);
+            }
         }
     }
 
