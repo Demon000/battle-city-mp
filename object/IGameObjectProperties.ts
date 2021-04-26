@@ -1,5 +1,17 @@
 import IDrawable from '@/drawable/IDrawable';
 
+export enum RenderPass {
+    ALL,
+    GROUND,
+    WALL,
+    BULLET,
+    TANK,
+    TANK_NAME,
+    BUSHES,
+    EXPLOSIONS,
+    SMOKE = EXPLOSIONS,
+}
+
 // eslint-disable-next-line
 export type ResourceMeta = Record<string, any>;
 

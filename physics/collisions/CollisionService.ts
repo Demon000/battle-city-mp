@@ -89,7 +89,7 @@ export default class CollisionService {
         this.boundingBoxRepository.removeValue(objectId);
     }
 
-    getOverlappingObjects(box: BoundingBox): Iterable<number> {
+    getOverlappingObjects(box: BoundingBox): number[] {
         return this.boundingBoxRepository.getBoxOverlappingValues(box);
     }
 

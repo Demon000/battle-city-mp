@@ -48,7 +48,7 @@ export default class GameObjectService {
         return this.repository.getAll();
     }
 
-    getMultipleObjects(objectIds: Iterable<number>): Iterable<GameObject> {
+    getMultipleObjects(objectIds: number[]): GameObject[] {
         return this.repository.getMultiple(objectIds);
     }
 

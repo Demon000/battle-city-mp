@@ -85,7 +85,7 @@ export default class GameAudioService {
         this.objectAudioRendererRepository.remove(objectId);
     }
 
-    playObjectsAudioEffect(objects: Iterable<GameObject>, point: Point, box: BoundingBox): void {
+    playObjectsAudioEffect(objects: GameObject[], point: Point, box: BoundingBox): void {
         CartesianUtils.setCartesianPositions(this.context.listener, point);
 
         for (const object of this.objectsPlayingAudioEffects) {
