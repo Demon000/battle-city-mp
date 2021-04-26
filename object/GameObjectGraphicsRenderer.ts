@@ -178,13 +178,13 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
             return false;
         }
 
+        if (drawable.meta.isInvisible && !this.showInvisible) {
+            return false;
+        }
+
         const isRenderPass = drawable.isRenderPass(this.pass);
         if (!isRenderPass) {
             return true;
-        }
-
-        if (drawable.meta.isInvisible && !this.showInvisible) {
-            return false;
         }
 
         drawable.draw(this.context, this.drawX, this.drawY);
