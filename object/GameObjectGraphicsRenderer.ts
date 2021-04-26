@@ -3,7 +3,6 @@ import DrawablePositionMatching from '@/drawable/DrawablePositionMatching';
 import { DrawableType } from '@/drawable/DrawableType';
 import IDrawable from '@/drawable/IDrawable';
 import GameObject from '@/object/GameObject';
-import { GameObjectType } from '@/object/GameObjectType';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 import { Direction } from '@/physics/Direction';
 import Point from '@/physics/point/Point';
@@ -79,7 +78,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         return drawable !== undefined && drawable !== null;
     }
 
-    private findDrawablesMatchingMetas(type: GameObjectType, metas: ResourceMeta[]): IDrawable[] | undefined {
+    private findDrawablesMatchingMetas(metas: ResourceMeta[]): IDrawable[] | undefined {
         const drawables = metas.map(this.findDrawableMatchingMeta, this);
 
         if (drawables[0] === undefined) {
@@ -141,7 +140,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
 
         if (this.drawables === null
             || !this.isDrawablesMatchingMetas(this.drawables, metas)) {
-            this.drawables = this.findDrawablesMatchingMetas(this.object.type, metas);
+            this.drawables = this.findDrawablesMatchingMetas(metas);
         }
     
         /*
