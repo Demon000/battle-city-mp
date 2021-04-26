@@ -13,6 +13,7 @@ import { Direction } from '@/physics/Direction';
 import Tank, { PartialTankOptions } from '@/tank/Tank';
 import TankService, { TankServiceEvent } from '@/tank/TankService';
 import { TankTier } from '@/tank/TankTier';
+import IterableWrapper from '@/utils/IterableUtils';
 import MapRepository from '@/utils/MapRepository';
 import Ticker, { TickerEvent } from '@/utils/Ticker';
 import EventEmitter from 'eventemitter3';
@@ -305,12 +306,14 @@ export default class GameServer {
                 const destroyBox = this.bulletService.getBulletBrickWallDestroyBox(bulletId, brickWallId);
                 const objectsIds = this.collisionService.getOverlappingObjects(destroyBox);
                 const objects = this.gameObjectService.getMultipleObjects(objectsIds);
-                const brickWalls = objects.filter(o => o.type === GameObjectType.BRICK_WALL);
                 spawnExplosion(position, ExplosionType.SMALL);
                 this.gameObjectService.setObjectDestroyed(bulletId);
-                for (const brickWall of brickWalls) {
-                    this.gameObjectService.setObjectDestroyed(brickWall.id);
-                }
+
+                new IterableWrapper(objects)
+                    .filter(o => o.type === GameObjectType.BRICK_WALL)
+                    .forEach(brickWall => {
+                        this.gameObjectService.setObjectDestroyed(brickWall.id);
+                    });
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_TANK,
@@ -419,7 +422,7 @@ export default class GameServer {
     onMapEditorDestroyObjects(destroyBox: BoundingBox): void {
         const objectsIds = this.collisionService.getOverlappingObjects(destroyBox);
         const objects = this.gameObjectService.getMultipleObjects(objectsIds);
-        objects
+        new IterableWrapper(objects)
             .filter(o => o.type !== GameObjectType.TANK)
             .forEach(o => this.gameObjectService.unregisterObject(o.id));
     }

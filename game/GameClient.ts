@@ -136,7 +136,8 @@ export default class GameClient {
 
         const viewableObjectIds = this.collisionService.getOverlappingObjects(box);
         const viewableObjects = this.gameObjectService.getMultipleObjects(viewableObjectIds);
-        this.gameGraphicsService.renderObjects(viewableObjects, position);
+        this.gameGraphicsService.initializeRender(position);
+        this.gameGraphicsService.renderObjectsOver(viewableObjects);
         this.gameAudioService.playObjectsAudioEffect(viewableObjects, position, box);
 
         const gridSize = this.gameMapEditorService.getGridSize();
@@ -148,7 +149,7 @@ export default class GameClient {
         this.gameMapEditorService.updateGhostObjects();
         const ghostObjects = this.gameMapEditorService.getGhostObjects();
         if (ghostObjects.length !== 0) {
-            this.gameGraphicsService.renderGhostObjects(ghostObjects, position);
+            this.gameGraphicsService.renderGhostObjectsOver(ghostObjects);
         }
     }
 
