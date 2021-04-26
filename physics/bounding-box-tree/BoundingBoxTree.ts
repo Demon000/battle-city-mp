@@ -188,13 +188,12 @@ export default class BoundingBoxTree<V> {
         this.fixTreeUpwards(grandParentNode);
     }
 
-    getOverlappingNodes(box: BoundingBox): BoundingBoxNode<V>[] {
-        const nodes = new Array<BoundingBoxNode<V>>();
+    *getOverlappingNodes(box: BoundingBox): Generator<BoundingBoxNode<V>, void, void> {
         const stack = new Array<BoundingBoxNode<V>>();
         let i = 0;
 
         if (this.root === undefined) {
-            return stack;
+            return;
         }
 
         stack.push(this.root);
@@ -204,7 +203,7 @@ export default class BoundingBoxTree<V> {
 
             if (Utils.overlaps(node.box, box)) {
                 if (node.left === undefined || node.right === undefined) {
-                    nodes.push(node);
+                    yield node;
                 } else {
                     stack.push(node.left);
                     stack.push(node.right);
@@ -213,8 +212,6 @@ export default class BoundingBoxTree<V> {
 
             i++;
         }
-
-        return nodes;
     }
 
     clearNodes(): void {

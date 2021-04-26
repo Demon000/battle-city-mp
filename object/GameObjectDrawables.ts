@@ -7,7 +7,7 @@ import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
 import { TankTier } from '@/tank/TankTier';
 import { GameObjectType } from './GameObjectType';
-import { RenderPass } from './IGameObjectProperties';
+import { RenderPass } from './RenderPass';
 
 const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
     [GameObjectType.STEEL_WALL]: [

@@ -1,4 +1,5 @@
 import GameObject from '@/object/GameObject';
+import { RenderPass } from '@/object/RenderPass';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import Point from '@/physics/point/Point';
 import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
@@ -11,7 +12,6 @@ export default class GameGraphicsService {
     private canvas;
     private canvasX = 0;
     private canvasY = 0;
-    private pass = 0;
     private targetGameSize;
     private context;
     private showInvisible = false;
@@ -59,50 +59,56 @@ export default class GameGraphicsService {
         return object.graphicsRenderer;
     }
 
-    renderObjectsPrepareFilter(object: GameObject): boolean {
-        const renderer = this.getObjectRenderer(object);
-        renderer.update(this.scale);
-        return renderer.isRenderable();
-    }
-
-    renderObjectsPrepare(objects: GameObject[]): GameObject[] {
-        return objects.filter(this.renderObjectsPrepareFilter, this);
-    }
-
-    renderObjectsPassFilter(object: GameObject): boolean {
-        const renderer = this.getObjectRenderer(object);
-        const objectRelativeX = Math.floor(object.position.x) - this.canvasX;
-        const objectRelativeY = Math.floor(object.position.y) - this.canvasY;
-        const objectDrawX = objectRelativeX * this.scale;
-        const objectDrawY = objectRelativeY * this.scale;
-        return renderer.renderPass(this.context, this.pass,
-            objectDrawX, objectDrawY, this.showInvisible);
-    }
-
-    renderObjectsOver(objects: GameObject[], point: Point): void {
-        this.canvasX = point.x - this.gameWidth / 2;
-        this.canvasY = point.y - this.gameHeight / 2;
-
-        this.pass = 0;
-        let renderObjects = this.renderObjectsPrepare(objects);
-        while (renderObjects.length) {
-            renderObjects = renderObjects.filter(this.renderObjectsPassFilter, this);
-            this.pass++;
+    *renderObjectsPrepare(objects: Iterable<GameObject>): Generator<GameObject, void, void> {
+        for (const object of objects) {
+            const renderer = this.getObjectRenderer(object);
+            renderer.update(this.scale);
+            if (renderer.isRenderable()) {
+                yield object;
+            }
         }
     }
 
-    renderObjects(objects: GameObject[], point: Point): void {
+    *renderObjectsPass(objects: Iterable<GameObject>, pass: number): Generator<GameObject, void, void> {
+        for (const object of objects) {
+            const renderer = this.getObjectRenderer(object);
+            const objectRelativeX = Math.floor(object.position.x) - this.canvasX;
+            const objectRelativeY = Math.floor(object.position.y) - this.canvasY;
+            const objectDrawX = objectRelativeX * this.scale;
+            const objectDrawY = objectRelativeY * this.scale;
+            const moreToRender = renderer.renderPass(this.context, pass,
+                objectDrawX, objectDrawY, this.showInvisible);
+            if (moreToRender) {
+                yield object;
+            }
+        }
+    }
+
+    renderObjectsOver(objects: Iterable<GameObject>): void {
+        let renderObjects = this.renderObjectsPrepare(objects);
+        for (let pass = 0; pass < RenderPass.MAX; pass++) {
+            renderObjects = this.renderObjectsPass(renderObjects, pass);
+        }
+
+        let renderObject = renderObjects.next();
+        while (!renderObject.done) {
+            renderObject = renderObjects.next();
+        }
+    }
+
+    initializeRender(point: Point): void {
         this.context.imageSmoothingEnabled = false;
         this.context.fillStyle = 'black';
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        this.renderObjectsOver(objects, point);
+        this.canvasX = point.x - this.gameWidth / 2;
+        this.canvasY = point.y - this.gameHeight / 2;
     }
 
-    renderGhostObjects(objects: GameObject[], point: Point): void {
+    renderGhostObjectsOver(objects: Iterable<GameObject>): void {
         this.context.globalAlpha = 0.5;
 
-        this.renderObjectsOver(objects, point);
+        this.renderObjectsOver(objects);
 
         this.context.globalAlpha = 1;
     }

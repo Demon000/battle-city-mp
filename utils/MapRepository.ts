@@ -1,3 +1,5 @@
+import IterableWrapper from './IterableUtils';
+
 export default class MapRepository<K, V> {
     private map = new Map<K, V>();
 
@@ -18,13 +20,10 @@ export default class MapRepository<K, V> {
         return value;
     }
 
-    getMultiple(ids: K[]): V[] {
-        const objects = new Array<V>();
-        for (const id of ids) {
-            objects.push(this.get(id));
-        }
-
-        return objects;
+    getMultiple(ids: Iterable<K>): Iterable<V> {
+        return new IterableWrapper(ids)
+            .map(id => this.get(id))
+            .iterable;
     }
 
     getAll(): V[] {
