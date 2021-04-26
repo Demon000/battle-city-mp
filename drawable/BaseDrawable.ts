@@ -18,10 +18,8 @@ export default abstract class BaseDrawable implements IDrawable {
     abstract draw(context: CanvasRenderingContext2D, drawX: number, drawY: number): void;
     abstract isLoaded(): boolean;
 
-    isRenderPass(pass: number): boolean {
-        const renderPass = this.ownProperties.renderPass;
-        return (renderPass === undefined && pass === 0)
-            || (renderPass !== undefined && renderPass === pass);
+    getRenderPass(): number {
+        return this.ownProperties.renderPass ?? 0;
     }
 
     setInheritedProperties(properties: DrawableProperties = {}): void {

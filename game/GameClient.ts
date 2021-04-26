@@ -151,6 +151,8 @@ export default class GameClient {
         if (ghostObjects.length !== 0) {
             this.gameGraphicsService.renderGhostObjectsOver(ghostObjects);
         }
+
+        this.gameGraphicsService.finalizeRender();
     }
 
     onWindowResize(): void {

@@ -1,4 +1,5 @@
 import { ResourceMeta } from '@/object/IGameObjectProperties';
+import { Context2D } from '@/utils/CanvasUtils';
 
 export interface DrawableProperties {
     renderPass?: number;
@@ -13,10 +14,10 @@ export default interface IDrawable {
     readonly meta: ResourceMeta;
 
     setInheritedProperties(properties: DrawableProperties): void;
-    isRenderPass(pass: number): boolean;
+    getRenderPass(): number;
     isLoaded(): boolean;
 
-    draw(context: CanvasRenderingContext2D, drawX: number, drawY: number): void;
+    draw(context: Context2D, drawX: number, drawY: number): void;
     scale(scaleX: number, scaleY?: number): this | undefined;
     offset(offsetX: number, offsetY: number): this | undefined;
 }

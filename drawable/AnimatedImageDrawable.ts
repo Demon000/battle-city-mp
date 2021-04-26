@@ -67,16 +67,16 @@ export default class AnimatedImageDrawable extends BaseImageDrawable {
         this.updateDrawablesInheritedProperties();
     }
 
-    isRenderPass(_pass: number): boolean {
-        return true;
-    }       
-
     isLoaded(): boolean {
         return this.drawables.every(drawable => drawable.isLoaded());
     }
 
+    getRenderPass(): number {
+        throw new Error('Cannot get render pass of animated image drawable');
+    }
+
     draw(_context: CanvasRenderingContext2D, _drawX: number, _drawY: number): void {
-        // do nothing
+        throw new Error('Cannot draw animated image drawable');
     }
 
     private copy(drawables: IImageDrawable[]): this {

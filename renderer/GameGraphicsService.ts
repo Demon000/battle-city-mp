@@ -2,6 +2,7 @@ import GameObject from '@/object/GameObject';
 import { RenderPass } from '@/object/RenderPass';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import Point from '@/physics/point/Point';
+import CanvasUtils, { Context2D } from '@/utils/CanvasUtils';
 import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
 import GameObjectGraphicsRendererFactory from '../object/GameObjectGraphicsRendererFactory';
 
@@ -9,40 +10,45 @@ export default class GameGraphicsService {
     private scale = 0;
     private gameWidth = 0;
     private gameHeight = 0;
-    private canvas;
+    private context: Context2D;
+    private layersContext!: Context2D[];
     private canvasX = 0;
     private canvasY = 0;
     private targetGameSize;
-    private context;
     private showInvisible = false;
 
     constructor(
         canvas: HTMLCanvasElement,
         targetGameSize: number,
     ) {
-        this.canvas = canvas;
         this.targetGameSize = targetGameSize;
-
-        const context = canvas.getContext('2d', {
+        this.context = CanvasUtils.getContext(canvas, {
             alpha: false,
         });
-        if (!context) {
-            throw new Error('Failed to create canvas context');
-        }
-        this.context = context;
 
         this.calculateDimensions();
     }
 
     calculateDimensions(): void {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        this.context.canvas.width = width;
+        this.context.canvas.height = height;
+        this.layersContext = new Array<Context2D>();
 
-        const minRenderSize = Math.max(this.canvas.width, this.canvas.height);
+        for (const _ of new Array(RenderPass.MAX)) {
+            const canvas = CanvasUtils.create(width, height);
+            const context = CanvasUtils.getContext(canvas);
+            this.layersContext.push(context);
+        }
+
+        const minRenderSize = Math.max(width, height);
         this.scale = Math.ceil(minRenderSize / this.targetGameSize);
-        this.gameWidth = this.canvas.width / this.scale;
+
+        this.gameWidth = width / this.scale;
+        this.gameHeight = height / this.scale;
+
         this.gameWidth -= this.gameWidth % 2;
-        this.gameHeight = this.canvas.height / this.scale;
         this.gameHeight -= this.gameHeight % 2;
     }
 
@@ -69,37 +75,32 @@ export default class GameGraphicsService {
         }
     }
 
-    *renderObjectsPass(objects: Iterable<GameObject>, pass: number): Generator<GameObject, void, void> {
-        for (const object of objects) {
-            const renderer = this.getObjectRenderer(object);
-            const objectRelativeX = Math.floor(object.position.x) - this.canvasX;
-            const objectRelativeY = Math.floor(object.position.y) - this.canvasY;
-            const objectDrawX = objectRelativeX * this.scale;
-            const objectDrawY = objectRelativeY * this.scale;
-            const moreToRender = renderer.renderPass(this.context, pass,
-                objectDrawX, objectDrawY, this.showInvisible);
-            if (moreToRender) {
-                yield object;
-            }
-        }
+    renderObject(object: GameObject): void {
+        const renderer = this.getObjectRenderer(object);
+        const objectRelativeX = Math.floor(object.position.x) - this.canvasX;
+        const objectRelativeY = Math.floor(object.position.y) - this.canvasY;
+        const objectDrawX = objectRelativeX * this.scale;
+        const objectDrawY = objectRelativeY * this.scale;
+        renderer.render(this.layersContext,
+            objectDrawX, objectDrawY, this.showInvisible);
     }
 
     renderObjectsOver(objects: Iterable<GameObject>): void {
-        let renderObjects = this.renderObjectsPrepare(objects);
-        for (let pass = 0; pass < RenderPass.MAX; pass++) {
-            renderObjects = this.renderObjectsPass(renderObjects, pass);
-        }
-
-        let renderObject = renderObjects.next();
-        while (!renderObject.done) {
-            renderObject = renderObjects.next();
+        const renderObjects = this.renderObjectsPrepare(objects);
+        for (const object of renderObjects) {
+            this.renderObject(object);
         }
     }
 
     initializeRender(point: Point): void {
         this.context.imageSmoothingEnabled = false;
         this.context.fillStyle = 'black';
-        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.context.fillRect(0, 0, this.context.canvas.width,
+            this.context.canvas.height);
+
+        for (const context of this.layersContext) {
+            context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+        }
 
         this.canvasX = point.x - this.gameWidth / 2;
         this.canvasY = point.y - this.gameHeight / 2;
@@ -137,6 +138,12 @@ export default class GameGraphicsService {
             this.context.moveTo(0, scaledY);
             this.context.lineTo(scaledX, scaledY);
             this.context.stroke();
+        }
+    }
+
+    finalizeRender(): void {
+        for (const context of this.layersContext) {
+            this.context.drawImage(context.canvas, 0, 0);
         }
     }
 

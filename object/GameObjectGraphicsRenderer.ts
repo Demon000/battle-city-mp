@@ -7,16 +7,8 @@ import { GameObjectType } from '@/object/GameObjectType';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 import { Direction } from '@/physics/Direction';
 import Point from '@/physics/point/Point';
+import { Context2D } from '@/utils/CanvasUtils';
 import GameObjectDrawables from './GameObjectDrawables';
-
-export interface RenderPassFilterContext<O> {
-    object: O;
-    context: CanvasRenderingContext2D;
-    drawX: number;
-    drawY: number;
-    pass: number;
-    showInvisible: boolean;
-}
 
 export interface ProcessDrawableContext<O> {
     object: O;
@@ -165,7 +157,13 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         return this.processedDrawables !== undefined && this.processedDrawables.length !== 0;
     }
 
-    renderPassFilter(this: RenderPassFilterContext<O>, drawable: IDrawable | undefined): boolean {
+    renderDrawable(
+        drawable: IDrawable | undefined,
+        layersContext: Context2D[],
+        drawX: number,
+        drawY: number,
+        showInvisible: boolean,
+    ): boolean {
         if (drawable === undefined) {
             return false;
         }
@@ -178,40 +176,30 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
             return false;
         }
 
-        if (drawable.meta.isInvisible && !this.showInvisible) {
+        if (drawable.meta.isInvisible && !showInvisible) {
             return false;
         }
 
-        const isRenderPass = drawable.isRenderPass(this.pass);
-        if (!isRenderPass) {
-            return true;
-        }
+        const renderPass = drawable.getRenderPass();
+        const context = layersContext[renderPass];
 
-        drawable.draw(this.context, this.drawX, this.drawY);
+        drawable.draw(context, drawX, drawY);
 
         return false;
     }
 
-    renderPass(
-        context: CanvasRenderingContext2D,
-        pass: number,
+    render(
+        layersContext: Context2D[],
         drawX: number,
         drawY: number,
         showInvisible: boolean,
-    ): boolean {
+    ): void {
         if (this.processedDrawables === undefined) {
-            return false;
+            return;
         }
 
-        this.processedDrawables = this.processedDrawables.filter(this.renderPassFilter, {
-            object: this.object,
-            context,
-            drawX,
-            drawY,
-            pass,
-            showInvisible,
-        });
-
-        return this.processedDrawables.length !== 0;
+        for (const drawable of this.processedDrawables) {
+            this.renderDrawable(drawable, layersContext, drawX, drawY, showInvisible);
+        }
     }
 }
