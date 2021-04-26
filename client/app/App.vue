@@ -1,10 +1,17 @@
 <template>
     <div id="app-content">
-        <canvas
-            id="game-canvas"
-            ref="canvas"
+        <div
+            id="game-canvas-container"
+            ref="canvasContainer"
             tabindex="1"
-        ></canvas>
+        >
+            <canvas
+                class="game-canvas"
+                v-for="index in RenderPass.MAX"
+                :key="index"
+                :ref="addCanvasRef"
+            ></canvas>
+        </div>
 
         <div id="game-overlay">
             <div id="game-controls" class="controls">
@@ -154,6 +161,7 @@ import GameClientSocket from '@/game/GameClientSocket';
 import { GameSocketEvents } from '@/game/GameSocketEvent';
 import { GameMapGridSizes } from '@/maps/GameMapGridSizes';
 import { GameObjectType, GameShortObjectType } from '@/object/GameObjectType';
+import { RenderPass } from '@/object/RenderPass';
 import Player from '@/player/Player';
 import { TankTier } from '@/tank/TankTier';
 import screenfull from 'screenfull';
@@ -174,6 +182,7 @@ export default class App extends Vue {
     GameShortObjectType = GameShortObjectType;
     GameObjectType = GameObjectType;
     TankTier = TankTier;
+    RenderPass = RenderPass;
     playerColor = '';
     playerName = '';
     isBuilding = false;
@@ -182,15 +191,16 @@ export default class App extends Vue {
     selectedObjectType = GameObjectType.NONE;
     ownPlayer: Player | null = null;
     players: Player[] | null = null;
+    canvases: HTMLCanvasElement[] = [];
 
     mounted(): void {
-        const canvas = this.$refs.canvas as HTMLCanvasElement;
+        const canvasContainer = this.$refs.canvasContainer as HTMLDivElement;
 
         this.socket = io(CLIENT_CONFIG_SOCKET_BASE_URL, {
             transports: ['websocket'],
             autoConnect: false,
         });
-        this.gameClient = new GameClient(canvas);
+        this.gameClient = new GameClient(this.canvases);
         this.gameClient.emitter.on(GameClientEvent.PLAYERS_CHANGED, () => {
             this.updatePlayers();
         });
@@ -203,15 +213,15 @@ export default class App extends Vue {
         window.addEventListener('resize', this.onWindowResize);
         window.addEventListener('keydown', this.onNonGameKeyboardEvent);
         window.addEventListener('keyup', this.onNonGameKeyboardEvent);
-        canvas.addEventListener('blur', this.onCanvasBlurEvent);
-        canvas.addEventListener('keydown', this.onKeyboardEvent);
-        canvas.addEventListener('keyup', this.onKeyboardEvent);
-        canvas.addEventListener('mousemove', this.onMouseMoveEvent, {
+        canvasContainer.addEventListener('blur', this.onCanvasBlurEvent);
+        canvasContainer.addEventListener('keydown', this.onKeyboardEvent);
+        canvasContainer.addEventListener('keyup', this.onKeyboardEvent);
+        canvasContainer.addEventListener('mousemove', this.onMouseMoveEvent, {
             passive: true,
         });
-        canvas.addEventListener('click', this.onMouseClickEvent);
-        canvas.addEventListener('contextmenu', this.onMouseRightClickEvent);
-        canvas.focus();
+        canvasContainer.addEventListener('click', this.onMouseClickEvent);
+        canvasContainer.addEventListener('contextmenu', this.onMouseRightClickEvent);
+        canvasContainer.focus();
 
         const shootButton = this.$refs.shootButton as HTMLElement;
         shootButton.addEventListener('touchstart', this.onShootButtonTouchEvent);
@@ -223,6 +233,10 @@ export default class App extends Vue {
         if (screenfull.isEnabled) {
             screenfull.on('change', this.onFullscreenChanged);
         }
+    }
+
+    addCanvasRef(canvas: HTMLCanvasElement): void {
+        this.canvases.push(canvas);
     }
 
     updatePlayers(): void {
@@ -351,10 +365,10 @@ export default class App extends Vue {
         this.gameClient?.setMapEditorSelectedObjectType(this.selectedObjectType);
     }
 
-    focusCanvas(): boolean {
-        const canvas = this.$refs.canvas as HTMLCanvasElement;
-        if (document.activeElement !== canvas) {
-            canvas.focus();
+    focusCanvasContainer(): boolean {
+        const canvasContainer = this.$refs.canvasContainer as HTMLDivElement;
+        if (document.activeElement !== canvasContainer) {
+            canvasContainer.focus();
             return true;
         }
 
@@ -362,8 +376,8 @@ export default class App extends Vue {
     }
 
     onMouseMoveEvent(event: MouseEvent): void {
-        const canvasFocused = this.focusCanvas();
-        if (canvasFocused) {
+        const focused = this.focusCanvasContainer();
+        if (focused) {
             return;
         }
 
@@ -374,8 +388,8 @@ export default class App extends Vue {
     }
 
     onMouseClickEvent(): void {
-        const canvasFocused = this.focusCanvas();
-        if (canvasFocused) {
+        const focused = this.focusCanvasContainer();
+        if (focused) {
             return;
         }
 
@@ -387,8 +401,8 @@ export default class App extends Vue {
     onMouseRightClickEvent(event: MouseEvent): void {
         event.preventDefault();
 
-        const canvasFocused = this.focusCanvas();
-        if (canvasFocused) {
+        const focused = this.focusCanvasContainer();
+        if (focused) {
             return;
         }
 
@@ -408,8 +422,6 @@ export default class App extends Vue {
 
 <style>
 #app-content {
-    width: 100%;
-    height: 100%;
     user-select: none;
 }
 
@@ -418,18 +430,26 @@ button {
     font-family: 'Press Start 2P';
 }
 
-#game-canvas {
+#app-content,
+#game-canvas-container,
+#game-overlay,
+.game-canvas {
     width: 100%;
     height: 100%;
 }
 
-#game-overlay {
+#game-canvas-container {
+    background: #000000;
+}
+
+#game-overlay,
+.game-canvas {
     position: absolute;
-    width: 100%;
-    height: 100%;
     top: 0;
     left: 0;
+}
 
+#game-overlay {
     pointer-events: none;
 }
 

@@ -42,13 +42,13 @@ export default class GameClient {
     emitter;
     ticker;
 
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(canvases: HTMLCanvasElement[]) {
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>();
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
         this.gameCamera = new GameCamera();
-        this.gameGraphicsService = new GameGraphicsService(canvas, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
+        this.gameGraphicsService = new GameGraphicsService(canvases, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
         this.objectAudioRendererRepository = new MapRepository<number, GameObjectAudioRenderer>();
         this.gameAudioService = new GameAudioService(this.objectAudioRendererRepository);
         this.gameMapEditorService = new GameMapEditorService();
@@ -149,10 +149,8 @@ export default class GameClient {
         this.gameMapEditorService.updateGhostObjects();
         const ghostObjects = this.gameMapEditorService.getGhostObjects();
         if (ghostObjects.length !== 0) {
-            this.gameGraphicsService.renderGhostObjectsOver(ghostObjects);
+            this.gameGraphicsService.renderObjectsOver(ghostObjects);
         }
-
-        this.gameGraphicsService.finalizeRender();
     }
 
     onWindowResize(): void {

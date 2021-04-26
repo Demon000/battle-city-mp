@@ -2,7 +2,7 @@ import GameObject from '@/object/GameObject';
 import { RenderPass } from '@/object/RenderPass';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import Point from '@/physics/point/Point';
-import CanvasUtils, { Context2D } from '@/utils/CanvasUtils';
+import CanvasUtils, { Canvas, Context2D } from '@/utils/CanvasUtils';
 import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
 import GameObjectGraphicsRendererFactory from '../object/GameObjectGraphicsRendererFactory';
 
@@ -10,36 +10,44 @@ export default class GameGraphicsService {
     private scale = 0;
     private gameWidth = 0;
     private gameHeight = 0;
-    private context: Context2D;
-    private layersContext!: Context2D[];
+    private canvases: Canvas[];
+    private contexts!: Context2D[];
     private canvasX = 0;
     private canvasY = 0;
     private targetGameSize;
     private showInvisible = false;
 
     constructor(
-        canvas: HTMLCanvasElement,
+        canvases: HTMLCanvasElement[],
         targetGameSize: number,
     ) {
+        this.canvases = canvases;
         this.targetGameSize = targetGameSize;
-        this.context = CanvasUtils.getContext(canvas, {
-            alpha: false,
-        });
 
+        this.initializeContexts();
         this.calculateDimensions();
+    }
+
+    private initializeContexts(): void {
+        this.contexts = new Array<Context2D>();
+
+        for (const canvas of this.canvases) {
+            const context = CanvasUtils.getContext(canvas);
+            context.imageSmoothingEnabled = false;
+            this.contexts.push(context);
+        }
+
+        const gridContext = this.contexts[RenderPass.GRID];
+        gridContext.strokeStyle = '#ffffff';
     }
 
     calculateDimensions(): void {
         const width = window.innerWidth;
         const height = window.innerHeight;
-        this.context.canvas.width = width;
-        this.context.canvas.height = height;
-        this.layersContext = new Array<Context2D>();
 
-        for (const _ of new Array(RenderPass.MAX)) {
-            const canvas = CanvasUtils.create(width, height);
-            const context = CanvasUtils.getContext(canvas);
-            this.layersContext.push(context);
+        for (const canvas of this.canvases) {
+            canvas.width = width;
+            canvas.height = height;
         }
 
         const minRenderSize = Math.max(width, height);
@@ -71,7 +79,7 @@ export default class GameGraphicsService {
         const objectRelativeY = Math.floor(object.position.y) - this.canvasY;
         const objectDrawX = objectRelativeX * this.scale;
         const objectDrawY = objectRelativeY * this.scale;
-        renderer.render(this.layersContext,
+        renderer.render(this.contexts,
             objectDrawX, objectDrawY, this.showInvisible);
     }
 
@@ -86,12 +94,7 @@ export default class GameGraphicsService {
     }
 
     initializeRender(point: Point): void {
-        this.context.imageSmoothingEnabled = false;
-        this.context.fillStyle = 'black';
-        this.context.fillRect(0, 0, this.context.canvas.width,
-            this.context.canvas.height);
-
-        for (const context of this.layersContext) {
+        for (const context of this.contexts) {
             context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         }
 
@@ -99,16 +102,9 @@ export default class GameGraphicsService {
         this.canvasY = point.y - this.gameHeight / 2;
     }
 
-    renderGhostObjectsOver(objects: Iterable<GameObject>): void {
-        this.context.globalAlpha = 0.5;
-
-        this.renderObjectsOver(objects);
-
-        this.context.globalAlpha = 1;
-    }
-
     renderGrid(gridSize: number): void {
-        this.context.strokeStyle = '#ffffff';
+        const context = this.contexts[RenderPass.GRID];
+
         const canvasOffsetX = this.canvasX % gridSize;
         const canvasOffsetY = this.canvasY % gridSize;
 
@@ -118,25 +114,19 @@ export default class GameGraphicsService {
         scaledY = this.gameHeight * this.scale;
         for (let x = -canvasOffsetX; x < this.gameWidth; x +=  gridSize) {
             scaledX = x * this.scale;
-            this.context.beginPath();
-            this.context.moveTo(scaledX, 0);
-            this.context.lineTo(scaledX, scaledY);
-            this.context.stroke();
+            context.beginPath();
+            context.moveTo(scaledX, 0);
+            context.lineTo(scaledX, scaledY);
+            context.stroke();
         }
 
         scaledX = this.gameWidth * this.scale;
         for (let y = -canvasOffsetY; y < this.gameHeight; y += gridSize) {
             scaledY = y * this.scale;
-            this.context.beginPath();
-            this.context.moveTo(0, scaledY);
-            this.context.lineTo(scaledX, scaledY);
-            this.context.stroke();
-        }
-    }
-
-    finalizeRender(): void {
-        for (const context of this.layersContext) {
-            this.context.drawImage(context.canvas, 0, 0);
+            context.beginPath();
+            context.moveTo(0, scaledY);
+            context.lineTo(scaledX, scaledY);
+            context.stroke();
         }
     }
 
