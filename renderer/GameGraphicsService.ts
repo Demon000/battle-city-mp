@@ -36,9 +36,6 @@ export default class GameGraphicsService {
             context.imageSmoothingEnabled = false;
             this.contexts.push(context);
         }
-
-        const gridContext = this.contexts[RenderPass.GRID];
-        gridContext.strokeStyle = '#ffffff';
     }
 
     calculateDimensions(): void {
@@ -104,6 +101,7 @@ export default class GameGraphicsService {
 
     renderGrid(gridSize: number): void {
         const context = this.contexts[RenderPass.GRID];
+        context.strokeStyle = '#ffffff';
 
         const canvasOffsetX = this.canvasX % gridSize;
         const canvasOffsetY = this.canvasY % gridSize;
