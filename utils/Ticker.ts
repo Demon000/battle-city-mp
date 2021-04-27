@@ -49,7 +49,9 @@ export default class Ticker {
     }
 
     _requestAnimationFrameWrapper(currentTickTime: number): void {
-        this.tick(currentTickTime);
+        setTimeout(() => {
+            this.tick(currentTickTime);
+        });
     }
 
     _timeoutWrapper(): void {
