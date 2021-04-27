@@ -9,15 +9,10 @@ import Point from '@/physics/point/Point';
 import { Context2D } from '@/utils/CanvasUtils';
 import GameObjectDrawables from './GameObjectDrawables';
 
-export interface ProcessDrawableContext<O> {
-    object: O;
-    scale: number;
-}
-
 export default class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
     object;
     drawables?: IDrawable[] | null = null;
-    processedDrawables?: IDrawable[];
+    scale = 1;
 
     constructor(object: O) {
         this.object = object;
@@ -104,10 +99,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         return true;
     }
 
-    protected processDrawable(
-        this: ProcessDrawableContext<O>,
-        drawable: IDrawable | undefined,
-    ): IDrawable | undefined {
+    protected processDrawable(drawable: IDrawable | undefined): IDrawable | undefined {
         if (drawable !== undefined) {
             drawable = drawable.scale(this.scale);
         }
@@ -115,45 +107,48 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         return drawable;
     }
 
-    protected processDrawables(drawables: (IDrawable | undefined)[], scale: number): IDrawable[] {
-        return drawables.map(this.processDrawable, {
-            object: this.object,
-            scale,
-        }).filter(this.filterOutMissingDrawable) as IDrawable[];
+    protected processDrawables(drawables: (IDrawable | undefined)[]): IDrawable[] {
+        return drawables
+            .map(this.processDrawable, this)
+            .filter(this.filterOutMissingDrawable, this) as IDrawable[];
     }
 
     update(scale: number): void {
+        /*
+         * Metas were undefined, meaning that this game object will never have a sprite.
+         */
         if (this.drawables === undefined) {
             return;
         }
 
-        const metas = this.object.graphicsMeta;
-        if (metas === undefined) {
-            this.drawables = undefined;
-            return;
-        }
-
-        if (metas === null) {
-            this.drawables = null;
-            return;
-        }
-
-        if (this.drawables === null
-            || !this.isDrawablesMatchingMetas(this.drawables, metas)) {
-            this.drawables = this.findDrawablesMatchingMetas(metas);
-        }
-    
         /*
-         * Scale now, before updating the current drawable, to prevent losing it.
-         * TODO: keep current drawable across scaling operations?
+         * Metas were either undefined, meaning that the game object will never have a sprite,
+         * or null, meaning that it has no sprite right now.
          */
-        if (this.drawables !== undefined) {
-            this.processedDrawables = this.processDrawables(this.drawables, scale);
+        const metas = this.object.graphicsMeta;
+        if (metas === undefined || metas === null) {
+            this.drawables = metas;
+            return;
+        }
+
+        /*
+         * If our last metas were null, and our current metas is not null, or if our
+         * drawables no longer match the metas, try to find drawables matching the metas.
+         */
+        if (this.drawables === null
+            || !this.isDrawablesMatchingMetas(this.drawables, metas)
+            || scale !== this.scale) {
+            const drawables = this.findDrawablesMatchingMetas(metas);
+
+            if (drawables !== undefined) {
+                this.scale = scale;
+                this.drawables = this.processDrawables(drawables);
+            }
         }
     }
 
     isRenderable(): boolean {
-        return this.processedDrawables !== undefined && this.processedDrawables.length !== 0;
+        return this.drawables !== undefined && this.drawables !== null && this.drawables.length !== 0;
     }
 
     renderDrawable(
@@ -193,11 +188,11 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         drawY: number,
         showInvisible: boolean,
     ): void {
-        if (this.processedDrawables === undefined) {
+        if (this.drawables === undefined || this.drawables === null) {
             return;
         }
 
-        for (const drawable of this.processedDrawables) {
+        for (const drawable of this.drawables) {
             this.renderDrawable(drawable, layersContext, drawX, drawY, showInvisible);
         }
     }
