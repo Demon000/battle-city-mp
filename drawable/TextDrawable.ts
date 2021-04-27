@@ -56,11 +56,14 @@ export default class TextDrawable extends BaseDrawable {
             this.fontFace.load()
                 .then((fontFace: FontFace) => {
                     document.fonts.add(fontFace);
-                    this._isLoaded = true;
                 }).catch(_err => {
                     this.ownProperties.fontFamily = undefined;
+                    this.ownProperties.fontUrl = undefined;
+                }).finally(() => {
                     this._isLoaded = true;
                 });
+        } else {
+            this._isLoaded = true;
         }
     }
 
