@@ -135,7 +135,7 @@ export default class GameClient {
         }
 
         const viewableObjectIds = this.collisionService.getOverlappingObjects(box);
-        const viewableObjects = Array.from(this.gameObjectService.getMultipleObjects(viewableObjectIds));
+        const viewableObjects = this.gameObjectService.getMultipleObjects(viewableObjectIds);
         this.gameGraphicsService.initializeRender(position);
         this.gameGraphicsService.renderObjectsOver(viewableObjects);
         this.gameAudioService.playObjectsAudioEffect(viewableObjects, position, box);

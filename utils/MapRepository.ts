@@ -1,4 +1,4 @@
-import IterableWrapper from './IterableUtils';
+import LazyIterable from './LazyIterable';
 
 export default class MapRepository<K, V> {
     private map = new Map<K, V>();
@@ -20,10 +20,9 @@ export default class MapRepository<K, V> {
         return value;
     }
 
-    getMultiple(ids: Iterable<K>): Iterable<V> {
-        return new IterableWrapper(ids)
-            .map(id => this.get(id))
-            .iterable;
+    getMultiple(ids: Iterable<K>): LazyIterable<V> {
+        return LazyIterable.from(ids)
+            .map(id => this.get(id));
     }
 
     getAll(): V[] {

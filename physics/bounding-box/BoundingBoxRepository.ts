@@ -1,22 +1,21 @@
 import BoundingBox from './BoundingBox';
 import BoundingBoxNode from '../bounding-box-tree/BoundingBoxNode';
 import BoundingBoxTree from '../bounding-box-tree/BoundingBoxTree';
-import IterableWrapper from '@/utils/IterableUtils';
+import LazyIterable from '@/utils/LazyIterable';
 
 export default class BoundingBoxRepository<V> {
     tree = new BoundingBoxTree<V>();
     map = new Map<V, BoundingBoxNode<V>>();
 
-    getBoxOverlappingValues(box: BoundingBox): Iterable<V> {
-        return new IterableWrapper(this.tree.getOverlappingNodes(box))
+    getBoxOverlappingValues(box: BoundingBox): LazyIterable<V> {
+        return LazyIterable.from(this.tree.getOverlappingNodes(box))
             .map((node => {
                 if (node.value === undefined) {
                     throw new Error('Overlapping node does not contain a value');
                 }
 
                 return node.value;
-            }))
-            .iterable;
+            }));
     }
 
     addBoxValue(value: V, box: BoundingBox): void {

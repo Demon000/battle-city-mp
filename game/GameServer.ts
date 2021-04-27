@@ -13,7 +13,7 @@ import { Direction } from '@/physics/Direction';
 import Tank, { PartialTankOptions } from '@/tank/Tank';
 import TankService, { TankServiceEvent } from '@/tank/TankService';
 import { TankTier } from '@/tank/TankTier';
-import IterableWrapper from '@/utils/IterableUtils';
+import LazyIterable from '@/utils/LazyIterable';
 import MapRepository from '@/utils/MapRepository';
 import Ticker, { TickerEvent } from '@/utils/Ticker';
 import EventEmitter from 'eventemitter3';
@@ -311,7 +311,7 @@ export default class GameServer {
                 spawnExplosion(bullet.centerPosition, ExplosionType.SMALL);
                 this.gameObjectService.setObjectDestroyed(bulletId);
 
-                new IterableWrapper(objects)
+                objects
                     .filter(o => o.type === GameObjectType.BRICK_WALL)
                     .forEach(brickWall => {
                         this.gameObjectService.setObjectDestroyed(brickWall.id);
@@ -430,7 +430,7 @@ export default class GameServer {
     onMapEditorDestroyObjects(destroyBox: BoundingBox): void {
         const objectsIds = this.collisionService.getOverlappingObjects(destroyBox);
         const objects = this.gameObjectService.getMultipleObjects(objectsIds);
-        new IterableWrapper(objects)
+        objects
             .filter(o => o.type !== GameObjectType.TANK)
             .forEach(o => this.gameObjectService.unregisterObject(o.id));
     }
