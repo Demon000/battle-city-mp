@@ -62,7 +62,7 @@ export default class ActionFactory {
                 buttonState = ButtonState.PRESSED;
                 break;
             default:
-                throw new Error('Invalid joystick event type');
+                throw new Error(`Invalid joystick event type: ${type}`);
         }
 
         let buttonType;
@@ -80,7 +80,7 @@ export default class ActionFactory {
                 buttonType = ButtonType.LEFT;
                 break;
             default:
-                throw new Error('Invalid joystick button angle');
+                throw new Error(`Invalid joystick button angle: ${angle}`);
         }
 
         return new ButtonPressAction({
@@ -100,7 +100,7 @@ export default class ActionFactory {
                 buttonState = ButtonState.PRESSED;
                 break;
             default:
-                throw new Error('Invalid button event type');
+                throw new Error(`Invalid button event type: ${type}`);
         }
 
         return new ButtonPressAction({
