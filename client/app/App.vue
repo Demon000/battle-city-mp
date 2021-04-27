@@ -441,6 +441,8 @@ button {
 
 #game-canvas-container {
     background: #000000;
+
+    outline: none;
 }
 
 #game-overlay,
