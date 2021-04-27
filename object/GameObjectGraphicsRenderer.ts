@@ -135,15 +135,16 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
          * If our last metas were null, and our current metas is not null, or if our
          * drawables no longer match the metas, try to find drawables matching the metas.
          */
-        if (this.drawables === null
-            || !this.isDrawablesMatchingMetas(this.drawables, metas)
-            || scale !== this.scale) {
-            const drawables = this.findDrawablesMatchingMetas(metas);
+        if (this.drawables !== null
+            && this.isDrawablesMatchingMetas(this.drawables, metas)
+            && scale === this.scale) {
+            return;
+        }
 
-            if (drawables !== undefined) {
-                this.scale = scale;
-                this.drawables = this.processDrawables(drawables);
-            }
+        const drawables = this.findDrawablesMatchingMetas(metas);
+        if (drawables !== undefined) {
+            this.scale = scale;
+            this.drawables = this.processDrawables(drawables);
         }
     }
 
