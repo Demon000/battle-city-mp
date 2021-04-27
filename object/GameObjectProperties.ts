@@ -39,6 +39,12 @@ const properties: IGameObjectProperties[] = [
         height: 8,
     },
     {
+        type: GameObjectType.GRASS,
+        shortType: GameShortObjectType.GRASS,
+        width: 8,
+        height: 8,
+    },
+    {
         type: GameObjectType.WATER,
         shortType: GameShortObjectType.WATER,
         width: 8,

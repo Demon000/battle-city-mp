@@ -7,6 +7,7 @@ export enum GameShortObjectType {
     ICE = 'I',
     WATER = 'W',
     SAND = 'A',
+    GRASS = 'G',
 }
 
 export enum GameObjectType {
@@ -24,6 +25,7 @@ export enum GameObjectType {
     SMOKE = 'smoke',
     WATER = 'water',
     SAND = 'sand',
+    GRASS = 'grass',
 }
 
 export const SavableGameObjectTypes = [
@@ -35,4 +37,5 @@ export const SavableGameObjectTypes = [
     GameObjectType.ICE,
     GameObjectType.WATER,
     GameObjectType.SAND,
+    GameObjectType.GRASS,
 ];

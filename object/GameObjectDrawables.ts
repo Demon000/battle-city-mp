@@ -39,6 +39,11 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             renderPass: RenderPass.GROUND,
         }),
     ],
+    [GameObjectType.GRASS]: [
+        new ImageDrawable('grass.png', {}, {
+            renderPass: RenderPass.GROUND,
+        }),
+    ],
     [GameObjectType.SAND]: [
         new ImageDrawable('sand.png', {}, {
             renderPass: RenderPass.GROUND,
