@@ -284,29 +284,31 @@ export default class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_LEVEL_BORDER,
-            (bulletId: number, _staticObjectId: number, position: Point) => {
-                spawnExplosion(position, ExplosionType.SMALL, GameObjectType.NONE);
+            (bulletId: number, _staticObjectId: number, _position: Point) => {
+                const bullet = this.gameObjectService.getObject(bulletId);
+                spawnExplosion(bullet.centerPosition, ExplosionType.SMALL, GameObjectType.NONE);
                 this.gameObjectService.setObjectDestroyed(bulletId);
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_STEEL_WALL,
-            (bulletId: number, steelWallId: number, position: Point) => {
+            (bulletId: number, steelWallId: number, _position: Point) => {
                 const bullet = this.bulletService.getBullet(bulletId);
                 this.gameObjectService.setObjectDestroyed(bulletId);
                 if (bullet.power === BulletPower.HEAVY) {
-                    spawnExplosion(position, ExplosionType.SMALL);
+                    spawnExplosion(bullet.centerPosition, ExplosionType.SMALL);
                     this.gameObjectService.setObjectDestroyed(steelWallId);
                 } else {
-                    spawnExplosion(position, ExplosionType.SMALL, GameObjectType.NONE);
+                    spawnExplosion(bullet.centerPosition, ExplosionType.SMALL, GameObjectType.NONE);
                 }
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BRICK_WALL,
-            (bulletId: number, brickWallId: number, position: Point) => {
+            (bulletId: number, brickWallId: number, _position: Point) => {
                 const destroyBox = this.bulletService.getBulletBrickWallDestroyBox(bulletId, brickWallId);
                 const objectsIds = this.collisionService.getOverlappingObjects(destroyBox);
                 const objects = this.gameObjectService.getMultipleObjects(objectsIds);
-                spawnExplosion(position, ExplosionType.SMALL);
+                const bullet = this.gameObjectService.getObject(bulletId);
+                spawnExplosion(bullet.centerPosition, ExplosionType.SMALL);
                 this.gameObjectService.setObjectDestroyed(bulletId);
 
                 new IterableWrapper(objects)
@@ -317,7 +319,7 @@ export default class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_TANK,
-            (bulletId: number, tankId: number, position: Point) => {
+            (bulletId: number, tankId: number, _position: Point) => {
                 const bullet = this.bulletService.getBullet(bulletId);
                 if (bullet.tankId === tankId) {
                     return;
@@ -331,7 +333,7 @@ export default class GameServer {
                 bullet.damage -= tankHealth;
 
                 if (tank.health <= 0) {
-                    spawnExplosion(position, ExplosionType.SMALL);
+                    spawnExplosion(bullet.centerPosition, ExplosionType.SMALL);
                     spawnExplosion(tank.centerPosition, ExplosionType.BIG, GameObjectType.TANK);
                     this.playerService.setPlayerRequestedSpawnStatus(tank.playerId, PlayerSpawnStatus.DESPAWN);
                     this.playerService.addPlayerDeath(tank.playerId);
@@ -339,7 +341,7 @@ export default class GameServer {
                         this.playerService.addPlayerKill(bullet.playerId);
                     }
                 } else {
-                    spawnExplosion(position, ExplosionType.SMALL, GameObjectType.NONE);
+                    spawnExplosion(bullet.centerPosition, ExplosionType.SMALL, GameObjectType.NONE);
                 }
 
                 if (bullet.damage <= 0) {
@@ -348,8 +350,9 @@ export default class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BULLET,
-            (movingBulletId: number, staticBulletId: number, position: Point) => {
-                spawnExplosion(position, ExplosionType.SMALL);
+            (movingBulletId: number, staticBulletId: number, _position: Point) => {
+                const bullet = this.gameObjectService.getObject(movingBulletId);
+                spawnExplosion(bullet.centerPosition, ExplosionType.SMALL);
                 this.gameObjectService.setObjectDestroyed(movingBulletId);
                 this.gameObjectService.setObjectDestroyed(staticBulletId);
             });
