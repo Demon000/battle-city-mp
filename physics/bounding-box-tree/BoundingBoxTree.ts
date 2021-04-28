@@ -1,6 +1,7 @@
 import BoundingBox from '../bounding-box/BoundingBox';
 import BoundingBoxNode from './BoundingBoxNode';
 import Utils from '../bounding-box/BoundingBoxUtils';
+import { BoundingBoxTreeIterator } from './BoundingBoxTreeIterator';
 
 export default class BoundingBoxTree<V> {
     root?: BoundingBoxNode<V>;
@@ -189,32 +190,12 @@ export default class BoundingBoxTree<V> {
     }
 
     getOverlappingNodes(box: BoundingBox): Iterable<BoundingBoxNode<V>> {
-        const stack = new Array<BoundingBoxNode<V>>();
-        const nodes = new Array<BoundingBoxNode<V>>();
-        let i = 0;
-
-        if (this.root === undefined) {
-            return nodes;
-        }
-
-        stack.push(this.root);
-
-        while (stack[i]) {
-            const node = stack[i];
-
-            if (Utils.overlaps(node.box, box)) {
-                if (node.left === undefined || node.right === undefined) {
-                    nodes.push(node);
-                } else {
-                    stack.push(node.left);
-                    stack.push(node.right);
-                }
-            }
-
-            i++;
-        }
-
-        return nodes;
+        const root = this.root;
+        return {
+            [Symbol.iterator]() {
+                return new BoundingBoxTreeIterator(box, root);
+            },
+        };
     }
 
     clearNodes(): void {
