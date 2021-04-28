@@ -57,7 +57,8 @@ export default class GameServer {
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>();
         this.collisionRules = rules;
-        this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository, this.collisionRules);
+        this.collisionService = new CollisionService(this.gameObjectRepository,
+            this.boundingBoxRepository, this.collisionRules);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
         this.tankService = new TankService(this.gameObjectRepository);
         this.bulletService = new BulletService(this.gameObjectRepository);
