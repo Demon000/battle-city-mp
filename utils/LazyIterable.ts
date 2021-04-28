@@ -22,6 +22,10 @@ export default class LazyIterable<T> implements Iterable<T> {
     }
 
     static from<B>(iterable: Iterable<B>): LazyIterable<B> {
+        if (iterable instanceof LazyIterable) {
+            return iterable;
+        }
+
         return new LazyIterable<B>(iterable);
     }
 

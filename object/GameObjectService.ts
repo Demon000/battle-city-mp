@@ -1,5 +1,4 @@
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
-import LazyIterable from '@/utils/LazyIterable';
 import MapRepository from '@/utils/MapRepository';
 import Random from '@/utils/Random';
 import EventEmitter from 'eventemitter3';
@@ -49,7 +48,7 @@ export default class GameObjectService {
         return this.repository.getAll();
     }
 
-    getMultipleObjects(objectIds: Iterable<number>): LazyIterable<GameObject> {
+    getMultipleObjects(objectIds: Iterable<number>): Iterable<GameObject> {
         return this.repository.getMultiple(objectIds);
     }
 

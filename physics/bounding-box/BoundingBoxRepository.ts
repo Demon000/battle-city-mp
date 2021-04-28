@@ -7,7 +7,7 @@ export default class BoundingBoxRepository<V> {
     tree = new BoundingBoxTree<V>();
     map = new Map<V, BoundingBoxNode<V>>();
 
-    getBoxOverlappingValues(box: BoundingBox): LazyIterable<V> {
+    getBoxOverlappingValues(box: BoundingBox): Iterable<V> {
         return LazyIterable.from(this.tree.getOverlappingNodes(box))
             .map((node => {
                 if (node.value === undefined) {

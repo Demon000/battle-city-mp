@@ -20,7 +20,7 @@ export default class MapRepository<K, V> {
         return value;
     }
 
-    getMultiple(ids: Iterable<K>): LazyIterable<V> {
+    getMultiple(ids: Iterable<K>): Iterable<V> {
         return LazyIterable.from(ids)
             .map(id => this.get(id));
     }
