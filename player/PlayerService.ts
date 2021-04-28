@@ -88,10 +88,6 @@ export default class PlayerService {
         this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
     }
 
-    getPlayerTankId(playerId: string): number | null {
-        const player = this.repository.get(playerId);
-        return player.tankId;
-    }
 
     setPlayerName(playerId: string, name: string): void {
         const player = this.repository.get(playerId);
