@@ -13,7 +13,6 @@ import { Direction } from '@/physics/Direction';
 import Tank, { PartialTankOptions } from '@/tank/Tank';
 import TankService, { TankServiceEvent } from '@/tank/TankService';
 import { TankTier } from '@/tank/TankTier';
-import LazyIterable from '@/utils/LazyIterable';
 import MapRepository from '@/utils/MapRepository';
 import Ticker, { TickerEvent } from '@/utils/Ticker';
 import EventEmitter from 'eventemitter3';
