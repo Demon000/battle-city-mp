@@ -5,88 +5,72 @@ import GameObject, { GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
 
-const tierToMaxSpeedMap = {
-    [TankTier.NORMAL]: 114,
-    [TankTier.LIGHT]: 128,
-    [TankTier.HEAVY]: 96,
-};
+export interface ITankTierProperties {
+    maxSpeed: number;
+    accelerationFactor: number;
+    decelerationFactor: number;
+    bulletSpeed: number;
+    maxBullets: number;
+    bulletCooldown: number;
+    bulletPower: BulletPower;
+    sandMaxSpeedFactor: number;
+    sandAccelerationFactor: number;
+    sandDecelerationFactor: number;
+    iceMaxSpeedFactor: number;
+    iceAccelerationFactor: number;
+    iceDecelerationFactor: number;
+    maxHealth: number;
+}
 
-const tierToAccelerationFactorMap = {
-    [TankTier.NORMAL]: 3,
-    [TankTier.LIGHT]: 2,
-    [TankTier.HEAVY]: 1,
-};
-
-const tierToDecelerationFactorMap = {
-    [TankTier.NORMAL]: 3,
-    [TankTier.LIGHT]: 2,
-    [TankTier.HEAVY]: 1,
-};
-
-const tierToBulletSpeedMap = {
-    [TankTier.NORMAL]: 128,
-    [TankTier.LIGHT]: 128,
-    [TankTier.HEAVY]: 128,
-};
-
-const tierToMaxBulletsMap = {
-    [TankTier.NORMAL]: 3,
-    [TankTier.LIGHT]: 2,
-    [TankTier.HEAVY]: 1,
-};
-
-const tierToBulletCooldownMap = {
-    [TankTier.NORMAL]: 250,
-    [TankTier.LIGHT]: 250,
-    [TankTier.HEAVY]: 500,
-};
-
-const tierToBulletPowerMap = {
-    [TankTier.NORMAL]: BulletPower.LIGHT,
-    [TankTier.LIGHT]: BulletPower.LIGHT,
-    [TankTier.HEAVY]: BulletPower.HEAVY,
-};
-
-const tierToSandMaxSpeedFactorMap = {
-    [TankTier.NORMAL]: 0.5,
-    [TankTier.LIGHT]: 0.25,
-    [TankTier.HEAVY]: 0.25,
-};
-
-const tierToSandAccelerationFactorMap = {
-    [TankTier.NORMAL]: 1,
-    [TankTier.LIGHT]: 1,
-    [TankTier.HEAVY]: 1,
-};
-
-const tierToSandDecelrationFactorMap = {
-    [TankTier.NORMAL]: 2,
-    [TankTier.LIGHT]: 2,
-    [TankTier.HEAVY]: 2,
-};
-
-const tierToIceMaxSpeedFactorMap = {
-    [TankTier.NORMAL]: 1.5,
-    [TankTier.LIGHT]: 1.5,
-    [TankTier.HEAVY]: 1.5,
-};
-
-const tierToIceAccelerationFactorMap = {
-    [TankTier.NORMAL]: 2,
-    [TankTier.LIGHT]: 2,
-    [TankTier.HEAVY]: 2,
-};
-
-const tierToIceDecelerationFactorMap = {
-    [TankTier.NORMAL]: 0.5,
-    [TankTier.LIGHT]: 0.5,
-    [TankTier.HEAVY]: 0.5,
-};
-
-const tierToMaxHealthMap = {
-    [TankTier.NORMAL]: 2,
-    [TankTier.LIGHT]: 1,
-    [TankTier.HEAVY]: 3,
+const tierToPropertiesMap: Record<TankTier, ITankTierProperties> = {
+    [TankTier.NORMAL]: {
+        maxSpeed: 114,
+        accelerationFactor: 3,
+        decelerationFactor: 3,
+        bulletSpeed: 128,
+        maxBullets: 3,
+        bulletCooldown: 250,
+        bulletPower: BulletPower.LIGHT,
+        sandMaxSpeedFactor: 0.5,
+        sandAccelerationFactor: 1,
+        sandDecelerationFactor: 2,
+        iceMaxSpeedFactor: 1.5,
+        iceAccelerationFactor: 2,
+        iceDecelerationFactor: 0.5,
+        maxHealth: 2,
+    },
+    [TankTier.LIGHT]: {
+        maxSpeed: 128,
+        accelerationFactor: 2,
+        bulletSpeed: 128,
+        decelerationFactor: 2,
+        maxBullets: 2,
+        bulletCooldown: 250,
+        bulletPower: BulletPower.LIGHT,
+        sandMaxSpeedFactor: 0.25,
+        sandAccelerationFactor: 1,
+        sandDecelerationFactor: 2,
+        iceMaxSpeedFactor: 1.5,
+        iceAccelerationFactor: 2,
+        iceDecelerationFactor: 0.5,
+        maxHealth: 1,
+    },
+    [TankTier.HEAVY]: {
+        maxSpeed: 96,
+        accelerationFactor: 1,
+        bulletSpeed: 128,
+        decelerationFactor: 1,
+        maxBullets: 1,
+        bulletCooldown: 500,
+        bulletPower: BulletPower.HEAVY,
+        sandMaxSpeedFactor: 1,
+        sandAccelerationFactor: 1,
+        sandDecelerationFactor: 2,
+        iceMaxSpeedFactor: 1.5,
+        iceAccelerationFactor: 2,
+        iceDecelerationFactor: 0.5,
+        maxHealth: 3,
+    },
 };
 
 const tierHealthToSmokeTime = new Map([
@@ -141,7 +125,7 @@ export default class Tank extends GameObject {
         this.lastSmokeTime = options.lastSmokeTime ?? 0;
         this.bulletIds = options.bulletIds ?? new Array<number>();
         this.color = options.color ?? [231, 156, 33];
-        this.health = options.health ?? tierToMaxHealthMap[this.tier];
+        this.health = options.health ?? this.maxHealth;
     }
 
     toOptions(): TankOptions {
@@ -174,8 +158,12 @@ export default class Tank extends GameObject {
         this.health = options.health ?? this.health;
     }
 
+    get tierProperties(): ITankTierProperties {
+        return tierToPropertiesMap[this.tier];
+    }
+
     get maxHealth(): number {
-        return tierToMaxHealthMap[this.tier];
+        return this.tierProperties.maxHealth;
     }
 
     get smokeTime(): number | undefined {
@@ -187,61 +175,61 @@ export default class Tank extends GameObject {
     }
 
     get maxMovementSpeed(): number {
-        let speed = tierToMaxSpeedMap[this.tier];
+        let speed = this.tierProperties.maxSpeed;
 
         if (this.isOnIce) {
-            speed *= tierToIceMaxSpeedFactorMap[this.tier];
+            speed *= this.tierProperties.iceMaxSpeedFactor;
         }
 
         if (this.isOnSand) {
-            speed *= tierToSandMaxSpeedFactorMap[this.tier];
+            speed *= this.tierProperties.sandMaxSpeedFactor;
         }
 
         return speed;
     }
 
     get accelerationFactor(): number {
-        let factor = tierToAccelerationFactorMap[this.tier];
+        let factor = this.tierProperties.accelerationFactor;
 
         if (this.isOnIce) {
-            factor *= tierToIceAccelerationFactorMap[this.tier];
+            factor *= this.tierProperties.iceAccelerationFactor;
         }
 
         if (this.isOnSand) {
-            factor *= tierToSandAccelerationFactorMap[this.tier];
+            factor *= this.tierProperties.sandAccelerationFactor;
         }
 
         return factor;
     }
 
     get decelerationFactor(): number {
-        let factor = tierToDecelerationFactorMap[this.tier];
+        let factor = this.tierProperties.decelerationFactor;
 
         if (this.isOnIce) {
-            factor *= tierToIceDecelerationFactorMap[this.tier];
+            factor *= this.tierProperties.iceDecelerationFactor;
         }
 
         if (this.isOnSand) {
-            factor *= tierToSandDecelrationFactorMap[this.tier];
+            factor *= this.tierProperties.sandDecelerationFactor;
         }
 
         return factor;
     }
 
     get bulletSpeed(): number {
-        return tierToBulletSpeedMap[this.tier] + this.movementSpeed;
+        return this.tierProperties.bulletSpeed + this.movementSpeed;
     }
 
     get bulletPower(): BulletPower {
-        return tierToBulletPowerMap[this.tier];
+        return this.tierProperties.bulletPower;
     }
 
     get maxBullets(): number {
-        return tierToMaxBulletsMap[this.tier];
+        return this.tierProperties.maxBullets;
     }
 
     get bulletCooldown(): number {
-        return tierToBulletCooldownMap[this.tier];
+        return this.tierProperties.bulletCooldown;
     }
 
     get graphicsMeta(): ResourceMeta[] | undefined | null {
