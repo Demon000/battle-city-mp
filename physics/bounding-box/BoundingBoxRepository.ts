@@ -23,7 +23,8 @@ export default class BoundingBoxRepository<V> {
             throw new Error('Node already exists with value');
         }
 
-        const node = new BoundingBoxNode<V>(box);
+        const node = new BoundingBoxNode<V>();
+        node.box = box;
         node.value = value;
         this.tree.addNode(node);
         this.map.set(value, node);

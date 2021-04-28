@@ -4,30 +4,34 @@ import BoundingBox from '../bounding-box/BoundingBox';
 
 export class BoundingBoxTreeIterator<V> implements Iterator<BoundingBoxNode<V>> {
     private box: BoundingBox;
+    private nodes: BoundingBoxNode<V>[];
 
-    private stack = new Array<BoundingBoxNode<V>>();
+    private stack = new Array<number>();
     private i = 0;
 
-    constructor(box: BoundingBox, node: BoundingBoxNode<V> | undefined) {
+    constructor(box: BoundingBox, nodeIndex: number | undefined, nodes: BoundingBoxNode<V>[]) {
         this.box = box;
+        this.nodes = nodes;
 
-        if (node !== undefined) {
-            this.stack.push(node);
+        if (nodeIndex !== undefined) {
+            this.stack.push(nodeIndex);
         }
     }
 
     next(): IteratorResult<BoundingBoxNode<V>, undefined> {
-        let foundNode = undefined;
+        let foundNode;
+        let nodeIndex;
 
-        while (this.stack[this.i] !== undefined) {
-            const node = this.stack[this.i];
-
-            if (BoundingBoxUtils.overlaps(node.box, this.box)) {
-                if (node.left === undefined || node.right === undefined) {
+        while ((nodeIndex = this.stack[this.i]) !== undefined) {
+            const node = this.nodes[nodeIndex];
+            if (node !== undefined &&
+                BoundingBoxUtils.overlaps(node.box, this.box)) {
+                if (node.leftIndex === undefined
+                    || node.rightIndex === undefined) {
                     foundNode = node;
                 } else {
-                    this.stack.push(node.left);
-                    this.stack.push(node.right);
+                    this.stack.push(node.leftIndex);
+                    this.stack.push(node.rightIndex);
                 }
             }
 

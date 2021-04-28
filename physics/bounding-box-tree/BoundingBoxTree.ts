@@ -1,44 +1,74 @@
 import BoundingBox from '../bounding-box/BoundingBox';
 import BoundingBoxNode from './BoundingBoxNode';
 import Utils from '../bounding-box/BoundingBoxUtils';
+import BoundingBoxUtils from '../bounding-box/BoundingBoxUtils';
 import { BoundingBoxTreeIterator } from './BoundingBoxTreeIterator';
 
 export default class BoundingBoxTree<V> {
-    root?: BoundingBoxNode<V>;
+    rootIndex?: number;
+    nodes = new Array<BoundingBoxNode<V>>();
+    freeIndices = new Array<number>();
 
     calculateBranchingCost(node: BoundingBoxNode<V>, box: BoundingBox): number {
         const newNodeBox = Utils.combine(box, node.box);
         let cost = Utils.volume(newNodeBox);
-        if (node.left !== undefined && node.right !== undefined) {
+        if (node.leftIndex !== undefined && node.rightIndex !== undefined) {
             cost -= Utils.volume(node.box);
         }
         return cost;
     }
 
-    private swapNodeUp(up: BoundingBoxNode<V>, down: BoundingBoxNode<V>) {
-        const left = down.left;
-        const right = down.right;
+    recalculateNodeHeight(node: BoundingBoxNode<V>): void {
+        if (node.leftIndex === undefined || node.rightIndex === undefined) {
+            throw new Error('Cannot recalculate height of leaf node');
+        }
 
-        if (left === undefined || right === undefined) {
+        const left = this.nodes[node.leftIndex];
+        const right = this.nodes[node.rightIndex];
+
+        node.maxHeight = 1 + Math.max(left.maxHeight, right.maxHeight);
+    }
+
+    recalculateNodeBox(node: BoundingBoxNode<V>): void {
+        if (node.leftIndex === undefined || node.rightIndex === undefined) {
+            throw new Error('Cannot recalculate box of leaf node');
+        }
+
+        const left = this.nodes[node.leftIndex];
+        const right = this.nodes[node.rightIndex];
+
+        node.box = BoundingBoxUtils.combine(left.box, right.box);
+    }
+
+    recalculateNode(node: BoundingBoxNode<V>): void {
+        this.recalculateNodeBox(node);
+        this.recalculateNodeHeight(node);
+    }
+
+    private swapNodeUp(up: BoundingBoxNode<V>, down: BoundingBoxNode<V>) {
+        if (down.leftIndex === undefined || down.rightIndex === undefined) {
             throw new Error('Height of node being balanced is inconsistent with structure');
         }
 
-        down.left = up;
-        down.parent = up.parent;
-        up.parent = down;
+        down.leftIndex = up.index;
+        down.parentIndex = up.parentIndex;
+        up.parentIndex = down.index;
 
-        if (down.parent === undefined) {
-            this.root = down;
+        if (down.parentIndex === undefined) {
+            this.rootIndex = down.index;
         } else {
-            if (down.parent.left === up) {
-                down.parent.left = down;
-            } else if (down.parent.right === up) {
-                down.parent.right = down;
+            const downParent = this.nodes[down.parentIndex];
+            if (downParent.leftIndex === up.index) {
+                downParent.leftIndex = down.index;
+            } else if (downParent.rightIndex === up.index) {
+                downParent.rightIndex = down.index;
             } else {
                 throw new Error('Parent of node being rotated is inconsistent');
             }
         }
 
+        const left = this.nodes[down.leftIndex];
+        const right = this.nodes[down.rightIndex];
         let newDownRightNode;
         let replaceOldDownNode;
         if (left.maxHeight > right.maxHeight) {
@@ -49,39 +79,42 @@ export default class BoundingBoxTree<V> {
             replaceOldDownNode = left;
         }
 
-        if (up.right === down) {
-            up.right = replaceOldDownNode;
-        } else if (up.left === down) {
-            up.left = replaceOldDownNode;
+        if (up.rightIndex === down.index) {
+            up.rightIndex = replaceOldDownNode.index;
+        } else if (up.leftIndex === down.index) {
+            up.leftIndex = replaceOldDownNode.index;
         } else {
             throw new Error('Parent of node being rotated is inconsistent');
         }
 
-        down.right = newDownRightNode;
-        replaceOldDownNode.parent = up;
+        down.rightIndex = newDownRightNode.index;
+        replaceOldDownNode.parentIndex = up.index;
 
-        up.recalculate();
-        down.recalculate();
+        this.recalculateNode(up);
+        this.recalculateNode(down);
     }
 
     private balance(node: BoundingBoxNode<V>): BoundingBoxNode<V> {
-        if (node.left === undefined || node.right === undefined || node.maxHeight < 4) {
+        if (node.leftIndex === undefined || node.rightIndex === undefined || node.maxHeight < 4) {
             return node;
         }
 
-        const balance = node.right.maxHeight - node.left.maxHeight;
+        const left = this.nodes[node.leftIndex];
+        const right = this.nodes[node.rightIndex];
+        const balance = right.maxHeight - left.maxHeight;
         if (balance === 0) {
             return node;
         }
 
-        let nodeToSwap;
+        let nodeToSwapIndex;
         if (balance > 1) {
-            nodeToSwap = node.right;
+            nodeToSwapIndex = node.rightIndex;
         } else if (balance < -1) {
-            nodeToSwap = node.left;
+            nodeToSwapIndex = node.leftIndex;
         }
 
-        if (nodeToSwap !== undefined) {
+        if (nodeToSwapIndex !== undefined) {
+            const nodeToSwap = this.nodes[nodeToSwapIndex];
             this.swapNodeUp(node, nodeToSwap);
             return nodeToSwap;
         }
@@ -91,24 +124,47 @@ export default class BoundingBoxTree<V> {
 
     fixTreeUpwards(node?: BoundingBoxNode<V>): void {
         while (node !== undefined) {
-            if (node.left !== undefined && node.right !== undefined) {
-                node.recalculateHeight();
-                node.recalculateBox();
+            if (node.leftIndex !== undefined && node.rightIndex !== undefined) {
+                this.recalculateNode(node);
             }
 
             node = this.balance(node);
-            node = node.parent;
+            if (node.parentIndex === undefined) {
+                return;
+            }
+
+            node = this.nodes[node.parentIndex];
         }
     }
 
+    getFreeIndex(): number {
+        if (this.freeIndices.length) {
+            return this.freeIndices.pop()!;
+        } else {
+            return this.nodes.length;
+        }
+    }
+
+    setToFreeIndex(node: BoundingBoxNode<V>): void {
+        const index = this.getFreeIndex();
+        node.index = index;
+        this.nodes[index] = node;
+    }
+
+    freeIndex(index: number): void {
+        delete this.nodes[index];
+        this.freeIndices.push(index);
+    }
+
     addNode(node: BoundingBoxNode<V>): void {
-        if (this.root === undefined) {
-            this.root = node;
+        this.setToFreeIndex(node);
+        if (this.rootIndex === undefined) {
+            this.rootIndex = node.index;
             return;
         }
 
-        let siblingNode = this.root;
-        while (siblingNode.left !== undefined && siblingNode.right !== undefined) {
+        let siblingNode = this.nodes[this.rootIndex];
+        while (siblingNode.leftIndex !== undefined && siblingNode.rightIndex !== undefined) {
             const currentNodeVolume = Utils.volume(siblingNode.box);
 
             const newParentNodeBox = Utils.combine(siblingNode.box, node.box);
@@ -117,33 +173,42 @@ export default class BoundingBoxTree<V> {
 
             const minimumPushDownCost = newParentNodeCost - 2 * currentNodeVolume;
 
-            const leftCost = this.calculateBranchingCost(siblingNode.left, node.box) + minimumPushDownCost;
-            const rightCost = this.calculateBranchingCost(siblingNode.right, node.box) + minimumPushDownCost;
+            const siblingNodeLeft = this.nodes[siblingNode.leftIndex];
+            const leftCost = this.calculateBranchingCost(siblingNodeLeft, node.box) + minimumPushDownCost;
+
+            const siblingNodeRight = this.nodes[siblingNode.rightIndex];
+            const rightCost = this.calculateBranchingCost(siblingNodeRight, node.box) + minimumPushDownCost;
 
             if (newParentNodeCost < leftCost && newParentNodeCost < rightCost) {
                 break;
             }
 
             if (leftCost <= rightCost) {
-                siblingNode = siblingNode.left;
+                siblingNode = this.nodes[siblingNode.leftIndex];
             } else {
-                siblingNode = siblingNode.right;
+                siblingNode = this.nodes[siblingNode.rightIndex];
             }
         }
 
-        const oldParentNode = siblingNode.parent;
-        const newParentNode = BoundingBoxNode.fromChildren(node, siblingNode, oldParentNode);
-        node.parent = siblingNode.parent = newParentNode;
+        const oldParentNodeIndex = siblingNode.parentIndex;
+        const newParentNode = new BoundingBoxNode<V>();
+        this.setToFreeIndex(newParentNode);
+        newParentNode.box = BoundingBoxUtils.combine(node.box, siblingNode.box);
+        newParentNode.leftIndex = node.index;
+        newParentNode.rightIndex = siblingNode.index;
+        newParentNode.parentIndex = oldParentNodeIndex;
+        node.parentIndex = siblingNode.parentIndex = newParentNode.index;
 
-        if (oldParentNode === undefined) {
-            this.root = newParentNode;
+        if (oldParentNodeIndex === undefined) {
+            this.rootIndex = newParentNode.index;
             return;
         }
 
-        if (oldParentNode.left === siblingNode) {
-            oldParentNode.left = newParentNode;
-        } else if (oldParentNode.right === siblingNode) {
-            oldParentNode.right = newParentNode;
+        const oldParentNode = this.nodes[oldParentNodeIndex];
+        if (oldParentNode.leftIndex === siblingNode.index) {
+            oldParentNode.leftIndex = newParentNode.index;
+        } else if (oldParentNode.rightIndex === siblingNode.index) {
+            oldParentNode.rightIndex = newParentNode.index;
         } else {
             throw new Error('Parent of node being pushed down is inconsistent');
         }
@@ -152,53 +217,59 @@ export default class BoundingBoxTree<V> {
     }
 
     removeNode(node: BoundingBoxNode<V>): void {
-        if (!node.parent) {
-            this.root = undefined;
+        if (node.parentIndex === undefined) {
+            this.clearNodes();            
             return;
         }
 
-        const parentNode = node.parent;
-        const grandParentNode = node.parent.parent;
+        const parentNode = this.nodes[node.parentIndex];
+        const grandParentNodeIndex = parentNode.parentIndex;
 
-        let siblingNode;
-        if (parentNode.left === node) {
-            siblingNode = parentNode.right;
-        } else if (parentNode.right === node) {
-            siblingNode = parentNode.left;
+        let siblingNodeIndex;
+        if (parentNode.leftIndex === node.index) {
+            siblingNodeIndex = parentNode.rightIndex;
+        } else if (parentNode.rightIndex === node.index) {
+            siblingNodeIndex = parentNode.leftIndex;
         } else {
             throw new Error('Parent of node being removed is inconsistent');
         }
 
-        if (siblingNode === undefined) {
+        if (siblingNodeIndex === undefined) {
             throw new Error('Tree node does not have a sibling');
         }
 
-        if (grandParentNode === undefined) {
-            this.root = siblingNode;
+        let grandParentNode;
+        if (grandParentNodeIndex === undefined) {
+            this.rootIndex = siblingNodeIndex;
         } else {
-            if (grandParentNode.left === parentNode) {
-                grandParentNode.left = siblingNode;
-            } else if (grandParentNode.right === parentNode) {
-                grandParentNode.right = siblingNode;
+            grandParentNode = this.nodes[grandParentNodeIndex];
+            if (grandParentNode.leftIndex === node.parentIndex) {
+                grandParentNode.leftIndex = siblingNodeIndex;
+            } else if (grandParentNode.rightIndex === node.parentIndex) {
+                grandParentNode.rightIndex = siblingNodeIndex;
             } else {
                 throw new Error('Grand parent of node being removed is inconsistent');
             }
         }
 
-        siblingNode.parent = grandParentNode;
+        const siblingNode = this.nodes[siblingNodeIndex];
+        siblingNode.parentIndex = grandParentNodeIndex;
         this.fixTreeUpwards(grandParentNode);
+        this.freeIndex(node.parentIndex);
+        this.freeIndex(node.index);
     }
 
     getOverlappingNodes(box: BoundingBox): Iterable<BoundingBoxNode<V>> {
-        const root = this.root;
         return {
-            [Symbol.iterator]() {
-                return new BoundingBoxTreeIterator(box, root);
+            [Symbol.iterator]: () => {
+                return new BoundingBoxTreeIterator(box, this.rootIndex, this.nodes);
             },
         };
     }
 
     clearNodes(): void {
-        this.root = undefined;
+        this.rootIndex = undefined;
+        this.nodes.length = 0;
+        this.freeIndices.length = 0;
     }
 }
