@@ -47,6 +47,8 @@ export default class GameClient {
         this.boundingBoxRepository = new BoundingBoxRepository<number>();
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
+        this.playerRepository = new MapRepository<string, Player>();
+        this.playerService = new PlayerService(this.playerRepository);
         this.gameCamera = new GameCamera();
         this.gameGraphicsService = new GameGraphicsService(canvases, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
         this.objectAudioRendererRepository = new MapRepository<number, GameObjectAudioRenderer>();
@@ -54,9 +56,6 @@ export default class GameClient {
         this.gameMapEditorService = new GameMapEditorService();
         this.emitter = new EventEmitter<GameClientEvents>();
         this.ticker = new Ticker();
-
-        this.playerRepository = new MapRepository<string, Player>();
-        this.playerService = new PlayerService(this.playerRepository);
 
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED,
             (objectId: number, box: BoundingBox) => {
