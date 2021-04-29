@@ -392,14 +392,37 @@ export default class GameServer {
                 }
 
                 const tank = this.tankService.getTank(tankId);
-                const tankHealth = tank.health;
-                const bulletDamage = bullet.damage;
 
-                tank.health -= bulletDamage;
-                bullet.damage -= tankHealth;
+                const gameMode = this.gameMapService.getGameMode();
+                if (gameMode === undefined) {
+                    return;
+                }
+
+                const gameModeProperties = GameModeProperties.getTypeProperties(gameMode);
+
+                let hitSameTeam = false;
+                if (gameModeProperties.hasTeams && !gameModeProperties.friendlyFire) {
+                    const tankPlayer = this.playerService.getPlayer(tank.playerId);
+
+                    let bulletPlayer;
+                    if (bullet.playerId !== undefined) {
+                        bulletPlayer = this.playerService.getPlayer(bullet.playerId);
+                    }
+
+                    if (bulletPlayer !== undefined && bulletPlayer.teamId === tankPlayer.teamId) {
+                        hitSameTeam = true;
+                    }
+                }
+
+                if (!hitSameTeam) {
+                    const tankHealth = tank.health;
+                    const bulletDamage = bullet.damage;
+
+                    tank.health -= bulletDamage;
+                    bullet.damage -= tankHealth;
+                }
 
                 if (tank.health <= 0) {
-                    spawnExplosion(bullet.centerPosition, ExplosionType.SMALL);
                     spawnExplosion(tank.centerPosition, ExplosionType.BIG, GameObjectType.TANK);
                     this.playerService.setPlayerRequestedSpawnStatus(tank.playerId, PlayerSpawnStatus.DESPAWN);
                     this.playerService.addPlayerDeath(tank.playerId);
@@ -410,7 +433,8 @@ export default class GameServer {
                     spawnExplosion(bullet.centerPosition, ExplosionType.SMALL, GameObjectType.NONE);
                 }
 
-                if (bullet.damage <= 0) {
+                if (hitSameTeam || bullet.damage <= 0) {
+                    spawnExplosion(bullet.centerPosition, ExplosionType.SMALL);
                     this.gameObjectService.setObjectDestroyed(bulletId);
                 }
             });

@@ -7,6 +7,7 @@ const gameModeProperties: Record<GameModeType, IGameModeProperties> = {
     },
     [GameModeType.TEAM_DEATHMATCH]: {
         hasTeams: true,
+        friendlyFire: false,
     },
 };
 
