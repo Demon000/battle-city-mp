@@ -1,5 +1,5 @@
 import fs from 'fs';
-import GameObject, { PartialGameObjectOptions } from '@/object/GameObject';
+import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import GameObjectFactory from '@/object/GameObjectFactory';
 import GameObjectProperties from '@/object/GameObjectProperties';
 import { GameShortObjectType } from '@/object/GameObjectType';
@@ -7,7 +7,7 @@ import { GameShortObjectType } from '@/object/GameObjectType';
 export interface GameMapOptions {
     resolution?: number;
     objectsFromBlocks?: string[];
-    objectsFromOptions?: PartialGameObjectOptions[];
+    objectsFromOptions?: GameObjectOptions[];
 }
 
 export default class GameMap {
@@ -27,7 +27,7 @@ export default class GameMap {
         fs.writeFileSync(path, fileData);
     }
 
-    setObjectsFromOptions(objectsOptions: PartialGameObjectOptions[]): void {
+    setObjectsFromOptions(objectsOptions: GameObjectOptions[]): void {
         this.options.objectsFromOptions = objectsOptions;
     }
 

@@ -29,10 +29,9 @@ export default class GameMapService {
         }
 
         const objectsOptions = objects.map(o => o.toSaveOptions())
-            .filter(o => o !== undefined) as PartialGameObjectOptions[];
+            .filter(o => o !== undefined) as GameObjectOptions[];
         this.map.setObjectsFromBlocks([]);
         this.map.setObjectsFromOptions(objectsOptions);
-
     }
 
     saveToFile(path?: string): void {

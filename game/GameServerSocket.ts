@@ -1,7 +1,7 @@
 import { ActionOptions } from '@/actions/Action';
 import ActionFactory from '@/actions/ActionFactory';
 import { Color } from '@/drawable/Color';
-import { PartialGameObjectOptions } from '@/object/GameObject';
+import { GameObjectOptions } from '@/object/GameObject';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import { PlayerSpawnStatus } from '@/player/Player';
 import { Server, Socket } from 'socket.io';
@@ -74,7 +74,7 @@ export default class GameServerSocket {
         });
 
         socket.on(GameSocketEvent.PLAYER_MAP_EDITOR_CREATE_OBJECTS,
-            (objectsOptions: PartialGameObjectOptions[]) => {
+            (objectsOptions: GameObjectOptions[]) => {
                 this.gameServer.onMapEditorCreateObjects(objectsOptions);
             });
 

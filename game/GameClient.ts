@@ -188,11 +188,8 @@ export default class GameClient {
 
     getMapEditorObjectsOptions(): GameObjectOptions[] {
         const objects = this.gameMapEditorService.getGhostObjects();
-        const objectsOptions = objects.map(o => o.toOptions())
-            .map(o => {
-                delete o.id;
-                return o;
-            }) as GameObjectOptions[];
+        const objectsOptions = objects
+            .map(o => o.toSaveOptions()) as GameObjectOptions[];
         return objectsOptions;
     }
 
