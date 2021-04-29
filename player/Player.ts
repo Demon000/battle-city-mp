@@ -66,6 +66,7 @@ export default class Player {
 
     setOptions(options: PartialPlayerOptions): void {
         this.tankId = options.tankId ?? this.tankId;
+        this.teamId = options.teamId ?? this.teamId;
         this.name = options.name ?? this.name;
         this.kills = options.kills ?? this.kills;
         this.deaths = options.deaths ?? this.deaths;

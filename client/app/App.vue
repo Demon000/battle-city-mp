@@ -121,9 +121,11 @@
                             <td>Kills</td>
                             <td>Deaths</td>
                             <td>Points</td>
+                            <td>Team</td>
+                            <td>Tank</td>
                         </tr>
                         <tr
-                            v-for="player of players"
+                            v-for="{player, team, tank} of playersStats"
                             :key="player.id"
                             :class="{
                                 'is-own-player': player.id === ownPlayer.id,
@@ -133,6 +135,26 @@
                             <td>{{ player.kills }}</td>
                             <td>{{ player.deaths }}</td>
                             <td>{{ player.points }}</td>
+                            <td class="team-cell">
+                                <template
+                                    v-if="team"
+                                >
+                                    <span
+                                        class="team-color"
+                                        :style="{
+                                            background: colorToString(team.color),
+                                        }"
+                                    >
+                                    </span>
+                                </template>
+                            </td>
+                            <td>
+                                <template
+                                    v-if="tank"
+                                >
+                                    {{ tank.tier }}
+                                </template>
+                            </td>
                         </tr>
                     </table>
                 </div>
@@ -156,6 +178,7 @@
 
 <script lang="ts">
 import ActionFactory from '@/actions/ActionFactory';
+import { Color } from '@/drawable/Color';
 import GameClient, { GameClientEvent } from '@/game/GameClient';
 import GameClientSocket from '@/game/GameClientSocket';
 import { GameSocketEvents } from '@/game/GameSocketEvent';
@@ -163,6 +186,7 @@ import { GameMapGridSizes } from '@/maps/GameMapGridSizes';
 import { GameObjectType, GameShortObjectType } from '@/object/GameObjectType';
 import { RenderPass } from '@/object/RenderPass';
 import Player from '@/player/Player';
+import PlayerStats from '@/player/PlayerStats';
 import { TankTier } from '@/tank/TankTier';
 import screenfull from 'screenfull';
 import { io, Socket } from 'socket.io-client';
@@ -190,7 +214,7 @@ export default class App extends Vue {
     gridSize = 0;
     selectedObjectType = GameObjectType.NONE;
     ownPlayer: Player | null = null;
-    players: Player[] | null = null;
+    playersStats: PlayerStats[] | null = null;
     canvases: HTMLCanvasElement[] = [];
 
     mounted(): void {
@@ -236,6 +260,10 @@ export default class App extends Vue {
         }
     }
 
+    colorToString(color: Color): string {
+        return `rgb(${color.join(', ')})`;
+    }
+
     addCanvasRef(canvas: HTMLCanvasElement): void {
         this.canvases.push(canvas);
     }
@@ -245,14 +273,14 @@ export default class App extends Vue {
             return;
         }
 
-        this.players = markRaw(this.gameClient.getPlayers());
+        this.playersStats = markRaw(this.gameClient.getPlayersStats());
 
         const ownPlayer = this.gameClient.getOwnPlayer();
         this.ownPlayer = ownPlayer ? markRaw(ownPlayer) : null;
     }
 
     clearPlayers(): void {
-        this.players = null;
+        this.playersStats = null;
         this.ownPlayer = null;
     }
 
@@ -529,6 +557,17 @@ button {
 
 #stats table .header td {
   border: 2px solid #ffffff;
+}
+
+#stats table td.team-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#stats table td .team-color {
+    height: 16px;
+    width: 16px;
 }
 
 #virtual-controls {

@@ -96,7 +96,7 @@ export default class GameServer {
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_SERVER_STATUS,
             (playerId: string) => {
                 const objectsOptions = this.gameObjectService.getObjects().map(object => object.toOptions());
-                const playersOptions = this.playerService.getPlayersStats().map(player => player.toOptions());
+                const playersOptions = this.playerService.getPlayers().map(player => player.toOptions());
                 const teamsOptions = this.teamService.getTeams()?.map(team => team.toOptions());
                 this.gameEventBatcher.addPlayerEvent(playerId, [GameEvent.SERVER_STATUS, {
                     objectsOptions,

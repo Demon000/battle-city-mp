@@ -46,7 +46,11 @@ export default class PlayerService {
         return this.repository.get(playerId);
     }
 
-    getPlayersStats(): Player[] {
+    getPlayers(): Player[] {
+        return this.repository.getAll();
+    }
+
+    getSortedPlayers(): Player[] {
         return this.repository.getAll().sort((a, b) => b.points - a.points);
     }
 

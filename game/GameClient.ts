@@ -20,6 +20,8 @@ import GameObjectFactory from '@/object/GameObjectFactory';
 import EventEmitter from 'eventemitter3';
 import Team from '@/team/Team';
 import TeamService from '@/team/TeamService';
+import PlayerStats from '@/player/PlayerStats';
+import TankService from '@/tank/TankService';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -36,6 +38,7 @@ export default class GameClient {
     private teamService;
     private gameObjectRepository;
     private gameObjectService;
+    private tankService;
     private boundingBoxRepository;
     private collisionService;
     private gameCamera;
@@ -51,6 +54,7 @@ export default class GameClient {
         this.boundingBoxRepository = new BoundingBoxRepository<number>();
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
+        this.tankService = new TankService(this.gameObjectRepository);
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.playerRepository);
         this.teamRepository = new MapRepository<string, Team>();
@@ -179,8 +183,25 @@ export default class GameClient {
         this.playerService.setOwnPlayerId(playerId);
     }
 
-    getPlayers(): Player[] {
-        return this.playerService.getPlayersStats();
+    getPlayersStats(): PlayerStats[] {
+        return this.playerService.getSortedPlayers()
+            .map(player => {
+                let tank;
+                if (player.tankId !== null) {
+                    tank = this.tankService.getTank(player.tankId);
+                }
+
+                let team;
+                if (player.teamId !== null) {
+                    team = this.teamService.getTeam(player.teamId);
+                }
+
+                return {
+                    player,
+                    team,
+                    tank,
+                };
+            });
     }
 
     getOwnPlayer(): Player | undefined {
