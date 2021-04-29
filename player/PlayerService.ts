@@ -70,6 +70,7 @@ export default class PlayerService {
         const player = new Player({
             id: playerId,
             tankId: null,
+            teamId: null,
         });
         this.addPlayer(player);
     }
@@ -90,6 +91,14 @@ export default class PlayerService {
         this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
     }
 
+    setPlayerTeam(playerId: string, teamId: string): void {
+        const player = this.repository.get(playerId);
+        player.teamId = teamId;
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
+            teamId,
+        });
+        this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
+    }
 
     setPlayerName(playerId: string, name: string): void {
         const player = this.repository.get(playerId);

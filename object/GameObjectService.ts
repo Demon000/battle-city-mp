@@ -1,4 +1,5 @@
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
+import PlayerSpawn from '@/player-spawn/PlayerSpawn';
 import MapRepository from '@/utils/MapRepository';
 import Random from '@/utils/Random';
 import EventEmitter from 'eventemitter3';
@@ -120,13 +121,16 @@ export default class GameObjectService {
         }
     }
 
-    getRandomSpawnPosition(): Point {
+    getRandomSpawnPosition(teamId?: string): Point {
         const objects = this.repository.getAll();
         const playerSpawnObjects = new Array<GameObject>();
 
         for (const object of objects) {
             if (object.type === GameObjectType.PLAYER_SPAWN) {
-                playerSpawnObjects.push(object);
+                const playerSpawn = object as PlayerSpawn;
+                if (teamId === undefined || teamId === playerSpawn.teamId) {
+                    playerSpawnObjects.push(object);
+                }
             }
         }
 

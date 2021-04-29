@@ -6,6 +6,7 @@ import ButtonPressAction, { ButtonType } from '../actions/ButtonPressAction';
 export interface PlayerOptions {
     id: string;
     tankId: number | null;
+    teamId: string | null;
     name?: string;
     deaths?: number;
     kills?: number;
@@ -30,6 +31,7 @@ export default class Player {
     requestedTankColor?: Color;
     disconnected = false;
     tankId: number | null;
+    teamId: string | null;
     id: string;
     name?: string;
     kills: number;
@@ -39,6 +41,7 @@ export default class Player {
     constructor(options: PlayerOptions) {
         this.id = options.id;
         this.tankId = options.tankId;
+        this.teamId = options.teamId;
         this.name = options.name;
         this.kills = options.kills ?? 0;
         this.deaths = options.deaths ?? 0;
@@ -53,6 +56,7 @@ export default class Player {
         return {
             id: this.id,
             tankId: this.tankId,
+            teamId: this.teamId,
             name: this.name,
             kills: this.kills,
             deaths: this.deaths,

@@ -3,9 +3,11 @@ import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import GameObjectFactory from '@/object/GameObjectFactory';
 import GameObjectProperties from '@/object/GameObjectProperties';
 import { GameShortObjectType } from '@/object/GameObjectType';
+import Team, { TeamOptions } from '@/team/Team';
 
 export interface GameMapOptions {
     resolution?: number;
+    teamsOptions?: TeamOptions[];
     objectsFromBlocks?: string[];
     objectsFromOptions?: GameObjectOptions[];
 }
@@ -98,5 +100,18 @@ export default class GameMap {
         const objectsFromBlocks = this.getObjectsFromBlocks();
         const objectsFromOptions = this.getObjectsFromOptions();
         return objectsFromOptions.concat(objectsFromBlocks);
+    }
+
+    getTeams(): Team[] | undefined {
+        if (this.options.teamsOptions === undefined) {
+            return undefined;
+        }
+
+        const teams = new Array<Team>();
+        for (const teamOptions of this.options.teamsOptions) {
+            teams.push(new Team(teamOptions));
+        }
+
+        return teams;
     }
 }

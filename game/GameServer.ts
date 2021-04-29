@@ -5,6 +5,8 @@ import { SERVER_CONFIG_TPS } from '@/config';
 import { Color } from '@/drawable/Color';
 import Explosion from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
+import { GameModeProperties } from '@/game-mode/GameModeProperties';
+import { GameModeType } from '@/game-mode/GameModeType';
 import GameObjectFactory from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
@@ -13,6 +15,8 @@ import { Direction } from '@/physics/Direction';
 import Tank, { PartialTankOptions } from '@/tank/Tank';
 import TankService, { TankServiceEvent } from '@/tank/TankService';
 import { TankTier } from '@/tank/TankTier';
+import Team from '@/team/Team';
+import TeamService, { TeamServiceEvent } from '@/team/TeamService';
 import LazyIterable from '@/utils/LazyIterable';
 import MapRepository from '@/utils/MapRepository';
 import Ticker, { TickerEvent } from '@/utils/Ticker';
@@ -49,6 +53,8 @@ export default class GameServer {
     private collisionRules;
     private collisionService;
     private gameEventBatcher;
+    private teamRepository;
+    private teamService;
     ticker;
 
     emitter = new EventEmitter<GameServerEvents>();
@@ -65,6 +71,8 @@ export default class GameServer {
         this.gameMapService = new GameMapService();
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.playerRepository);
+        this.teamRepository = new MapRepository<string, Team>();
+        this.teamService = new TeamService(this.teamRepository);
         this.gameEventBatcher = new GameEventBatcher();
         this.ticker = new Ticker(SERVER_CONFIG_TPS);
 
@@ -76,6 +84,11 @@ export default class GameServer {
                 this.gameObjectService.registerObjects(objects);
             });
 
+        this.gameMapService.emitter.on(GameMapServiceEvent.TEAMS_CREATED,
+            (teams: Team[]) => {
+                this.teamService.addTeams(teams);
+            });
+
         /**
          * PlayerService event handlers
          */
@@ -83,9 +96,11 @@ export default class GameServer {
             (playerId: string) => {
                 const objectsOptions = this.gameObjectService.getObjects().map(object => object.toOptions());
                 const playersOptions = this.playerService.getPlayersStats().map(player => player.toOptions());
+                const teamsOptions = this.teamService.getTeams()?.map(team => team.toOptions());
                 this.gameEventBatcher.addPlayerEvent(playerId, [GameEvent.SERVER_STATUS, {
                     objectsOptions,
                     playersOptions,
+                    teamsOptions,
                     tps: SERVER_CONFIG_TPS,
                 }]);
             });
@@ -98,6 +113,16 @@ export default class GameServer {
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_CHANGED,
             (playerId: string, playerOptions: PartialPlayerOptions) => {
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.PLAYER_CHANGED, playerId, playerOptions]);
+            });
+
+        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_BEFORE_REMOVE,
+            (playerId: string) => {
+                const player = this.playerService.getPlayer(playerId);
+                if (player.teamId === null) {
+                    return;
+                }
+
+                this.teamService.removeTeamPlayer(player.teamId, playerId);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REMOVED,
@@ -134,12 +159,39 @@ export default class GameServer {
                 const player = this.playerService.getPlayer(playerId);
 
                 if (status === PlayerSpawnStatus.SPAWN && player.tankId === null) {
-                    const position = this.gameObjectService.getRandomSpawnPosition();
+                    const gameMode = this.gameMapService.getGameMode();
+                    if (gameMode === undefined) {
+                        return;
+                    }
+
+                    let teamId;
+                    const gameModeProperties = GameModeProperties.getTypeProperties(gameMode);
+                    if (gameModeProperties.hasTeams && player.teamId === null) {
+                        const team = this.teamService.findTeamWithLeastPlayers();
+                        if (team === undefined) {
+                            return;
+                        }
+
+                        this.setPlayerTeam(playerId, team.id);
+                        teamId = team.id;
+                    } else if (gameModeProperties.hasTeams && player.teamId !== null) {
+                        teamId = player.teamId;
+                    }
+
+                    let tankColor;
+                    if (gameModeProperties.hasTeams && player.teamId !== null) {
+                        const team = this.teamService.getTeam(player.teamId);
+                        tankColor = team.color;
+                    } else {
+                        tankColor = player.requestedTankColor;
+                    }
+
+                    const position = this.gameObjectService.getRandomSpawnPosition(teamId);
                     const tank = new Tank({
                         position,
                         playerId,
                         playerName: player.displayName,
-                        color: player.requestedTankColor,
+                        color: tankColor,
                         tier: player.requestedTankTier,
                     });
                     this.gameObjectService.registerObject(tank);
@@ -147,6 +199,19 @@ export default class GameServer {
                     this.gameObjectService.unregisterObject(player.tankId);
                 }
             });
+
+        /**
+         * TeamService event handlers
+         */
+        this.teamService.emitter.on(TeamServiceEvent.TEAM_PLAYER_ADDED,
+            (teamId: string, playerId: string) => {
+                this.gameEventBatcher.addBroadcastEvent([GameEvent.TEAM_PLAYER_ADDED, teamId, playerId]);
+            });
+
+            this.teamService.emitter.on(TeamServiceEvent.TEAM_PLAYER_REMOVED,
+                (teamId: string, playerId: string) => {
+                    this.gameEventBatcher.addBroadcastEvent([GameEvent.TEAM_PLAYER_REMOVED, teamId, playerId]);
+                });
 
         /**
          * GameObjectService event handlers
@@ -387,6 +452,7 @@ export default class GameServer {
                 this.gameEventBatcher.flush();
             });
 
+        this.gameMapService.setGameMode(GameModeType.TEAM_DEATHMATCH);
         this.gameMapService.loadFromFile('./maps/simple.json');
     }
 
@@ -446,12 +512,63 @@ export default class GameServer {
         this.playerService.setPlayerRequestedSpawnStatus(playerId, spawnStatus);
     }
 
+    setPlayerTeam(playerId: string, teamId: string): void {
+        this.teamService.addTeamPlayer(teamId, playerId);
+        this.playerService.setPlayerTeam(playerId, teamId);
+    }
+
+    onPlayerRequestedTeam(playerId: string, teamId: string): void {
+        const gameMode = this.gameMapService.getGameMode();
+        if (gameMode === undefined) {
+            return;
+        }
+
+        const gameModeProperties = GameModeProperties.getTypeProperties(gameMode);
+        if (!gameModeProperties.hasTeams) {
+            return;
+        }
+
+        const team = this.teamService.findTeamById(teamId);
+        if (team === undefined) {
+            return;
+        }
+
+        const player = this.playerService.getPlayer(playerId);
+        let existingTeam;
+        if (player.teamId !== null) {
+            existingTeam = this.teamService.getTeam(player.teamId);
+        } else {
+            existingTeam = this.teamService.findTeamWithLeastPlayers();
+        }
+
+        if (existingTeam === undefined) {
+            return;
+        }
+
+        if (!this.teamService.isTeamSwitchingAllowed(existingTeam.id,
+            team.id)) {
+            return;
+        }
+
+        this.setPlayerTeam(playerId, teamId);
+    }
+
     onPlayerDisconnected(playerId: string): void {
         this.playerService.setPlayerRequestedSpawnStatus(playerId, PlayerSpawnStatus.DESPAWN);
         this.playerService.setPlayerRequestedDisconnect(playerId);
     }
 
     onPlayerRequestTankColor(playerId: string, color: Color): void {
+        const gameMode = this.gameMapService.getGameMode();
+        if (gameMode === undefined) {
+            return;
+        }
+
+        const gameModeProperties = GameModeProperties.getTypeProperties(gameMode);
+        if (gameModeProperties.hasTeams) {
+            return;
+        }
+
         this.playerService.setPlayerRequestedTankColor(playerId, color);
     }
 

@@ -18,6 +18,8 @@ import Point from '@/physics/point/Point';
 import { GameServerStatus } from './GameServerStatus';
 import GameObjectFactory from '@/object/GameObjectFactory';
 import EventEmitter from 'eventemitter3';
+import Team from '@/team/Team';
+import TeamService from '@/team/TeamService';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -30,6 +32,8 @@ export interface GameClientEvents {
 export default class GameClient {
     private playerRepository;
     private playerService;
+    private teamRepository;
+    private teamService;
     private gameObjectRepository;
     private gameObjectService;
     private boundingBoxRepository;
@@ -49,6 +53,8 @@ export default class GameClient {
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.playerRepository);
+        this.teamRepository = new MapRepository<string, Team>();
+        this.teamService = new TeamService(this.teamRepository);
         this.gameCamera = new GameCamera();
         this.gameGraphicsService = new GameGraphicsService(canvases, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
         this.objectAudioRendererRepository = new MapRepository<number, GameObjectAudioRenderer>();
@@ -99,10 +105,23 @@ export default class GameClient {
         this.playerService.removePlayer(playerId);
     }
 
+    onTeamPlayerAdded(teamId: string, playerId: string): void {
+        this.teamService.addTeamPlayer(teamId, playerId);
+    }
+
+    onTeamPlayerRemoved(teamId: string, playerId: string): void {
+        this.teamService.removeTeamPlayer(teamId, playerId);
+    }
+
     onServerStatus(serverStatus: GameServerStatus): void {
         this.clear();
         const players = serverStatus.playersOptions.map(o => new Player(o));
         this.playerService.addPlayers(players);
+
+        if (serverStatus.teamsOptions !== undefined) {
+            const teams = serverStatus.teamsOptions.map(o => new Team(o));
+            this.teamService.addTeams(teams);
+        }
 
         const objects = serverStatus.objectsOptions.map(o => GameObjectFactory.buildFromOptions(o));
         this.gameObjectService.registerObjects(objects);
@@ -205,6 +224,7 @@ export default class GameClient {
 
     clear(): void {
         this.playerService.clear();
+        this.teamService.clear();
         this.gameObjectRepository.clear();
         this.boundingBoxRepository.clear();
         this.gameAudioService.clear();

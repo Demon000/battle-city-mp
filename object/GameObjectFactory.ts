@@ -1,5 +1,6 @@
 import Bullet, { BulletOptions } from '@/bullet/Bullet';
 import Explosion, { ExplosionOptions } from '@/explosion/Explosion';
+import PlayerSpawn, { PlayerSpawnOptions } from '@/player-spawn/PlayerSpawn';
 import Point from '../physics/point/Point';
 import Tank, { TankOptions } from '../tank/Tank';
 import GameObject, { GameObjectOptions } from './GameObject';
@@ -33,6 +34,8 @@ export default class GameObjectFactory {
             return new Bullet(options as BulletOptions);
         } else if (options.type === GameObjectType.EXPLOSION) {
             return new Explosion(options as ExplosionOptions);
+        } else if (options.type === GameObjectType.PLAYER_SPAWN) {
+            return new PlayerSpawn(options as PlayerSpawnOptions);
         } else {
             return new GameObject(options);
         }
