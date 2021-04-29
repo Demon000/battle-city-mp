@@ -10,6 +10,7 @@ import { PlayerPoints, PlayerPointsEvent } from './PlayerPoints';
 export enum PlayerServiceEvent {
     PLAYER_ADDED = 'player-added',
     PLAYER_CHANGED = 'player-changed',
+    PLAYER_BEFORE_REMOVE = 'player-before-remove',
     PLAYER_REMOVED = 'player-removed',
     PLAYERS_CHANGED = 'players-changed',
 
@@ -23,6 +24,7 @@ export enum PlayerServiceEvent {
 interface PlayerServiceEvents {
     [PlayerServiceEvent.PLAYER_ADDED]: (player: Player) => void,
     [PlayerServiceEvent.PLAYER_CHANGED]: (playerId: string, playerOptions: PartialPlayerOptions) => void,
+    [PlayerServiceEvent.PLAYER_BEFORE_REMOVE]: (playerId: string) => void,
     [PlayerServiceEvent.PLAYER_REMOVED]: (playerId: string) => void,
     [PlayerServiceEvent.PLAYERS_CHANGED]: () => void,
     [PlayerServiceEvent.PLAYER_REQUESTED_MOVE]: (playerId: string, direction: Direction | undefined) => void,
@@ -201,9 +203,7 @@ export default class PlayerService {
             return false;
         }
 
-        this.repository.remove(player.id);
-        this.emitter.emit(PlayerServiceEvent.PLAYER_REMOVED, player.id);
-        this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
+        this.removePlayer(player.id);
         return true;
     }
 
@@ -250,6 +250,7 @@ export default class PlayerService {
     }
 
     removePlayer(playerId: string): void {
+        this.emitter.emit(PlayerServiceEvent.PLAYER_BEFORE_REMOVE, playerId);
         this.repository.remove(playerId);
         this.emitter.emit(PlayerServiceEvent.PLAYER_REMOVED, playerId);
         this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
