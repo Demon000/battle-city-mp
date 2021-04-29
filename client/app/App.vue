@@ -275,17 +275,22 @@ export default class App extends Vue {
     }
 
     onNonGameKeyboardEvent(event: KeyboardEvent): void {
+        let handled = false;
+        let repeated = false;
+
         if (event.repeat) {
-            return;
+            repeated = true;
         }
 
-        if (event.key.toLowerCase() === 'b' && event.type === 'keyup') {
+        if (!repeated && event.key.toLowerCase() === 'b'
+            && event.type === 'keyup') {
             this.isBuilding = !this.isBuilding;
             this.gameClientSocket?.mapEditorEnable(this.isBuilding);
-            return;
+
+            handled = true;
         }
 
-        if (event.key.toLowerCase() === 'tab') {
+        if (!repeated && event.key.toLowerCase() === 'tab') {
             if (event.type === 'keydown') {
                 this.isStatsOpen = true;
                 this.updatePlayers();
@@ -296,9 +301,11 @@ export default class App extends Vue {
                 this.clearPlayers();
             }
 
-            event.preventDefault();
+            handled = true;
+        }
 
-            return;
+        if (repeated || handled) {
+            event.preventDefault();
         }
     }
 
