@@ -275,6 +275,10 @@ export default class App extends Vue {
     }
 
     onNonGameKeyboardEvent(event: KeyboardEvent): void {
+        if (event.repeat) {
+            return;
+        }
+
         if (event.key.toLowerCase() === 'b' && event.type === 'keyup') {
             this.isBuilding = !this.isBuilding;
             this.gameClientSocket?.mapEditorEnable(this.isBuilding);

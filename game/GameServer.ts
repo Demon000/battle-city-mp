@@ -7,6 +7,7 @@ import Explosion from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { GameModeProperties } from '@/game-mode/GameModeProperties';
 import { GameModeType } from '@/game-mode/GameModeType';
+import { SameTeamBulletHitMode } from '@/game-mode/IGameModeProperties';
 import GameObjectFactory from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
@@ -208,10 +209,10 @@ export default class GameServer {
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.TEAM_PLAYER_ADDED, teamId, playerId]);
             });
 
-            this.teamService.emitter.on(TeamServiceEvent.TEAM_PLAYER_REMOVED,
-                (teamId: string, playerId: string) => {
-                    this.gameEventBatcher.addBroadcastEvent([GameEvent.TEAM_PLAYER_REMOVED, teamId, playerId]);
-                });
+        this.teamService.emitter.on(TeamServiceEvent.TEAM_PLAYER_REMOVED,
+            (teamId: string, playerId: string) => {
+                this.gameEventBatcher.addBroadcastEvent([GameEvent.TEAM_PLAYER_REMOVED, teamId, playerId]);
+            });
 
         /**
          * GameObjectService event handlers
@@ -400,8 +401,10 @@ export default class GameServer {
 
                 const gameModeProperties = GameModeProperties.getTypeProperties(gameMode);
 
-                let hitSameTeam = false;
-                if (gameModeProperties.hasTeams && !gameModeProperties.friendlyFire) {
+                let ignoreBulletDamage = false;
+                let destroyBullet = false;
+                if (SameTeamBulletHitMode.DESTROY === gameModeProperties.sameTeamBulletHitMode
+                    || SameTeamBulletHitMode.PASS === gameModeProperties.sameTeamBulletHitMode) {
                     const tankPlayer = this.playerService.getPlayer(tank.playerId);
 
                     let bulletPlayer;
@@ -410,11 +413,15 @@ export default class GameServer {
                     }
 
                     if (bulletPlayer !== undefined && bulletPlayer.teamId === tankPlayer.teamId) {
-                        hitSameTeam = true;
+                        ignoreBulletDamage = true;
+
+                        if (gameModeProperties.sameTeamBulletHitMode === SameTeamBulletHitMode.DESTROY) {
+                            destroyBullet = true;
+                        }
                     }
                 }
 
-                if (!hitSameTeam) {
+                if (!ignoreBulletDamage) {
                     const tankHealth = tank.health;
                     const bulletDamage = bullet.damage;
 
@@ -433,7 +440,7 @@ export default class GameServer {
                     spawnExplosion(bullet.centerPosition, ExplosionType.SMALL, GameObjectType.NONE);
                 }
 
-                if (hitSameTeam || bullet.damage <= 0) {
+                if (destroyBullet || bullet.damage <= 0) {
                     spawnExplosion(bullet.centerPosition, ExplosionType.SMALL);
                     this.gameObjectService.setObjectDestroyed(bulletId);
                 }

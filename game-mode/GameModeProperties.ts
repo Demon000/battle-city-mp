@@ -1,13 +1,14 @@
 import { GameModeType } from './GameModeType';
-import { IGameModeProperties } from './IGameModeProperties';
+import { IGameModeProperties, SameTeamBulletHitMode } from './IGameModeProperties';
 
 const gameModeProperties: Record<GameModeType, IGameModeProperties> = {
     [GameModeType.DEATHMATCH]: {
         hasTeams: false,
+        sameTeamBulletHitMode: SameTeamBulletHitMode.ALLOW,
     },
     [GameModeType.TEAM_DEATHMATCH]: {
         hasTeams: true,
-        friendlyFire: false,
+        sameTeamBulletHitMode: SameTeamBulletHitMode.DESTROY,
     },
 };
 
