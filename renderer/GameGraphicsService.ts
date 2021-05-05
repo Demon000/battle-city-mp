@@ -2,7 +2,7 @@ import GameObject from '@/object/GameObject';
 import { RenderPass } from '@/object/RenderPass';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import Point from '@/physics/point/Point';
-import CanvasUtils, { Canvas, Context2D } from '@/utils/CanvasUtils';
+import CanvasUtils, { Context2D } from '@/utils/CanvasUtils';
 import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
 import GameObjectGraphicsRendererFactory from '../object/GameObjectGraphicsRendererFactory';
 
@@ -10,7 +10,7 @@ export default class GameGraphicsService {
     private scale = 0;
     private gameWidth = 0;
     private gameHeight = 0;
-    private canvases: Canvas[];
+    private canvases;
     private contexts!: Context2D[];
     private canvasX = 0;
     private canvasY = 0;
@@ -39,12 +39,17 @@ export default class GameGraphicsService {
     }
 
     calculateDimensions(): void {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
+        const ratio = window.devicePixelRatio;
+        const visibleWidth = window.innerWidth;
+        const visibleHeight = window.innerHeight;
+        const width = Math.ceil(visibleWidth * ratio);
+        const height = Math.ceil(visibleHeight * ratio);
 
         for (const canvas of this.canvases) {
             canvas.width = width;
             canvas.height = height;
+            canvas.style.width = `${visibleWidth}px`;
+            canvas.style.height = `${visibleHeight}px`;
         }
 
         const minRenderSize = Math.min(width, height);
