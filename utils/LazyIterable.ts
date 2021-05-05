@@ -11,10 +11,53 @@ export type IterableOperation = {
     fn: (value: any) => boolean;
 };
 
+class LazyIterableIterator<T> {
+    private iterator;
+    private operations;
+
+    constructor(iterator: Iterator<any>, operations: IterableOperation[]) {
+        this.iterator = iterator;
+        this.operations = operations;
+    }
+
+    next(): IteratorResult<T> {
+        let value;
+        while ((value = this.iterator.next().value)) {
+            let isFilteredOut = false;
+            let result: any = value;
+
+            for (const operation of this.operations) {
+                if (operation.type === IterableOperationType.FILTER) {
+                    isFilteredOut = !operation.fn(result);
+                } else if (operation.type === IterableOperationType.MAP) {
+                    result = operation.fn(result);
+                }
+
+                if (isFilteredOut === true) {
+                    break;
+                }
+            }
+
+            if (isFilteredOut) {
+                continue;
+            }
+
+            return {
+                value: result,
+                done: false,
+            };
+        }
+
+        return {
+            value: undefined,
+            done: true,
+        };
+    }
+}
+
 export default class LazyIterable<T> implements Iterable<T> {
-    private _values?: Array<T>;
-    private iterable: Iterable<any>;
-    private operations: IterableOperation[];
+    private iterable;
+    private operations;
 
     private constructor(iterable: Iterable<any>, operations: IterableOperation[] = []) {
         this.iterable = iterable;
@@ -49,67 +92,18 @@ export default class LazyIterable<T> implements Iterable<T> {
         }]);
     }
 
-    values(): Array<T> {
-        if (this._values !== undefined) {
-            return this._values;
-        }
-
-        const values = new Array<T>();
-
-        for (const value of this.iterable) {
-            let isFilteredOut = false;
-            let result: any = value;
-            for (const operation of this.operations) {
-                if (operation.type === IterableOperationType.FILTER) {
-                    isFilteredOut = !operation.fn(result);
-                } else if (operation.type === IterableOperationType.MAP) {
-                    result = operation.fn(result);
-                }
-
-                if (isFilteredOut === true) {
-                    break;
-                }
-            }
-
-            if (isFilteredOut) {
-                continue;
-            }
-
-            values.push(result);
-        }
-
-        return this._values = values;
-    }
-
     forEach<C>(
         fn: (value: T) => void,
         context?: C,
     ): void {
-        const values = this.values();
         const fnc = fn.bind(context);
-        for (const value of values) {
+        for (const value of this) {
             fnc(value);
         }
     }
 
     [Symbol.iterator](): Iterator<T, any, undefined> {
-        const values = this.values();
-        let index = 0;
-
-        return {
-            next(): IteratorResult<T> {
-                if (index >= values.length) {
-                    return {
-                        done: true,
-                        value: null,
-                    };
-                }
-
-                return {
-                    done: false,
-                    value: values[index++],
-                };
-            },
-        };
+        const iterator = this.iterable[Symbol.iterator]();
+        return new LazyIterableIterator(iterator, this.operations);
     }
 }
