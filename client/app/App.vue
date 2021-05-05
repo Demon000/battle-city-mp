@@ -232,6 +232,7 @@ export default class App extends Vue {
         this.gameClientSocket = new GameClientSocket(this.socket, this.gameClient);
         this.joystick = new DirectionalJoystickWrapper({
             zone: this.$refs.dpad as HTMLElement,
+            threshold: 0.2,
         });
 
         window.addEventListener('resize', this.onWindowResize);
