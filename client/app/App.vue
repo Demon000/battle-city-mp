@@ -343,6 +343,7 @@ export default class App extends Vue {
         }
 
         this.gameClientSocket?.requestPlayerAction(action);
+        event.preventDefault();
     }
 
     onJoystickEvent(event: DirectionalJoystickEvent): void {
