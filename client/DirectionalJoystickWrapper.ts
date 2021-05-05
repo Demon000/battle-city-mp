@@ -32,7 +32,7 @@ export default class DirectionalJoystickWrapper extends EventEmitter {
                 type: 'dirup',
                 angle: this.lastDirectionAngle,
             });
-        } 
+        }
 
         this.lastDirectionAngle = data.direction.angle;
         if (this.lastDirectionAngle === undefined) {
