@@ -117,10 +117,7 @@ export default class GameObject {
     }
 
     get graphicsMeta(): ResourceMeta[] | undefined | null {
-        return [{
-            direction: this.direction,
-            position: this.position,
-        }];
+        return [{}];
     }
 
     get audioMeta(): ResourceMeta | undefined | null {
