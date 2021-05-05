@@ -10,14 +10,6 @@ export default class ActionFactory {
         }
     }
 
-    static buildFromButton(buttonType: ButtonType, buttonState: ButtonState): ButtonPressAction {
-        return new ButtonPressAction({
-            timestamp: Date.now(),
-            buttonState,
-            buttonType,
-        });
-    }
-
     static buildFromKeyboardEvent(event: KeyboardEvent): ButtonPressAction | undefined {
         if (!['keydown', 'keyup'].includes(event.type)) {
             return undefined;
@@ -53,7 +45,49 @@ export default class ActionFactory {
                 return undefined;
         }
 
-        return this.buildFromButton(buttonType, buttonState);
+        return new ButtonPressAction({
+            timestamp: event.timeStamp,
+            buttonState,
+            buttonType,
+        });
+    }
+
+    static buildFromJoystickEvent(type: string, angle: string): ButtonPressAction | undefined {
+        let buttonState;
+        switch (type) {
+            case 'dirup':
+                buttonState = ButtonState.UNPRESSED;
+                break;
+            case 'dirdown':
+                buttonState = ButtonState.PRESSED;
+                break;
+            default:
+                throw new Error(`Invalid joystick event type: ${type}`);
+        }
+
+        let buttonType;
+        switch (angle) {
+            case 'up':
+                buttonType = ButtonType.UP;
+                break;
+            case 'down':
+                buttonType = ButtonType.DOWN;
+                break;
+            case 'right':
+                buttonType = ButtonType.RIGHT;
+                break;
+            case 'left':
+                buttonType = ButtonType.LEFT;
+                break;
+            default:
+                throw new Error(`Invalid joystick button angle: ${angle}`);
+        }
+
+        return new ButtonPressAction({
+            timestamp: Date.now(),
+            buttonState,
+            buttonType,
+        });
     }
 
     static buildFromShootButtonTouchEvent(type: string): ButtonPressAction | undefined {
