@@ -9,7 +9,7 @@ export interface GameMapOptions {
     resolution?: number;
     teamsOptions?: TeamOptions[];
     objectsFromBlocks?: string[];
-    objectsFromOptions?: GameObjectOptions[];
+    objectsFromOptions?: Iterable<GameObjectOptions>;
 }
 
 export default class GameMap {
@@ -29,7 +29,7 @@ export default class GameMap {
         fs.writeFileSync(path, fileData);
     }
 
-    setObjectsFromOptions(objectsOptions: GameObjectOptions[]): void {
+    setObjectsFromOptions(objectsOptions: Iterable<GameObjectOptions>): void {
         this.options.objectsFromOptions = objectsOptions;
     }
 

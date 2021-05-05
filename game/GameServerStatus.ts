@@ -3,8 +3,8 @@ import { PlayerOptions } from '@/player/Player';
 import { TeamOptions } from '@/team/Team';
 
 export interface GameServerStatus {
-    playersOptions: PlayerOptions[];
-    objectsOptions: GameObjectOptions[];
-    teamsOptions: TeamOptions[] | undefined;
+    playersOptions: Iterable<PlayerOptions>;
+    objectsOptions: Iterable<GameObjectOptions>;
+    teamsOptions: Iterable<TeamOptions> | undefined;
     tps: number;
 }

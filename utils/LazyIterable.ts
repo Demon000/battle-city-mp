@@ -102,6 +102,10 @@ export default class LazyIterable<T> implements Iterable<T> {
         }
     }
 
+    toArray(): T[] {
+        return Array.from(this);
+    }
+
     [Symbol.iterator](): Iterator<T, any, undefined> {
         const iterator = this.iterable[Symbol.iterator]();
         return new LazyIterableIterator(iterator, this.operations);

@@ -22,6 +22,7 @@ import Team from '@/team/Team';
 import TeamService from '@/team/TeamService';
 import PlayerStats from '@/player/PlayerStats';
 import TankService from '@/tank/TankService';
+import LazyIterable from '@/utils/LazyIterable';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -119,16 +120,24 @@ export default class GameClient {
 
     onServerStatus(serverStatus: GameServerStatus): void {
         this.clear();
-        const players = serverStatus.playersOptions.map(o => new Player(o));
+        console.log(serverStatus);
+        const players =
+            LazyIterable.from(serverStatus.playersOptions)
+                .map(o => new Player(o));
         this.playerService.addPlayers(players);
 
         if (serverStatus.teamsOptions !== undefined) {
-            const teams = serverStatus.teamsOptions.map(o => new Team(o));
+            const teams =
+            LazyIterable.from(serverStatus.teamsOptions)
+                .map(o => new Team(o));
             this.teamService.addTeams(teams);
         }
 
-        const objects = serverStatus.objectsOptions.map(o => GameObjectFactory.buildFromOptions(o));
+        const objects =
+            LazyIterable.from(serverStatus.objectsOptions)
+                .map(o => GameObjectFactory.buildFromOptions(o));
         this.gameObjectService.registerObjects(objects);
+
         const objectIds = objects.map(o => o.id);
         this.collisionService.registerObjectsCollisions(objectIds);
     }

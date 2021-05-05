@@ -45,7 +45,7 @@ export default class GameObjectService {
         return this.repository.get(objectId);
     }
 
-    getObjects(): GameObject[] {
+    getObjects(): Iterable<GameObject> {
         return this.repository.getAll();
     }
 
@@ -58,7 +58,7 @@ export default class GameObjectService {
         this.emitter.emit(GameObjectServiceEvent.OBJECT_REGISTERED, object);
     }
 
-    registerObjects(objects: GameObject[]): void {
+    registerObjects(objects: Iterable<GameObject>): void {
         for (const object of objects) {
             this.registerObject(object);
         }

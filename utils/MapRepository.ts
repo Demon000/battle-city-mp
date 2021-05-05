@@ -25,8 +25,8 @@ export default class MapRepository<K, V> {
             .map(id => this.get(id));
     }
 
-    getAll(): V[] {
-        return Array.from(this.map.values());
+    getAll(): Iterable<V> {
+        return this.map.values();
     }
 
     add(key: K, value: V): void {

@@ -46,12 +46,14 @@ export default class PlayerService {
         return this.repository.get(playerId);
     }
 
-    getPlayers(): Player[] {
+    getPlayers(): Iterable<Player> {
         return this.repository.getAll();
     }
 
     getSortedPlayers(): Player[] {
-        return this.repository.getAll().sort((a, b) => b.points - a.points);
+        const playersIterable = this.repository.getAll();
+        const players = Array.from(playersIterable);
+        return players.sort((a, b) => b.points - a.points);
     }
 
     addPlayer(player: Player): void {
@@ -60,7 +62,7 @@ export default class PlayerService {
         this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
     }
 
-    addPlayers(players: Player[]): void {
+    addPlayers(players: Iterable<Player>): void {
         for (const player of players) {
             this.addPlayer(player);
         }

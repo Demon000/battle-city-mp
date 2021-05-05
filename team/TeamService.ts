@@ -20,13 +20,13 @@ export default class TeamService {
         this.repository = repository;
     }
 
-    addTeams(teams: Team[]): void {
+    addTeams(teams: Iterable<Team>): void {
         for (const team of teams) {
             this.repository.add(team.id, team);
         }
     }
 
-    getTeams(): Team[] | undefined {
+    getTeams(): Iterable<Team> | undefined {
         return this.repository.getAll();
     }
 

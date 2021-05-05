@@ -75,7 +75,7 @@ export default class CollisionService {
         this.boundingBoxRepository.addBoxValue(objectId, object.getBoundingBox());
     }
 
-    registerObjectsCollisions(objectIds: number[]): void {
+    registerObjectsCollisions(objectIds: Iterable<number>): void {
         for (const objectId of objectIds) {
             this.registerObjectCollisions(objectId);
         }

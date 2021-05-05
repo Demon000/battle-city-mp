@@ -1,6 +1,7 @@
 import GameObject from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 import CollisionTracker from '@/physics/collisions/CollisionTracker';
+import LazyIterable from '@/utils/LazyIterable';
 import MapRepository from '@/utils/MapRepository';
 import { EventEmitter } from 'eventemitter3';
 import Tank, { PartialTankOptions } from './Tank';
@@ -25,17 +26,11 @@ export default class TankService {
         this.repository = repository;
     }
 
-    private getTanks(): Tank[] {
-        const tanks = new Array<Tank>();
-
+    private getTanks(): Iterable<Tank> {
         const objects = this.repository.getAll();
-        for (const object of objects) {
-            if (object.type === GameObjectType.TANK) {
-                tanks.push(object as Tank);
-            }
-        }
 
-        return tanks;
+        return LazyIterable.from(objects)
+            .filter(o => o.type === GameObjectType.TANK) as Iterable<Tank>;
     }
 
     getTank(tankId: number): Tank {

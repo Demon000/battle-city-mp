@@ -2,6 +2,7 @@ import { GameModeProperties } from '@/game-mode/GameModeProperties';
 import { GameModeType } from '@/game-mode/GameModeType';
 import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import Team from '@/team/Team';
+import LazyIterable from '@/utils/LazyIterable';
 import EventEmitter from 'eventemitter3';
 import GameMap from './GameMap';
 
@@ -54,13 +55,15 @@ export default class GameMapService {
         console.log(message);
     }
 
-    setMapObjects(objects: GameObject[]): void {
+    setMapObjects(objects: Iterable<GameObject>): void {
         if (this.map === undefined) {
             return;
         }
 
-        const objectsOptions = objects.map(o => o.toSaveOptions())
-            .filter(o => o !== undefined) as GameObjectOptions[];
+        const objectsOptions =
+            LazyIterable.from(objects)
+                .map(o => o.toSaveOptions())
+                .filter(o => o !== undefined) as Iterable<GameObjectOptions>;
         this.map.setObjectsFromBlocks([]);
         this.map.setObjectsFromOptions(objectsOptions);
     }

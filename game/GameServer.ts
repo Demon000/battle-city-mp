@@ -95,9 +95,24 @@ export default class GameServer {
          */
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_SERVER_STATUS,
             (playerId: string) => {
-                const objectsOptions = this.gameObjectService.getObjects().map(object => object.toOptions());
-                const playersOptions = this.playerService.getPlayers().map(player => player.toOptions());
-                const teamsOptions = this.teamService.getTeams()?.map(team => team.toOptions());
+                const objects = this.gameObjectService.getObjects();
+                const objectsOptions =
+                    LazyIterable.from(objects)
+                        .map(object => object.toOptions())
+                        .toArray();
+                const players = this.playerService.getPlayers();
+                const playersOptions =
+                    LazyIterable.from(players)
+                        .map(player => player.toOptions())
+                        .toArray();
+                const teams = this.teamService.getTeams();
+                let teamsOptions;
+                if (teams !== undefined) {
+                    teamsOptions =
+                        LazyIterable.from(teams)
+                            .map(team => team.toOptions())
+                            .toArray();
+                }
                 this.gameEventBatcher.addPlayerEvent(playerId, [GameEvent.SERVER_STATUS, {
                     objectsOptions,
                     playersOptions,
