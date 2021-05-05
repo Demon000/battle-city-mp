@@ -178,6 +178,7 @@
 
 <script lang="ts">
 import ActionFactory from '@/actions/ActionFactory';
+import { ButtonState, ButtonType } from '@/actions/ButtonPressAction';
 import { Color } from '@/drawable/Color';
 import GameClient, { GameClientEvent } from '@/game/GameClient';
 import GameClientSocket from '@/game/GameClientSocket';
@@ -193,13 +194,13 @@ import { io, Socket } from 'socket.io-client';
 import { markRaw } from 'vue';
 import { Vue } from 'vue-class-component';
 import { CLIENT_CONFIG_SOCKET_BASE_URL, CLIENT_SPRITES_RELATIVE_URL } from '../../config';
-import DirectionalJoystickWrapper, { DirectionalJoystickEvent } from '../DirectionalJoystickWrapper';
+import Joystick, { JoystickEvent } from '../Joystick';
 
 export default class App extends Vue {
     socket?: Socket<GameSocketEvents>;
     gameClient?: GameClient;
     gameClientSocket?: GameClientSocket;
-    joystick?: DirectionalJoystickWrapper;
+    joystick?: Joystick;
     isFullscreen = false;
     CLIENT_SPRITES_RELATIVE_URL = CLIENT_SPRITES_RELATIVE_URL;
     GameMapGridSizes = GameMapGridSizes;
@@ -230,9 +231,9 @@ export default class App extends Vue {
         });
 
         this.gameClientSocket = new GameClientSocket(this.socket, this.gameClient);
-        this.joystick = new DirectionalJoystickWrapper({
-            zone: this.$refs.dpad as HTMLElement,
-        });
+
+        const joystickElement = this.$refs.dpad as HTMLElement;
+        this.joystick = new Joystick(joystickElement);
 
         window.addEventListener('resize', this.onWindowResize);
         window.addEventListener('keydown', this.onNonGameKeyboardEvent);
@@ -251,8 +252,7 @@ export default class App extends Vue {
         shootButton.addEventListener('touchstart', this.onShootButtonTouchEvent);
         shootButton.addEventListener('touchend', this.onShootButtonTouchEvent);
 
-        this.joystick.on('dirdown', this.onJoystickEvent);
-        this.joystick.on('dirup', this.onJoystickEvent);
+        this.joystick.emitter.on(JoystickEvent.BUTTON_EVENT, this.onJoystickButtonEvent);
 
         if (screenfull.isEnabled) {
             screenfull.on('change', this.onFullscreenChanged);
@@ -346,8 +346,8 @@ export default class App extends Vue {
         event.preventDefault();
     }
 
-    onJoystickEvent(event: DirectionalJoystickEvent): void {
-        const action = ActionFactory.buildFromJoystickEvent(event.type, event.angle);
+    onJoystickButtonEvent(buttonType: ButtonType, buttonState: ButtonState): void {
+        const action = ActionFactory.buildFromButton(buttonType, buttonState);
         if (action === undefined) {
             return;
         }
@@ -577,7 +577,7 @@ button {
     width: 100%;
     height: 50%;
 
-    display: none;
+    display: flex;
 }
 
 #virtual-dpad {
@@ -601,7 +601,7 @@ button {
     padding: 8px;
 }
 
-@media (pointer: coarse) {
+/* @media (pointer: coarse) { */
     #virtual-controls {
         display: flex;
     }
@@ -609,5 +609,5 @@ button {
     #fullscreen-controls {
         display: block;
     }
-}
+/* } */
 </style>
