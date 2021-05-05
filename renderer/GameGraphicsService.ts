@@ -47,7 +47,7 @@ export default class GameGraphicsService {
             canvas.height = height;
         }
 
-        const minRenderSize = Math.max(width, height);
+        const minRenderSize = Math.min(width, height);
         this.scale = Math.ceil(minRenderSize / this.targetGameSize);
 
         this.gameWidth = width / this.scale;
