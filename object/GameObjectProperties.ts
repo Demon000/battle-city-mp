@@ -123,7 +123,7 @@ for (const property of properties) {
 }
 
 export default class GameObjectProperties {
-    static getTypeProperties(type: string): IGameObjectProperties {
+    static getTypeProperties(type: GameObjectType): IGameObjectProperties {
         const properties = typePropertiesMap.get(type);
         if (!properties) {
             throw new Error('Invalid type ' + type);
@@ -131,11 +131,16 @@ export default class GameObjectProperties {
         return properties;
     }
 
-    static getShortTypeProperties(shortType: string): IGameObjectProperties {
+    static getShortTypeProperties(shortType: GameShortObjectType): IGameObjectProperties {
         const properties = shortTypePropertiesMap.get(shortType);
         if (!properties) {
             throw new Error('Invalid short type ' + shortType);
         }
         return properties;
+    }
+
+    static getTypeFromShortType(shortType: GameShortObjectType): GameObjectType {
+        const properties = this.getShortTypeProperties(shortType);
+        return properties.type;
     }
 }

@@ -43,6 +43,7 @@ export interface GameServerEvents {
 }
 
 export default class GameServer {
+    private gameObjectFactory;
     private gameMapService;
     private playerRepository;
     private playerService;
@@ -61,6 +62,7 @@ export default class GameServer {
     emitter = new EventEmitter<GameServerEvents>();
 
     constructor() {
+        this.gameObjectFactory = new GameObjectFactory();
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>();
         this.collisionRules = rules;
@@ -69,7 +71,7 @@ export default class GameServer {
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
         this.tankService = new TankService(this.gameObjectRepository);
         this.bulletService = new BulletService(this.gameObjectRepository);
-        this.gameMapService = new GameMapService();
+        this.gameMapService = new GameMapService(this.gameObjectFactory);
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.playerRepository);
         this.teamRepository = new MapRepository<string, Team>();
@@ -536,7 +538,7 @@ export default class GameServer {
     }
 
     onMapEditorCreateObjects(objectsOptions: GameObjectOptions[]): void {
-        const objects = objectsOptions.map(o => GameObjectFactory.buildFromOptions(o));
+        const objects = objectsOptions.map(o => this.gameObjectFactory.buildFromOptions(o));
         this.gameObjectService.registerObjects(objects);
     }
 

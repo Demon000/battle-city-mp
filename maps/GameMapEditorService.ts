@@ -6,12 +6,17 @@ import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import Point from '@/physics/point/Point';
 
 export default class GameMapEditorService {
+    private gameObjectFactory;
     private enabled = false;
     private gridSize = 0;
     private selectedType = GameObjectType.NONE;
     private hoverPosition?: Point;
     private viewPosition?: Point;
     private ghostObjects = new Array<GameObject>();
+
+    constructor(gameObjectFactory: GameObjectFactory) {
+        this.gameObjectFactory = gameObjectFactory;
+    }
 
     getSnappedRelativePosition(position: Point): Point | undefined {
         if (this.viewPosition === undefined) {
@@ -49,9 +54,12 @@ export default class GameMapEditorService {
         for (let y = 0; y < this.gridSize; y += properties.height) {
             for (let x = 0; x < this.gridSize; x += properties.width) {
                 this.ghostObjects.push(
-                    GameObjectFactory.buildFromType(this.selectedType, {
-                        x: x + snappedPosition.x,
-                        y: y + snappedPosition.y,
+                    this.gameObjectFactory.buildFromOptions({
+                        type: this.selectedType,
+                        position: {
+                            x: x + snappedPosition.x,
+                            y: y + snappedPosition.y,
+                        },
                     }),
                 );
             }

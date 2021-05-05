@@ -11,7 +11,6 @@ export enum GameShortObjectType {
 }
 
 export enum GameObjectType {
-    ANY = 'any',
     NONE = 'none',
     BRICK_WALL = 'brick-wall',
     STEEL_WALL = 'steel-wall',
@@ -26,6 +25,14 @@ export enum GameObjectType {
     WATER = 'water',
     SAND = 'sand',
     GRASS = 'grass',
+}
+
+export function isGameShortObjectType(shortType: string): boolean {
+    return Object.values(GameShortObjectType).includes(shortType as any);
+}
+
+export function isGameObjectType(type: string): boolean {
+    return Object.values(GameObjectType).includes(type as any);
 }
 
 export const SavableGameObjectTypes = [

@@ -2,14 +2,14 @@ import fs from 'fs';
 import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import GameObjectFactory from '@/object/GameObjectFactory';
 import GameObjectProperties from '@/object/GameObjectProperties';
-import { GameShortObjectType } from '@/object/GameObjectType';
+import { GameShortObjectType, isGameShortObjectType } from '@/object/GameObjectType';
 import Team, { TeamOptions } from '@/team/Team';
 
 export interface GameMapOptions {
     resolution?: number;
     teamsOptions?: TeamOptions[];
     objectsFromBlocks?: string[];
-    objectsFromOptions?: Iterable<GameObjectOptions>;
+    objectsFromOptions?: GameObjectOptions[];
 }
 
 export default class GameMap {
@@ -30,20 +30,20 @@ export default class GameMap {
     }
 
     setObjectsFromOptions(objectsOptions: Iterable<GameObjectOptions>): void {
-        this.options.objectsFromOptions = objectsOptions;
+        this.options.objectsFromOptions = Array.from(objectsOptions);
     }
 
     setObjectsFromBlocks(objectsFromBlocks: string[]): void {
         this.options.objectsFromBlocks = objectsFromBlocks;
     }
 
-    getObjectsFromBlocks(): GameObject[] {
-        const objects = new Array<GameObject>();
+    getObjectssOptionsFromBlocks(): GameObjectOptions[] {
+        const objectsOptions = new Array<GameObjectOptions>();
         const splitBlocks = new Array<Array<string>>();
 
         if (this.options.resolution === undefined
             || this.options.objectsFromBlocks === undefined) {
-            return objects;
+            return objectsOptions;
         }
 
         for (const row of this.options.objectsFromBlocks) {
@@ -58,48 +58,43 @@ export default class GameMap {
             for (let bigX = 0; bigX < mapWidth; bigX += resolution) {
                 const mapColumn = bigX / resolution;
 
-                const shortType = splitBlocks[mapRow][mapColumn];
-                if (shortType === ' ') {
+                const shortTypeString = splitBlocks[mapRow][mapColumn];
+                if (shortTypeString === ' ') {
                     continue;
                 }
 
-                const properties = GameObjectProperties.getShortTypeProperties(shortType);
+                if (!isGameShortObjectType(shortTypeString)) {
+                    throw new Error(`Invalid short object type: ${shortTypeString}`);
+                }
+
+                const shortType = shortTypeString as GameShortObjectType;
+                const type = GameObjectProperties.getTypeFromShortType(shortType);
+                const properties = GameObjectProperties.getTypeProperties(type);
                 for (let smallY = bigY; smallY < bigY + resolution; smallY += properties.height) {
                     for (let smallX = bigX; smallX < bigX + resolution; smallX += properties.width) {
-                        const object = GameObjectFactory.buildFromShortType(shortType as GameShortObjectType, {
-                            y: smallY,
-                            x: smallX,
+                        objectsOptions.push({
+                            type,
+                            position: {
+                                y: smallY,
+                                x: smallX,
+                            },
                         });
-
-                        objects.push(object);
                     }
                 }
             }
         }
 
-        return objects;
+        return objectsOptions;
     }
 
-    getObjectsFromOptions(): GameObject[] {
-        const objects = new Array<GameObject>();
-
-        if (this.options.objectsFromOptions === undefined) {
-            return objects;
-        }
-
-        for (const objectOptions of this.options.objectsFromOptions) {
-            objects.push(
-                GameObjectFactory.buildFromOptions(objectOptions),
-            );
-        }
-
-        return objects;
+    getObjectsOptionsFromOptions(): GameObjectOptions[] {
+        return this.options.objectsFromOptions ?? [];
     }
 
-    getObjects(): GameObject[] {
-        const objectsFromBlocks = this.getObjectsFromBlocks();
-        const objectsFromOptions = this.getObjectsFromOptions();
-        return objectsFromOptions.concat(objectsFromBlocks);
+    getObjectsOptions(): GameObjectOptions[] {
+        const objectsOptionsFromBlocks = this.getObjectssOptionsFromBlocks();
+        const objectsOptionsFromOptions = this.getObjectsOptionsFromOptions();
+        return objectsOptionsFromOptions.concat(objectsOptionsFromBlocks);
     }
 
     getTeams(): Team[] | undefined {

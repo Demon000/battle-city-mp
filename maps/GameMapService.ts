@@ -1,6 +1,7 @@
 import { GameModeProperties } from '@/game-mode/GameModeProperties';
 import { GameModeType } from '@/game-mode/GameModeType';
 import GameObject, { GameObjectOptions } from '@/object/GameObject';
+import GameObjectFactory from '@/object/GameObjectFactory';
 import Team from '@/team/Team';
 import LazyIterable from '@/utils/LazyIterable';
 import EventEmitter from 'eventemitter3';
@@ -18,9 +19,14 @@ interface GameMapServiceEvents {
 }
 
 export default class GameMapService {
+    private gameObjectFactory;
     private map?: GameMap;
     private gameMode?: GameModeType;
     emitter = new EventEmitter<GameMapServiceEvents>();
+
+    constructor(gameObjectFactory: GameObjectFactory) {
+        this.gameObjectFactory = gameObjectFactory;
+    }
 
     setGameMode(gameMode: GameModeType): void {
         this.gameMode = gameMode;
@@ -38,9 +44,10 @@ export default class GameMapService {
         let message = `Loaded map from ${path} with: `;
         this.map = new GameMap(path);
 
-        const objects = this.map.getObjects();
+        const objectsOptions = this.map.getObjectsOptions();
+        const objects = objectsOptions.map(o => this.gameObjectFactory.buildFromOptions(o));
         this.emitter.emit(GameMapServiceEvent.OBJECTS_SPAWNED, objects);
-        message += `${objects.length} objects`;
+        message += `${objectsOptions.length} objects`;
 
         const gameModeProperties = GameModeProperties.getTypeProperties(this.gameMode);
         if (gameModeProperties.hasTeams) {

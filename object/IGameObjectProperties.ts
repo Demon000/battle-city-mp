@@ -1,4 +1,5 @@
 import IDrawable from '@/drawable/IDrawable';
+import { GameObjectType, GameShortObjectType } from './GameObjectType';
 
 // eslint-disable-next-line
 export type ResourceMeta = Record<string, any>;
@@ -17,8 +18,8 @@ export interface IAudioEffect {
 }
 
 export default interface IGameObjectProperties {
-    type: string;
-    shortType?: string;
+    type: GameObjectType;
+    shortType?: GameShortObjectType;
 
     width: number;
     height: number;

@@ -33,6 +33,7 @@ export interface GameClientEvents {
 }
 
 export default class GameClient {
+    private gameObjectFactory;
     private playerRepository;
     private playerService;
     private teamRepository;
@@ -51,6 +52,7 @@ export default class GameClient {
     ticker;
 
     constructor(canvases: HTMLCanvasElement[]) {
+        this.gameObjectFactory = new GameObjectFactory();
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>();
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);
@@ -64,7 +66,7 @@ export default class GameClient {
         this.gameGraphicsService = new GameGraphicsService(canvases, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
         this.objectAudioRendererRepository = new MapRepository<number, GameObjectAudioRenderer>();
         this.gameAudioService = new GameAudioService(this.objectAudioRendererRepository);
-        this.gameMapEditorService = new GameMapEditorService();
+        this.gameMapEditorService = new GameMapEditorService(this.gameObjectFactory);
         this.emitter = new EventEmitter<GameClientEvents>();
         this.ticker = new Ticker();
 
@@ -86,7 +88,7 @@ export default class GameClient {
     }
 
     onObjectRegistered(objectOptions: GameObjectOptions): void {
-        const object = GameObjectFactory.buildFromOptions(objectOptions);
+        const object = this.gameObjectFactory.buildFromOptions(objectOptions);
         this.gameObjectService.registerObject(object);
         this.collisionService.registerObjectCollisions(object.id);
     }
@@ -134,7 +136,7 @@ export default class GameClient {
 
         const objects =
             LazyIterable.from(serverStatus.objectsOptions)
-                .map(o => GameObjectFactory.buildFromOptions(o));
+                .map(o => this.gameObjectFactory.buildFromOptions(o));
         this.gameObjectService.registerObjects(objects);
 
         const objectIds = objects.map(o => o.id);
