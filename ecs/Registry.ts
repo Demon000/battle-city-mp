@@ -11,15 +11,15 @@ export enum RegistryEvent {
 }
 
 export interface RegistryEvents {
-    [RegistryEvent.COMPONENT_ATTACHED]: (registry: Registry, tag: string, component: Component) => void;
-    [RegistryEvent.COMPONENT_DETACHED]: (registry: Registry, tag: string, component: Component) => void;
+    [RegistryEvent.COMPONENT_ATTACHED]: (registry: Registry, tag: string, component: Component<any>) => void;
+    [RegistryEvent.COMPONENT_DETACHED]: (registry: Registry, tag: string, component: Component<any>) => void;
 }
 
 export default class Registry {
     private idGenerator;
-    private tagsComponentsMap = new Map<string, Set<Component>>();
-    private componentsEntitiesMap = new Map<Component, Entity>();
-    private entitiesComponentsMap = new Map<Entity, Map<string, Component>>();
+    private tagsComponentsMap = new Map<string, Set<Component<any>>>();
+    private componentsEntitiesMap = new Map<Component<any>, Entity>();
+    private entitiesComponentsMap = new Map<Entity, Map<string, Component<any>>>();
     emitter = new EventEmitter<RegistryEvents>();
 
     constructor(idGenerator: RegistryIDGenerator) {
@@ -28,7 +28,7 @@ export default class Registry {
 
     registerEntity(entity: Entity): void {
         assert(!this.entitiesComponentsMap.has(entity));
-        this.entitiesComponentsMap.set(entity, new Map<string, Component>());
+        this.entitiesComponentsMap.set(entity, new Map<string, Component<any>>());
     }
 
     createEntity(): Entity {
@@ -50,21 +50,21 @@ export default class Registry {
         }
     }
 
-    getOrCreateTagComponents(tag: string): Set<Component> {
+    getOrCreateTagComponents(tag: string): Set<Component<any>> {
         let tagComponents = this.tagsComponentsMap.get(tag);
         if (tagComponents === undefined) {
-            tagComponents = new Set<Component>();
+            tagComponents = new Set<Component<any>>();
             this.tagsComponentsMap.set(tag, tagComponents);
         }
 
         return tagComponents;
     }
 
-    attachComponent(entity: Entity, tag: string, value: any): void {
+    attachComponent<T>(entity: Entity, tag: string, value: T): void {
         const componentsMap = this.entitiesComponentsMap.get(entity);
         assert(componentsMap);
 
-        const component = new Component(value);
+        const component = new Component<T>(value);
         assert(!componentsMap.has(tag));
         componentsMap.set(tag, component);
 
@@ -98,7 +98,7 @@ export default class Registry {
         this.emitter.emit(RegistryEvent.COMPONENT_DETACHED, this, tag, component);
     }
 
-    findComponent(entity: Entity, tag: string): Component | undefined {
+    findComponent(entity: Entity, tag: string): Component<any> | undefined {
         const componentsMap = this.entitiesComponentsMap.get(entity);
         assert(componentsMap);
 
@@ -110,13 +110,13 @@ export default class Registry {
         return component !== undefined;
     }
 
-    getComponent(entity: Entity, tag: string): Component {
+    getComponent(entity: Entity, tag: string): Component<any> {
         const component = this.findComponent(entity, tag);
         assert(component);
         return component;
     }
 
-    getEntity(component: Component): Entity {
+    getEntity(component: Component<any>): Entity {
         const entity = this.componentsEntitiesMap.get(component);
         assert(entity);
         return entity;
@@ -126,18 +126,17 @@ export default class Registry {
         return this.entitiesComponentsMap.keys();
     }
 
-    getComponents(tag: string): IterableIterator<Component> {
+    getComponents(tag: string): IterableIterator<Component<any>> {
         return this.getOrCreateTagComponents(tag).keys();
     }
 
     getView(tag: string, ...tags: string[]): Iterable<Entity> {
-        const components = this.getComponents(tag);
-
-        const that = this;
         return {
-            [Symbol.iterator](): Iterator<Entity> {
-                return new RegistryViewIterator(that, components, tags);
-            },
+            [Symbol.iterator]: () => new RegistryViewIterator(
+                this,
+                this.getComponents(tag),
+                tags,
+            ),
         };
     }
 }

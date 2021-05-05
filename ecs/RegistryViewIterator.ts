@@ -7,7 +7,7 @@ export default class RegistryViewIterator implements Iterator<Entity> {
     private components;
     private tags;
 
-    constructor(registry: Registry, components: IterableIterator<Component>, tags: string[]) {
+    constructor(registry: Registry, components: IterableIterator<Component<any>>, tags: string[]) {
         this.registry = registry;
         this.components = components;
         this.tags = tags;

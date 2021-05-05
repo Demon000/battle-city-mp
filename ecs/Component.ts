@@ -1,7 +1,7 @@
-export default class Component {
+export default class Component<T> {
     value;
 
-    constructor(value: any) {
+    constructor(value: T) {
         this.value = value;
     }
 }
