@@ -16,7 +16,7 @@ export default class RegistryViewIterator implements Iterator<Entity> {
     next(): IteratorResult<Entity, undefined> {
         let currentComponent;
         let foundEntity;
-        while (currentComponent = this.components.next().value) {
+        while ((currentComponent = this.components.next().value)) {
             const entity = this.registry.getEntity(currentComponent);
             let hasAllTags = true;
 

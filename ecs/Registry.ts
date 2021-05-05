@@ -137,7 +137,7 @@ export default class Registry {
         return {
             [Symbol.iterator](): Iterator<Entity> {
                 return new RegistryViewIterator(that, components, tags);
-            }
+            },
         };
     }
 }
