@@ -120,7 +120,6 @@ export default class GameClient {
 
     onServerStatus(serverStatus: GameServerStatus): void {
         this.clear();
-        console.log(serverStatus);
         const players =
             LazyIterable.from(serverStatus.playersOptions)
                 .map(o => new Player(o));
