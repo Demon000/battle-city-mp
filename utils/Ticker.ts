@@ -11,6 +11,7 @@ interface TickerEvents {
 
 export default class Ticker {
     tickTime?: number;
+    lastRequestId?: number;
     lastTickTime = 0;
     deltaSeconds = 0;
     running = false;
@@ -60,7 +61,10 @@ export default class Ticker {
     }
 
     callRequestAnimationFrame(): void {
-        requestAnimationFrame(this.requestAnimationFrameWrapper);
+        if (this.lastRequestId !== undefined) {
+            cancelAnimationFrame(this.lastRequestId);
+        }
+        this.lastRequestId = requestAnimationFrame(this.requestAnimationFrameWrapper);
     }
 
     callSetTimeout(): void {
