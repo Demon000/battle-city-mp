@@ -1,6 +1,5 @@
 import fs from 'fs';
-import GameObject, { GameObjectOptions } from '@/object/GameObject';
-import GameObjectFactory from '@/object/GameObjectFactory';
+import { GameObjectOptions } from '@/object/GameObject';
 import GameObjectProperties from '@/object/GameObjectProperties';
 import { GameShortObjectType, isGameShortObjectType } from '@/object/GameObjectType';
 import Team, { TeamOptions } from '@/team/Team';
