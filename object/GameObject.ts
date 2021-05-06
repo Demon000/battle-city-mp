@@ -8,7 +8,7 @@ import IGameObjectProperties, { ResourceMeta } from './IGameObjectProperties';
 export interface GameObjectOptions {
     id?: number;
     type?: GameObjectType;
-    position: Point;
+    position?: Point;
     direction?: Direction;
     movementSpeed?: number;
     movementDirection?: Direction | null;
@@ -40,7 +40,7 @@ export default class GameObject {
 
         this.id = options.id ?? GameObject.globalId++;
         this.type = options.type;
-        this.position = options.position;
+        this.position = options.position ?? {x: 0, y: 0};
         this.direction = options.direction ?? Direction.UP;
         this.movementSpeed = options.movementSpeed ?? 0;
         this.movementDirection = options.movementDirection ?? null;
