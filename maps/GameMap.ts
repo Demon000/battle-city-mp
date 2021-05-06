@@ -67,12 +67,11 @@ export default class GameMap {
                 }
 
                 const shortType = shortTypeString as GameShortObjectType;
-                const type = GameObjectProperties.getTypeFromShortType(shortType);
-                const properties = GameObjectProperties.getTypeProperties(type);
+                const properties = GameObjectProperties.getShortTypeProperties(shortType);
                 for (let smallY = bigY; smallY < bigY + resolution; smallY += properties.height) {
                     for (let smallX = bigX; smallX < bigX + resolution; smallX += properties.width) {
                         objectsOptions.push({
-                            type,
+                            type: properties.type,
                             position: {
                                 y: smallY,
                                 x: smallX,

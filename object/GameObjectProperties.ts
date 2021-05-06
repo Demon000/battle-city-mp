@@ -138,9 +138,4 @@ export default class GameObjectProperties {
         }
         return properties;
     }
-
-    static getTypeFromShortType(shortType: GameShortObjectType): GameObjectType {
-        const properties = this.getShortTypeProperties(shortType);
-        return properties.type;
-    }
 }
