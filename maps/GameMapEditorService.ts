@@ -1,6 +1,5 @@
 import GameObject from '@/object/GameObject';
 import GameObjectFactory from '@/object/GameObjectFactory';
-import GameObjectProperties from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import Point from '@/physics/point/Point';
@@ -45,24 +44,33 @@ export default class GameMapEditorService {
             return;
         }
 
-        const properties = GameObjectProperties.getTypeProperties(this.selectedType);
+
         const snappedPosition = this.getSnappedRelativePosition(this.hoverPosition);
         if (snappedPosition === undefined) {
             return;
         }
 
-        for (let y = 0; y < this.gridSize; y += properties.height) {
-            for (let x = 0; x < this.gridSize; x += properties.width) {
-                this.ghostObjects.push(
-                    this.gameObjectFactory.buildFromOptions({
-                        type: this.selectedType,
-                        position: {
-                            x: x + snappedPosition.x,
-                            y: y + snappedPosition.y,
-                        },
-                    }),
-                );
+        let object;
+        for (let y = 0; y < this.gridSize;) {
+            for (let x = 0; x < this.gridSize;) {
+                object = this.gameObjectFactory.buildFromOptions({
+                    type: this.selectedType,
+                    position: {
+                        x: snappedPosition.x + x,
+                        y: snappedPosition.y + y,
+                    },
+                });
+
+                x += object.width;
+
+                this.ghostObjects.push(object);
             }
+
+            if (object === undefined) {
+                return;
+            }
+
+            y += object.height;
         }
     }
 

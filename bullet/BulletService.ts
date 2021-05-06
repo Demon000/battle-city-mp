@@ -1,5 +1,4 @@
 import GameObject from '@/object/GameObject';
-import GameObjectProperties from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import DirectionUtils from '@/physics/collisions/DirectionUtils';
@@ -43,8 +42,8 @@ export default class BulletService {
         const bulletCenter = bullet.centerPosition;
         const brickWallCenterPosition = brickWall.centerPosition;
 
-        const brickWallWidth = brickWall.properties.width;
-        const brickWallHeight = brickWall.properties.height;
+        const brickWallWidth = brickWall.width;
+        const brickWallHeight = brickWall.height;
         if (DirectionUtils.isHorizontalAxis(bullet.direction)) {
             if (bulletCenter.y > brickWallCenterPosition.y) {
                 box.tl.y -= brickWallHeight;
@@ -84,24 +83,22 @@ export default class BulletService {
 
     spawnBulletForTank(tank: Tank): void {
         const objectCenterPosition = tank.centerPosition;
-        const properties = GameObjectProperties.getTypeProperties(GameObjectType.BULLET);
-
-        const bulletY = objectCenterPosition.y - properties.height / 2;
-        const bulletX = objectCenterPosition.x - properties.width / 2;
-
         const bullet = new Bullet({
-            type: GameObjectType.BULLET,
             direction: tank.direction,
             movementDirection: tank.direction,
-            position: {
-                y: bulletY,
-                x: bulletX,
-            },
             movementSpeed: tank.bulletSpeed,
             tankId: tank.id,
             playerId: tank.playerId,
             power: tank.bulletPower,
         });
+
+        const bulletY = objectCenterPosition.y - bullet.height / 2;
+        const bulletX = objectCenterPosition.x - bullet.width / 2;
+
+        bullet.position = {
+            y: bulletY,
+            x: bulletX,
+        };
 
         this.emitter.emit(BulletServiceEvent.BULLET_SPAWNED, bullet);
     }

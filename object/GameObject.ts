@@ -85,6 +85,10 @@ export default class GameObject {
         return this.properties.height;
     }
 
+    get directionAxisSnapping(): number | undefined {
+        return this.properties.directionAxisSnapping;
+    }
+
     get isMoving(): boolean {
         return this.movementSpeed > 0;
     }
@@ -96,7 +100,7 @@ export default class GameObject {
         };
     }
 
-    get properties(): IGameObjectProperties {
+    private get properties(): IGameObjectProperties {
         return GameObjectProperties.getTypeProperties(this.type);
     }
 
@@ -128,8 +132,8 @@ export default class GameObject {
         return {
             tl: position,
             br: {
-                y: position.y + this.properties.height,
-                x: position.x + this.properties.width,
+                y: position.y + this.height,
+                x: position.x + this.width,
             },
         };
     }

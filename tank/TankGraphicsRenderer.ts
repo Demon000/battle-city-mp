@@ -51,7 +51,7 @@ export default class TankGraphicsRenderer extends GameObjectGraphicsRenderer<Tan
             let offsetY = 0;
             let positionYReference: TextPositionReference | undefined = 'end';
             if (direction === Direction.UP) {
-                offsetY = this.object.properties.height;
+                offsetY = this.object.height;
                 positionYReference = undefined;
             }
 

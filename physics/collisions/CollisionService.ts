@@ -306,16 +306,16 @@ export default class CollisionService {
 
         this.emitter.emit(CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED, objectId, direction);
 
-        if (gameObject.properties.directionAxisSnapping !== undefined &&
+        if (gameObject.directionAxisSnapping !== undefined &&
                 !DirectionUtils.isSameAxis(oldDirection, direction)) {
             let x = gameObject.position.x;
             let y = gameObject.position.y;
             if (DirectionUtils.isHorizontalAxis(direction)) {
                 y = this.calculateSnappedCoordinates(gameObject.position.y,
-                    gameObject.properties.directionAxisSnapping);
+                    gameObject.directionAxisSnapping);
             } else {
                 x = this.calculateSnappedCoordinates(gameObject.position.x,
-                    gameObject.properties.directionAxisSnapping);
+                    gameObject.directionAxisSnapping);
             }
 
             this.validateObjectMovement(objectId, {
