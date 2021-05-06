@@ -7,6 +7,7 @@ import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
 import GameObjectGraphicsRendererFactory from '../object/GameObjectGraphicsRendererFactory';
 
 export default class GameGraphicsService {
+    private rendererFactory;
     private scale = 0;
     private gameWidth = 0;
     private gameHeight = 0;
@@ -18,9 +19,11 @@ export default class GameGraphicsService {
     private showInvisible = false;
 
     constructor(
+        rendererFactory: GameObjectGraphicsRendererFactory,
         canvases: HTMLCanvasElement[],
         targetGameSize: number,
     ) {
+        this.rendererFactory = rendererFactory;
         this.canvases = canvases;
         this.targetGameSize = targetGameSize;
 
@@ -68,7 +71,7 @@ export default class GameGraphicsService {
 
     getObjectRenderer(object: GameObject): GameObjectGraphicsRenderer {
         if (object.graphicsRenderer === undefined) {
-            object.graphicsRenderer = GameObjectGraphicsRendererFactory
+            object.graphicsRenderer = this.rendererFactory
                 .buildFromObject(object);
         }
 

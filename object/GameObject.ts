@@ -32,6 +32,7 @@ export default class GameObject {
     destroyed = false;
 
     graphicsRenderer?: any;
+    audioRenderer?: any;
 
     constructor(options: GameObjectOptions) {
         if (options.type === undefined) {

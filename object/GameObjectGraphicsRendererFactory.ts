@@ -9,7 +9,7 @@ import Bullet from '@/bullet/Bullet';
 import BulletGraphicsRenderer from '@/bullet/BulletGraphicsRenderer';
 
 export default class GameObjectGraphicsRendererFactory {
-    static buildFromObject(
+    buildFromObject(
         object: GameObject,
     ): GameObjectGraphicsRenderer {
         switch (object.type) {

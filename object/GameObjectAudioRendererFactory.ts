@@ -5,7 +5,7 @@ import TankAudioRenderer from '@/tank/TankAudioRenderer';
 import ExplosionAudioRenderer from '@/explosion/ExplosionAudioRenderer';
 
 export default class GameObjectAudioRendererFactory {
-    static buildFromObject(
+    buildFromObject(
         object: GameObject,
         context: AudioContext,
         finalNode: AudioNode,

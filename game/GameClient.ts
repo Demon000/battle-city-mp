@@ -11,7 +11,6 @@ import BoundingBoxRepository from '../physics/bounding-box/BoundingBoxRepository
 import CollisionService from '../physics/collisions/CollisionService';
 import Player, { PartialPlayerOptions, PlayerOptions } from '../player/Player';
 import PlayerService, { PlayerServiceEvent } from '../player/PlayerService';
-import GameObjectAudioRenderer from '@/object/GameObjectAudioRenderer';
 import GameMapEditorService from '@/maps/GameMapEditorService';
 import { GameObjectType } from '@/object/GameObjectType';
 import Point from '@/physics/point/Point';
@@ -23,6 +22,8 @@ import TeamService from '@/team/TeamService';
 import PlayerStats from '@/player/PlayerStats';
 import TankService from '@/tank/TankService';
 import LazyIterable from '@/utils/LazyIterable';
+import GameObjectGraphicsRendererFactory from '@/object/GameObjectGraphicsRendererFactory';
+import GameObjectAudioRendererFactory from '@/object/GameObjectAudioRendererFactory';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -44,8 +45,9 @@ export default class GameClient {
     private boundingBoxRepository;
     private collisionService;
     private gameCamera;
+    private graphicsRendererFactory;
     private gameGraphicsService;
-    private objectAudioRendererRepository;
+    private audioRendererFactory;
     private gameAudioService;
     private gameMapEditorService;
     emitter;
@@ -63,9 +65,10 @@ export default class GameClient {
         this.teamRepository = new MapRepository<string, Team>();
         this.teamService = new TeamService(this.teamRepository);
         this.gameCamera = new GameCamera();
-        this.gameGraphicsService = new GameGraphicsService(canvases, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
-        this.objectAudioRendererRepository = new MapRepository<number, GameObjectAudioRenderer>();
-        this.gameAudioService = new GameAudioService(this.objectAudioRendererRepository);
+        this.graphicsRendererFactory = new GameObjectGraphicsRendererFactory();
+        this.gameGraphicsService = new GameGraphicsService(this.graphicsRendererFactory, canvases, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
+        this.audioRendererFactory = new GameObjectAudioRendererFactory();
+        this.gameAudioService = new GameAudioService(this.audioRendererFactory);
         this.gameMapEditorService = new GameMapEditorService(this.gameObjectFactory);
         this.emitter = new EventEmitter<GameClientEvents>();
         this.ticker = new Ticker();
@@ -73,6 +76,12 @@ export default class GameClient {
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED,
             (objectId: number, box: BoundingBox) => {
                 this.collisionService.updateObjectCollisions(objectId, box);
+            });
+
+        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BEFORE_UNREGISTER,
+            (objectId: number) => {
+                const object = this.gameObjectService.getObject(objectId);
+                this.gameAudioService.stopAudioPlayback(object);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYERS_CHANGED,
@@ -96,7 +105,6 @@ export default class GameClient {
     onObjectUnregistered(objectId: number): void {
         this.gameObjectService.unregisterObject(objectId);
         this.collisionService.unregisterObjectCollisions(objectId);
-        this.gameAudioService.removeObjectAudioRenderer(objectId);
     }
 
     onPlayerAdded(playerOptions: PlayerOptions): void {

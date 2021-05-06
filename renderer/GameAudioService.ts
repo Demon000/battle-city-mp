@@ -7,19 +7,20 @@ import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import BoundingBoxUtils from '@/physics/bounding-box/BoundingBoxUtils';
 import Point from '@/physics/point/Point';
 import CartesianUtils from '@/utils/CartesianUtils';
-import MapRepository from '@/utils/MapRepository';
 import axios from 'axios';
 
 export default class GameAudioService {
+    private rendererFactory;
     private context;
     private compressorNode;
     private finalNode;
-    private objectAudioRendererRepository;
     private objectsPlayingAudioEffects = new Set<GameObject>();
     private maxAudibleDistance = CLIENT_CONFIG_VISIBLE_GAME_SIZE / 2;
 
-    constructor(objectAudioRendererRepository: MapRepository<number, GameObjectAudioRenderer>) {
-        this.objectAudioRendererRepository = objectAudioRendererRepository;
+    constructor(
+        rendererFactory: GameObjectAudioRendererFactory,
+    ) {
+        this.rendererFactory = rendererFactory;
         this.context = new AudioContext();
         this.compressorNode = new DynamicsCompressorNode(this.context);
         this.compressorNode.connect(this.context.destination);
@@ -60,29 +61,22 @@ export default class GameAudioService {
     }
 
     getOrCreateAudioRenderer(object: GameObject): GameObjectAudioRenderer {
-        let audioRenderer = this.objectAudioRendererRepository.find(object.id);
-        if (audioRenderer === undefined) {
-            audioRenderer = GameObjectAudioRendererFactory.buildFromObject(
+        if (object.audioRenderer === undefined) {
+            object.audioRenderer = this.rendererFactory.buildFromObject(
                 object, this.context, this.finalNode, this.maxAudibleDistance);
-            this.objectAudioRendererRepository.add(object.id, audioRenderer);
-        }
-    
-        return audioRenderer;
-    }
-
-    findAudioRenderer(objectId: number): GameObjectAudioRenderer | undefined {
-        return this.objectAudioRendererRepository.find(objectId);
-    }
-
-    removeObjectAudioRenderer(objectId: number): void {
-        const audioRenderer = this.findAudioRenderer(objectId);
-        if (audioRenderer === undefined) {
-            return;
         }
 
+        return object.audioRenderer;
+    }
+
+    findAudioRenderer(object: GameObject): GameObjectAudioRenderer {
+        return object.audioRenderer;
+    }
+
+    stopAudioPlayback(object: GameObject): void {
+        const audioRenderer = this.findAudioRenderer(object);
         audioRenderer.stop();
         this.objectsPlayingAudioEffects.delete(audioRenderer.object);
-        this.objectAudioRendererRepository.remove(objectId);
     }
 
     playObjectsAudioEffect(objects: Iterable<GameObject>, point: Point, box: BoundingBox): void {
@@ -116,7 +110,5 @@ export default class GameAudioService {
             const audioRenderer = this.getOrCreateAudioRenderer(object);
             audioRenderer.stop();
         }
-
-        this.objectAudioRendererRepository.clear();
     }
 }
