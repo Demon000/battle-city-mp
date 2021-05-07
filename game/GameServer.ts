@@ -5,9 +5,7 @@ import { SERVER_CONFIG_TPS } from '@/config';
 import { Color } from '@/drawable/Color';
 import Explosion from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
-import { GameModeProperties } from '@/game-mode/GameModeProperties';
-import { GameModeType } from '@/game-mode/GameModeType';
-import { SameTeamBulletHitMode } from '@/game-mode/IGameModeProperties';
+import { GameModesProperties, SameTeamBulletHitMode } from '@/game-mode/IGameModeProperties';
 import GameObjectFactory from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
@@ -36,6 +34,10 @@ import Player, { PartialPlayerOptions, PlayerSpawnStatus } from '../player/Playe
 import PlayerService, { PlayerServiceEvent } from '../player/PlayerService';
 import { BroadcastBatchGameEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
 import GameEventBatcher, { GameEventBatcherEvent } from './GameEventBatcher';
+import JSON5 from 'json5';
+import GameModeService from '@/game-mode/GameModeService';
+import { assertType } from 'typescript-is';
+import fs from 'fs';
 
 export interface GameServerEvents {
     [GameEvent.BROADCAST_BATCH]: (events: BroadcastBatchGameEvent[]) => void,
@@ -43,6 +45,10 @@ export interface GameServerEvents {
 }
 
 export default class GameServer {
+    private gameModesPropertiesText;
+    private gameModesPropertiesData;
+    private gameModesProperties;
+    private gameModeService;
     private gameObjectFactory;
     private gameMapService;
     private playerRepository;
@@ -62,6 +68,10 @@ export default class GameServer {
     emitter = new EventEmitter<GameServerEvents>();
 
     constructor() {
+        this.gameModesPropertiesText = fs.readFileSync('./game-mode/game-modes-properties.json5', 'utf8');
+        this.gameModesPropertiesData = JSON5.parse(this.gameModesPropertiesText);
+        this.gameModesProperties = assertType<GameModesProperties>(this.gameModesPropertiesData);
+        this.gameModeService = new GameModeService(this.gameModesPropertiesData);
         this.gameObjectFactory = new GameObjectFactory();
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>();
@@ -177,19 +187,10 @@ export default class GameServer {
                 const player = this.playerService.getPlayer(playerId);
 
                 if (status === PlayerSpawnStatus.SPAWN && player.tankId === null) {
-                    const gameMode = this.gameMapService.getGameMode();
-                    if (gameMode === undefined) {
-                        return;
-                    }
-
                     let teamId;
-                    const gameModeProperties = GameModeProperties.getTypeProperties(gameMode);
+                    const gameModeProperties = this.gameModeService.getGameModeProperties();
                     if (gameModeProperties.hasTeams && player.teamId === null) {
-                        const team = this.teamService.findTeamWithLeastPlayers();
-                        if (team === undefined) {
-                            return;
-                        }
-
+                        const team = this.teamService.getTeamWithLeastPlayers();
                         this.setPlayerTeam(playerId, team.id);
                         teamId = team.id;
                     } else if (gameModeProperties.hasTeams && player.teamId !== null) {
@@ -410,13 +411,7 @@ export default class GameServer {
                 }
 
                 const tank = this.tankService.getTank(tankId);
-
-                const gameMode = this.gameMapService.getGameMode();
-                if (gameMode === undefined) {
-                    return;
-                }
-
-                const gameModeProperties = GameModeProperties.getTypeProperties(gameMode);
+                const gameModeProperties = this.gameModeService.getGameModeProperties();
 
                 let ignoreBulletDamage = false;
                 let destroyBullet = false;
@@ -500,7 +495,7 @@ export default class GameServer {
                 this.gameEventBatcher.flush();
             });
 
-        this.gameMapService.setGameMode(GameModeType.TEAM_DEATHMATCH);
+        this.gameModeService.setGameMode('team-deathmatch');
         this.gameMapService.loadFromFile('./maps/simple.json');
     }
 
@@ -566,12 +561,7 @@ export default class GameServer {
     }
 
     onPlayerRequestedTeam(playerId: string, teamId: string): void {
-        const gameMode = this.gameMapService.getGameMode();
-        if (gameMode === undefined) {
-            return;
-        }
-
-        const gameModeProperties = GameModeProperties.getTypeProperties(gameMode);
+        const gameModeProperties = this.gameModeService.getGameModeProperties();
         if (!gameModeProperties.hasTeams) {
             return;
         }
@@ -586,15 +576,10 @@ export default class GameServer {
         if (player.teamId !== null) {
             existingTeam = this.teamService.getTeam(player.teamId);
         } else {
-            existingTeam = this.teamService.findTeamWithLeastPlayers();
+            existingTeam = this.teamService.getTeamWithLeastPlayers();
         }
 
-        if (existingTeam === undefined) {
-            return;
-        }
-
-        if (!this.teamService.isTeamSwitchingAllowed(existingTeam.id,
-            team.id)) {
+        if (!this.teamService.isTeamSwitchingAllowed(existingTeam.id, team.id)) {
             return;
         }
 
@@ -607,13 +592,8 @@ export default class GameServer {
     }
 
     onPlayerRequestTankColor(playerId: string, color: Color): void {
-        const gameMode = this.gameMapService.getGameMode();
-        if (gameMode === undefined) {
-            return;
-        }
-
-        const gameModeProperties = GameModeProperties.getTypeProperties(gameMode);
-        if (gameModeProperties.hasTeams) {
+        const gameModeProperties = this.gameModeService.getGameModeProperties();
+        if (!gameModeProperties.hasTeams) {
             return;
         }
 

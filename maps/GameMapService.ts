@@ -1,5 +1,3 @@
-import { GameModeProperties } from '@/game-mode/GameModeProperties';
-import { GameModeType } from '@/game-mode/GameModeType';
 import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import GameObjectFactory from '@/object/GameObjectFactory';
 import Team from '@/team/Team';
@@ -21,26 +19,13 @@ interface GameMapServiceEvents {
 export default class GameMapService {
     private gameObjectFactory;
     private map?: GameMap;
-    private gameMode?: GameModeType;
     emitter = new EventEmitter<GameMapServiceEvents>();
 
     constructor(gameObjectFactory: GameObjectFactory) {
         this.gameObjectFactory = gameObjectFactory;
     }
 
-    setGameMode(gameMode: GameModeType): void {
-        this.gameMode = gameMode;
-    }
-
-    getGameMode(): GameModeType | undefined {
-        return this.gameMode;
-    }
-
     loadFromFile(path: string): void {
-        if (this.gameMode === undefined) {
-            throw new Error('Cannot load map without a game mode');
-        }
-
         let message = `Loaded map from ${path} with: `;
         this.map = new GameMap(path);
 
@@ -49,15 +34,9 @@ export default class GameMapService {
         this.emitter.emit(GameMapServiceEvent.OBJECTS_SPAWNED, objects);
         message += `${objectsOptions.length} objects`;
 
-        const gameModeProperties = GameModeProperties.getTypeProperties(this.gameMode);
-        if (gameModeProperties.hasTeams) {
-            const teams = this.map.getTeams();
-            if (teams === undefined) {
-                throw new Error('Cannot load map without teams in game mode that has teams');
-            }
-            this.emitter.emit(GameMapServiceEvent.TEAMS_CREATED, teams);
-            message += `, ${teams.length} teams`;
-        }
+        const teams = this.map.getTeams();
+        this.emitter.emit(GameMapServiceEvent.TEAMS_CREATED, teams);
+        message += `, ${teams.length} teams`;
 
         console.log(message);
     }

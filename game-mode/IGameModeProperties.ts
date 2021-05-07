@@ -8,3 +8,5 @@ export interface IGameModeProperties {
     hasTeams: boolean;
     sameTeamBulletHitMode: SameTeamBulletHitMode;
 }
+
+export type GameModesProperties = Record<string, IGameModeProperties>;

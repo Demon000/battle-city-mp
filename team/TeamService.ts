@@ -51,7 +51,7 @@ export default class TeamService {
         this.emitter.emit(TeamServiceEvent.TEAM_PLAYER_REMOVED, teamId, playerId);
     }
 
-    findTeamWithLeastPlayers(): Team | undefined {
+    getTeamWithLeastPlayers(): Team {
         let foundTeam;
 
         const teams = this.repository.getAll();
@@ -60,6 +60,10 @@ export default class TeamService {
                 || team.playerIds.length < foundTeam.playerIds.length) {
                 foundTeam = team;
             }
+        }
+
+        if (foundTeam === undefined) {
+            throw new Error('Failed to find team');
         }
 
         return foundTeam;
