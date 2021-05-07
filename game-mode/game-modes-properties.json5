@@ -1,0 +1,10 @@
+{
+    'deathmatch': {
+        hasTeams: false,
+        sameTeamBulletHitMode: 'allow',
+    },
+    'team-deathmatch': {
+        hasTeams: true,
+        sameTeamBulletHitMode: 'destroy',
+    }
+}
