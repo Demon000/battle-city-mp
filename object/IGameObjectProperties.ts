@@ -1,4 +1,3 @@
-import IDrawable from '@/drawable/IDrawable';
 import { GameObjectType, GameShortObjectType } from './GameObjectType';
 
 // eslint-disable-next-line
@@ -26,6 +25,5 @@ export default interface IGameObjectProperties {
     directionAxisSnapping?: number;
     automaticDestroyTime?: number;
 
-    drawables?: IDrawable[];
     audioEffects?: IAudioEffect[];
 }
