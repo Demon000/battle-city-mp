@@ -1,42 +1,36 @@
 import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import GameObjectFactory from '@/object/GameObjectFactory';
-import Team from '@/team/Team';
+import { TeamOptions } from '@/team/Team';
 import LazyIterable from '@/utils/LazyIterable';
 import EventEmitter from 'eventemitter3';
 import GameMap from './GameMap';
 
 
 export enum GameMapServiceEvent {
-    OBJECTS_SPAWNED = 'objects-spawned',
-    TEAMS_CREATED = 'teams-created',
+    MAP_OBJECTS_OPTIONS = 'map-objects-options',
+    MAP_TEAMS_OPTIONS = 'map-teams-options',
 }
 
 interface GameMapServiceEvents {
-    [GameMapServiceEvent.OBJECTS_SPAWNED]: (objects: GameObject[]) => void;
-    [GameMapServiceEvent.TEAMS_CREATED]: (teams: Team[]) => void;
+    [GameMapServiceEvent.MAP_OBJECTS_OPTIONS]: (objectsOptions: GameObjectOptions[]) => void;
+    [GameMapServiceEvent.MAP_TEAMS_OPTIONS]: (teamsOptions: TeamOptions[]) => void;
 }
 
 export default class GameMapService {
-    private gameObjectFactory;
     private map?: GameMap;
     emitter = new EventEmitter<GameMapServiceEvents>();
-
-    constructor(gameObjectFactory: GameObjectFactory) {
-        this.gameObjectFactory = gameObjectFactory;
-    }
 
     loadFromFile(path: string): void {
         let message = `Loaded map from ${path} with: `;
         this.map = new GameMap(path);
 
         const objectsOptions = this.map.getObjectsOptions();
-        const objects = objectsOptions.map(o => this.gameObjectFactory.buildFromOptions(o));
-        this.emitter.emit(GameMapServiceEvent.OBJECTS_SPAWNED, objects);
+        this.emitter.emit(GameMapServiceEvent.MAP_OBJECTS_OPTIONS, objectsOptions);
         message += `${objectsOptions.length} objects`;
 
-        const teams = this.map.getTeams();
-        this.emitter.emit(GameMapServiceEvent.TEAMS_CREATED, teams);
-        message += `, ${teams.length} teams`;
+        const teamsOptions = this.map.getTeamsOptions();
+        this.emitter.emit(GameMapServiceEvent.MAP_TEAMS_OPTIONS, teamsOptions);
+        message += `, ${teamsOptions.length} teams`;
 
         console.log(message);
     }

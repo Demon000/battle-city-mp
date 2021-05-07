@@ -14,7 +14,7 @@ import { Direction } from '@/physics/Direction';
 import Tank, { PartialTankOptions } from '@/tank/Tank';
 import TankService, { TankServiceEvent } from '@/tank/TankService';
 import { TankTier } from '@/tank/TankTier';
-import Team from '@/team/Team';
+import Team, { TeamOptions } from '@/team/Team';
 import TeamService, { TeamServiceEvent } from '@/team/TeamService';
 import LazyIterable from '@/utils/LazyIterable';
 import MapRepository from '@/utils/MapRepository';
@@ -81,7 +81,7 @@ export default class GameServer {
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
         this.tankService = new TankService(this.gameObjectRepository);
         this.bulletService = new BulletService(this.gameObjectRepository);
-        this.gameMapService = new GameMapService(this.gameObjectFactory);
+        this.gameMapService = new GameMapService();
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.playerRepository);
         this.teamRepository = new MapRepository<string, Team>();
@@ -92,13 +92,15 @@ export default class GameServer {
         /**
          * GameMapService event handlers
          */
-        this.gameMapService.emitter.on(GameMapServiceEvent.OBJECTS_SPAWNED,
-            (objects: GameObject[]) => {
+        this.gameMapService.emitter.on(GameMapServiceEvent.MAP_OBJECTS_OPTIONS,
+            (objectsOptions: GameObjectOptions[]) => {
+                const objects = objectsOptions.map(o => this.gameObjectFactory.buildFromOptions(o));
                 this.gameObjectService.registerObjects(objects);
             });
 
-        this.gameMapService.emitter.on(GameMapServiceEvent.TEAMS_CREATED,
-            (teams: Team[]) => {
+        this.gameMapService.emitter.on(GameMapServiceEvent.MAP_TEAMS_OPTIONS,
+            (teamsOptions: TeamOptions[]) => {
+                const teams = teamsOptions.map(o => new Team(o));
                 this.teamService.addTeams(teams);
             });
 

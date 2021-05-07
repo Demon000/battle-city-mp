@@ -95,7 +95,7 @@ export default class GameMap {
         return objectsOptionsFromOptions.concat(objectsOptionsFromBlocks);
     }
 
-    getTeams(): Team[] {
+    getTeamsOptions(): Team[] {
         if (this.options.teamsOptions === undefined) {
             return [];
         }
