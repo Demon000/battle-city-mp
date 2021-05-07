@@ -48,8 +48,8 @@ export default class GameMapService {
 
         const objectsOptions =
             LazyIterable.from(objects)
-                .map(o => o.toSaveOptions())
-                .filter(o => o !== undefined) as Iterable<GameObjectOptions>;
+                .filter(o => !!o.savable)
+                .map(o => o.toSaveOptions());
         this.map.setObjectsFromBlocks([]);
         this.map.setObjectsFromOptions(objectsOptions);
     }

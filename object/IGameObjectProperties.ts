@@ -22,6 +22,7 @@ export default interface IGameObjectProperties {
 
     width: number;
     height: number;
+    savable?: boolean;
     directionAxisSnapping?: number;
     automaticDestroyTime?: number;
 

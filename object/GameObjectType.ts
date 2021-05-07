@@ -34,15 +34,3 @@ export function isGameShortObjectType(shortType: string): boolean {
 export function isGameObjectType(type: string): boolean {
     return Object.values(GameObjectType).includes(type as any);
 }
-
-export const SavableGameObjectTypes = [
-    GameObjectType.BRICK_WALL,
-    GameObjectType.STEEL_WALL,
-    GameObjectType.BUSH,
-    GameObjectType.LEVEL_BORDER,
-    GameObjectType.PLAYER_SPAWN,
-    GameObjectType.ICE,
-    GameObjectType.WATER,
-    GameObjectType.SAND,
-    GameObjectType.GRASS,
-];

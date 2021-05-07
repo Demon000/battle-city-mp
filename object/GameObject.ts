@@ -2,7 +2,7 @@ import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import Point from '@/physics/point/Point';
 import { Direction } from '../physics/Direction';
 import GameObjectProperties from './GameObjectProperties';
-import { GameObjectType, SavableGameObjectTypes } from './GameObjectType';
+import { GameObjectType } from './GameObjectType';
 import IGameObjectProperties, { ResourceMeta } from './IGameObjectProperties';
 
 export interface GameObjectOptions {
@@ -59,11 +59,7 @@ export default class GameObject {
         };
     }
 
-    toSaveOptions(): GameObjectOptions | undefined {
-        if (!SavableGameObjectTypes.includes(this.type)) {
-            return undefined;
-        }
-
+    toSaveOptions(): GameObjectOptions {
         return {
             type: this.type,
             position: this.position,
@@ -84,6 +80,10 @@ export default class GameObject {
 
     get height(): number {
         return this.properties.height;
+    }
+
+    get savable(): boolean | undefined {
+        return this.properties.savable;
     }
 
     get directionAxisSnapping(): number | undefined {

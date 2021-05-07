@@ -23,12 +23,8 @@ export default class PlayerSpawn extends GameObject {
         });
     }
 
-    toSaveOptions(): PlayerSpawnOptions | undefined {
+    toSaveOptions(): PlayerSpawnOptions {
         const gameObjectSaveOptions = super.toSaveOptions();
-        if (gameObjectSaveOptions === undefined) {
-            return undefined;
-        }
-
         return Object.assign(gameObjectSaveOptions, {
             teamId: this.teamId,
         });
