@@ -71,7 +71,7 @@ export default class GameServer {
         this.gameModesPropertiesText = fs.readFileSync('./game-mode/game-modes-properties.json5', 'utf8');
         this.gameModesPropertiesData = JSON5.parse(this.gameModesPropertiesText);
         this.gameModesProperties = assertType<GameModesProperties>(this.gameModesPropertiesData);
-        this.gameModeService = new GameModeService(this.gameModesPropertiesData);
+        this.gameModeService = new GameModeService(this.gameModesProperties);
         this.gameObjectFactory = new GameObjectFactory();
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>();
