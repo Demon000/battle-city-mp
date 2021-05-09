@@ -16,6 +16,18 @@ export class Component {
         this.entity = entity;
     }
 
+    findSibling<T extends Component>(
+        clazz: ComponentClassType<T>,
+    ): T | undefined {
+        return this.registry.findSiblingComponent(this, clazz);
+    }
+
+    getSibling<T extends Component>(
+        clazz: ComponentClassType<T>,
+    ): T {
+        return this.registry.getSiblingComponent(this, clazz);
+    }
+
     getEntity(): Entity {
         return this.entity;
     }
