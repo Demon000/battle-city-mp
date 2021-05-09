@@ -75,6 +75,10 @@ export default class GameAudioService {
 
     stopAudioPlayback(object: GameObject): void {
         const audioRenderer = this.findAudioRenderer(object);
+        if (audioRenderer === undefined) {
+            return;
+        }
+
         audioRenderer.stop();
         this.objectsPlayingAudioEffects.delete(audioRenderer.object);
     }
