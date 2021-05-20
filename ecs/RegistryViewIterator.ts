@@ -1,41 +1,30 @@
 import { Component, ComponentClassType } from './Component';
 import Entity from './Entity';
-import Registry from './Registry';
 
 export default class RegistryViewIterator implements Iterator<Entity> {
-    private registry;
-    private components;
-    private clazzes;
-
     constructor(
-        registry: Registry,
-        components: IterableIterator<Component>,
-        clazzes: ComponentClassType[],
-    ) {
-        this.registry = registry;
-        this.components = components;
-        this.clazzes = clazzes;
-    }
+        private components: IterableIterator<Component<any>>,
+        private clazzes: ComponentClassType[],
+    ) {}
 
     next(): IteratorResult<Entity, undefined> {
         let currentComponent;
         let foundEntity;
         while ((currentComponent = this.components.next().value)) {
-            const entity = this.registry.getComponentEntity(currentComponent);
-            let hasAllTags = true;
+            let hasAllComponents = true;
 
             for (const clazz of this.clazzes) {
-                if (!this.registry.hasComponent(entity, clazz)) {
-                    hasAllTags = false;
+                if (!currentComponent.entity.hasComponent(clazz)) {
+                    hasAllComponents = false;
                     break;
                 }
             }
 
-            if (!hasAllTags) {
+            if (!hasAllComponents) {
                 continue;
             }
 
-            foundEntity = entity;
+            foundEntity = currentComponent.entity;
             break;
         }
 

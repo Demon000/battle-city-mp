@@ -1,41 +1,33 @@
 import Entity from './Entity';
 import Registry from './Registry';
 
-export interface ComponentOptions {}
-
-export class Component {
-    static readonly tag = 'component';
-    private registry;
-    private entity;
-
+export class Component<C extends Component<C>> {
     constructor(
+        readonly registry: Registry,
+        readonly entity: Entity,
+        readonly clazz: ComponentClassType<C>,
+    ) {}
+
+    static readonly TAG?: string;
+
+    static get tag(): string {
+        return this.TAG ?? this.name;
+    }
+
+    remove(): C {
+        return this.entity.removeComponent(this.clazz);
+    }
+}
+
+export type ComponentClassType<C = any> = {
+    readonly TAG?: string;
+    readonly serializable?: boolean;
+    readonly tag: string;
+    readonly id?: number;
+
+    new (
         registry: Registry,
         entity: Entity,
-    ) {
-        this.registry = registry;
-        this.entity = entity;
-    }
-
-    findSibling<T extends Component>(
-        clazz: ComponentClassType<T>,
-    ): T | undefined {
-        return this.registry.findSiblingComponent(this, clazz);
-    }
-
-    getSibling<T extends Component>(
-        clazz: ComponentClassType<T>,
-    ): T {
-        return this.registry.getSiblingComponent(this, clazz);
-    }
-
-    getEntity(): Entity {
-        return this.entity;
-    }
-}
-
-export interface ComponentClassType<T extends Component = any> {
-    readonly tag: string;
-    readonly serializable?: boolean;
-
-    new (registry: Registry, entity: Entity): T;
-}
+        clazz: ComponentClassType<C>,
+    ): C;
+};

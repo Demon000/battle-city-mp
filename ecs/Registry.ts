@@ -6,6 +6,10 @@ import { EntityId } from './EntityId';
 import RegistryIDGenerator from './RegistryIdGenerator';
 import RegistryViewIterator from './RegistryViewIterator';
 
+export type ComponentInitialization =
+    [ComponentClassType<any>, any] |
+    ComponentClassType<any>;
+
 export enum RegistryEvent {
     ENTITY_ADDED = 'entity-added',
     ENTITY_REMOVED = 'entity-removed',
@@ -20,40 +24,38 @@ export interface RegistryEvents {
 }
 
 export interface RegistryComponentEvents {
-    [RegistryEvent.COMPONENT_ADDED]: <T extends Component>(
+    [RegistryEvent.COMPONENT_ADDED]: <C extends Component<C>>(
         registry: Registry,
-        component: T,
+        component: C,
     ) => void;
-    [RegistryEvent.COMPONENT_REMOVED]: <T extends Component>(
+    [RegistryEvent.COMPONENT_REMOVED]: <C extends Component<C>>(
         registry: Registry,
-        component: T,
+        component: C,
     ) => void;
 }
 
 export default class Registry {
     private idGenerator;
-    private tagsComponentsMap = new Map<string, Set<Component>>();
-    private componentsEntityMap = new Map<Component, Entity>();
-    private entitiesComponentsMap = new Map<Entity, Map<string, Component>>();
+    private tagsComponentsMap = new Map<string, Set<Component<any>>>();
     private componentsEmitterMap = new Map<string, EventEmitter<RegistryComponentEvents>>();
-    private tagsToComponentTypeMap = new Map<string, ComponentClassType>();
-    private idsToEntityMap = new Map<EntityId, Entity>();
+
+    private idsEntityMap = new Map<EntityId, Entity>();
     emitter = new EventEmitter<RegistryEvents>();
 
     constructor(idGenerator: RegistryIDGenerator) {
         this.idGenerator = idGenerator;
     }
 
-    componentEmitter<T extends Component>(
-        clazz: ComponentClassType<T>,
+    componentEmitter<C extends Component<C>>(
+        clazz: ComponentClassType<C>,
         create?: false,
     ): EventEmitter<RegistryComponentEvents> | undefined;
-    componentEmitter<T extends Component>(
-        clazz: ComponentClassType<T>,
+    componentEmitter<C extends Component<C>>(
+        clazz: ComponentClassType<C>,
         create: true,
     ): EventEmitter<RegistryComponentEvents>;
-    componentEmitter<T extends Component>(
-        clazz: ComponentClassType<T>,
+    componentEmitter<C extends Component<C>>(
+        clazz: ComponentClassType<C>,
         create?: boolean,
     ): EventEmitter<RegistryComponentEvents> | undefined {
         let componentEmitter = this.componentsEmitterMap.get(clazz.tag);
@@ -66,82 +68,85 @@ export default class Registry {
     }
 
     registerEntity(entity: Entity): void {
-        assert(!this.entitiesComponentsMap.has(entity));
-        assert(!this.idsToEntityMap.has(entity.id));
-        this.entitiesComponentsMap.set(entity, new Map<string, Component>());
-        this.idsToEntityMap.set(entity.id, entity);
+        assert(!this.idsEntityMap.has(entity.id));
+        this.idsEntityMap.set(entity.id, entity);
     }
 
-    createEntity(): Entity {
+    createEntity(components: ComponentInitialization[]): Entity {
         const id = this.idGenerator.generate();
-        const entity = new Entity(id);
+        const entity = new Entity(id, this);
         this.registerEntity(entity);
+
+        if (components !== undefined) {
+            this.addComponents(entity, components);
+        }
+
         return entity;
     }
 
-    destroyEntity(entity: Entity): void {
-        const componentsMap = this.entitiesComponentsMap.get(entity);
-        assert(componentsMap);
+    addComponents(entity: Entity, components: ComponentInitialization[]): void {
+        for (const clazzDataOrClazz of components) {
+            let clazz;
+            let data;
 
-        const existed = this.entitiesComponentsMap.delete(entity);
-        assert(existed);
+            if (Array.isArray(clazzDataOrClazz)) {
+                [clazz, data] = clazzDataOrClazz;
+            } else {
+                clazz = clazzDataOrClazz;
+            }
 
-        for (const tag of componentsMap.keys()) {
-            const componentType = this.tagsToComponentTypeMap.get(tag);
-            assert(componentType);
-            this.removeComponent(entity, componentType);
+            this.addComponent(entity, clazz, data);
         }
+    }
 
-        const entityIdExisted = this.idsToEntityMap.delete(entity.id);
+    destroyEntity(entity: Entity): void {
+        entity.removeComponents();
+        const entityIdExisted = this.idsEntityMap.delete(entity.id);
         assert(entityIdExisted);
     }
 
-    private getOrCreateComponentTypeSet<T extends Component>(
-        clazz: ComponentClassType<T>,
-    ): Set<Component> {
+    private getOrCreateComponentTypeSet<C extends Component<C>>(
+        clazz: ComponentClassType<C>,
+    ): Set<Component<C>> {
         let tagComponents = this.tagsComponentsMap.get(clazz.tag);
         if (tagComponents === undefined) {
-            tagComponents = new Set<Component>();
+            tagComponents = new Set<Component<C>>();
             this.tagsComponentsMap.set(clazz.tag, tagComponents);
         }
 
         return tagComponents;
     }
 
-    addComponent<T extends Component>(
+    addComponent<
+        C extends Component<C>,
+    >(
         entity: Entity,
-        clazz: ComponentClassType<T>,
-    ): void {
-        const componentsMap = this.entitiesComponentsMap.get(entity);
-        assert(componentsMap);
+        clazz: ComponentClassType<C>,
+        data?: Partial<C>,
+    ): C {
+        let component = entity.findComponent(clazz);
+        assert(component === undefined);
 
-        const component = new clazz(this, entity);
-        assert(!componentsMap.has(clazz.tag));
-        componentsMap.set(clazz.tag, component);
+        component = new clazz(this, entity, clazz);
+        Object.assign(component, data);
+        entity.addLocalComponent(component);
 
         const tagComponents = this.getOrCreateComponentTypeSet(clazz);
         tagComponents.add(component);
-
-        this.componentsEntityMap.set(component, entity);
 
         const componentEmitter = this.componentEmitter(clazz);
         if (componentEmitter) {
             componentEmitter.emit(RegistryEvent.COMPONENT_ADDED, this, component);
         }
+
+        return component;
     }
 
-    removeComponent<T extends Component>(
+    removeEntityComponent<C extends Component<C>>(
         entity: Entity,
-        clazz: ComponentClassType<T>,
-    ): void {
-        const componentsMap = this.entitiesComponentsMap.get(entity);
-        assert(componentsMap);
-
-        const component = componentsMap.get(clazz.tag);
-        assert(component);
-
-        const entityHadTag = componentsMap.delete(clazz.tag);
-        assert(entityHadTag);
+        clazz: ComponentClassType<C>,
+    ): C {
+        const component = entity.removeLocalComponent(clazz);
 
         const tagComponents = this.tagsComponentsMap.get(clazz.tag);
         assert(tagComponents);
@@ -149,67 +154,22 @@ export default class Registry {
         const tagsHadComponent = tagComponents.delete(component);
         assert(tagsHadComponent);
 
-        const componentHadEntity = this.componentsEntityMap.delete(component);
-        assert(componentHadEntity);
-
         const componentEmitter = this.componentEmitter(clazz);
         if (componentEmitter) {
             componentEmitter.emit(RegistryEvent.COMPONENT_REMOVED, this, component);
         }
-    }
 
-    findComponent<T extends Component>(
-        entity: Entity,
-        clazz: ComponentClassType<T>,
-    ): T | undefined {
-        const componentsMap = this.entitiesComponentsMap.get(entity);
-        assert(componentsMap);
-
-        return componentsMap.get(clazz.tag) as T;
-    }
-
-    hasComponent<T extends Component>(
-        entity: Entity,
-        clazz: ComponentClassType<T>,
-    ): boolean {
-        const component = this.findComponent(entity, clazz);
-        return component !== undefined;
-    }
-
-    getComponent<T extends Component>(
-        entity: Entity,
-        clazz: ComponentClassType<T>,
-    ): T | undefined {
-        const component = this.findComponent<T>(entity, clazz);
-        assert(component);
         return component;
     }
 
-    findSiblingComponent<S extends Component, T extends Component>(
-        ofComponent: S,
-        clazz: ComponentClassType<T>,
-    ): T | undefined {
-        const entity = this.getComponentEntity(ofComponent);
-        return this.getComponent(entity, clazz);
-    }
-
-    getSiblingComponent<S extends Component, T extends Component>(
-        ofComponent: S,
-        clazz: ComponentClassType<T>,
-    ): T {
-        const component = this.findSiblingComponent(ofComponent, clazz);
-        assert(component);
-        return component;
-    }
-
-    getComponentEntity<T extends Component>(component: T): Entity {
-        const entity = this.componentsEntityMap.get(component);
-        assert(entity);
-        return entity;
+    removeComponent<C extends Component<C>>(
+        component: C,
+    ): C {
+        return this.removeEntityComponent(component.entity, component.clazz) as C;
     }
 
     findEntityById(id: EntityId): Entity | undefined {
-        return this.idsToEntityMap.get(id);
+        return this.idsEntityMap.get(id);
     }
 
     getEntityById(id: EntityId): Entity {
@@ -219,22 +179,21 @@ export default class Registry {
     }
 
     getEntities(): IterableIterator<Entity> {
-        return this.entitiesComponentsMap.keys();
+        return this.idsEntityMap.values();
     }
 
-    getComponents<T extends Component>(
-        clazz: ComponentClassType<T>,
-    ): IterableIterator<Component> {
+    getComponents<C extends Component<C>>(
+        clazz: ComponentClassType<C>,
+    ): IterableIterator<Component<C>> {
         return this.getOrCreateComponentTypeSet(clazz).keys();
     }
 
-    getView<T extends Component>(
-        clazz: ComponentClassType<T>,
+    getView<C extends Component<C>>(
+        clazz: ComponentClassType<C>,
         ...clazzes: ComponentClassType[]
     ): Iterable<Entity> {
         return {
             [Symbol.iterator]: () => new RegistryViewIterator(
-                this,
                 this.getComponents(clazz),
                 clazzes,
             ),
