@@ -38,6 +38,11 @@ import JSON5 from 'json5';
 import GameModeService from '@/game-mode/GameModeService';
 import { assertType } from 'typescript-is';
 import fs from 'fs';
+import EntityFactory from '@/entity/EntityFactory';
+import Registry from '@/ecs/Registry';
+import RegistryNumberIdGenerator from '@/ecs/RegistryNumberIdGenerator';
+import ComponentRegistry from '@/components/ComponentRegistry';
+import EntityBlueprint from '@/entity/EntityBlueprint';
 
 export interface GameServerEvents {
     [GameEvent.BROADCAST_BATCH]: (events: BroadcastBatchGameEvent[]) => void,
@@ -45,6 +50,12 @@ export interface GameServerEvents {
 }
 
 export default class GameServer {
+    private registry;
+    private entityFactory;
+    private componentRegistry;
+
+    private entityBlueprints;
+
     private gameModesPropertiesText;
     private gameModesPropertiesData;
     private gameModesProperties;
@@ -68,6 +79,15 @@ export default class GameServer {
     emitter = new EventEmitter<GameServerEvents>();
 
     constructor() {
+        const registryIdGenerator = new RegistryNumberIdGenerator();
+        this.registry = new Registry(registryIdGenerator);
+
+        const entitiesBlueprintText = fs.readFileSync('./entity/entities-blueprint.json5', 'utf8');
+        const entitiesBlueptintData = JSON5.parse(entitiesBlueprintText);
+        this.componentRegistry = new ComponentRegistry();
+        this.entityBlueprints = new EntityBlueprint(this.componentRegistry, entitiesBlueptintData);
+        this.entityFactory = new EntityFactory(this.registry, this.entityBlueprints);
+
         this.gameModesPropertiesText = fs.readFileSync('./game-mode/game-modes-properties.json5', 'utf8');
         this.gameModesPropertiesData = JSON5.parse(this.gameModesPropertiesText);
         this.gameModesProperties = assertType<GameModesProperties>(this.gameModesPropertiesData);
@@ -88,6 +108,13 @@ export default class GameServer {
         this.teamService = new TeamService(this.teamRepository);
         this.gameEventBatcher = new GameEventBatcher();
         this.ticker = new Ticker(SERVER_CONFIG_TPS);
+
+        console.log(this.entityFactory.buildBrickWall(
+            {
+                x: 0,
+                y: 0,
+            },
+        ));
 
         /**
          * GameMapService event handlers
