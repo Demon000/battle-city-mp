@@ -13,9 +13,9 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
     private baseCachedSource?: Source;
     private cachedSource?: Source;
     private _isLoaded;
-    meta;
+    private source;
 
-    source;
+    meta;
 
     constructor(
         source: Source | string,
