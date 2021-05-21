@@ -1,0 +1,10 @@
+{
+    'brick-wall': {
+        SizeComponent: {
+            width: 4,
+            height: 4,
+        },
+        BoundingBoxComponent: {},
+        CollisionComponent: {},
+    },
+}
