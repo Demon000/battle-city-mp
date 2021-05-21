@@ -5,6 +5,8 @@ import { Color } from './Color';
 import { DrawableType } from './DrawableType';
 import { IImageDrawable, ImageDrawableProperties } from './IImageDrawable';
 import ImageUtils, { Source } from '../utils/ImageUtils';
+import Point from '@/physics/point/Point';
+import CanvasUtils, { Context2D } from '@/utils/CanvasUtils';
 
 export default class ImageDrawable extends BaseImageDrawable implements IImageDrawable {
     readonly type = DrawableType.IMAGE;
@@ -24,6 +26,7 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         if (typeof source === 'string') {
             this._isLoaded = false;
             this.source = new Image();
+            this.source.crossOrigin = 'anonymous';
             this.source.addEventListener('load', () => {
                 this._isLoaded = true;
             });
@@ -41,11 +44,75 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         return super.properties;
     }
 
+    private getScale(): Point {
+        const properties = this.properties;
+        return {
+            x: properties.scaleX ?? 1,
+            y: properties.scaleY ?? 1,
+        };
+    }
+
+    private getOffset(): Point {
+        const scale = this.getScale();
+
+        const properties = this.properties;
+        return {
+            x: (properties.offsetX ?? 0) * scale.x,
+            y: (properties.offsetY ?? 0) * scale.y,
+        };
+    }
+
+    getMinPoint(): Point {
+        const baseMinPoint = this.getOffset();
+        const minPoint = {
+            x: baseMinPoint.x,
+            y: baseMinPoint.y,
+        };
+
+        if (this.properties.overlays !== undefined) {
+            for (const overlay of this.properties.overlays) {
+                const overlayMinPoint = overlay.getMinPoint();
+                minPoint.x = Math.min(minPoint.x, baseMinPoint.x + overlayMinPoint.x);
+                minPoint.y = Math.min(minPoint.y, baseMinPoint.y + overlayMinPoint.y);
+            }
+        }
+
+        return minPoint;
+    }
+
+    getMaxPoint(): Point {
+        const offset = this.getOffset();
+        const source = this.getBaseCachedSource();
+        const maxPoint = {
+            x: offset.x + source.width,
+            y: offset.y + source.height,
+        };
+
+        if (this.properties.overlays !== undefined) {
+            for (const overlay of this.properties.overlays) {
+                const overlayMaxPoint = overlay.getMaxPoint();
+                maxPoint.x = Math.max(maxPoint.x, offset.x + overlayMaxPoint.x);
+                maxPoint.y = Math.max(maxPoint.y, offset.x + overlayMaxPoint.y);
+            }
+        }
+
+        return maxPoint;
+    }
+
+    private getTotalSize(): Point {
+        const minPoint = this.getMinPoint();
+        const maxPoint = this.getMaxPoint();
+        return {
+            x: maxPoint.x - minPoint.x,
+            y: maxPoint.y - minPoint.y,
+        };
+    }
+
     isLoaded(): boolean {
         return this._isLoaded;
     }
 
-    private applyOverlays(context: CanvasRenderingContext2D, drawX: number, drawY: number): void {
+    private applyOverlays(context: Context2D, drawX: number, drawY: number): void {
         if (this.properties.overlays === undefined) {
             return;
         }
@@ -55,22 +122,39 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         }
     }
 
-    private getCachedSource(): Source {
-        if (this.cachedSource !== undefined) {
-            return this.cachedSource;
-        }
-
+    getBaseCachedSource(): Source {
         const properties = this.properties;
-        const scaleX = properties.scaleX ?? 1;
-        const scaleY = properties.scaleY ?? 1;
+        const scale = this.getScale();
+
         let canvas = this.source;
-        if (scaleX !== 1 && scaleY !== 1) {
-            canvas = ImageUtils.drawSourceWithScale(canvas, scaleX, scaleY);
+        if (scale.x !== 1 || scale.y !== 1) {
+            canvas = ImageUtils.drawSourceWithScale(canvas, scale.x, scale.y);
         }
 
         if (properties.maskColor !== undefined) {
             canvas = ImageUtils.maskColor(canvas, properties.maskColor);
         }
+
+        return canvas;
+    }
+
+    getCachedSource(): Source {
+        if (this.cachedSource !== undefined) {
+            return this.cachedSource;
+        }
+
+        const totalSize = this.getTotalSize();
+        const canvas = CanvasUtils.create(totalSize.x, totalSize.y, true);
+        const context = CanvasUtils.getContext(canvas);
+
+        const minPoint = this.getMinPoint();
+        const offset = this.getOffset();
+        const drawX = offset.x - minPoint.x;
+        const drawY = offset.y - minPoint.y;
+
+        const source = this.getBaseCachedSource();
+        context.drawImage(source, drawX, drawY);
+        this.applyOverlays(context, drawX, drawY);
 
         return this.cachedSource = canvas;
     }
@@ -81,33 +165,36 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         }
 
         const source = this.getCachedSource();
+        const minPoint = this.getMinPoint();
+
+        drawX += minPoint.x;
+        drawY += minPoint.y;
+
         const properties = this.properties;
-
-        drawX += (properties.offsetX ?? 0) * (properties.scaleX ?? 1);
-        drawY += (properties.offsetY ?? 0) * (properties.scaleY ?? 1);
-
         let oldCompositionType;
+
         if (properties.compositionType !== undefined) {
             oldCompositionType = context.globalCompositeOperation;
             context.globalCompositeOperation = properties.compositionType;
         }
+
         context.drawImage(source, drawX, drawY);
+
         if (properties.compositionType !== undefined && oldCompositionType !== undefined) {
             context.globalCompositeOperation = oldCompositionType;
         }
-
-        this.applyOverlays(context, drawX, drawY);
     }
 
     _scale(scaleX: number, scaleY: number = scaleX): this {
         const properties = this.properties;
-        const ownScaleX = (properties.scaleX ?? 1) * scaleX;
-        const ownScaleY = (properties.scaleY ?? 1) * scaleY;
+        const scale = this.getScale();
+        scale.x *= scaleX;
+        scale.y *= scaleY;
 
         return new (<any>this.constructor)(this.source, this.meta, {
             ...this.properties,
-            scaleX: ownScaleX,
-            scaleY: ownScaleY,
+            scaleX: scale.x,
+            scaleY: scale.y,
             overlays: properties.overlays?.map(overlay => overlay.scale(scaleX, scaleY)),
         });
     }
@@ -120,9 +207,9 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
     }
 
     _offset(offsetX: number, offsetY: number): this {
-        const properties = this.properties;
-        offsetX += properties.offsetX ?? 0;
-        offsetY += properties.offsetY ?? 0;
+        const offset = this.getOffset();
+        offsetX += offset.x;
+        offsetY += offset.y;
         return new (<any>this.constructor)(this.source, this.meta, {
             ...this.properties,
             offsetX,

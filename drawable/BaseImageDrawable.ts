@@ -1,3 +1,4 @@
+import Point from '@/physics/point/Point';
 import BaseDrawable from './BaseDrawable';
 import { Color } from './Color';
 import { IImageDrawable } from './IImageDrawable';
@@ -6,6 +7,8 @@ export default abstract class BaseImageDrawable extends BaseDrawable implements 
     private colorMaskCache = new Map<string, this>();
 
     protected abstract _colorMask(color: Color): this;
+    abstract getMinPoint(): Point;
+    abstract getMaxPoint(): Point;
 
     getColorMaskKey(color: Color): string {
         return `${color[0]},${color[1]},${color[2]}`;

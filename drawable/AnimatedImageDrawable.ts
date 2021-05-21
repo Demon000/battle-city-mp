@@ -1,4 +1,5 @@
 import { ResourceMeta } from '@/object/IGameObjectProperties';
+import Point from '@/physics/point/Point';
 import BaseImageDrawable from './BaseImageDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
@@ -77,6 +78,14 @@ export default class AnimatedImageDrawable extends BaseImageDrawable {
 
     draw(_context: CanvasRenderingContext2D, _drawX: number, _drawY: number): void {
         throw new Error('Cannot draw animated image drawable');
+    }
+
+    getMinPoint(): Point {
+        throw new Error('Cannot get min point of animated image drawable');
+    }
+
+    getMaxPoint(): Point {
+        throw new Error('Cannot get max point of animated image drawable');
     }
 
     private copy(drawables: IImageDrawable[]): this {
