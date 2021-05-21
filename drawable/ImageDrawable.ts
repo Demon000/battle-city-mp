@@ -10,6 +10,7 @@ import CanvasUtils, { Context2D } from '@/utils/CanvasUtils';
 
 export default class ImageDrawable extends BaseImageDrawable implements IImageDrawable {
     readonly type = DrawableType.IMAGE;
+    private baseCachedSource?: Source;
     private cachedSource?: Source;
     private _isLoaded;
     meta;
@@ -123,6 +124,10 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
     }
 
     getBaseCachedSource(): Source {
+        if (this.baseCachedSource !== undefined) {
+            return this.baseCachedSource;
+        }
+
         const properties = this.properties;
         const scale = this.getScale();
 
@@ -135,7 +140,7 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
             canvas = ImageUtils.maskColor(canvas, properties.maskColor);
         }
 
-        return canvas;
+        return this.baseCachedSource = canvas;
     }
 
     getCachedSource(): Source {
