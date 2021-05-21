@@ -5,6 +5,10 @@ export default class PointUtils {
         return {...point};
     }
 
+    static equal(first: Point, second: Point): boolean {
+        return first.x === second.x && first.y === second.y;
+    }
+
     static min(first: Point, second: Point): Point {
         const x = Math.min(first.x, second.x);
         const y = Math.min(first.y, second.y);

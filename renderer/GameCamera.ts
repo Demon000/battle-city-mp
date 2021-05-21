@@ -13,8 +13,8 @@ export default class GameCamera {
         }
 
         return {
-            x: Math.floor(this.position.x),
-            y: Math.floor(this.position.y),
+            x: this.position.x,
+            y: this.position.y,
         };
     }
 }

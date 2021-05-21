@@ -7,6 +7,8 @@ const properties: IGameObjectProperties[] = [
         shortType: GameShortObjectType.STEEL_WALL,
         width: 8,
         height: 8,
+        depth: 16,
+        positionZ: 0,
         savable: true,
     },
     {
@@ -14,6 +16,8 @@ const properties: IGameObjectProperties[] = [
         shortType: GameShortObjectType.BUSH,
         width: 8,
         height: 8,
+        depth: 16,
+        positionZ: 0,
         savable: true,
     },
     {
@@ -21,6 +25,8 @@ const properties: IGameObjectProperties[] = [
         shortType: GameShortObjectType.PLAYER_SPAWN,
         width: 16,
         height: 16,
+        depth: 1,
+        positionZ: 0,
         savable: true,
     },
     {
@@ -28,6 +34,8 @@ const properties: IGameObjectProperties[] = [
         shortType: GameShortObjectType.LEVEL_BORDER,
         width: 16,
         height: 16,
+        depth: 16,
+        positionZ: 0,
         savable: true,
     },
     {
@@ -35,6 +43,8 @@ const properties: IGameObjectProperties[] = [
         shortType: GameShortObjectType.ICE,
         width: 8,
         height: 8,
+        depth: 1,
+        positionZ: 0,
         savable: true,
     },
     {
@@ -42,6 +52,8 @@ const properties: IGameObjectProperties[] = [
         shortType: GameShortObjectType.SAND,
         width: 8,
         height: 8,
+        depth: 1,
+        positionZ: 0,
         savable: true,
     },
     {
@@ -49,6 +61,8 @@ const properties: IGameObjectProperties[] = [
         shortType: GameShortObjectType.GRASS,
         width: 8,
         height: 8,
+        depth: 1,
+        positionZ: 0,
         savable: true,
     },
     {
@@ -56,6 +70,8 @@ const properties: IGameObjectProperties[] = [
         shortType: GameShortObjectType.WATER,
         width: 8,
         height: 8,
+        depth: 1,
+        positionZ: 0,
         savable: true,
     },
     {
@@ -63,18 +79,24 @@ const properties: IGameObjectProperties[] = [
         shortType: GameShortObjectType.BRICK_WALL,
         width: 4,
         height: 4,
+        depth: 16,
+        positionZ: 0,
         savable: true,
     },
     {
         type: GameObjectType.SMOKE,
         width: 0,
         height: 0,
+        depth: 0,
+        positionZ: 8,
         automaticDestroyTime: 1000,
     },
     {
         type: GameObjectType.TANK,
         width: 16,
         height: 16,
+        depth: 16,
+        positionZ: 0,
         directionAxisSnapping: 4,
         // audioEffects: [
         //     {
@@ -90,6 +112,8 @@ const properties: IGameObjectProperties[] = [
         type: GameObjectType.BULLET,
         width: 2,
         height: 2,
+        depth: 2,
+        positionZ: 8,
         audioEffects: [
             {
                 filename: 'shoot_bullet.wav',
@@ -98,8 +122,10 @@ const properties: IGameObjectProperties[] = [
     },
     {
         type: GameObjectType.EXPLOSION,
-        width: 0,
-        height: 0,
+        width: 16,
+        height: 16,
+        depth: 16,
+        positionZ: 0,
         automaticDestroyTime: 240,
         audioEffects: [
             {

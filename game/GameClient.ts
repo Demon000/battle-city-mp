@@ -34,6 +34,7 @@ export interface GameClientEvents {
 }
 
 export default class GameClient {
+    private canvases;
     private gameObjectFactory;
     private playerRepository;
     private playerService;
@@ -54,6 +55,7 @@ export default class GameClient {
     ticker;
 
     constructor(canvases: HTMLCanvasElement[]) {
+        this.canvases = canvases;
         this.gameObjectFactory = new GameObjectFactory();
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>();
@@ -66,7 +68,7 @@ export default class GameClient {
         this.teamService = new TeamService(this.teamRepository);
         this.gameCamera = new GameCamera();
         this.graphicsRendererFactory = new GameObjectGraphicsRendererFactory();
-        this.gameGraphicsService = new GameGraphicsService(this.graphicsRendererFactory, canvases, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
+        this.gameGraphicsService = new GameGraphicsService(this.graphicsRendererFactory, canvases, CLIENT_CONFIG_VISIBLE_GAME_SIZE, true);
         this.audioRendererFactory = new GameObjectAudioRendererFactory();
         this.gameAudioService = new GameAudioService(this.audioRendererFactory);
         this.gameMapEditorService = new GameMapEditorService(this.gameObjectFactory);
@@ -81,6 +83,7 @@ export default class GameClient {
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BEFORE_UNREGISTER,
             (objectId: number) => {
                 const object = this.gameObjectService.getObject(objectId);
+                this.gameGraphicsService.destroyObjectRenderer(object);
                 this.gameAudioService.stopAudioPlayback(object);
             });
 
