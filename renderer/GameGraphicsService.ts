@@ -5,12 +5,9 @@ import Point from '@/physics/point/Point';
 import CanvasUtils, { Context2D } from '@/utils/CanvasUtils';
 import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
 import GameObjectGraphicsRendererFactory from '../object/GameObjectGraphicsRendererFactory';
-import { Color3, StandardMaterial, Engine, MeshBuilder, Scene, Vector3, ArcRotateCamera, DirectionalLight, ShadowGenerator } from 'babylonjs';
-import PointUtils from '@/physics/point/PointUtils';
 
 export default class GameGraphicsService {
     private rendererFactory;
-    private is3d;
     private scale = 0;
     private gameWidth = 0;
     private gameHeight = 0;
@@ -20,73 +17,21 @@ export default class GameGraphicsService {
     private canvasY = 0;
     private targetGameSize;
     private showInvisible = false;
-    private scene?: Scene;
-    private camera?: ArcRotateCamera;
-    private shadowGenerator?: ShadowGenerator;
-    private point: Point = {
-        x: 0,
-        y: 0,
-    };
 
     constructor(
         rendererFactory: GameObjectGraphicsRendererFactory,
         canvases: HTMLCanvasElement[],
         targetGameSize: number,
-        is3d: boolean,
     ) {
         this.rendererFactory = rendererFactory;
         this.canvases = canvases;
         this.targetGameSize = targetGameSize;
-        this.is3d = is3d;
 
+        this.initializeContexts();
         this.calculateDimensions();
-        if (is3d) {
-            this.initialize3d();
-        } else {
-            this.initialize2d();
-        }
     }
 
-    private initialize3d(): void {
-        const engine = new Engine(this.canvases[0], true, {
-            preserveDrawingBuffer: true,
-            stencil: true,
-        });
-        engine.inputElement = this.canvases[this.canvases.length - 1];
-
-        this.scene = new Scene(engine);
-        this.camera = new ArcRotateCamera('camera', 0, 0, 0, new Vector3(0, 0, 0), this.scene);
-        this.camera.attachControl();
-
-        const light = new DirectionalLight('light', new Vector3(-1, -2, -1), this.scene);
-        light.diffuse = new BABYLON.Color3(1, 1, 1);
-        light.specular = new BABYLON.Color3(0.5, 0.5, 0.25);
-        light.intensity = 2;
-
-        const groundMaterial = new StandardMaterial('material', this.scene);
-        groundMaterial.diffuseColor = new Color3(0.2, 0.2, 0.2);
-        groundMaterial.specularColor = new Color3(0.25, 0.25, 0.25);
-
-        const ground = MeshBuilder.CreateGround('ground', {
-            width: 1024,
-            height: 1024,
-        }, this.scene);
-
-        ground.position.x = -512;
-        ground.position.z = 512;
-        ground.position.y = 0;
-        ground.material = groundMaterial;
-        ground.receiveShadows = true;
-
-        this.shadowGenerator = new ShadowGenerator(4096, light);
-        this.shadowGenerator.useExponentialShadowMap = true;
-        this.shadowGenerator.useContactHardeningShadow = true;
-        this.shadowGenerator.useKernelBlur = true;
-        this.shadowGenerator.blurKernel = 64;
-        this.shadowGenerator.setDarkness(0.5);
-    }
-
-    private initialize2d(): void {
+    private initializeContexts(): void {
         this.contexts = new Array<Context2D>();
 
         for (const canvas of this.canvases) {
@@ -124,27 +69,10 @@ export default class GameGraphicsService {
         this.showInvisible = showInvisible;
     }
 
-    findObjectRenderer(object: GameObject): GameObjectGraphicsRenderer | undefined {
-        return object.graphicsRenderer;
-    }
-
-    destroyObjectRenderer(object: GameObject): void {
-        const renderer = this.findObjectRenderer(object);
-        if (renderer === undefined) {
-            return;
-        }
-
-        if (renderer.scene !== undefined && renderer.mesh !== undefined) {
-            renderer.scene.removeMesh(renderer.mesh);
-            this.shadowGenerator?.removeShadowCaster(object.graphicsRenderer.mesh);
-        }
-    }
-
     getObjectRenderer(object: GameObject): GameObjectGraphicsRenderer {
         if (object.graphicsRenderer === undefined) {
             object.graphicsRenderer = this.rendererFactory
-                .buildFromObject(object, this.scene);
-            this.shadowGenerator?.addShadowCaster(object.graphicsRenderer.mesh);
+                .buildFromObject(object);
         }
 
         return object.graphicsRenderer;
@@ -170,35 +98,13 @@ export default class GameGraphicsService {
         }
     }
 
-    initializeRender3d(point: Point): void {
-        if (this.scene === undefined || this.camera === undefined) {
-            return;
-        }
-
-        if (!PointUtils.equal(point, this.point)) {
-            this.camera.setPosition(new Vector3(-point.x, this.targetGameSize, point.y));
-            this.camera.setTarget(new Vector3(-point.x, 0, point.y));
-            this.point = point;
-        }
-
-        this.scene.render();
-    }
-
-    initializeRender2d(point: Point): void {
+    initializeRender(point: Point): void {
         for (const context of this.contexts) {
             context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         }
 
         this.canvasX = point.x - this.gameWidth / 2;
         this.canvasY = point.y - this.gameHeight / 2;
-    }
-
-    initializeRender(point: Point): void {
-        if (this.is3d) {
-            this.initializeRender3d(point);
-        } else {
-            this.initializeRender2d(point);
-        }
     }
 
     renderGrid(gridSize: number): void {

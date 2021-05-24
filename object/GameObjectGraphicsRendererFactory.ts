@@ -7,22 +7,20 @@ import Tank from '@/tank/Tank';
 import Explosion from '@/explosion/Explosion';
 import Bullet from '@/bullet/Bullet';
 import BulletGraphicsRenderer from '@/bullet/BulletGraphicsRenderer';
-import { Scene } from 'babylonjs';
 
 export default class GameObjectGraphicsRendererFactory {
     buildFromObject(
         object: GameObject,
-        scene: Scene | undefined,
     ): GameObjectGraphicsRenderer {
         switch (object.type) {
             case GameObjectType.TANK:
-                return new TankGraphicsRenderer(object as Tank, scene);
+                return new TankGraphicsRenderer(object as Tank);
             case GameObjectType.BULLET:
-                return new BulletGraphicsRenderer(object as Bullet, scene);
+                return new BulletGraphicsRenderer(object as Bullet);
             case GameObjectType.EXPLOSION:
-                return new ExplosionGraphicsRenderer(object as Explosion, scene);
+                return new ExplosionGraphicsRenderer(object as Explosion);
             default:
-                return new GameObjectGraphicsRenderer(object, scene);
+                return new GameObjectGraphicsRenderer(object);
         }
     }
 }

@@ -10,8 +10,6 @@ export const CLIENT_SOUNDS_RELATIVE_URL: string = process.env
 // eslint-disable-next-line
 export const CLIENT_FONTS_RELATIVE_URL: string = process.env
     .VUE_APP_FONTS_RELATIVE_URL as string;
-export const CLIENT_MODELS_RELATIVE_URL: string = process.env
-    .VUE_APP_MODELS_RELATIVE_URL as string;
 // eslint-disable-next-line
 export const CLIENT_CONFIG_VISIBLE_GAME_SIZE: number = Number.parseInt(process.env
     .VUE_APP_VISIBLE_GAME_SIZE!);

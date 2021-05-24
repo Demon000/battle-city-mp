@@ -7,13 +7,11 @@ import { IImageDrawable, ImageDrawableProperties } from './IImageDrawable';
 import ImageUtils, { Source } from '../utils/ImageUtils';
 import Point from '@/physics/point/Point';
 import CanvasUtils, { Context2D } from '@/utils/CanvasUtils';
-import { DynamicTexture, Constants, Scene, StandardMaterial } from 'babylonjs';
 
 export default class ImageDrawable extends BaseImageDrawable implements IImageDrawable {
     readonly type = DrawableType.IMAGE;
     private baseCachedSource?: Source;
     private cachedSource?: Source;
-    private material?: StandardMaterial;
     private _isLoaded;
     private source;
 
@@ -164,35 +162,6 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         this.applyOverlays(context, drawX, drawY);
 
         return this.cachedSource = canvas;
-    }
-
-    getMaterial(scene: Scene): StandardMaterial {
-        if (this.material !== undefined) {
-            return this.material;
-        }
-
-        const source = this.getCachedSource();
-        const material = new StandardMaterial('material', scene);
-        const texture = new DynamicTexture('texture', {
-            width: source.width,
-            height: source.height,
-        }, scene, true);
-
-        texture.anisotropicFilteringLevel = 0;
-        texture.hasAlpha = true;
-        texture.updateSamplingMode(Constants.TEXTURE_NEAREST_SAMPLINGMODE);
-
-        const context = texture.getContext();
-        context.imageSmoothingEnabled = false;
-        context.clearRect(0, 0, source.width, source.height);
-        context.drawImage(source, 0, 0);
-
-        texture.update();
-
-        material.diffuseTexture = texture;
-        material.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-
-        return this.material = material;
     }
 
     draw(context: CanvasRenderingContext2D, drawX: number, drawY: number): void {

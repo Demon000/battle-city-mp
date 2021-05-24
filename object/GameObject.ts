@@ -82,14 +82,6 @@ export default class GameObject {
         return this.properties.height;
     }
 
-    get depth(): number {
-        return this.properties.depth;
-    }
-
-    get positionZ(): number {
-        return this.properties.positionZ;
-    }
-
     get savable(): boolean | undefined {
         return this.properties.savable;
     }

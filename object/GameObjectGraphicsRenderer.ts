@@ -7,32 +7,15 @@ import { ResourceMeta } from '@/object/IGameObjectProperties';
 import { Direction } from '@/physics/Direction';
 import Point from '@/physics/point/Point';
 import { Context2D } from '@/utils/CanvasUtils';
-import { MeshBuilder, Scene, AbstractMesh } from 'babylonjs';
 import GameObjectDrawables from './GameObjectDrawables';
-import ImageDrawable from '@/drawable/ImageDrawable';
 
 export default class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
     object;
     drawables?: IDrawable[] | null = null;
     scale = 1;
-    mesh;
-    scene;
-    setTexture = false;
 
-    constructor(object: O, scene: Scene | undefined) {
+    constructor(object: O) {
         this.object = object;
-        this.scene = scene;
-
-        if (this.scene !== undefined) {
-            this.mesh = MeshBuilder.CreateTiledBox('box', {
-                width: object.width,
-                height: object.depth,
-                depth: object.height,
-                tileWidth: object.width,
-                tileHeight: object.height,
-            }, scene) as AbstractMesh;
-            this.mesh.receiveShadows = true;
-        }
     }
 
     private isMatchingPosition(positionMatching: DrawablePositionMatching, position: Point): boolean {
@@ -130,19 +113,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
             .filter(this.filterOutMissingDrawable, this) as IDrawable[];
     }
 
-    updateMeshPosition(): void {
-        if (this.mesh === undefined) {
-            return;
-        }
-
-        this.mesh.position.x = -this.object.position.x - this.object.width / 2;
-        this.mesh.position.z = this.object.position.y + this.object.height / 2;
-        this.mesh.position.y = this.object.positionZ + this.object.depth / 2;
-    }
-
     update(scale: number): void {
-        this.updateMeshPosition();
-
         /*
          * Metas were undefined, meaning that this game object will never have a sprite.
          */
@@ -175,34 +146,6 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
             this.scale = scale;
             this.drawables = this.processDrawables(drawables);
         }
-
-        if (this.drawables !== undefined && this.drawables !== null
-            && this.scene !== undefined && this.mesh !== undefined) {
-            let drawable: IDrawable | undefined = this.drawables[0];
-            if (drawable.type === DrawableType.ANIMATED_IMAGE) {
-                drawable = (drawable as AnimatedImageDrawable).getCurrentDrawable(this.object.spawnTime);
-            }
-
-            if (drawable !== undefined && drawable.type === DrawableType.IMAGE) {
-                const imageDrawable = drawable as ImageDrawable;
-                this.mesh.material = imageDrawable.getMaterial(this.scene);
-
-                let radians;
-                if (this.object.direction === Direction.UP) {
-                    radians = 1 * (Math.PI / 2);
-                } else if (this.object.direction === Direction.RIGHT) {
-                    radians = 2 * (Math.PI / 2);
-                } else if (this.object.direction === Direction.DOWN) {
-                    radians = 3 * (Math.PI / 2);
-                } else if (this.object.direction === Direction.LEFT) {
-                    radians = 4 * (Math.PI / 2);
-                } else {
-                    throw new Error('Invalid direction');
-                }
-
-                this.mesh.rotation.y = radians;
-            }
-        }
     }
 
     isRenderable(): boolean {
@@ -216,10 +159,6 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         drawY: number,
         showInvisible: boolean,
     ): boolean {
-        if (this.scene !== undefined) {
-            return false;
-        }
-
         if (drawable === undefined) {
             return false;
         }
