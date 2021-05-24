@@ -94,6 +94,7 @@ export default class AnimatedImageDrawable extends BaseImageDrawable {
             this.durations,
             this.meta,
             this.loop,
+            this.properties,
         );
     }
 
