@@ -103,7 +103,7 @@ export default class AnimatedImageDrawable extends BaseImageDrawable {
             drawable.colorMask(color)) as IImageDrawable[]);
     }
 
-    _offset(offsetX: number, offsetY: number): this {
+    protected _offset(offsetX: number, offsetY: number): this {
         return this.copy(this.drawables.map(drawable =>
             drawable.offset(offsetX, offsetY)) as IImageDrawable[]);
     }
