@@ -40,8 +40,6 @@
   "dependencies": {
     "@types/yargs": "^16.0.1",
     "axios": "^0.21.1",
-    "babylonjs": "^4.2.0",
-    "babylonjs-loaders": "^4.2.0",
     "core-js": "^3.6.5",
     "cors": "^2.8.5",
     "eventemitter3": "^4.0.7",
