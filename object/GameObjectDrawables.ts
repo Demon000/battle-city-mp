@@ -124,6 +124,40 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             ],
         }),
     ],
+    [GameObjectType.DIRT]: [
+        new ImageDrawable('dirt_tl.png', {
+            renderPass: RenderPass.GROUND,
+            tests: [
+                positionTest(16, 8, [
+                    { x: 0, y: 0 },
+                ]),
+            ],
+        }),
+        new ImageDrawable('dirt_tr.png', {
+            renderPass: RenderPass.GROUND,
+            tests: [
+                positionTest(16, 8, [
+                    { x: 1, y: 0 },
+                ]),
+            ],
+        }),
+        new ImageDrawable('dirt_bl.png', {
+            renderPass: RenderPass.GROUND,
+            tests: [
+                positionTest(16, 8, [
+                    { x: 0, y: 1 },
+                ]),
+            ],
+        }),
+        new ImageDrawable('dirt_br.png', {
+            renderPass: RenderPass.GROUND,
+            tests: [
+                positionTest(16, 8, [
+                    { x: 1, y: 1 },
+                ]),
+            ],
+        }),
+    ],
     [GameObjectType.TANK]: [
         ...((): IDrawable[] => {
             const generateTankDrawableTests = (

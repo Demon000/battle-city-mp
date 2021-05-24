@@ -8,6 +8,7 @@ export enum GameShortObjectType {
     WATER = 'W',
     SAND = 'A',
     GRASS = 'G',
+    DIRT = 'D',
 }
 
 export enum GameObjectType {
@@ -25,6 +26,7 @@ export enum GameObjectType {
     WATER = 'water',
     SAND = 'sand',
     GRASS = 'grass',
+    DIRT = 'dirt',
 }
 
 export function isGameShortObjectType(shortType: string): boolean {

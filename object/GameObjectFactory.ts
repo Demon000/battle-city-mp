@@ -1,5 +1,6 @@
 import BrickWall from '@/brick-wall/BrickWall';
 import Bullet, { BulletOptions } from '@/bullet/Bullet';
+import Dirt from '@/dirt/Dirt';
 import Explosion, { ExplosionOptions } from '@/explosion/Explosion';
 import Grass from '@/grass/Grass';
 import PlayerSpawn, { PlayerSpawnOptions } from '@/player-spawn/PlayerSpawn';
@@ -15,6 +16,8 @@ export default class GameObjectFactory {
             return new BrickWall(options as GameObjectOptions);
         } else if (options.type === GameObjectType.GRASS) {
             return new Grass(options as GameObjectOptions);
+        } else if (options.type === GameObjectType.DIRT) {
+            return new Dirt(options as GameObjectOptions);
         } else if (options.type === GameObjectType.BULLET) {
             return new Bullet(options as BulletOptions);
         } else if (options.type === GameObjectType.EXPLOSION) {
