@@ -125,7 +125,7 @@
                             <td>Tank</td>
                         </tr>
                         <tr
-                            v-for="{player, team, tank} of playersStats"
+                            v-for="{player, team, tier} of playersStats"
                             :key="player.id"
                             :class="{
                                 'is-own-player': player.id === ownPlayer.id,
@@ -149,11 +149,7 @@
                                 </template>
                             </td>
                             <td>
-                                <template
-                                    v-if="tank"
-                                >
-                                    {{ tank.tier }}
-                                </template>
+                                {{ tier }}
                             </td>
                         </tr>
                     </table>

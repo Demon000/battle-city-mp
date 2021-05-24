@@ -217,7 +217,7 @@ export default class GameClient {
                 return {
                     player,
                     team,
-                    tank,
+                    tier: tank?.tier || player.requestedTankTier,
                 };
             });
     }
