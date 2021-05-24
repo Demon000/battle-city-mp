@@ -419,8 +419,8 @@ export default class App extends Vue {
         }
 
         this.gameClient?.setMapEditorHoverPosition({
-            x: event.offsetX,
-            y: event.offsetY,
+            x: event.offsetX * window.devicePixelRatio,
+            y: event.offsetY * window.devicePixelRatio,
         });
     }
 
