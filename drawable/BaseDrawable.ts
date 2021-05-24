@@ -1,4 +1,5 @@
 import { ResourceMeta } from '@/object/IGameObjectProperties';
+import Point from '@/physics/point/Point';
 import IDrawable, { DrawableProperties } from './IDrawable';
 
 export default abstract class BaseDrawable implements IDrawable {
@@ -20,6 +21,24 @@ export default abstract class BaseDrawable implements IDrawable {
 
     getRenderPass(): number {
         return this.ownProperties.renderPass ?? 0;
+    }
+
+    getScale(): Point {
+        const properties = this.properties;
+        return {
+            x: properties.scaleX ?? 1,
+            y: properties.scaleY ?? 1,
+        };
+    }
+
+    getOffset(): Point {
+        const scale = this.getScale();
+
+        const properties = this.properties;
+        return {
+            x: (properties.offsetX ?? 0) * scale.x,
+            y: (properties.offsetY ?? 0) * scale.y,
+        };
     }
 
     setInheritedProperties(properties: DrawableProperties = {}): void {

@@ -84,11 +84,10 @@ export default class TextDrawable extends BaseDrawable {
 
     private drawText(): Canvas {
         const properties = this.properties;
-        const scaleX = properties.scaleX ?? 1;
-        const scaleY = properties.scaleY ?? 1;
-        const fontSize = (properties.fontSize ?? 16) * scaleY;
-        const width = (fontSize * (this.text.length + 2)) * scaleX;
-        const height = (fontSize * 4) * scaleY;
+        const scale = this.getScale();
+        const fontSize = (properties.fontSize ?? 16) * scale.y;
+        const width = (fontSize * (this.text.length + 2)) * scale.x;
+        const height = (fontSize * 4) * scale.y;
 
         const canvas = CanvasUtils.create(width, height);
         const context = canvas.getContext('2d');
@@ -102,8 +101,8 @@ export default class TextDrawable extends BaseDrawable {
         const color = properties.fontColor ?? [255, 255, 255];
         context.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
 
-        const offsetX = fontSize * scaleX;
-        const offsetY = fontSize * scaleY;
+        const offsetX = fontSize * scale.x;
+        const offsetY = fontSize * scale.y;
         context.fillText(this.text, offsetX, offsetY);
 
         return canvas;
@@ -117,11 +116,10 @@ export default class TextDrawable extends BaseDrawable {
         const textCanvas = this.drawText();
         const textMeasurements = ImageUtils.measureContents(textCanvas);
         const properties = this.properties;
-        const scaleX = properties.scaleX ?? 1;
-        const scaleY = properties.scaleY ?? 1;
-        const paddingX = (properties.paddingX ?? 0) * scaleX;
-        const paddingY = (properties.paddingY ?? 0) * scaleY;
-        const maxTextWidth = properties.maxTextWidth && properties.maxTextWidth * scaleX;
+        const scale = this.getScale();
+        const paddingX = (properties.paddingX ?? 0) * scale.x;
+        const paddingY = (properties.paddingY ?? 0) * scale.y;
+        const maxTextWidth = properties.maxTextWidth && properties.maxTextWidth * scale.x;
         let textWidth = textMeasurements.width;
         if (maxTextWidth !== undefined
             && textWidth > maxTextWidth) {
@@ -158,10 +156,9 @@ export default class TextDrawable extends BaseDrawable {
         const source = this.getCachedSource();
         const properties = this.properties;
 
-        const scaleX = properties.scaleX ?? 1;
-        const scaleY = properties.scaleY ?? 1;
-        drawX += (properties.offsetX ?? 0) * scaleX;
-        drawY += (properties.offsetY ?? 0) * scaleY;
+        const offset = this.getOffset();
+        drawX += offset.x;
+        drawY += offset.y;
 
         if (properties.positionXReference === 'center') {
             drawX -= Math.floor(source.width / 2);
@@ -200,9 +197,9 @@ export default class TextDrawable extends BaseDrawable {
     }
 
     _scale(scaleX: number, scaleY = scaleX): this {
-        const properties = this.properties;
-        scaleX *= properties.scaleX ?? 1;
-        scaleY *= properties.scaleY ?? 1;
+        const scale = this.getScale();
+        scaleX *= scale.x;
+        scaleY *= scale.y;
         return new (<any>this.constructor)(this.text, this.meta, {
             ...this.properties,
             scaleX,
@@ -211,9 +208,9 @@ export default class TextDrawable extends BaseDrawable {
     }
 
     _offset(offsetX: number, offsetY: number): this {
-        const properties = this.properties;
-        offsetX += properties.offsetX ?? 0;
-        offsetY += properties.offsetY ?? 0;
+        const offset = this.getOffset();
+        offsetX += offset.x;
+        offsetY += offset.y;
         return new (<any>this.constructor)(this.text, this.meta, {
             ...this.properties,
             offsetX,

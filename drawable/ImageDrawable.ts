@@ -45,24 +45,6 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         return super.properties;
     }
 
-    private getScale(): Point {
-        const properties = this.properties;
-        return {
-            x: properties.scaleX ?? 1,
-            y: properties.scaleY ?? 1,
-        };
-    }
-
-    private getOffset(): Point {
-        const scale = this.getScale();
-
-        const properties = this.properties;
-        return {
-            x: (properties.offsetX ?? 0) * scale.x,
-            y: (properties.offsetY ?? 0) * scale.y,
-        };
-    }
-
     getMinPoint(): Point {
         const baseMinPoint = this.getOffset();
         const minPoint = {
