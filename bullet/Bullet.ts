@@ -1,6 +1,7 @@
 import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
+import ObjectUtils from '@/utils/ObjectUtils';
 import { BulletPower } from './BulletPower';
 
 const bulletPowerToDamageMap = {
@@ -43,8 +44,10 @@ export default class Bullet extends GameObject {
 
     setOptions(options: PartialBulletOptions): void {
         super.setOptions(options);
-        this.tankId = options.tankId ?? this.tankId;
-        this.power = options.power ?? this.power;
+        ObjectUtils.keysAssign(this, [
+            'tankId',
+            'power',
+        ], options);
     }
 
     get graphicsMeta(): ResourceMeta[] | undefined | null {

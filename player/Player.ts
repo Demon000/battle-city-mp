@@ -1,6 +1,7 @@
 import { Color } from '@/drawable/Color';
 import { Direction } from '@/physics/Direction';
 import { TankTier } from '@/tank/TankTier';
+import ObjectUtils from '@/utils/ObjectUtils';
 import ButtonPressAction, { ButtonType } from '../actions/ButtonPressAction';
 
 export interface PlayerOptions {
@@ -65,11 +66,13 @@ export default class Player {
     }
 
     setOptions(options: PartialPlayerOptions): void {
-        this.tankId = options.tankId ?? this.tankId;
-        this.teamId = options.teamId ?? this.teamId;
-        this.name = options.name ?? this.name;
-        this.kills = options.kills ?? this.kills;
-        this.deaths = options.deaths ?? this.deaths;
-        this.points = options.points ?? this.points;
+        ObjectUtils.keysAssign(this, [
+            'tankId',
+            'teamId',
+            'name',
+            'kills',
+            'deaths',
+            'points',
+        ], options);
     }
 }

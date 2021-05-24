@@ -1,6 +1,7 @@
 import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
+import ObjectUtils from '@/utils/ObjectUtils';
 import { ExplosionType } from './ExplosionType';
 
 export interface ExplosionOptions extends GameObjectOptions {
@@ -33,8 +34,11 @@ export default class Explosion extends GameObject {
 
     setOptions(options: PartialExplosionOptions): void {
         super.setOptions(options);
-        this.explosionType = options.explosionType ?? this.explosionType;
-        this.destroyedObjectType = options.destroyedObjectType ?? this.destroyedObjectType;
+
+        ObjectUtils.keysAssign(this, [
+            'explosionType',
+            'destroyedObjectType',
+        ], options);
     }
 
     get graphicsMeta(): ResourceMeta[] | undefined | null {

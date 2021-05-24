@@ -1,4 +1,5 @@
 import { Color } from '@/drawable/Color';
+import ObjectUtils from '@/utils/ObjectUtils';
 
 export interface TeamOptions {
     id: string;
@@ -32,7 +33,9 @@ export default class Team {
     }
 
     setOptions(options: TeamOptions): void {
-        this.color = options.color ?? this.color;
-        this.playerIds = options.playerIds ?? this.playerIds;
+        ObjectUtils.keysAssign(this, [
+            'color',
+            'playerIds',
+        ], options);
     }
 }

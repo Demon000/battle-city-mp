@@ -1,6 +1,7 @@
 import { BulletPower } from '@/bullet/BulletPower';
 import { Color } from '@/drawable/Color';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
+import ObjectUtils from '@/utils/ObjectUtils';
 import GameObject, { GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
@@ -143,19 +144,20 @@ export default class Tank extends GameObject {
 
     setOptions(options: PartialTankOptions): void {
         super.setOptions(options);
-
-        this.tier = options.tier ?? this.tier;
-        this.playerId = options.playerId ?? this.playerId;
-        this.playerName = options.playerName ?? this.playerName;
-        this.isShooting = options.isShooting ?? this.isShooting;
-        this.isOnIce = options.isOnIce ?? this.isOnIce;
-        this.isOnSand = options.isOnSand ?? this.isOnSand;
-        this.isUnderBush = options.isUnderBush ?? this.isUnderBush;
-        this.lastBulletShotTime = options.lastBulletShotTime ?? this.lastBulletShotTime;
-        this.lastSmokeTime = options.lastSmokeTime ?? this.lastSmokeTime;
-        this.bulletIds = options.bulletIds ?? this.bulletIds;
-        this.color = options.color ?? this.color;
-        this.health = options.health ?? this.health;
+        ObjectUtils.keysAssign(this, [
+            'tier',
+            'playerId',
+            'playerName',
+            'isShooting',
+            'isOnIce',
+            'isOnSand',
+            'isUnderBush',
+            'lastBulletShotTime',
+            'lastSmokeTime',
+            'bulletIds',
+            'color',
+            'health',
+        ], options);
     }
 
     get tierProperties(): ITankTierProperties {
