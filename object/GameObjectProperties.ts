@@ -52,6 +52,13 @@ const properties: IGameObjectProperties[] = [
         savable: true,
     },
     {
+        type: GameObjectType.DIRT,
+        shortType: GameShortObjectType.DIRT,
+        width: 8,
+        height: 8,
+        savable: true,
+    },
+    {
         type: GameObjectType.WATER,
         shortType: GameShortObjectType.WATER,
         width: 8,
