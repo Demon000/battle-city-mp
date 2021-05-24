@@ -1,4 +1,3 @@
-import { ResourceMeta } from '@/object/IGameObjectProperties';
 import Point from '@/physics/point/Point';
 import BaseImageDrawable from './BaseImageDrawable';
 import { Color } from './Color';
@@ -7,7 +6,6 @@ import { IImageDrawable, ImageDrawableProperties } from './IImageDrawable';
 
 export default class AnimatedImageDrawable extends BaseImageDrawable {
     readonly type = DrawableType.ANIMATED_IMAGE;
-    meta;
 
     drawables;
     durations;
@@ -17,7 +15,6 @@ export default class AnimatedImageDrawable extends BaseImageDrawable {
     constructor(
         drawables: IImageDrawable[],
         durations: number[],
-        meta: ResourceMeta = {},
         loop = true,
         properties: ImageDrawableProperties = {},
     ) {
@@ -31,7 +28,6 @@ export default class AnimatedImageDrawable extends BaseImageDrawable {
         this.durations = durations;
         this.loop = loop;
         this.totalDuration = durations.reduce((sum, timing) => sum + timing, 0);
-        this.meta = meta;
         this.ownProperties = properties;
         this.updateDrawablesInheritedProperties();
     }
@@ -92,7 +88,6 @@ export default class AnimatedImageDrawable extends BaseImageDrawable {
         return new (<any>this.constructor)(
             drawables,
             this.durations,
-            this.meta,
             this.loop,
             this.properties,
         );

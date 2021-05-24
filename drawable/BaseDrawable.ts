@@ -1,10 +1,8 @@
-import { ResourceMeta } from '@/object/IGameObjectProperties';
 import Point from '@/physics/point/Point';
 import IDrawable, { DrawableProperties } from './IDrawable';
 
 export default abstract class BaseDrawable implements IDrawable {
     abstract type: string;
-    abstract meta: ResourceMeta;
 
     private scaleCache = new Map<string, this>();
     private offsetCache = new Map<string, this>();

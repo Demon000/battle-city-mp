@@ -1,11 +1,8 @@
 import AnimatedImageDrawable from '@/drawable/AnimatedImageDrawable';
-import DrawablePositionMatching from '@/drawable/DrawablePositionMatching';
 import { DrawableType } from '@/drawable/DrawableType';
 import IDrawable from '@/drawable/IDrawable';
 import GameObject from '@/object/GameObject';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
-import { Direction } from '@/physics/Direction';
-import Point from '@/physics/point/Point';
 import { Context2D } from '@/utils/CanvasUtils';
 import GameObjectDrawables from './GameObjectDrawables';
 
@@ -18,34 +15,13 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         this.object = object;
     }
 
-    private isMatchingPosition(positionMatching: DrawablePositionMatching, position: Point): boolean {
-        const x = Math.floor(Math.abs(position.x % positionMatching.mod / positionMatching.divide));
-        const y = Math.floor(Math.abs(position.y % positionMatching.mod / positionMatching.divide));
-
-        return positionMatching.equals.some(p => p.x === x && p.y === y);
-    }
-
-    private isMatchingDirection(setDirection: Direction, direction: Direction): boolean {
-        return setDirection === direction;
-    }
-
-    isDrawableMetaEqual(drawableMeta: ResourceMeta, objectMeta: ResourceMeta): boolean {
-        if (drawableMeta.direction !== undefined) {
-            if (objectMeta.direction === undefined) {
-                return false;
-            }
-
-            if (!this.isMatchingDirection(drawableMeta.direction, objectMeta.direction)) {
-                return false;
-            }
+    isDrawableMatchingMeta(drawable: IDrawable, objectMeta: ResourceMeta): boolean {
+        if (drawable.properties.tests === undefined) {
+            return true;
         }
 
-        if (drawableMeta.position !== undefined) {
-            if (objectMeta.position === undefined) {
-                return false;
-            }
-
-            if (!this.isMatchingPosition(drawableMeta.position, objectMeta.position)) {
+        for (const test of drawable.properties.tests) {
+            if (!test(objectMeta)) {
                 return false;
             }
         }
@@ -60,8 +36,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         }
 
         const drawable = drawables
-            .find(d => d.meta === undefined
-                || this.isDrawableMetaEqual(d.meta, meta));
+            .find(d => this.isDrawableMatchingMeta(d, meta));
         if (drawable === undefined) {
             return null;
         }
@@ -91,7 +66,8 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         for (let i = 0; i < metas.length; i++) {
             const drawable = drawables[i];
             const meta = metas[i];
-            if (drawable.meta !== undefined && !this.isDrawableMetaEqual(drawable.meta, meta)) {
+
+            if (!this.isDrawableMatchingMeta(drawable, meta)) {
                 return false;
             }
         }
@@ -102,6 +78,10 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
     protected processDrawable(drawable: IDrawable | undefined): IDrawable | undefined {
         if (drawable !== undefined) {
             drawable = drawable.scale(this.scale);
+        }
+
+        if (drawable !== undefined && drawable.properties.processor !== undefined) {
+            drawable = drawable.properties.processor.call(drawable, this.object);
         }
 
         return drawable;
@@ -141,9 +121,10 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
             return;
         }
 
+        this.scale = scale;
+
         const drawables = this.findDrawablesMatchingMetas(metas);
         if (drawables !== undefined) {
-            this.scale = scale;
             this.drawables = this.processDrawables(drawables);
         }
     }
@@ -171,7 +152,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
             return false;
         }
 
-        if (drawable.meta.isInvisible && !showInvisible) {
+        if (drawable.properties.isInvisible && !showInvisible) {
             return false;
         }
 

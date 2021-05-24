@@ -22,7 +22,6 @@ import TeamService from '@/team/TeamService';
 import PlayerStats from '@/player/PlayerStats';
 import TankService from '@/tank/TankService';
 import LazyIterable from '@/utils/LazyIterable';
-import GameObjectGraphicsRendererFactory from '@/object/GameObjectGraphicsRendererFactory';
 import GameObjectAudioRendererFactory from '@/object/GameObjectAudioRendererFactory';
 
 export enum GameClientEvent {
@@ -45,7 +44,6 @@ export default class GameClient {
     private boundingBoxRepository;
     private collisionService;
     private gameCamera;
-    private graphicsRendererFactory;
     private gameGraphicsService;
     private audioRendererFactory;
     private gameAudioService;
@@ -65,8 +63,7 @@ export default class GameClient {
         this.teamRepository = new MapRepository<string, Team>();
         this.teamService = new TeamService(this.teamRepository);
         this.gameCamera = new GameCamera();
-        this.graphicsRendererFactory = new GameObjectGraphicsRendererFactory();
-        this.gameGraphicsService = new GameGraphicsService(this.graphicsRendererFactory, canvases, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
+        this.gameGraphicsService = new GameGraphicsService(canvases, CLIENT_CONFIG_VISIBLE_GAME_SIZE);
         this.audioRendererFactory = new GameObjectAudioRendererFactory();
         this.gameAudioService = new GameAudioService(this.audioRendererFactory);
         this.gameMapEditorService = new GameMapEditorService(this.gameObjectFactory);

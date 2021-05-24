@@ -1,5 +1,4 @@
 import { CLIENT_SPRITES_RELATIVE_URL } from '@/config';
-import { ResourceMeta } from '@/object/IGameObjectProperties';
 import BaseImageDrawable from './BaseImageDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
@@ -15,11 +14,8 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
     private _isLoaded;
     private source;
 
-    meta;
-
     constructor(
         source: Source | string,
-        meta: ResourceMeta = {},
         properties: ImageDrawableProperties = {},
     ) {
         super();
@@ -37,7 +33,6 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
             this.source = source;
         }
 
-        this.meta = meta;
         this.ownProperties = properties;
     }
 
@@ -178,7 +173,7 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         scale.x *= scaleX;
         scale.y *= scaleY;
 
-        return new (<any>this.constructor)(this.source, this.meta, {
+        return new (<any>this.constructor)(this.source, {
             ...this.properties,
             scaleX: scale.x,
             scaleY: scale.y,
@@ -187,7 +182,7 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
     }
 
     _colorMask(maskColor: Color): this {
-        return new (<any>this.constructor)(this.source, this.meta, {
+        return new (<any>this.constructor)(this.source, {
             ...this.properties,
             maskColor,
         });
@@ -197,7 +192,7 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         const offset = this.getOffset();
         offsetX += offset.x;
         offsetY += offset.y;
-        return new (<any>this.constructor)(this.source, this.meta, {
+        return new (<any>this.constructor)(this.source, {
             ...this.properties,
             offsetX,
             offsetY,

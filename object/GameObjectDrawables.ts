@@ -1,51 +1,73 @@
 import { BulletPower } from '@/bullet/BulletPower';
 import AnimatedImageDrawable from '@/drawable/AnimatedImageDrawable';
-import IDrawable from '@/drawable/IDrawable';
+import IDrawable, { DrawableProcessingFunction, DrawableTestFunction } from '@/drawable/IDrawable';
+import { IImageDrawable } from '@/drawable/IImageDrawable';
 import ImageDrawable from '@/drawable/ImageDrawable';
-import TextDrawable from '@/drawable/TextDrawable';
+import TextDrawable, { TextPositionReference } from '@/drawable/TextDrawable';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
+import Point from '@/physics/point/Point';
+import Tank from '@/tank/Tank';
 import { TankTier } from '@/tank/TankTier';
+import GameObject from './GameObject';
 import { GameObjectType } from './GameObjectType';
+import { ResourceMeta } from './IGameObjectProperties';
 import { RenderPass } from './RenderPass';
+
+const positionTest = (mod: number, divide: number, points: Point[]): DrawableTestFunction => {
+    return (meta: ResourceMeta): boolean => {
+        if (meta.position === undefined) {
+            return false;
+        }
+
+        const position = meta.position;
+        const x = Math.floor(Math.abs(position.x % mod / divide));
+        const y = Math.floor(Math.abs(position.y % mod / divide));
+        return points.some(p => p.x === x && p.y === y);
+    };
+};
+
+const directionTest = (direction: Direction): DrawableTestFunction => {
+    return (meta: ResourceMeta): boolean => {
+        if (meta.direction === undefined) {
+            return false;
+        }
+
+        return meta.direction === direction;
+    };
+};
 
 const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
     [GameObjectType.STEEL_WALL]: [
-        new ImageDrawable('steel_wall.png', {}, {
+        new ImageDrawable('steel_wall.png', {
             renderPass: RenderPass.WALL,
         }),
     ],
     [GameObjectType.BUSH]: [
-        new ImageDrawable('bush.png', {}, {
+        new ImageDrawable('bush.png', {
             renderPass: RenderPass.BUSHES,
         }),
     ],
     [GameObjectType.LEVEL_BORDER]: [
-        new ImageDrawable('level_border.png', {}, {
+        new ImageDrawable('level_border.png', {
             renderPass: RenderPass.WALL,
         }),
     ],
     [GameObjectType.PLAYER_SPAWN]: [
         new ImageDrawable('player_spawn.png', {
-            isInvisible: true,
-        }, {
             renderPass: RenderPass.WALL,
+            isInvisible: true,
             scaleX: 0.5,
             scaleY: 0.5,
         }),
     ],
     [GameObjectType.ICE]: [
-        new ImageDrawable('ice.png', {}, {
-            renderPass: RenderPass.GROUND,
-        }),
-    ],
-    [GameObjectType.GRASS]: [
-        new ImageDrawable('grass.png', {}, {
+        new ImageDrawable('ice.png', {
             renderPass: RenderPass.GROUND,
         }),
     ],
     [GameObjectType.SAND]: [
-        new ImageDrawable('sand.png', {}, {
+        new ImageDrawable('sand.png', {
             renderPass: RenderPass.GROUND,
         }),
     ],
@@ -58,72 +80,102 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             1000,
             1000,
             1000,
-        ], {}, true, {
+        ], true, {
             renderPass: RenderPass.GROUND,
         }),
     ],
     [GameObjectType.BRICK_WALL]: [
         new ImageDrawable('brick_wall_even.png', {
-            position: {
-                mod: 8,
-                divide: 4,
-                equals: [
-                    {
-                        x: 0,
-                        y: 0,
-                    },
-                    {
-                        x: 1,
-                        y: 1,
-                    },
-                ],
-            },
-        }, {
             renderPass: RenderPass.WALL,
+            tests: [
+                positionTest(8, 4, [
+                    { x: 0, y: 0 },
+                    { x: 1, y: 1 },
+                ]),
+            ],
         }),
         new ImageDrawable('brick_wall_odd.png', {
-            position: {
-                mod: 8,
-                divide: 4,
-                equals: [
-                    {
-                        x: 0,
-                        y: 1,
-                    },
-                    {
-                        x: 1,
-                        y: 0,
-                    },
-                ],
-            },
-        }, {
             renderPass: RenderPass.WALL,
+            tests: [
+                positionTest(8, 4, [
+                    { x: 0, y: 1 },
+                    { x: 1, y: 0 },
+                ]),
+            ],
+        }),
+    ],
+    [GameObjectType.GRASS]: [
+        new ImageDrawable('grass_even.png', {
+            renderPass: RenderPass.GROUND,
+            tests: [
+                positionTest(16, 8, [
+                    { x: 0, y: 0 },
+                    { x: 1, y: 1 },
+                ]),
+            ],
+        }),
+        new ImageDrawable('grass_odd.png', {
+            renderPass: RenderPass.GROUND,
+            tests: [
+                positionTest(16, 8, [
+                    { x: 0, y: 1 },
+                    { x: 1, y: 0 },
+                ]),
+            ],
         }),
     ],
     [GameObjectType.TANK]: [
         ...((): IDrawable[] => {
-            const generateTankTierDirectionFrame = (
+            const generateTankDrawableTests = (
                 tier: TankTier,
                 direction: Direction,
-                frame: number,
                 isMoving: boolean,
             ) => {
+                return [
+                    directionTest(direction),
+                    (meta: ResourceMeta): boolean => {
+                        if (!meta.isTank) {
+                            return false;
+                        }
+
+                        if (meta.isMoving !== isMoving) {
+                            return false;
+                        }
+
+                        if (meta.tier !== tier) {
+                            return false;
+                        }
+
+                        return true;
+                    },
+                ];
+            };
+
+            const tankColorProcessor: DrawableProcessingFunction = function (object: GameObject) {
+                const drawable = this as IImageDrawable;
+                const tank = object as Tank;
+                return drawable.colorMask(tank.color);
+            };
+
+            const generateTankDrawableFrame = (
+                tier: TankTier,
+                direction: Direction,
+                isMoving: boolean,
+                frame: number,
+            ) => {
                 return new ImageDrawable(`tank_${tier}_${direction}_${frame}.png`, {
-                    isTank: true,
-                    isMoving,
-                    direction,
-                    tier,
-                }, {
                     renderPass: RenderPass.TANK,
                     scaleX: 0.5,
                     scaleY: 0.5,
+                    tests: generateTankDrawableTests(tier, direction, isMoving),
+                    processor: tankColorProcessor,
                     overlays: [
-                        new ImageDrawable(`tank_${tier}_${direction}_${frame}_highlights.png`, {}, {
+                        new ImageDrawable(`tank_${tier}_${direction}_${frame}_highlights.png`, {
                             compositionType: 'lighter',
                             scaleX: 0.5,
                             scaleY: 0.5,
                         }),
-                        new ImageDrawable(`tank_${tier}_${direction}_${frame}_shadows.png`, {}, {
+                        new ImageDrawable(`tank_${tier}_${direction}_${frame}_shadows.png`, {
                             compositionType: 'difference',
                             scaleX: 0.5,
                             scaleY: 0.5,
@@ -138,24 +190,21 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                 for (const direction of Object.values(Direction)) {
                     drawables.push(
                         new AnimatedImageDrawable([
-                            generateTankTierDirectionFrame(tier, direction, 0, true),
-                            generateTankTierDirectionFrame(tier, direction, 1, true),
+                            generateTankDrawableFrame(tier, direction, true, 0),
+                            generateTankDrawableFrame(tier, direction, true, 1),
                         ], [
                             62.5,
                             62.5,
-                        ], {
-                            isTank: true,
-                            isMoving: true,
-                            direction,
-                            tier,
-                        }, true, {
+                        ], true, {
+                            tests: generateTankDrawableTests(tier, direction, true),
+                            processor: tankColorProcessor,
                             renderPass: RenderPass.TANK,
                             scaleX: 0.5,
                             scaleY: 0.5,
                         }),
                     );
                     drawables.push(
-                        generateTankTierDirectionFrame(tier, direction, 0, false),
+                        generateTankDrawableFrame(tier, direction, false, 0),
                     );
                 }
             }
@@ -163,8 +212,6 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             return drawables;
         })(),
         new TextDrawable('', {
-            isText: true,
-        }, {
             renderPass: RenderPass.TANK_NAME,
             fontFamily: 'Press Start 2P',
             fontUrl: 'press_start_2p.ttf',
@@ -175,6 +222,45 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             paddingX: 1,
             paddingY: 1,
             positionXReference: 'center',
+            tests: [
+                (meta: ResourceMeta): boolean => {
+                    if (!meta.isText) {
+                        return false;
+                    }
+
+                    return true;
+                },
+            ],
+            processor(this: IDrawable, object: GameObject): IDrawable | undefined {
+                const tank = object as Tank;
+                let drawable: TextDrawable | undefined = this as TextDrawable;
+
+                drawable = drawable.withText(tank.playerName);
+                if (drawable === undefined) {
+                    return drawable;
+                }
+
+                const position = object.position;
+                const centerPosition = object.centerPosition;
+                const direction = object.direction;
+                const offsetX = centerPosition.x - position.x;
+                let offsetY = 0;
+                let positionYReference: TextPositionReference | undefined = 'end';
+                if (direction === Direction.UP) {
+                    offsetY = object.height;
+                    positionYReference = undefined;
+                }
+
+                if (positionYReference !== undefined) {
+                    drawable = (drawable as TextDrawable).positionYReference(positionYReference);
+                }
+
+                if (drawable === undefined) {
+                    return drawable;
+                }
+
+                return drawable.offset(offsetX, offsetY);
+            },
         }),
     ],
     [GameObjectType.SMOKE]: [
@@ -186,7 +272,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             250,
             250,
             250,
-        ], {}, false, {
+        ], false, {
             renderPass: RenderPass.SMOKE,
             offsetX: -8,
             offsetY: -8,
@@ -200,14 +286,17 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                 for (const direction of Object.values(Direction)) {
                     drawables.push(
                         new ImageDrawable(`bullet_${power}_${direction}.png`, {
-                            direction,
-                            power,
-                        }, {
                             renderPass: RenderPass.BULLET,
                             offsetX: -2,
                             offsetY: -2,
                             scaleX: 0.5,
                             scaleY: 0.5,
+                            tests: [
+                                directionTest(direction),
+                                (meta: ResourceMeta): boolean => {
+                                    return meta.power === power;
+                                },
+                            ],
                         }),
                     );
                 }
@@ -217,36 +306,58 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
         })(),
     ],
     [GameObjectType.EXPLOSION]: [
-        new AnimatedImageDrawable([
-            new ImageDrawable('explosion_small_0.png'),
-            new ImageDrawable('explosion_small_1.png'),
-            new ImageDrawable('explosion_small_2.png'),
-        ], [
-            80,
-            80,
-            80,
-        ], {
-            explosionType: ExplosionType.SMALL,
-        }, false, {
-            renderPass: RenderPass.EXPLOSIONS,
-            offsetX: -8,
-            offsetY: -8,
-        }),
-        new AnimatedImageDrawable([
-            new ImageDrawable('explosion_big_0.png'),
-            new ImageDrawable('explosion_big_1.png'),
-            new ImageDrawable('explosion_big_2.png'),
-        ], [
-            80,
-            80,
-            80,
-        ], {
-            explosionType: ExplosionType.BIG,
-        }, false, {
-            renderPass: RenderPass.EXPLOSIONS,
-            offsetX: -16,
-            offsetY: -16,
-        }),
+        ...((): IDrawable[] => {
+            const drawables = [];
+
+            const generateExplosionDrawableTests = (
+                type: ExplosionType,
+            ) => [
+                (meta: ResourceMeta): boolean => {
+                    return meta.explosionType === type;
+                },
+            ];
+
+            const generateExplosionDrawableFrame = (
+                type: ExplosionType,
+                frame: number,
+            ) => new ImageDrawable(`explosion_${type}_${frame}.png`);
+
+            drawables.push(
+                new AnimatedImageDrawable([
+                    generateExplosionDrawableFrame(ExplosionType.SMALL, 0),
+                    generateExplosionDrawableFrame(ExplosionType.SMALL, 1),
+                    generateExplosionDrawableFrame(ExplosionType.SMALL, 2),
+                ], [
+                    80,
+                    80,
+                    80,
+                ], false, {
+                    tests: generateExplosionDrawableTests(ExplosionType.SMALL),
+                    renderPass: RenderPass.EXPLOSIONS,
+                    offsetX: -8,
+                    offsetY: -8,
+                }),
+            );
+
+            drawables.push(
+                new AnimatedImageDrawable([
+                    generateExplosionDrawableFrame(ExplosionType.BIG, 0),
+                    generateExplosionDrawableFrame(ExplosionType.BIG, 1),
+                    generateExplosionDrawableFrame(ExplosionType.BIG, 2),
+                ], [
+                    80,
+                    80,
+                    80,
+                ], false, {
+                    tests: generateExplosionDrawableTests(ExplosionType.BIG),
+                    renderPass: RenderPass.EXPLOSIONS,
+                    offsetX: -16,
+                    offsetY: -16,
+                }),
+            );
+
+            return drawables;
+        })(),
     ],
 };
 

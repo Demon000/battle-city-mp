@@ -4,29 +4,20 @@ import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import Point from '@/physics/point/Point';
 import CanvasUtils, { Context2D } from '@/utils/CanvasUtils';
 import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
-import GameObjectGraphicsRendererFactory from '../object/GameObjectGraphicsRendererFactory';
 
 export default class GameGraphicsService {
-    private rendererFactory;
     private scale = 0;
     private gameWidth = 0;
     private gameHeight = 0;
-    private canvases;
     private contexts!: Context2D[];
     private canvasX = 0;
     private canvasY = 0;
-    private targetGameSize;
     private showInvisible = false;
 
     constructor(
-        rendererFactory: GameObjectGraphicsRendererFactory,
-        canvases: HTMLCanvasElement[],
-        targetGameSize: number,
+        private canvases: HTMLCanvasElement[],
+        private targetGameSize: number,
     ) {
-        this.rendererFactory = rendererFactory;
-        this.canvases = canvases;
-        this.targetGameSize = targetGameSize;
-
         this.initializeContexts();
         this.calculateDimensions();
     }
@@ -71,8 +62,7 @@ export default class GameGraphicsService {
 
     getObjectRenderer(object: GameObject): GameObjectGraphicsRenderer {
         if (object.graphicsRenderer === undefined) {
-            object.graphicsRenderer = this.rendererFactory
-                .buildFromObject(object);
+            object.graphicsRenderer = new GameObjectGraphicsRenderer(object);
         }
 
         return object.graphicsRenderer;

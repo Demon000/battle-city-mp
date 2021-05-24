@@ -1,4 +1,3 @@
-import { ResourceMeta } from '@/object/IGameObjectProperties';
 import BaseDrawable from './BaseDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
@@ -37,17 +36,14 @@ export default class TextDrawable extends BaseDrawable {
     private fontFace?: FontFace;
     private _isLoaded = false;
     text;
-    meta;
 
     constructor(
         text: string,
-        meta: ResourceMeta = {},
         properties: TextDrawableProperties = {},
     ) {
         super();
 
         this.text = text;
-        this.meta = meta;
         this.ownProperties = properties;
 
         if (properties.fontFamily !== undefined && properties.fontUrl !== undefined) {
@@ -176,9 +172,7 @@ export default class TextDrawable extends BaseDrawable {
     }
 
     _withText(text: string): this {
-        return new (<any>this.constructor)(text, this.meta, {
-            ...this.properties,
-        });
+        return new (<any>this.constructor)(text, this.properties);
     }
 
     withText(text: string): this | undefined {
@@ -200,7 +194,7 @@ export default class TextDrawable extends BaseDrawable {
         const scale = this.getScale();
         scaleX *= scale.x;
         scaleY *= scale.y;
-        return new (<any>this.constructor)(this.text, this.meta, {
+        return new (<any>this.constructor)(this.text, {
             ...this.properties,
             scaleX,
             scaleY,
@@ -211,7 +205,7 @@ export default class TextDrawable extends BaseDrawable {
         const offset = this.getOffset();
         offsetX += offset.x;
         offsetY += offset.y;
-        return new (<any>this.constructor)(this.text, this.meta, {
+        return new (<any>this.constructor)(this.text, {
             ...this.properties,
             offsetX,
             offsetY,
@@ -219,7 +213,7 @@ export default class TextDrawable extends BaseDrawable {
     }
 
     _positionXReference(positionXReference: TextPositionReference): this {
-        return new (<any>this.constructor)(this.text, this.meta, {
+        return new (<any>this.constructor)(this.text, {
             ...this.properties,
             positionXReference,
         });
@@ -241,7 +235,7 @@ export default class TextDrawable extends BaseDrawable {
     }
 
     _positionYReference(positionYReference: TextPositionReference): this {
-        return new (<any>this.constructor)(this.text, this.meta, {
+        return new (<any>this.constructor)(this.text, {
             ...this.properties,
             positionYReference,
         });
