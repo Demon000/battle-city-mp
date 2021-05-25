@@ -585,6 +585,11 @@ export default class GameServer {
     }
 
     setPlayerTeam(playerId: string, teamId: string): void {
+        const player = this.playerService.getPlayer(playerId);
+        if (player.teamId !== null) {
+            this.teamService.removeTeamPlayer(player.teamId, playerId);
+        }
+
         this.teamService.addTeamPlayer(teamId, playerId);
         this.playerService.setPlayerTeam(playerId, teamId);
     }
