@@ -41,6 +41,24 @@
                 >
                     {{ tier }}
                 </button>
+
+                <template v-if="teams">
+                    <label>Team</label>
+
+                    <button
+                        v-for="team in teams"
+                        :key="team.id"
+                        @click="onPlayerTeamClick(team.id)"
+                    >
+                        <span
+                            class="team-color"
+                            :style="{
+                                background: colorToString(team.color),
+                            }"
+                        >
+                        </span>
+                    </button>
+                </template>
             </div>
 
             <div id="fullscreen-controls" class="controls">
@@ -184,6 +202,7 @@ import { RenderPass } from '@/object/RenderPass';
 import Player from '@/player/Player';
 import PlayerStats from '@/player/PlayerStats';
 import { TankTier } from '@/tank/TankTier';
+import Team from '@/team/Team';
 import screenfull from 'screenfull';
 import { io, Socket } from 'socket.io-client';
 import { markRaw } from 'vue';
@@ -211,6 +230,7 @@ export default class App extends Vue {
     selectedObjectType = GameObjectType.NONE;
     ownPlayer: Player | null = null;
     playersStats: PlayerStats[] | null = null;
+    teams: Team[] | null = null;
     canvases: HTMLCanvasElement[] = [];
 
     mounted(): void {
@@ -223,6 +243,9 @@ export default class App extends Vue {
         this.gameClient = new GameClient(this.canvases);
         this.gameClient.emitter.on(GameClientEvent.PLAYERS_CHANGED, () => {
             this.updatePlayers();
+        });
+        this.gameClient.emitter.on(GameClientEvent.TEAMS_CHANGED, () => {
+            this.updateTeams();
         });
 
         this.gameClientSocket = new GameClientSocket(this.socket, this.gameClient);
@@ -273,6 +296,15 @@ export default class App extends Vue {
 
         const ownPlayer = this.gameClient.getOwnPlayer();
         this.ownPlayer = ownPlayer ? markRaw(ownPlayer) : null;
+    }
+
+    updateTeams(): void {
+        if (this.gameClient === undefined) {
+            return;
+        }
+
+        const teams = this.gameClient.getTeams();
+        this.teams = teams ? markRaw(teams) : null;
     }
 
     clearPlayers(): void {
@@ -382,6 +414,10 @@ export default class App extends Vue {
 
     onPlayerTierClick(tier: TankTier): void {
         this.gameClientSocket?.requestPlayerTankTier(tier);
+    }
+
+    onPlayerTeamClick(teamId: string): void {
+        this.gameClientSocket?.requestPlayerTeam(teamId);
     }
 
     onPlayerNameChanged(): void {
@@ -513,6 +549,12 @@ button {
     position: absolute;
     top: 0;
     left: 0;
+}
+
+#game-controls .team-color {
+    display: inline-block;
+    height: 16px;
+    width: 16px;
 }
 
 #fullscreen-controls {

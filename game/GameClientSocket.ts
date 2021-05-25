@@ -82,6 +82,10 @@ export default class GameClientSocket {
         this.socket.emit(GameSocketEvent.PLAYER_REQUEST_TANK_TIER, tier);
     }
 
+    requestPlayerTeam(teamId: string): void {
+        this.socket.emit(GameSocketEvent.PLAYER_REQUEST_TEAM, teamId);
+    }
+
     requestPlayerAction(action: Action): void {
         this.socket.emit(GameSocketEvent.PLAYER_ACTION, action.toOptions());
     }

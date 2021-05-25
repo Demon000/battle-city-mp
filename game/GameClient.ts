@@ -18,7 +18,7 @@ import { GameServerStatus } from './GameServerStatus';
 import GameObjectFactory from '@/object/GameObjectFactory';
 import EventEmitter from 'eventemitter3';
 import Team from '@/team/Team';
-import TeamService from '@/team/TeamService';
+import TeamService, { TeamServiceEvent } from '@/team/TeamService';
 import PlayerStats from '@/player/PlayerStats';
 import TankService from '@/tank/TankService';
 import LazyIterable from '@/utils/LazyIterable';
@@ -26,10 +26,12 @@ import GameObjectAudioRendererFactory from '@/object/GameObjectAudioRendererFact
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
+    TEAMS_CHANGED = 'teams-changed',
 }
 
 export interface GameClientEvents {
     [GameClientEvent.PLAYERS_CHANGED]: () => void;
+    [GameClientEvent.TEAMS_CHANGED]: () => void,
 }
 
 export default class GameClient {
@@ -84,6 +86,11 @@ export default class GameClient {
         this.playerService.emitter.on(PlayerServiceEvent.PLAYERS_CHANGED,
             () => {
                 this.emitter.emit(GameClientEvent.PLAYERS_CHANGED);
+            });
+
+        this.teamService.emitter.on(TeamServiceEvent.TEAMS_CHANGED,
+            () => {
+                this.emitter.emit(GameClientEvent.TEAMS_CHANGED);
             });
 
         this.ticker.emitter.on(TickerEvent.TICK, this.onTick, this);
@@ -217,6 +224,15 @@ export default class GameClient {
                     tier: tank?.tier || player.requestedTankTier,
                 };
             });
+    }
+
+    getTeams(): Team[] | undefined {
+        const teams = this.teamService.getTeams();
+        if (teams === undefined) {
+            return [];
+        }
+
+        return Array.from(teams);
     }
 
     getOwnPlayer(): Player | undefined {

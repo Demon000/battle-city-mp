@@ -5,11 +5,13 @@ import Team from './Team';
 export enum TeamServiceEvent {
     TEAM_PLAYER_ADDED = 'team-player-added',
     TEAM_PLAYER_REMOVED = 'team-player-removed',
+    TEAMS_CHANGED = 'teams-changed',
 }
 
 interface TeamServiceEvents {
     [TeamServiceEvent.TEAM_PLAYER_ADDED]: (teamId: string, playerId: string) => void,
     [TeamServiceEvent.TEAM_PLAYER_REMOVED]: (teamId: string, playerId: string) => void,
+    [TeamServiceEvent.TEAMS_CHANGED]: () => void,
 }
 
 export default class TeamService {
@@ -24,6 +26,8 @@ export default class TeamService {
         for (const team of teams) {
             this.repository.add(team.id, team);
         }
+
+        this.emitter.emit(TeamServiceEvent.TEAMS_CHANGED);
     }
 
     getTeams(): Iterable<Team> | undefined {

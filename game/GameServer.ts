@@ -594,7 +594,7 @@ export default class GameServer {
         this.playerService.setPlayerTeam(playerId, teamId);
     }
 
-    onPlayerRequestedTeam(playerId: string, teamId: string): void {
+    onPlayerRequestTeam(playerId: string, teamId: string): void {
         const gameModeProperties = this.gameModeService.getGameModeProperties();
         if (!gameModeProperties.hasTeams) {
             return;

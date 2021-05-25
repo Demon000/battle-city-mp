@@ -65,6 +65,10 @@ export default class GameServerSocket {
             this.gameServer.onPlayerRequestTankTier(socket.id, tier);
         });
 
+        socket.on(GameSocketEvent.PLAYER_REQUEST_TEAM, teamId => {
+            this.gameServer.onPlayerRequestTeam(socket.id, teamId);
+        });
+
         socket.on(GameSocketEvent.PLAYER_SET_NAME, name => {
             this.gameServer.onPlayerSetName(socket.id, name);
         });
