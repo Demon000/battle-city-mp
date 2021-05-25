@@ -445,8 +445,8 @@ export default class App extends Vue {
 
         if (this.isBuilding) {
             this.gameClientSocket?.mapEditorDestroyObjects({
-                x: event.offsetX,
-                y: event.offsetY,
+                x: event.offsetX * window.devicePixelRatio,
+                y: event.offsetY * window.devicePixelRatio,
             });
         }
     }
