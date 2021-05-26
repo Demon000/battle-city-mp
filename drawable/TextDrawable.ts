@@ -15,6 +15,7 @@ export type TextPositionReference = 'center' | 'end' | 'default';
 export interface TextDrawableProperties extends DrawableProperties {
     fontUrl?: string;
     fontFamily?: string;
+    fontFace?: FontFace;
     fontSize?: number;
     fontColor?: Color;
     maxTextWidth?: number;
@@ -33,7 +34,6 @@ export default class TextDrawable extends BaseDrawable {
     private positionYReferenceCache = new Map<string, this>();
     protected ownProperties: TextDrawableProperties;
     private cachedSource?: Source;
-    private fontFace?: FontFace;
     private _isLoaded = false;
     text;
 
@@ -46,10 +46,12 @@ export default class TextDrawable extends BaseDrawable {
         this.text = text;
         this.ownProperties = properties;
 
-        if (properties.fontFamily !== undefined && properties.fontUrl !== undefined) {
-            this.fontFace = new FontFace(properties.fontFamily,
+        if (properties.fontFace === undefined
+            && properties.fontFamily !== undefined
+            && properties.fontUrl !== undefined) {
+            properties.fontFace = new FontFace(properties.fontFamily,
                 `url('${CLIENT_FONTS_RELATIVE_URL}/${properties.fontUrl}')`);
-            this.fontFace.load()
+            properties.fontFace.load()
                 .then((fontFace: FontFace) => {
                     document.fonts.add(fontFace);
                 }).catch(_err => {
