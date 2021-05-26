@@ -15,15 +15,24 @@ import { ResourceMeta } from './IGameObjectProperties';
 import { RenderPass } from './RenderPass';
 
 const positionTest = (mod: number, divide: number, points: Point[]): DrawableTestFunction => {
+    const positionCache = new Map<number, boolean>();
     return (meta: ResourceMeta): boolean => {
         if (meta.position === undefined) {
             return false;
         }
 
+        const key = meta.position.x | (meta.position.y << 16);
+        let result = positionCache.get(key);
+        if (result !== undefined) {
+            return result;
+        }
+
         const position = meta.position;
         const x = Math.floor(Math.abs(position.x % mod / divide));
         const y = Math.floor(Math.abs(position.y % mod / divide));
-        return points.some(p => p.x === x && p.y === y);
+        result = points.some(p => p.x === x && p.y === y);
+        positionCache.set(key, result);
+        return result;
     };
 };
 
