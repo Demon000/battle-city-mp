@@ -4,8 +4,8 @@ import IDrawable, { DrawableProperties } from './IDrawable';
 export default abstract class BaseDrawable implements IDrawable {
     abstract type: string;
 
-    private scaleCache = new Map<string, this>();
-    private offsetCache = new Map<string, this>();
+    private scaleCache = new Map<number, this>();
+    private offsetCache = new Map<number, this>();
 
     protected inheritedProperties: DrawableProperties = {};
     protected ownProperties: DrawableProperties = {};
@@ -53,8 +53,8 @@ export default abstract class BaseDrawable implements IDrawable {
         return this._properties;
     }
 
-    getScaleKey(scaleX: number, scaleY: number): string {
-        return `${scaleX},${scaleY}`;
+    getScaleKey(scaleX: number, scaleY: number): number {
+        return scaleX | (scaleY << 16);
     }
 
     scale(scaleX: number, scaleY: number = scaleX): this | undefined {
@@ -73,8 +73,8 @@ export default abstract class BaseDrawable implements IDrawable {
         return drawble;
     }
 
-    getOffsetKey(offsetX: number, offsetY: number): string {
-        return `${offsetX},${offsetY}`;
+    getOffsetKey(offsetX: number, offsetY: number): number {
+        return offsetX | (offsetY << 16);
     }
 
     offset(offsetX: number, offsetY: number): this | undefined {
