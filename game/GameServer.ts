@@ -126,7 +126,19 @@ export default class GameServer {
          */
         this.gameMapService.emitter.on(GameMapServiceEvent.MAP_OBJECTS_OPTIONS,
             (objectsOptions: GameObjectOptions[]) => {
-                const objects = objectsOptions.map(o => this.gameObjectFactory.buildFromOptions(o));
+                const gameModeProperties = this.gameModeService.getGameModeProperties();
+                const objects = objectsOptions
+                    .filter(o => {
+                        if (gameModeProperties.ignoredObjectTypes === undefined
+                            || o.type === undefined) {
+                            return true;
+                        }
+
+                        return !gameModeProperties.ignoredObjectTypes.includes(o.type);
+                    })
+                    .map(o => {
+                        return this.gameObjectFactory.buildFromOptions(o);
+                    });
                 this.gameObjectService.registerObjects(objects);
             });
 
@@ -570,7 +582,7 @@ export default class GameServer {
                 this.gameEventBatcher.flush();
             });
 
-        this.gameModeService.setGameMode('team-deathmatch');
+        this.gameModeService.setGameMode('capture-the-flag');
         this.gameMapService.loadFromFile('./maps/simple.json');
     }
 

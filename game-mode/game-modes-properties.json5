@@ -2,9 +2,19 @@
     'deathmatch': {
         hasTeams: false,
         sameTeamBulletHitMode: 'allow',
+        ignoredObjectTypes: [
+            'flag',
+        ],
     },
     'team-deathmatch': {
         hasTeams: true,
         sameTeamBulletHitMode: 'destroy',
-    }
+        ignoredObjectTypes: [
+            'flag',
+        ],
+    },
+    'capture-the-flag': {
+        hasTeams: true,
+        sameTeamBulletHitMode: 'destroy',
+    },
 }
