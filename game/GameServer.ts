@@ -221,7 +221,6 @@ export default class GameServer {
                         const team = this.teamService.getTeamWithLeastPlayers();
                         this.setPlayerTeam(playerId, team.id);
                     }
-                    let teamId = player.teamId;
 
                     let tankColor;
                     if (gameModeProperties.hasTeams && player.teamId !== null) {
@@ -231,12 +230,12 @@ export default class GameServer {
                         tankColor = player.requestedTankColor;
                     }
 
-                    const position = this.gameObjectService.getRandomSpawnPosition(teamId);
+                    const position = this.gameObjectService.getRandomSpawnPosition(player.teamId);
                     const tank = new Tank({
                         position,
                         playerId,
                         playerName: player.displayName,
-                        teamId: teamId,
+                        teamId: player.teamId,
                         color: tankColor,
                         tier: player.requestedTankTier,
                     });
