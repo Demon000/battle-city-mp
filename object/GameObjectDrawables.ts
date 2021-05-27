@@ -362,9 +362,13 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             offsetX: 9,
             offsetY: -5,
             processor: function (object: GameObject) {
-                const drawable = this as IImageDrawable;
                 const tank = object as Tank;
-                return drawable.colorMask(tank.color);
+                if (tank.flagColor === null) {
+                    return this;
+                }
+
+                const drawable = this as IImageDrawable;
+                return drawable.colorMask(tank.flagColor);
             },
             tests: [
                 (meta: ResourceMeta): boolean => {
