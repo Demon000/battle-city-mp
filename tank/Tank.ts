@@ -145,6 +145,7 @@ export default class Tank extends GameObject {
             bulletIds: this.bulletIds,
             color: this.color,
             health: this.health,
+            flagColor: this.flagColor,
         });
     }
 
@@ -159,6 +160,7 @@ export default class Tank extends GameObject {
             'bulletIds',
             'color',
             'health',
+            'flagColor',
         ], options);
     }
 
