@@ -2,18 +2,18 @@ import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 
 export interface PlayerSpawnOptions extends GameObjectOptions {
-    teamId?: string;
+    teamId?: string | null;
 }
 
 export default class PlayerSpawn extends GameObject {
-    teamId?: string;
+    teamId: string | null;
 
     constructor(options: PlayerSpawnOptions) {
         options.type = GameObjectType.PLAYER_SPAWN;
 
         super(options);
 
-        this.teamId = options.teamId;
+        this.teamId = options.teamId ?? null;
     }
 
     toOptions(): PlayerSpawnOptions {

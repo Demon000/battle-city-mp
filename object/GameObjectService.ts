@@ -121,14 +121,14 @@ export default class GameObjectService {
         }
     }
 
-    getRandomSpawnPosition(teamId?: string): Point {
+    getRandomSpawnPosition(teamId: string | null): Point {
         const objects = this.repository.getAll();
         const playerSpawnObjects = new Array<GameObject>();
 
         for (const object of objects) {
             if (object.type === GameObjectType.PLAYER_SPAWN) {
                 const playerSpawn = object as PlayerSpawn;
-                if (teamId === undefined || teamId === playerSpawn.teamId) {
+                if (teamId === null || teamId === playerSpawn.teamId) {
                     playerSpawnObjects.push(object);
                 }
             }
