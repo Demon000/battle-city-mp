@@ -1,3 +1,4 @@
+import { Color } from '@/drawable/Color';
 import GameObject from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 import CollisionTracker from '@/physics/collisions/CollisionTracker';
@@ -133,5 +134,21 @@ export default class TankService {
     setTankShooting(tankId: number, isShooting: boolean): void {
         const tank = this.getTank(tankId);
         tank.isShooting = isShooting;
+    }
+
+    setTankFlag(tankId: number, teamId: string | null, color: Color | null, sourceId: number | null): void {
+        const tank = this.getTank(tankId);
+        tank.flagTeamId = teamId;
+        tank.flagColor = color;
+        tank.flagSourceId = sourceId;
+
+        this.emitter.emit(TankServiceEvent.TANK_UPDATED, tankId, {
+            flagTeamId: teamId,
+            flagColor: color,
+        });
+    }
+
+    clearTankFlag(tankId: number): void {
+        this.setTankFlag(tankId, null, null, null);
     }
 }

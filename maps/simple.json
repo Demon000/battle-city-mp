@@ -31391,6 +31391,32 @@
                 "y": 688,
                 "x": 128
             }
+        },
+        {
+            "type": "flag",
+            "position": {
+                "x": 592,
+                "y": 64
+            },
+            "teamId": "Red",
+            "color": [
+                220,
+                20,
+                60
+            ]
+        },
+        {
+            "type": "flag",
+            "position": {
+                "x": 64,
+                "y": 592
+            },
+            "teamId": "Blue",
+            "color": [
+                65,
+                105,
+                255
+            ]
         }
     ],
     "teamsOptions": [

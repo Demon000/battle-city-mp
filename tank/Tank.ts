@@ -95,6 +95,7 @@ export interface TankOptions extends GameObjectOptions {
     health?: number;
     flagTeamId?: string | null;
     flagColor?: Color | null;
+    flagSourceId?: number | null;
 }
 
 export type PartialTankOptions = Partial<TankOptions>;
@@ -115,6 +116,7 @@ export default class Tank extends GameObject {
     health: number;
     flagTeamId: string | null;
     flagColor: Color | null;
+    flagSourceId: number | null;
 
     constructor(options: TankOptions) {
         options.type = GameObjectType.TANK;
@@ -136,6 +138,7 @@ export default class Tank extends GameObject {
         this.health = options.health ?? this.maxHealth;
         this.flagTeamId = options.flagTeamId ?? null;
         this.flagColor = options.flagColor ?? null;
+        this.flagSourceId = options.flagSourceId ?? null;
     }
 
     toOptions(): TankOptions {

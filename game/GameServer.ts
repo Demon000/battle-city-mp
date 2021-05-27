@@ -43,6 +43,9 @@ import Registry from '@/ecs/Registry';
 import RegistryNumberIdGenerator from '@/ecs/RegistryNumberIdGenerator';
 import ComponentRegistry from '@/components/ComponentRegistry';
 import EntityBlueprint from '@/entity/EntityBlueprint';
+import Flag, { FlagType, PartialFlagOptions } from '@/flag/Flag';
+import FlagService, { FlagServiceEvent } from '@/flag/FlagService';
+import { PlayerPointsEvent } from '@/player/PlayerPoints';
 
 export interface GameServerEvents {
     [GameEvent.BROADCAST_BATCH]: (events: BroadcastBatchGameEvent[]) => void,
@@ -67,6 +70,7 @@ export default class GameServer {
     private gameObjectRepository;
     private gameObjectService;
     private tankService;
+    private flagService;
     private bulletService;
     private boundingBoxRepository;
     private collisionRules;
@@ -100,6 +104,7 @@ export default class GameServer {
             this.boundingBoxRepository, this.collisionRules);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
         this.tankService = new TankService(this.gameObjectRepository);
+        this.flagService = new FlagService(this.gameObjectRepository);
         this.bulletService = new BulletService(this.gameObjectRepository);
         this.gameMapService = new GameMapService();
         this.playerRepository = new MapRepository<string, Player>();
@@ -314,6 +319,15 @@ export default class GameServer {
                     case GameObjectType.TANK: {
                         const tank = object as Tank;
                         this.playerService.setPlayerTankId(tank.playerId, null);
+                        if (tank.flagTeamId !== null && tank.flagColor !== null) {
+                            const flag = new Flag({
+                                position: tank.position,
+                                teamId: tank.flagTeamId,
+                                color: tank.flagColor,
+                                flagType: FlagType.POLE_ONLY,
+                            });
+                            this.gameObjectService.registerObject(flag);
+                        }
                         break;
                     }
                     case GameObjectType.BULLET: {
@@ -351,6 +365,11 @@ export default class GameServer {
         this.tankService.emitter.on(TankServiceEvent.TANK_UPDATED,
             (tankId: number, tankOptions: PartialTankOptions) => {
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_CHANGED, tankId, tankOptions]);
+            });
+
+        this.flagService.emitter.on(FlagServiceEvent.FLAG_UPDATED,
+            (flagId: number, flagOptions: PartialFlagOptions) => {
+                this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_CHANGED, flagId, flagOptions]);
             });
 
         /**
@@ -495,6 +514,36 @@ export default class GameServer {
                 spawnExplosion(movingBullet.centerPosition, ExplosionType.SMALL);
                 this.gameObjectService.setObjectDestroyed(movingBulletId);
                 this.gameObjectService.setObjectDestroyed(staticBulletId);
+            });
+
+        this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_FLAG,
+            (tankId: number, flagId: number) => {
+                const tank = this.tankService.getTank(tankId);
+                const flag = this.flagService.getFlag(flagId);
+
+                if (tank.flagTeamId === null) {
+                    if (tank.teamId !== flag.teamId && flag.flagType === FlagType.FULL) {
+                        this.tankService.setTankFlag(tankId, flag.teamId, flag.color, flag.id);
+                        this.flagService.setFlagType(flagId, FlagType.BASE_ONLY);
+                    } else if (flag.flagType === FlagType.POLE_ONLY) {
+                        this.tankService.setTankFlag(tankId, flag.teamId, flag.color, flag.sourceId);
+                        this.gameObjectService.setObjectDestroyed(flagId);
+                    }
+                }
+
+                if (tank.flagTeamId !== null && tank.teamId === flag.teamId) {
+                    if (tank.flagTeamId === tank.teamId && flag.flagType === FlagType.BASE_ONLY) {
+                        this.tankService.clearTankFlag(tankId);
+                        this.flagService.setFlagType(flagId, FlagType.FULL);
+                        this.playerService.addPlayerPoints(tank.playerId, PlayerPointsEvent.RETURN_FLAG);
+                    } else if (tank.flagTeamId !== tank.teamId && flag.flagType === FlagType.FULL) {
+                        this.playerService.addPlayerPoints(tank.playerId, PlayerPointsEvent.CAPTURE_FLAG);
+                        if (tank.flagSourceId !== null) {
+                            this.flagService.setFlagType(tank.flagSourceId, FlagType.FULL);
+                        }
+                        this.tankService.clearTankFlag(tankId);
+                    }
+                }
             });
 
         /**

@@ -12,16 +12,18 @@ export enum FlagType {
 
 export interface FlagOptions extends GameObjectOptions {
     teamId: string;
-    color?: Color;
+    color: Color;
     flagType?: FlagType;
+    sourceId?: number;
 }
 
 export type PartialFlagOptions = Partial<FlagOptions>;
 
 export default class Flag extends GameObject {
-    teamId;
-    color;
-    flagType;
+    teamId: string;
+    color: Color;
+    flagType: FlagType;
+    sourceId: number | null;
 
     constructor(options: FlagOptions) {
         options.type = GameObjectType.FLAG;
@@ -31,6 +33,7 @@ export default class Flag extends GameObject {
         this.teamId = options.teamId;
         this.color = options.color ?? [255, 255, 255] as Color;
         this.flagType = options.flagType ?? FlagType.FULL;
+        this.sourceId = options.sourceId ?? null;
     }
 
     toOptions(): FlagOptions {
