@@ -236,6 +236,7 @@ export default class GameServer {
                         position,
                         playerId,
                         playerName: player.displayName,
+                        teamId: teamId,
                         color: tankColor,
                         tier: player.requestedTankTier,
                     });
