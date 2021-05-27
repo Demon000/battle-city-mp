@@ -1,5 +1,4 @@
 import GameObject, { GameObjectOptions } from '@/object/GameObject';
-import GameObjectFactory from '@/object/GameObjectFactory';
 import { TeamOptions } from '@/team/Team';
 import LazyIterable from '@/utils/LazyIterable';
 import EventEmitter from 'eventemitter3';

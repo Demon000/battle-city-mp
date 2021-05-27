@@ -44,7 +44,7 @@ export default class EntityFactory {
             case EntityType.BRICK_WALL:
                 return this.buildBrickWall(position);
             default:
-                throw new Error(`Unexpected world object entity type: ${type}`)
+                throw new Error(`Unexpected world object entity type: ${type}`);
         }
     }
 }

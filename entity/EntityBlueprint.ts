@@ -13,7 +13,7 @@ export default class EntityBlueprint {
         const blueprintData = this.typesBlueprintDataMap[type];
         assert(blueprintData);
         return Object.entries(blueprintData).map(
-            ([tag, data]) => [this.componentRegistry.getComponentClassByTag(tag), data]
+            ([tag, data]) => [this.componentRegistry.getComponentClassByTag(tag), data],
         );
     }
 }

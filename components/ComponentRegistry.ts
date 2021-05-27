@@ -9,11 +9,11 @@ import { assertType } from 'typescript-is';
 
 export type DataOfComponent<T> =
     T extends NewEntityComponent ? NewEntityComponentData :
-    T extends BoundingBoxComponent ? BoundingBoxComponentData :
-    T extends CollisionComponent ? CollisionComponentData :
-    T extends PositionComponent ? PositionComponentData :
-    T extends SizeComponent ? SizeComponentData :
-    never;
+        T extends BoundingBoxComponent ? BoundingBoxComponentData :
+            T extends CollisionComponent ? CollisionComponentData :
+                T extends PositionComponent ? PositionComponentData :
+                    T extends SizeComponent ? SizeComponentData :
+                        never;
 
 interface ProcessResults {
     clazz: ComponentClassType<any>;
