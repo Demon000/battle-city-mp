@@ -216,15 +216,12 @@ export default class GameServer {
                 const player = this.playerService.getPlayer(playerId);
 
                 if (status === PlayerSpawnStatus.SPAWN && player.tankId === null) {
-                    let teamId;
                     const gameModeProperties = this.gameModeService.getGameModeProperties();
                     if (gameModeProperties.hasTeams && player.teamId === null) {
                         const team = this.teamService.getTeamWithLeastPlayers();
                         this.setPlayerTeam(playerId, team.id);
-                        teamId = team.id;
-                    } else if (gameModeProperties.hasTeams && player.teamId !== null) {
-                        teamId = player.teamId;
                     }
+                    let teamId = player.teamId;
 
                     let tankColor;
                     if (gameModeProperties.hasTeams && player.teamId !== null) {
