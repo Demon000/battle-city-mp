@@ -103,9 +103,9 @@ export default class Tank extends GameObject {
     playerId: string;
     playerName: string;
     isShooting: boolean;
-    isOnIce?: boolean;
-    isOnSand?: boolean;
-    isUnderBush?: boolean;
+    isOnIce: boolean;
+    isOnSand: boolean;
+    isUnderBush: boolean;
     lastBulletShotTime: number;
     lastSmokeTime: number;
     bulletIds: number[];
