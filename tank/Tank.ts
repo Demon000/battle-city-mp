@@ -160,8 +160,6 @@ export default class Tank extends GameObject {
             'playerId',
             'playerName',
             'isShooting',
-            'isOnIce',
-            'isOnSand',
             'isUnderBush',
             'lastBulletShotTime',
             'lastSmokeTime',
