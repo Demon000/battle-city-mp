@@ -5,6 +5,7 @@ import { IImageDrawable } from '@/drawable/IImageDrawable';
 import ImageDrawable from '@/drawable/ImageDrawable';
 import TextDrawable, { TextPositionReference } from '@/drawable/TextDrawable';
 import { ExplosionType } from '@/explosion/ExplosionType';
+import Flag from '@/flag/Flag';
 import { Direction } from '@/physics/Direction';
 import Point from '@/physics/point/Point';
 import Tank from '@/tank/Tank';
@@ -165,6 +166,49 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             ],
         }),
     ],
+    [GameObjectType.FLAG]: [
+        new ImageDrawable('flag_base.png', {
+            renderPass: RenderPass.FLAG_BASE,
+            offsetX: 2,
+            offsetY: 2,
+            tests: [
+                (meta: ResourceMeta): boolean => {
+                    return meta.isFlagBase === true;
+                },
+            ],
+        }),
+        new ImageDrawable('flag_pole.png', {
+            renderPass: RenderPass.FLAG_POLE,
+            offsetX: 7,
+            offsetY: -15,
+            tests: [
+                (meta: ResourceMeta): boolean => {
+                    return meta.isFlagPole === true;
+                },
+            ],
+        }),
+        new ImageDrawable('flag_cloth.png', {
+            renderPass: RenderPass.FLAG_POLE,
+            offsetX: 8,
+            offsetY: -15,
+            processor: function (object: GameObject) {
+                const drawable = this as IImageDrawable;
+                const flag = object as Flag;
+                return drawable.colorMask(flag.color);
+            },
+            tests: [
+                (meta: ResourceMeta): boolean => {
+                    return meta.isFlagCloth === true;
+                },
+            ],
+            overlays: [
+                new ImageDrawable('flag_cloth_shadows.png', {
+                    renderPass: RenderPass.FLAG_POLE,
+                    compositionType: 'difference',
+                }),
+            ],
+        }),
+    ],
     [GameObjectType.TANK]: [
         ...((): IDrawable[] => {
             const generateTankDrawableTests = (
@@ -302,6 +346,37 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
 
                 return drawable.offset(offsetX, offsetY);
             },
+        }),
+        new ImageDrawable('flag_pole_tank.png', {
+            renderPass: RenderPass.FLAG_POLE,
+            offsetX: 8,
+            offsetY: -5,
+            tests: [
+                (meta: ResourceMeta): boolean => {
+                    return meta.isFlagPole === true;
+                },
+            ],
+        }),
+        new ImageDrawable('flag_cloth.png', {
+            renderPass: RenderPass.FLAG_POLE,
+            offsetX: 9,
+            offsetY: -5,
+            processor: function (object: GameObject) {
+                const drawable = this as IImageDrawable;
+                const tank = object as Tank;
+                return drawable.colorMask(tank.color);
+            },
+            tests: [
+                (meta: ResourceMeta): boolean => {
+                    return meta.isFlagCloth === true;
+                },
+            ],
+            overlays: [
+                new ImageDrawable('flag_cloth_shadows.png', {
+                    renderPass: RenderPass.FLAG_POLE,
+                    compositionType: 'difference',
+                }),
+            ],
         }),
     ],
     [GameObjectType.SMOKE]: [

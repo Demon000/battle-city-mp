@@ -92,6 +92,8 @@ export interface TankOptions extends GameObjectOptions {
     bulletIds?: number[];
     color?: Color;
     health?: number;
+    flagTeamId?: string | null;
+    flagColor?: Color | null;
 }
 
 export type PartialTankOptions = Partial<TankOptions>;
@@ -109,6 +111,8 @@ export default class Tank extends GameObject {
     bulletIds: number[];
     color: Color;
     health: number;
+    flagTeamId: string | null;
+    flagColor: Color | null;
 
     constructor(options: TankOptions) {
         options.type = GameObjectType.TANK;
@@ -127,6 +131,8 @@ export default class Tank extends GameObject {
         this.bulletIds = options.bulletIds ?? new Array<number>();
         this.color = options.color ?? [231, 156, 33];
         this.health = options.health ?? this.maxHealth;
+        this.flagTeamId = options.flagTeamId ?? null;
+        this.flagColor = options.flagColor ?? null;
     }
 
     toOptions(): TankOptions {
@@ -235,21 +241,29 @@ export default class Tank extends GameObject {
     }
 
     get graphicsMeta(): ResourceMeta[] | undefined | null {
-        const tankGraphicsMeta = {
+        const metas: ResourceMeta[] = [{
             isTank: true,
             direction: this.direction,
             isMoving: this.isMoving,
             tier: this.tier,
-        };
-
-        const textGraphicsMeta = {
-            isText: true,
-        };
-
-        const metas: ResourceMeta[] = [tankGraphicsMeta];
+        }];
 
         if (!this.isUnderBush) {
-            metas.push(textGraphicsMeta);
+            metas.push({
+                isText: true,
+            });
+        }
+
+        if (this.flagColor) {
+            metas.push(
+                {
+                    isFlagPole: true,
+                },
+                {
+                    isFlagCloth: true,
+                    color: this.flagColor,
+                },
+            );
         }
 
         return metas;

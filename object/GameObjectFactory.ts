@@ -2,6 +2,7 @@ import BrickWall from '@/brick-wall/BrickWall';
 import Bullet, { BulletOptions } from '@/bullet/Bullet';
 import Dirt from '@/dirt/Dirt';
 import Explosion, { ExplosionOptions } from '@/explosion/Explosion';
+import Flag, { FlagOptions } from '@/flag/Flag';
 import Grass from '@/grass/Grass';
 import PlayerSpawn, { PlayerSpawnOptions } from '@/player-spawn/PlayerSpawn';
 import Tank, { TankOptions } from '../tank/Tank';
@@ -24,6 +25,8 @@ export default class GameObjectFactory {
             return new Explosion(options as ExplosionOptions);
         } else if (options.type === GameObjectType.PLAYER_SPAWN) {
             return new PlayerSpawn(options as PlayerSpawnOptions);
+        } else if (options.type === GameObjectType.FLAG) {
+            return new Flag(options as FlagOptions);
         } else {
             return new GameObject(options);
         }

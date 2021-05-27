@@ -1,9 +1,10 @@
 export enum RenderPass {
-    ALL,
     GROUND,
+    FLAG_BASE,
     WALL,
     BULLET,
     TANK,
+    FLAG_POLE,
     TANK_NAME,
     BUSHES,
     EXPLOSIONS,

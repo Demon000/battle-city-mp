@@ -73,6 +73,13 @@ const properties: IGameObjectProperties[] = [
         savable: true,
     },
     {
+        type: GameObjectType.FLAG,
+        shortType: GameShortObjectType.FLAG,
+        width: 16,
+        height: 16,
+        savable: true,
+    },
+    {
         type: GameObjectType.SMOKE,
         width: 0,
         height: 0,
