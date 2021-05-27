@@ -337,6 +337,7 @@ export default class GameServer {
                                 teamId: tank.flagTeamId,
                                 color: tank.flagColor,
                                 flagType: FlagType.POLE_ONLY,
+                                sourceId: tank.flagSourceId,
                             });
                             this.gameObjectService.registerObject(flag);
                         }

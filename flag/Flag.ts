@@ -14,7 +14,7 @@ export interface FlagOptions extends GameObjectOptions {
     teamId: string;
     color: Color;
     flagType?: FlagType;
-    sourceId?: number;
+    sourceId?: number | null;
 }
 
 export type PartialFlagOptions = Partial<FlagOptions>;
