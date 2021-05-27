@@ -150,25 +150,38 @@ export default class PlayerService {
         }
     }
 
-    addPlayerKill(playerId: string): void {
+    addPlayerPoints(playerId: string, event: PlayerPointsEvent): void {
         const player = this.repository.get(playerId);
-        player.points += PlayerPoints[PlayerPointsEvent.KILL];
-        player.kills += 1;
+        player.points += PlayerPoints[event];
+
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
             points: player.points,
+        });
+    }
+
+    addPlayerKill(playerId: string): void {
+        const player = this.repository.get(playerId);
+
+        this.addPlayerPoints(playerId, PlayerPointsEvent.KILL);
+
+        player.kills += 1;
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
             kills: player.kills,
         });
+
         this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
     }
 
     addPlayerDeath(playerId: string): void {
         const player = this.repository.get(playerId);
-        player.points += PlayerPoints[PlayerPointsEvent.DEATH];
+
+        this.addPlayerPoints(playerId, PlayerPointsEvent.DEATH);
+
         player.deaths += 1;
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
-            points: player.points,
             deaths: player.deaths,
         });
+
         this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
     }
     
