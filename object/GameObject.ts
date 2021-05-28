@@ -207,7 +207,10 @@ export default class GameObject {
 
     getPositionedBoundingBox(position: Point): BoundingBox {
         return {
-            tl: position,
+            tl: {
+                x: position.x,
+                y: position.y,
+            },
             br: {
                 y: position.y + this.height,
                 x: position.x + this.width,
