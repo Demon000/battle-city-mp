@@ -34,8 +34,11 @@ export default class GameMapEditorService {
         };
     }
 
-    updateGhostObjects(): void {
-        this.ghostObjects = [];
+    updateGhostObjects(positionsOnly = false): void {
+        console.log(positionsOnly);
+        if (!positionsOnly) {
+            this.ghostObjects = [];
+        }
 
         if (!this.enabled
             || this.selectedType === GameObjectType.NONE
@@ -45,7 +48,6 @@ export default class GameMapEditorService {
             return;
         }
 
-
         const snappedPosition = this.getSnappedRelativePosition(this.hoverPosition);
         if (snappedPosition === undefined) {
             return;
@@ -54,17 +56,28 @@ export default class GameMapEditorService {
         let object;
         for (let y = 0; y < this.gridSize;) {
             for (let x = 0; x < this.gridSize;) {
-                object = this.gameObjectFactory.buildFromOptions({
-                    type: this.selectedType,
-                    position: {
+                if (positionsOnly) {
+                    const i = y * this.gridSize + x;
+                    object = this.ghostObjects[i];
+                    object.position = {
                         x: snappedPosition.x + x,
                         y: snappedPosition.y + y,
-                    },
-                });
+                    };
+                } else {
+                    object = this.gameObjectFactory.buildFromOptions({
+                        type: this.selectedType,
+                        position: {
+                            x: snappedPosition.x + x,
+                            y: snappedPosition.y + y,
+                        },
+                    });
+                }
 
                 x += object.width;
 
-                this.ghostObjects.push(object);
+                if (!positionsOnly) {
+                    this.ghostObjects.push(object);
+                }
             }
 
             if (object === undefined) {
@@ -77,22 +90,39 @@ export default class GameMapEditorService {
 
     setEnabled(enabled: boolean): void {
         this.enabled = enabled;
+        this.updateGhostObjects();
+    }
+
+    isEnabled(): boolean {
+        return this.enabled;
     }
 
     setGridSize(gridSize: number): void {
         this.gridSize = gridSize;
+        this.updateGhostObjects();
     }
 
     setSelectedObjectType(type: GameObjectType): void {
         this.selectedType = type;
+        this.updateGhostObjects();
     }
 
     setHoverPosition(position: Point): void {
+        if (!this.enabled) {
+            return;
+        }
+
         this.hoverPosition = position;
+        this.updateGhostObjects(true);
     }
 
     setViewPosition(position: Point): void {
+        if (!this.enabled) {
+            return;
+        }
+
         this.viewPosition = position;
+        this.updateGhostObjects(true);
     }
 
     getGridSize(): number {

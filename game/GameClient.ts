@@ -184,16 +184,17 @@ export default class GameClient {
         this.gameGraphicsService.renderObjectsOver(viewableObjects);
         this.gameAudioService.playObjectsAudioEffect(viewableObjects, position, box);
 
-        const gridSize = this.gameMapEditorService.getGridSize();
-        if (gridSize !== 0) {
-            this.gameGraphicsService.renderGrid(gridSize);
-        }
+        if (this.gameMapEditorService.isEnabled()) {
+            const gridSize = this.gameMapEditorService.getGridSize();
+            if (gridSize !== 0) {
+                this.gameGraphicsService.renderGrid(gridSize);
+            }
 
-        this.gameMapEditorService.setViewPosition(box.tl);
-        this.gameMapEditorService.updateGhostObjects();
-        const ghostObjects = this.gameMapEditorService.getGhostObjects();
-        if (ghostObjects.length !== 0) {
-            this.gameGraphicsService.renderObjectsOver(ghostObjects);
+            this.gameMapEditorService.setViewPosition(box.tl);
+            const ghostObjects = this.gameMapEditorService.getGhostObjects();
+            if (ghostObjects.length !== 0) {
+                this.gameGraphicsService.renderObjectsOver(ghostObjects);
+            }
         }
     }
 
