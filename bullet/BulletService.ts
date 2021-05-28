@@ -1,6 +1,7 @@
 import GameObject from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
+import BoundingBoxUtils from '@/physics/bounding-box/BoundingBoxUtils';
 import DirectionUtils from '@/physics/collisions/DirectionUtils';
 import { Direction } from '@/physics/Direction';
 import Tank from '@/tank/Tank';
@@ -37,7 +38,7 @@ export default class BulletService {
     getBulletBrickWallDestroyBox(bulletId: number, brickWallId: number): BoundingBox {
         const bullet = this.getBullet(bulletId);
         const brickWall = this.repository.get(brickWallId);
-        const box = brickWall.getBoundingBox();
+        const box = BoundingBoxUtils.clone(brickWall.getBoundingBox());
 
         const bulletCenter = bullet.centerPosition;
         const brickWallCenterPosition = brickWall.centerPosition;

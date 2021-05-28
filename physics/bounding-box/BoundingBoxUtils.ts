@@ -8,6 +8,19 @@ export default class BoundingBoxUtils {
         return wx * wy;
     }
 
+    static clone(box: BoundingBox): BoundingBox {
+        return {
+            tl: {
+                x: box.tl.x,
+                y: box.tl.y,
+            },
+            br: {
+                x: box.br.x,
+                y: box.br.y,
+            },
+        };
+    }
+
     static combine(first: BoundingBox, second: BoundingBox): BoundingBox {
         const tl = PointUtils.min(first.tl, second.tl);
         const br = PointUtils.max(first.br, second.br);
