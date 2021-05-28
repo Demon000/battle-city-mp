@@ -265,12 +265,12 @@ export default class Tank extends GameObject {
         this.markGraphicsMetaUpdated();
     }
 
-    get movementSpeed(): number {
-        return super.movementSpeed;
+    get isMoving(): boolean {
+        return super.isMoving;
     }
 
-    set movementSpeed(value: number) {
-        super.movementSpeed = value;
+    set isMoving(value: boolean) {
+        super.isMoving = value;
         this.markGraphicsMetaUpdated();
         this.updateAudioMeta();
     }

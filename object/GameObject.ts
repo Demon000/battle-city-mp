@@ -25,6 +25,7 @@ export default class GameObject {
     protected _position: Point;
     protected _direction: Direction;
     protected _movementSpeed: number;
+    protected _isMoving: boolean;
     graphicsMetaUpdated = false;
 
     id: number;
@@ -48,6 +49,7 @@ export default class GameObject {
         this._position = options.position ?? {x: 0, y: 0};
         this._direction = options.direction ?? Direction.UP;
         this._movementSpeed = options.movementSpeed ?? 0;
+        this._isMoving = this._movementSpeed > 0;
         this.movementDirection = options.movementDirection ?? null;
         this.spawnTime = Date.now();
     }
@@ -116,10 +118,19 @@ export default class GameObject {
 
     set movementSpeed(value: number) {
         this._movementSpeed = value;
+
+        const isMoving = value > 0;
+        if (this.isMoving !== isMoving) {
+            this.isMoving = isMoving;
+        }
     }
 
     get isMoving(): boolean {
-        return this.movementSpeed > 0;
+        return this._isMoving;
+    }
+
+    set isMoving(value: boolean) {
+        this._isMoving = value;
     }
 
     get centerPosition(): Point {
