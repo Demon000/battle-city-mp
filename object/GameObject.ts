@@ -23,6 +23,7 @@ export default class GameObject {
     protected _graphicsMeta: ResourceMeta[] | undefined | null;
     protected _audioMeta: ResourceMeta | undefined | null;
     protected _position: Point;
+    protected _boundingBox: BoundingBox;
     protected _direction: Direction;
     protected _movementSpeed: number;
     protected _isMoving: boolean;
@@ -47,6 +48,7 @@ export default class GameObject {
         this.id = options.id ?? GameObject.globalId++;
         this.type = options.type;
         this._position = options.position ?? {x: 0, y: 0};
+        this._boundingBox = this.getPositionedBoundingBox(this._position);
         this._direction = options.direction ?? Direction.UP;
         this._movementSpeed = options.movementSpeed ?? 0;
         this._isMoving = this._movementSpeed > 0;
@@ -189,7 +191,17 @@ export default class GameObject {
         return this._audioMeta;
     }
 
-    getBoundingBox(position=this._position): BoundingBox {
+    getBoundingBox(): BoundingBox {
+        const boundingBox = this._boundingBox;
+        const position = this._position;
+        if (boundingBox.tl.x === position.x && boundingBox.tl.y === position.y) {
+            return boundingBox;
+        }
+
+        return this._boundingBox = this.getPositionedBoundingBox(position);
+    }
+
+    getPositionedBoundingBox(position: Point): BoundingBox {
         return {
             tl: position,
             br: {
