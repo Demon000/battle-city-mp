@@ -253,7 +253,7 @@ export default class Tank extends GameObject {
 
     set isUnderBush(value: boolean) {
         this._isUnderBush = value;
-        this.updateGraphicsMeta();
+        this.markGraphicsMetaUpdated();
     }
 
     get flagColor(): Color | null {
@@ -262,7 +262,7 @@ export default class Tank extends GameObject {
 
     set flagColor(value: Color | null) {
         this._flagColor = value;
-        this.updateGraphicsMeta();
+        this.markGraphicsMetaUpdated();
     }
 
     get movementSpeed(): number {
@@ -271,7 +271,7 @@ export default class Tank extends GameObject {
 
     set movementSpeed(value: number) {
         super.movementSpeed = value;
-        this.updateGraphicsMeta();
+        this.markGraphicsMetaUpdated();
         this.updateAudioMeta();
     }
 
@@ -281,7 +281,7 @@ export default class Tank extends GameObject {
 
     set direction(value: Direction) {
         super.direction = value;
-        this.updateGraphicsMeta();
+        this.markGraphicsMetaUpdated();
     }
 
     protected updateGraphicsMeta(): void {

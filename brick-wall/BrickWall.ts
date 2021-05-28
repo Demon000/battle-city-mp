@@ -15,7 +15,7 @@ export default class BrickWall extends GameObject {
 
     set position(value: Point) {
         super.position = value;
-        this.updateGraphicsMeta();
+        this.markGraphicsMetaUpdated();
     }
 
     protected updateGraphicsMeta(): void {

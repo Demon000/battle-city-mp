@@ -25,6 +25,7 @@ export default class GameObject {
     protected _position: Point;
     protected _direction: Direction;
     protected _movementSpeed: number;
+    graphicsMetaUpdated = false;
 
     id: number;
     type: GameObjectType;
@@ -152,13 +153,18 @@ export default class GameObject {
         this._graphicsMeta = [{}];
     }
 
+    protected markGraphicsMetaUpdated(): void {
+        this.updateGraphicsMeta();
+        this.graphicsMetaUpdated = true;
+    }
+
     protected updateAudioMeta(): void {
         this._audioMeta = undefined;
     }
 
     get graphicsMeta(): ResourceMeta[] | undefined | null {
         if (this._graphicsMeta === undefined) {
-            this.updateGraphicsMeta();
+            this.markGraphicsMetaUpdated();
         }
 
         return this._graphicsMeta;

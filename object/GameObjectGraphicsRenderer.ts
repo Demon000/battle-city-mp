@@ -58,23 +58,6 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
         return drawables.filter(this.filterOutMissingDrawable) as IDrawable[];
     }
 
-    private isDrawablesMatchingMetas(drawables: IDrawable[], metas: ResourceMeta[]): boolean {
-        if (metas.length !== drawables.length) {
-            return false;
-        }
-
-        for (let i = 0; i < metas.length; i++) {
-            const drawable = drawables[i];
-            const meta = metas[i];
-
-            if (!this.isDrawableMatchingMeta(drawable, meta)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     protected processDrawable(drawable: IDrawable | undefined): IDrawable | undefined {
         if (drawable !== undefined) {
             drawable = drawable.scale(this.scale);
@@ -111,22 +94,17 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
             return;
         }
 
-        /*
-         * If our last metas were null, and our current metas is not null, or if our
-         * drawables no longer match the metas, try to find drawables matching the metas.
-         */
-        if (this.drawables !== null
-            && this.isDrawablesMatchingMetas(this.drawables, metas)
-            && scale === this.scale) {
+        if (!this.object.graphicsMetaUpdated) {
             return;
         }
 
         this.scale = scale;
-
         const drawables = this.findDrawablesMatchingMetas(metas);
         if (drawables !== undefined) {
             this.drawables = this.processDrawables(drawables);
         }
+
+        this.object.graphicsMetaUpdated = false;
     }
 
     isRenderable(): boolean {

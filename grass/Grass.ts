@@ -8,7 +8,7 @@ export default class Grass extends GameObject {
 
     set position(value: Point) {
         super.position = value;
-        this.updateGraphicsMeta();
+        this.markGraphicsMetaUpdated();
     }
 
     protected updateGraphicsMeta(): void {

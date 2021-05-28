@@ -59,7 +59,7 @@ export default class Flag extends GameObject {
 
     set flagType(type: FlagType) {
         this._flagType = type;
-        this.updateGraphicsMeta();
+        this.markGraphicsMetaUpdated();
     }
 
     protected updateGraphicsMeta(): void {
