@@ -20,9 +20,10 @@ export interface FlagOptions extends GameObjectOptions {
 export type PartialFlagOptions = Partial<FlagOptions>;
 
 export default class Flag extends GameObject {
+    protected _flagType: FlagType;
+
     teamId: string;
     color: Color;
-    flagType: FlagType;
     sourceId: number | null;
 
     constructor(options: FlagOptions) {
@@ -32,7 +33,7 @@ export default class Flag extends GameObject {
 
         this.teamId = options.teamId;
         this.color = options.color ?? [255, 255, 255] as Color;
-        this.flagType = options.flagType ?? FlagType.FULL;
+        this._flagType = options.flagType ?? FlagType.FULL;
         this.sourceId = options.sourceId ?? null;
     }
 
@@ -41,7 +42,7 @@ export default class Flag extends GameObject {
         return Object.assign(gameObjectOptions, {
             teamId: this.teamId,
             color: this.color,
-            flagType: this.flagType,
+            flagType: this._flagType,
         });
     }
 
@@ -54,19 +55,28 @@ export default class Flag extends GameObject {
         ], options);
     }
 
-    get graphicsMeta(): ResourceMeta[] | undefined | null {
+    get flagType(): FlagType {
+        return this._flagType;
+    }
+
+    set flagType(type: FlagType) {
+        this._flagType = type;
+        this.updateGraphicsMeta();
+    }
+
+    protected updateGraphicsMeta(): void {
         const metas: ResourceMeta[] = [];
+        const flagType = this._flagType;
 
-
-        if (this.flagType === FlagType.FULL
-            || this.flagType === FlagType.BASE_ONLY) {
+        if (flagType === FlagType.FULL
+            || flagType === FlagType.BASE_ONLY) {
             metas.push({
                 isFlagBase: true,
             });
         }
 
-        if (this.flagType === FlagType.FULL
-            || this.flagType === FlagType.POLE_ONLY) {
+        if (flagType === FlagType.FULL
+            || flagType === FlagType.POLE_ONLY) {
             metas.push(
                 {
                     isFlagPole: true,
@@ -78,6 +88,6 @@ export default class Flag extends GameObject {
             );
         }
 
-        return metas;
+        this._graphicsMeta = metas;
     }
 }

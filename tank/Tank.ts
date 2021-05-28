@@ -1,6 +1,7 @@
 import { BulletPower } from '@/bullet/BulletPower';
 import { Color } from '@/drawable/Color';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
+import { Direction } from '@/physics/Direction';
 import ObjectUtils from '@/utils/ObjectUtils';
 import GameObject, { GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
@@ -101,13 +102,15 @@ export interface TankOptions extends GameObjectOptions {
 export type PartialTankOptions = Partial<TankOptions>;
 
 export default class Tank extends GameObject {
+    protected _isUnderBush: boolean;
+    protected _flagColor: Color | null;
+
     tier: TankTier;
     playerId: string;
     playerName: string;
     isShooting: boolean;
     isOnIce: boolean;
     isOnSand: boolean;
-    isUnderBush: boolean;
     lastBulletShotTime: number;
     lastSmokeTime: number;
     bulletIds: number[];
@@ -115,7 +118,6 @@ export default class Tank extends GameObject {
     color: Color;
     health: number;
     flagTeamId: string | null;
-    flagColor: Color | null;
     flagSourceId: number | null;
 
     constructor(options: TankOptions) {
@@ -129,7 +131,7 @@ export default class Tank extends GameObject {
         this.isShooting = options.isShooting ?? false;
         this.isOnIce = options.isOnIce ?? false;
         this.isOnSand = options.isOnSand ?? false;
-        this.isUnderBush = options.isUnderBush ?? false;
+        this._isUnderBush = options.isUnderBush ?? false;
         this.lastBulletShotTime = options.lastBulletShotTime ?? 0;
         this.lastSmokeTime = options.lastSmokeTime ?? 0;
         this.bulletIds = options.bulletIds ?? new Array<number>();
@@ -137,7 +139,7 @@ export default class Tank extends GameObject {
         this.color = options.color ?? [231, 156, 33];
         this.health = options.health ?? this.maxHealth;
         this.flagTeamId = options.flagTeamId ?? null;
-        this.flagColor = options.flagColor ?? null;
+        this._flagColor = options.flagColor ?? null;
         this.flagSourceId = options.flagSourceId ?? null;
     }
 
@@ -248,7 +250,44 @@ export default class Tank extends GameObject {
         return this.tierProperties.bulletCooldown;
     }
 
-    get graphicsMeta(): ResourceMeta[] | undefined | null {
+    get isUnderBush(): boolean {
+        return this._isUnderBush;
+    }
+
+    set isUnderBush(value: boolean) {
+        this._isUnderBush = value;
+        this.updateGraphicsMeta();
+    }
+
+    get flagColor(): Color | null {
+        return this._flagColor;
+    }
+
+    set flagColor(value: Color | null) {
+        this._flagColor = value;
+        this.updateGraphicsMeta();
+    }
+
+    get movementSpeed(): number {
+        return super.movementSpeed;
+    }
+
+    set movementSpeed(value: number) {
+        super.movementSpeed = value;
+        this.updateGraphicsMeta();
+        this.updateAudioMeta();
+    }
+
+    get direction(): Direction {
+        return super.direction;
+    }
+
+    set direction(value: Direction) {
+        super.direction = value;
+        this.updateGraphicsMeta();
+    }
+
+    protected updateGraphicsMeta(): void {
         const metas: ResourceMeta[] = [{
             isTank: true,
             direction: this.direction,
@@ -274,11 +313,11 @@ export default class Tank extends GameObject {
             );
         }
 
-        return metas;
+        this._graphicsMeta = metas;
     }
 
-    get audioMeta(): ResourceMeta | undefined | null {
-        return {
+    protected updateAudioMeta(): void {
+        this._audioMeta = {
             isMoving: this.isMoving,
         };
     }

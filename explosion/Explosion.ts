@@ -1,6 +1,5 @@
 import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
-import { ResourceMeta } from '@/object/IGameObjectProperties';
 import ObjectUtils from '@/utils/ObjectUtils';
 import { ExplosionType } from './ExplosionType';
 
@@ -41,15 +40,15 @@ export default class Explosion extends GameObject {
         ], options);
     }
 
-    get graphicsMeta(): ResourceMeta[] | undefined | null {
-        return [{
+    protected updateGraphicsMeta(): void {
+        this._graphicsMeta = [{
             direction: this.direction,
             explosionType: this.explosionType,
         }];
     }
 
-    get audioMeta(): ResourceMeta | undefined | null {
-        return {
+    protected updateAudioMeta(): void {
+        this._audioMeta = {
             destroyedObjectType: this.destroyedObjectType,
         };
     }

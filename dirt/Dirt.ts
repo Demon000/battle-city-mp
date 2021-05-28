@@ -1,9 +1,18 @@
 import GameObject from '@/object/GameObject';
-import { ResourceMeta } from '@/object/IGameObjectProperties';
+import Point from '@/physics/point/Point';
 
 export default class Dirt extends GameObject {
-    get graphicsMeta(): ResourceMeta[] | undefined | null {
-        return [{
+    get position(): Point {
+        return super.position;
+    }
+
+    set position(value: Point) {
+        super.position = value;
+        this.updateGraphicsMeta();
+    }
+
+    protected updateGraphicsMeta(): void {
+        this._graphicsMeta = [{
             position: this.position,
         }];
     }

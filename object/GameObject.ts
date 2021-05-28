@@ -21,11 +21,14 @@ export type PartialGameObjectOptions = Partial<GameObjectOptions>;
 export default class GameObject {
     static globalId = 0;
 
+    protected _graphicsMeta: ResourceMeta[] | undefined | null;
+    protected _audioMeta: ResourceMeta | undefined | null;
+    protected _position: Point;
+    protected _direction: Direction;
+    protected _movementSpeed: number;
+
     id: number;
     type: GameObjectType;
-    position: Point;
-    direction: Direction;
-    movementSpeed: number;
     movementDirection: Direction | null;
     spawnTime: number;
 
@@ -42,9 +45,9 @@ export default class GameObject {
 
         this.id = options.id ?? GameObject.globalId++;
         this.type = options.type;
-        this.position = options.position ?? {x: 0, y: 0};
-        this.direction = options.direction ?? Direction.UP;
-        this.movementSpeed = options.movementSpeed ?? 0;
+        this._position = options.position ?? {x: 0, y: 0};
+        this._direction = options.direction ?? Direction.UP;
+        this._movementSpeed = options.movementSpeed ?? 0;
         this.movementDirection = options.movementDirection ?? null;
         this.spawnTime = Date.now();
     }
@@ -77,6 +80,14 @@ export default class GameObject {
         ], options);
     }
 
+    get position(): Point {
+        return this._position;
+    }
+
+    set position(value: Point) {
+        this._position = value;
+    }
+
     get width(): number {
         return this.properties.width;
     }
@@ -85,12 +96,28 @@ export default class GameObject {
         return this.properties.height;
     }
 
+    get direction(): Direction {
+        return this._direction;
+    }
+
+    set direction(value: Direction) {
+        this._direction = value;
+    }
+
     get savable(): boolean | undefined {
         return this.properties.savable;
     }
 
     get directionAxisSnapping(): number | undefined {
         return this.properties.directionAxisSnapping;
+    }
+
+    get movementSpeed(): number {
+        return this._movementSpeed;
+    }
+
+    set movementSpeed(value: number) {
+        this._movementSpeed = value;
     }
 
     get isMoving(): boolean {
@@ -124,15 +151,31 @@ export default class GameObject {
         return this.properties.automaticDestroyTime;
     }
 
+    protected updateGraphicsMeta(): void {
+        this._graphicsMeta = [{}];
+    }
+
+    protected updateAudioMeta(): void {
+        this._audioMeta = undefined;
+    }
+
     get graphicsMeta(): ResourceMeta[] | undefined | null {
-        return [{}];
+        if (this._graphicsMeta === undefined) {
+            this.updateGraphicsMeta();
+        }
+
+        return this._graphicsMeta;
     }
 
     get audioMeta(): ResourceMeta | undefined | null {
-        return undefined;
+        if (this._audioMeta === undefined) {
+            this.updateAudioMeta();
+        }
+
+        return this._audioMeta;
     }
 
-    getBoundingBox(position=this.position): BoundingBox {
+    getBoundingBox(position=this._position): BoundingBox {
         return {
             tl: position,
             br: {
