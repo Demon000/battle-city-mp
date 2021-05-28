@@ -1,4 +1,5 @@
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
+import BoundingBoxUtils from '@/physics/bounding-box/BoundingBoxUtils';
 import Point from '@/physics/point/Point';
 import { Direction } from '../physics/Direction';
 import GameObjectProperties from './GameObjectProperties';
@@ -206,15 +207,7 @@ export default class GameObject {
     }
 
     getPositionedBoundingBox(position: Point): BoundingBox {
-        return {
-            tl: {
-                x: position.x,
-                y: position.y,
-            },
-            br: {
-                y: position.y + this.height,
-                x: position.x + this.width,
-            },
-        };
+        return BoundingBoxUtils.create(position.x, position.y,
+            position.x + this.width, position.y + this.height);
     }
 }

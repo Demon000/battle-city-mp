@@ -22,16 +22,7 @@ export default class BoundingBoxUtils {
     }
 
     static clone(box: BoundingBox): BoundingBox {
-        return {
-            tl: {
-                x: box.tl.x,
-                y: box.tl.y,
-            },
-            br: {
-                x: box.br.x,
-                y: box.br.y,
-            },
-        };
+        return this.create(box.tl.x, box.tl.y, box.br.x, box.br.y);
     }
 
     static combine(first: BoundingBox, second: BoundingBox): BoundingBox {

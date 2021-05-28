@@ -2,6 +2,7 @@ import GameObject from '@/object/GameObject';
 import GameObjectFactory from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
+import BoundingBoxUtils from '@/physics/bounding-box/BoundingBoxUtils';
 import Point from '@/physics/point/Point';
 
 export default class GameMapEditorService {
@@ -108,13 +109,8 @@ export default class GameMapEditorService {
             return undefined;
         }
 
-        return {
-            tl: snappedPosition,
-            br: {
-                x: snappedPosition.x + this.gridSize,
-                y: snappedPosition.y + this.gridSize,
-            },
-        };
+        return BoundingBoxUtils.create(snappedPosition.x, snappedPosition.y,
+            snappedPosition.x + this.gridSize, snappedPosition.y + this.gridSize);
     }
 
     getGhostObjects(): GameObject[] {

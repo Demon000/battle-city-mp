@@ -1,6 +1,7 @@
 import GameObject from '@/object/GameObject';
 import { RenderPass } from '@/object/RenderPass';
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
+import BoundingBoxUtils from '@/physics/bounding-box/BoundingBoxUtils';
 import Point from '@/physics/point/Point';
 import CanvasUtils, { Context2D } from '@/utils/CanvasUtils';
 import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
@@ -127,16 +128,10 @@ export default class GameGraphicsService {
     }
 
     getViewableMapBoundingBox(position: Point): BoundingBox | undefined {
-        return {
-            tl: {
-                x: position.x - this.gameWidth / 2,
-                y: position.y - this.gameHeight / 2,
-            },
-            br: {
-                x: position.x + this.gameWidth / 2,
-                y: position.y + this.gameHeight / 2,
-            },
-        };
+        return BoundingBoxUtils.create(position.x - this.gameWidth / 2,
+            position.y - this.gameHeight / 2,
+            position.x + this.gameWidth / 2,
+            position.y + this.gameHeight / 2);
     }
 
     getWorldPosition(position: Point): Point {
