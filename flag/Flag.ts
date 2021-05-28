@@ -2,7 +2,6 @@ import { Color } from '@/drawable/Color';
 import GameObject, { GameObjectOptions } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
-import ObjectUtils from '@/utils/ObjectUtils';
 
 export enum FlagType {
     FULL = 'full',
@@ -48,11 +47,10 @@ export default class Flag extends GameObject {
 
     setOptions(options: PartialFlagOptions): void {
         super.setOptions(options);
-        ObjectUtils.keysAssign(this, [
-            'teamId',
-            'color',
-            'flagType',
-        ], options);
+
+        if (options.teamId !== undefined) this.teamId = options.teamId;
+        if (options.color !== undefined) this.color = options.color;
+        if (options.flagType !== undefined) this.flagType = options.flagType;
     }
 
     get flagType(): FlagType {

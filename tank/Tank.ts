@@ -2,7 +2,6 @@ import { BulletPower } from '@/bullet/BulletPower';
 import { Color } from '@/drawable/Color';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 import { Direction } from '@/physics/Direction';
-import ObjectUtils from '@/utils/ObjectUtils';
 import GameObject, { GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
@@ -160,20 +159,18 @@ export default class Tank extends GameObject {
 
     setOptions(options: PartialTankOptions): void {
         super.setOptions(options);
-        ObjectUtils.keysAssign(this, [
-            'tier',
-            'playerId',
-            'playerName',
-            'isShooting',
-            'isUnderBush',
-            'lastBulletShotTime',
-            'lastSmokeTime',
-            'bulletIds',
-            'teamId',
-            'color',
-            'health',
-            'flagColor',
-        ], options);
+
+        if (options.tier !== undefined) this.tier = options.tier;
+        if (options.playerId !== undefined) this.playerId = options.playerId;
+        if (options.playerName !== undefined) this.playerName = options.playerName;
+        if (options.isUnderBush !== undefined) this.isUnderBush = options.isUnderBush;
+        if (options.lastBulletShotTime !== undefined) this.lastBulletShotTime = options.lastBulletShotTime;
+        if (options.lastSmokeTime !== undefined) this.lastSmokeTime = options.lastSmokeTime;
+        if (options.bulletIds !== undefined) this.bulletIds = options.bulletIds;
+        if (options.teamId !== undefined) this.teamId = options.teamId;
+        if (options.color !== undefined) this.color = options.color;
+        if (options.health !== undefined) this.health = options.health;
+        if (options.flagColor !== undefined) this.flagColor = options.flagColor;
     }
 
     get tierProperties(): ITankTierProperties {

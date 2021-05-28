@@ -1,6 +1,5 @@
 import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import Point from '@/physics/point/Point';
-import ObjectUtils from '@/utils/ObjectUtils';
 import { Direction } from '../physics/Direction';
 import GameObjectProperties from './GameObjectProperties';
 import { GameObjectType } from './GameObjectType';
@@ -71,13 +70,11 @@ export default class GameObject {
     }
 
     setOptions(options: PartialGameObjectOptions): void {
-        ObjectUtils.keysAssign(this, [
-            'position',
-            'direction',
-            'movementSpeed',
-            'movementDirection',
-            'spawnTime',
-        ], options);
+        if (options.position !== undefined) this.position = options.position;
+        if (options.direction !== undefined) this.direction = options.direction;
+        if (options.movementSpeed !== undefined) this.movementSpeed = options.movementSpeed;
+        if (options.movementDirection !== undefined) this.movementDirection = options.movementDirection;
+        if (options.spawnTime !== undefined) this.spawnTime = options.spawnTime;
     }
 
     get position(): Point {
