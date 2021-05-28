@@ -2,12 +2,12 @@ import { CLIENT_SPRITES_RELATIVE_URL } from '@/config';
 import BaseImageDrawable from './BaseImageDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
-import { IImageDrawable, ImageDrawableProperties } from './IImageDrawable';
+import { ImageDrawableProperties } from './IImageDrawable';
 import ImageUtils, { Source } from '../utils/ImageUtils';
 import Point from '@/physics/point/Point';
 import CanvasUtils, { Context2D } from '@/utils/CanvasUtils';
 
-export default class ImageDrawable extends BaseImageDrawable implements IImageDrawable {
+export default class ImageDrawable extends BaseImageDrawable {
     readonly type = DrawableType.IMAGE;
     private baseCachedSource?: Source;
     private cachedSource?: Source;
@@ -100,7 +100,7 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         }
     }
 
-    getBaseCachedSource(): Source {
+    private getBaseCachedSource(): Source {
         if (this.baseCachedSource !== undefined) {
             return this.baseCachedSource;
         }
@@ -120,7 +120,7 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         return this.baseCachedSource = canvas;
     }
 
-    getCachedSource(): Source {
+    private getCachedSource(): Source {
         if (this.cachedSource !== undefined) {
             return this.cachedSource;
         }
@@ -167,7 +167,7 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         }
     }
 
-    _scale(scaleX: number, scaleY: number = scaleX): this {
+    protected _scale(scaleX: number, scaleY: number = scaleX): this {
         const properties = this.properties;
         const scale = this.getScale();
         scale.x *= scaleX;
@@ -181,14 +181,14 @@ export default class ImageDrawable extends BaseImageDrawable implements IImageDr
         });
     }
 
-    _colorMask(maskColor: Color): this {
+    protected _colorMask(maskColor: Color): this {
         return new (<any>this.constructor)(this.source, {
             ...this.properties,
             maskColor,
         });
     }
 
-    _offset(offsetX: number, offsetY: number): this {
+    protected _offset(offsetX: number, offsetY: number): this {
         const offset = this.getOffset();
         offsetX += offset.x;
         offsetY += offset.y;

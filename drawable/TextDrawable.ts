@@ -173,7 +173,7 @@ export default class TextDrawable extends BaseDrawable {
         context.drawImage(source, drawX, drawY);
     }
 
-    _withText(text: string): this {
+    protected _withText(text: string): this {
         return new (<any>this.constructor)(text, this.properties);
     }
 
@@ -192,7 +192,7 @@ export default class TextDrawable extends BaseDrawable {
         return drawable;
     }
 
-    _scale(scaleX: number, scaleY = scaleX): this {
+    protected _scale(scaleX: number, scaleY = scaleX): this {
         const scale = this.getScale();
         scaleX *= scale.x;
         scaleY *= scale.y;
@@ -203,7 +203,7 @@ export default class TextDrawable extends BaseDrawable {
         });
     }
 
-    _offset(offsetX: number, offsetY: number): this {
+    protected _offset(offsetX: number, offsetY: number): this {
         const offset = this.getOffset();
         offsetX += offset.x;
         offsetY += offset.y;
@@ -214,7 +214,7 @@ export default class TextDrawable extends BaseDrawable {
         });
     }
 
-    _positionXReference(positionXReference: TextPositionReference): this {
+    protected _positionXReference(positionXReference: TextPositionReference): this {
         return new (<any>this.constructor)(this.text, {
             ...this.properties,
             positionXReference,
@@ -236,7 +236,7 @@ export default class TextDrawable extends BaseDrawable {
         return drawable;
     }
 
-    _positionYReference(positionYReference: TextPositionReference): this {
+    protected _positionYReference(positionYReference: TextPositionReference): this {
         return new (<any>this.constructor)(this.text, {
             ...this.properties,
             positionYReference,
