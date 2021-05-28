@@ -18,6 +18,11 @@ export default class BoundingBoxRepository<V> {
             }));
     }
 
+    private addNode(value: V, node: BoundingBoxNode<V>): void {
+        this.tree.addNode(node);
+        this.map.set(value, node);
+    }
+
     addBoxValue(value: V, box: BoundingBox): void {
         if (this.map.has(value)) {
             throw new Error('Node already exists with value');
@@ -25,23 +30,29 @@ export default class BoundingBoxRepository<V> {
 
         const node = new BoundingBoxNode<V>(box);
         node.value = value;
-        this.tree.addNode(node);
-        this.map.set(value, node);
+        this.addNode(value, node);
     }
 
-    removeValue(value: V): void {
+    private removeNode(value: V): BoundingBoxNode<V> {
         const node = this.map.get(value);
         if (!node) {
             throw new Error('Node does not exist for value');
         }
 
         this.tree.removeNode(node);
+        return node;
+    }
+
+    removeValue(value: V): BoundingBoxNode<V> {
+        const node =this.removeNode(value);
         this.map.delete(value);
+        return node;
     }
 
     updateBoxValue(value: V, box: BoundingBox): void {
-        this.removeValue(value);
-        this.addBoxValue(value, box);
+        const node = this.removeNode(value);
+        node.box = box;
+        this.addNode(value, node);
     }
 
     clear(): void {
