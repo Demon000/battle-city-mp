@@ -94,7 +94,7 @@ export default class GameObjectGraphicsRenderer<O extends GameObject = GameObjec
             return;
         }
 
-        if (!this.object.graphicsMetaUpdated) {
+        if (!this.object.graphicsMetaUpdated && this.scale === scale) {
             return;
         }
 
