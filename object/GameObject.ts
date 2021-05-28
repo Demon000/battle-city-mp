@@ -198,7 +198,11 @@ export default class GameObject {
             return boundingBox;
         }
 
-        return this._boundingBox = this.getPositionedBoundingBox(position);
+        boundingBox.tl.x = position.x;
+        boundingBox.tl.y = position.y;
+        boundingBox.br.x = position.x + this.width;
+        boundingBox.br.y = position.y + this.height;
+        return boundingBox;
     }
 
     getPositionedBoundingBox(position: Point): BoundingBox {
