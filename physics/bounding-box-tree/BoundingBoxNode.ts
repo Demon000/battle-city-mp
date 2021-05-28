@@ -3,6 +3,7 @@ import BoundingBoxUtils from '../bounding-box/BoundingBoxUtils';
 
 export default class BoundingBoxNode<V> {
     box: BoundingBox;
+    realBox?: BoundingBox;
     parent?: BoundingBoxNode<V>;
     left?: BoundingBoxNode<V>;
     right?: BoundingBoxNode<V>;

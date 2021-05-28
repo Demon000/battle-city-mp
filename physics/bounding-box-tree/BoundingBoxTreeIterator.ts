@@ -24,7 +24,13 @@ export class BoundingBoxTreeIterator<V> implements Iterator<BoundingBoxNode<V>> 
 
             if (BoundingBoxUtils.overlaps(node.box, this.box)) {
                 if (node.left === undefined || node.right === undefined) {
-                    foundNode = node;
+                    if (node.realBox === undefined) {
+                        throw new Error('Leaf node has no real box');
+                    }
+
+                    if (BoundingBoxUtils.overlaps(node.realBox, this.box)) {
+                        foundNode = node;
+                    }
                 } else {
                     this.stack.push(node.left);
                     this.stack.push(node.right);
