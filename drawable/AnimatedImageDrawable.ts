@@ -2,6 +2,7 @@ import Point from '@/physics/point/Point';
 import BaseImageDrawable from './BaseImageDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
+import IDrawable from './IDrawable';
 import { IImageDrawable, ImageDrawableProperties } from './IImageDrawable';
 
 export default class AnimatedImageDrawable extends BaseImageDrawable {
@@ -64,8 +65,12 @@ export default class AnimatedImageDrawable extends BaseImageDrawable {
         this.updateDrawablesInheritedProperties();
     }
 
+    isDrawableLoaded(drawable: IDrawable): boolean {
+        return drawable.isLoaded();
+    }
+
     isLoaded(): boolean {
-        return this.drawables.every(drawable => drawable.isLoaded());
+        return this.drawables.every(this.isDrawableLoaded);
     }
 
     getRenderPass(): number {
