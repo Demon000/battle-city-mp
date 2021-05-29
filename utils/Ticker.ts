@@ -13,6 +13,7 @@ export default class Ticker {
     tickTime?: number;
     lastRequestId?: number;
     lastTickTime = 0;
+    currentTickTime = 0;
     deltaSeconds = 0;
     running = false;
     emitter = new EventEmitter<TickerEvents>();
@@ -20,6 +21,7 @@ export default class Ticker {
     timeoutWrapper: () => void;
     requestAnimationFrameWrapper: (currentTickTime: number) => void;
     callTick: () => void;
+    tick: () => void;
 
     constructor(tickRate?: number) {
         if (tickRate === undefined) {
@@ -32,15 +34,16 @@ export default class Ticker {
 
         this.timeoutWrapper = this._timeoutWrapper.bind(this);
         this.requestAnimationFrameWrapper = this._requestAnimationFrameWrapper.bind(this);
+        this.tick = this._tick.bind(this);
     }
 
-    tick(currentTickTime: number): void {
+    _tick(): void {
         if (this.lastTickTime) {
-            const deltaSeconds = (currentTickTime - this.lastTickTime) / 1000;
+            const deltaSeconds = (this.currentTickTime - this.lastTickTime) / 1000;
             this.emitter.emit(TickerEvent.TICK, deltaSeconds);
         }
 
-        this.lastTickTime = currentTickTime;
+        this.lastTickTime = this.currentTickTime;
 
         if (!this.running) {
             return;
@@ -50,14 +53,13 @@ export default class Ticker {
     }
 
     _requestAnimationFrameWrapper(currentTickTime: number): void {
-        setTimeout(() => {
-            this.tick(currentTickTime);
-        });
+        this.currentTickTime = currentTickTime;
+        setTimeout(this.tick);
     }
 
     _timeoutWrapper(): void {
-        const currentTickTime = now();
-        this.tick(currentTickTime);
+        this.currentTickTime = now();
+        this.tick();
     }
 
     callRequestAnimationFrame(): void {
