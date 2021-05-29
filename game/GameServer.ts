@@ -255,6 +255,7 @@ export default class GameServer {
                         teamId: player.teamId,
                         color: tankColor,
                         tier: player.requestedTankTier,
+                        collisionsDisabled: player.mapEditorEnabled,
                     });
                     this.gameObjectService.registerObject(tank);
                 } else if (status === PlayerSpawnStatus.DESPAWN && player.tankId !== null) {
@@ -612,6 +613,7 @@ export default class GameServer {
             return;
         }
 
+        player.mapEditorEnabled = enabled;
         const tank = this.tankService.getTank(player.tankId);
         if (tank === undefined) {
             return;

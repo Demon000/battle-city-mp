@@ -14,6 +14,7 @@ export interface GameObjectOptions {
     movementSpeed?: number;
     movementDirection?: Direction | null;
     spawnTime?: number;
+    collisionsDisabled?: boolean;
 }
 
 export type PartialGameObjectOptions = Partial<GameObjectOptions>;
@@ -35,7 +36,7 @@ export default class GameObject {
     movementDirection: Direction | null;
     spawnTime: number;
 
-    collisionsDisabled = false;
+    collisionsDisabled: boolean;
     destroyed = false;
 
     graphicsRenderer?: any;
@@ -55,6 +56,7 @@ export default class GameObject {
         this._isMoving = this._movementSpeed > 0;
         this.movementDirection = options.movementDirection ?? null;
         this.spawnTime = Date.now();
+        this.collisionsDisabled = options.collisionsDisabled ?? false;
     }
 
     toOptions(): GameObjectOptions {
@@ -81,6 +83,7 @@ export default class GameObject {
         if (options.movementSpeed !== undefined) this.movementSpeed = options.movementSpeed;
         if (options.movementDirection !== undefined) this.movementDirection = options.movementDirection;
         if (options.spawnTime !== undefined) this.spawnTime = options.spawnTime;
+        if (options.collisionsDisabled !== undefined) this.collisionsDisabled = options.collisionsDisabled;
     }
 
     get position(): Point {

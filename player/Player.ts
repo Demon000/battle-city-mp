@@ -37,6 +37,7 @@ export default class Player {
     kills: number;
     deaths: number;
     points: number;
+    mapEditorEnabled: boolean;
 
     constructor(options: PlayerOptions) {
         this.id = options.id;
@@ -46,6 +47,7 @@ export default class Player {
         this.kills = options.kills ?? 0;
         this.deaths = options.deaths ?? 0;
         this.points = options.points ?? 0;
+        this.mapEditorEnabled = false;
     }
 
     get displayName(): string {
