@@ -35,7 +35,6 @@ export default class GameMapEditorService {
     }
 
     updateGhostObjects(positionsOnly = false): void {
-        console.log(positionsOnly);
         if (!positionsOnly) {
             this.ghostObjects = [];
         }
