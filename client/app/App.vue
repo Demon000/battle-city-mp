@@ -203,6 +203,7 @@ import Player from '@/player/Player';
 import PlayerStats from '@/player/PlayerStats';
 import { TankTier } from '@/tank/TankTier';
 import Team from '@/team/Team';
+import RatioUtils from '@/utils/RatioUtils';
 import screenfull from 'screenfull';
 import { io, Socket } from 'socket.io-client';
 import { markRaw } from 'vue';
@@ -455,8 +456,8 @@ export default class App extends Vue {
         }
 
         this.gameClient?.setMapEditorHoverPosition({
-            x: event.offsetX * window.devicePixelRatio,
-            y: event.offsetY * window.devicePixelRatio,
+            x: RatioUtils.scaleForDevicePixelRatio(event.offsetX),
+            y: RatioUtils.scaleForDevicePixelRatio(event.offsetY),
         });
     }
 
@@ -481,8 +482,8 @@ export default class App extends Vue {
 
         if (this.isBuilding) {
             this.gameClientSocket?.mapEditorDestroyObjects({
-                x: event.offsetX * window.devicePixelRatio,
-                y: event.offsetY * window.devicePixelRatio,
+                x: RatioUtils.scaleForDevicePixelRatio(event.offsetX),
+                y: RatioUtils.scaleForDevicePixelRatio(event.offsetY),
             });
         }
     }

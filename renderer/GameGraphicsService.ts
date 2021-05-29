@@ -4,6 +4,7 @@ import BoundingBox from '@/physics/bounding-box/BoundingBox';
 import BoundingBoxUtils from '@/physics/bounding-box/BoundingBoxUtils';
 import Point from '@/physics/point/Point';
 import CanvasUtils, { Context2D } from '@/utils/CanvasUtils';
+import RatioUtils from '@/utils/RatioUtils';
 import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
 
 export default class GameGraphicsService {
@@ -34,11 +35,10 @@ export default class GameGraphicsService {
     }
 
     calculateDimensions(): void {
-        const ratio = window.devicePixelRatio;
         const visibleWidth = window.innerWidth;
         const visibleHeight = window.innerHeight;
-        const width = Math.ceil(visibleWidth * ratio);
-        const height = Math.ceil(visibleHeight * ratio);
+        const width = RatioUtils.scaleForDevicePixelRatio(visibleWidth);
+        const height = RatioUtils.scaleForDevicePixelRatio(visibleHeight);
 
         for (const canvas of this.canvases) {
             canvas.width = width;
