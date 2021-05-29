@@ -34,10 +34,8 @@ export default class GameMapEditorService {
         };
     }
 
-    updateGhostObjects(positionsOnly = false): void {
-        if (!positionsOnly) {
-            this.ghostObjects = [];
-        }
+    updateGhostObjects(): void {
+        this.ghostObjects = [];
 
         if (!this.enabled
             || this.selectedType === GameObjectType.NONE
@@ -55,28 +53,17 @@ export default class GameMapEditorService {
         let object;
         for (let y = 0; y < this.gridSize;) {
             for (let x = 0; x < this.gridSize;) {
-                if (positionsOnly) {
-                    const i = y * this.gridSize + x;
-                    object = this.ghostObjects[i];
-                    object.position = {
+                object = this.gameObjectFactory.buildFromOptions({
+                    type: this.selectedType,
+                    position: {
                         x: snappedPosition.x + x,
                         y: snappedPosition.y + y,
-                    };
-                } else {
-                    object = this.gameObjectFactory.buildFromOptions({
-                        type: this.selectedType,
-                        position: {
-                            x: snappedPosition.x + x,
-                            y: snappedPosition.y + y,
-                        },
-                    });
-                }
+                    },
+                });
 
                 x += object.width;
 
-                if (!positionsOnly) {
-                    this.ghostObjects.push(object);
-                }
+                this.ghostObjects.push(object);
             }
 
             if (object === undefined) {
@@ -108,12 +95,12 @@ export default class GameMapEditorService {
 
     setHoverPosition(position: Point): void {
         this.hoverPosition = position;
-        this.updateGhostObjects(true);
+        this.updateGhostObjects();
     }
 
     setViewPosition(position: Point): void {
         this.viewPosition = position;
-        this.updateGhostObjects(true);
+        this.updateGhostObjects();
     }
 
     getGridSize(): number {
