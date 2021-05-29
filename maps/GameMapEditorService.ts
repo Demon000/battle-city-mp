@@ -107,19 +107,11 @@ export default class GameMapEditorService {
     }
 
     setHoverPosition(position: Point): void {
-        if (!this.enabled) {
-            return;
-        }
-
         this.hoverPosition = position;
         this.updateGhostObjects(true);
     }
 
     setViewPosition(position: Point): void {
-        if (!this.enabled) {
-            return;
-        }
-
         this.viewPosition = position;
         this.updateGhostObjects(true);
     }

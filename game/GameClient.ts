@@ -27,11 +27,13 @@ import GameObjectAudioRendererFactory from '@/object/GameObjectAudioRendererFact
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
     TEAMS_CHANGED = 'teams-changed',
+    MAP_EDITOR_ENABLED_CHANGED = 'map-editor-enabled-changed',
 }
 
 export interface GameClientEvents {
     [GameClientEvent.PLAYERS_CHANGED]: () => void;
     [GameClientEvent.TEAMS_CHANGED]: () => void,
+    [GameClientEvent.MAP_EDITOR_ENABLED_CHANGED]: (enabled: boolean) => void;
 }
 
 export default class GameClient {
@@ -243,6 +245,7 @@ export default class GameClient {
     setMapEditorEnabled(enabled: boolean): void {
         this.gameMapEditorService.setEnabled(enabled);
         this.gameGraphicsService.setShowInvisible(enabled);
+        this.emitter.emit(GameClientEvent.MAP_EDITOR_ENABLED_CHANGED, enabled);
     }
 
     setMapEditorGridSize(gridSize: number): void {

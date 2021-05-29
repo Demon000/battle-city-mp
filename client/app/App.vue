@@ -248,6 +248,13 @@ export default class App extends Vue {
         this.gameClient.emitter.on(GameClientEvent.TEAMS_CHANGED, () => {
             this.updateTeams();
         });
+        this.gameClient.emitter.on(GameClientEvent.MAP_EDITOR_ENABLED_CHANGED, (enabled: boolean) => {
+            if (enabled) {
+                this.attachMouseEvents();
+            } else {
+                this.detachMouseEvents();
+            }
+        });
 
         this.gameClientSocket = new GameClientSocket(this.socket, this.gameClient);
         this.joystick = new DirectionalJoystickWrapper({
@@ -261,11 +268,6 @@ export default class App extends Vue {
         canvasContainer.addEventListener('blur', this.onCanvasBlurEvent);
         canvasContainer.addEventListener('keydown', this.onKeyboardEvent);
         canvasContainer.addEventListener('keyup', this.onKeyboardEvent);
-        canvasContainer.addEventListener('mousemove', this.onMouseMoveEvent, {
-            passive: true,
-        });
-        canvasContainer.addEventListener('click', this.onMouseClickEvent);
-        canvasContainer.addEventListener('contextmenu', this.onMouseRightClickEvent);
         canvasContainer.focus();
 
         const shootButton = this.$refs.shootButton as HTMLElement;
@@ -278,6 +280,24 @@ export default class App extends Vue {
         if (screenfull.isEnabled) {
             screenfull.on('change', this.onFullscreenChanged);
         }
+    }
+
+    attachMouseEvents(): void {
+        const canvasContainer = this.$refs.canvasContainer as HTMLDivElement;
+
+        canvasContainer.addEventListener('click', this.onMouseClickEvent);
+        canvasContainer.addEventListener('contextmenu', this.onMouseRightClickEvent);
+        canvasContainer.addEventListener('mousemove', this.onMouseMoveEvent, {
+            passive: true,
+        });
+    }
+
+    detachMouseEvents(): void {
+        const canvasContainer = this.$refs.canvasContainer as HTMLDivElement;
+
+        canvasContainer.removeEventListener('click', this.onMouseClickEvent);
+        canvasContainer.removeEventListener('contextmenu', this.onMouseRightClickEvent);
+        canvasContainer.removeEventListener('mousemove', this.onMouseMoveEvent);
     }
 
     colorToString(color: Color): string {
