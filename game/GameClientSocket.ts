@@ -82,7 +82,7 @@ export default class GameClientSocket {
         this.socket.emit(GameSocketEvent.PLAYER_REQUEST_TANK_TIER, tier);
     }
 
-    requestPlayerTeam(teamId: string): void {
+    requestPlayerTeam(teamId: string | null): void {
         this.socket.emit(GameSocketEvent.PLAYER_REQUEST_TEAM, teamId);
     }
 

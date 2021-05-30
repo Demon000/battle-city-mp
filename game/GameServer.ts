@@ -645,37 +645,42 @@ export default class GameServer {
         this.playerService.setPlayerRequestedSpawnStatus(playerId, spawnStatus);
     }
 
-    setPlayerTeam(playerId: string, teamId: string): void {
+    setPlayerTeam(playerId: string, teamId: string | null): void {
         const player = this.playerService.getPlayer(playerId);
         if (player.teamId !== null) {
             this.teamService.removeTeamPlayer(player.teamId, playerId);
         }
 
-        this.teamService.addTeamPlayer(teamId, playerId);
-        this.playerService.setPlayerTeam(playerId, teamId);
+        if (teamId !== null) {
+            this.teamService.addTeamPlayer(teamId, playerId);
+        }
+
+        this.playerService.setPlayerTeamId(playerId, teamId);
     }
 
-    onPlayerRequestTeam(playerId: string, teamId: string): void {
+    onPlayerRequestTeam(playerId: string, teamId: string | null): void {
         const gameModeProperties = this.gameModeService.getGameModeProperties();
         if (!gameModeProperties.hasTeams) {
             return;
         }
 
-        const team = this.teamService.findTeamById(teamId);
-        if (team === undefined) {
-            return;
-        }
+        if (teamId !== null) {
+            const team = this.teamService.findTeamById(teamId);
+            if (team === undefined) {
+                return;
+            }
 
-        const player = this.playerService.getPlayer(playerId);
-        let existingTeam;
-        if (player.teamId !== null) {
-            existingTeam = this.teamService.getTeam(player.teamId);
-        } else {
-            existingTeam = this.teamService.getTeamWithLeastPlayers();
-        }
+            const player = this.playerService.getPlayer(playerId);
+            let existingTeam;
+            if (player.teamId !== null) {
+                existingTeam = this.teamService.getTeam(player.teamId);
+            } else {
+                existingTeam = this.teamService.getTeamWithLeastPlayers();
+            }
 
-        if (!this.teamService.isTeamSwitchingAllowed(existingTeam.id, team.id)) {
-            return;
+            if (!this.teamService.isTeamSwitchingAllowed(existingTeam.id, team.id)) {
+                return;
+            }
         }
 
         this.setPlayerTeam(playerId, teamId);
