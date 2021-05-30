@@ -23,17 +23,31 @@ import PlayerStats from '@/player/PlayerStats';
 import TankService from '@/tank/TankService';
 import LazyIterable from '@/utils/LazyIterable';
 import GameObjectAudioRendererFactory from '@/object/GameObjectAudioRendererFactory';
+import { TankTier } from '@/tank/TankTier';
+import { Color } from '@/drawable/Color';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
     TEAMS_CHANGED = 'teams-changed',
     MAP_EDITOR_ENABLED_CHANGED = 'map-editor-enabled-changed',
+
+    OWN_PLAYER_ADDED = 'own-player-added',
+    OWN_PLAYER_CHANGED_TANK_ID = 'own-player-changed-tank-id',
+    OWN_PLAYER_CHANGED_TEAM_ID = 'own-player-changed-team-id',
+    OWN_PLAYER_CHANGED_TANK_TIER = 'own-player-changed-tank-tier',
+    OWN_PLAYER_CHANGED_TANK_COLOR = 'own-player-changed-tank-color',
 }
 
 export interface GameClientEvents {
     [GameClientEvent.PLAYERS_CHANGED]: () => void;
     [GameClientEvent.TEAMS_CHANGED]: () => void,
     [GameClientEvent.MAP_EDITOR_ENABLED_CHANGED]: (enabled: boolean) => void;
+
+    [GameClientEvent.OWN_PLAYER_ADDED]: () => void,
+    [GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID]: (tankId: number | null) => void;
+    [GameClientEvent.OWN_PLAYER_CHANGED_TEAM_ID]: (teamId: string | null) => void;
+    [GameClientEvent.OWN_PLAYER_CHANGED_TANK_TIER]: (tier: TankTier) => void;
+    [GameClientEvent.OWN_PLAYER_CHANGED_TANK_COLOR]: (color: Color) => void;
 }
 
 export default class GameClient {
@@ -83,6 +97,26 @@ export default class GameClient {
             (objectId: number) => {
                 const object = this.gameObjectService.getObject(objectId);
                 this.gameAudioService.stopAudioPlayback(object);
+            });
+
+        this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_ADDED, () => {
+            this.emitter.emit(GameClientEvent.OWN_PLAYER_ADDED);
+        });
+        this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_ID,
+            (tankId: number | null) => {
+                this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID, tankId);
+            });
+        this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_CHANGED_TEAM_ID,
+            (teamId: string | null) => {
+                this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_TEAM_ID, teamId);
+            });
+        this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_TIER,
+            (tier: TankTier) => {
+                this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_TANK_TIER, tier);
+            });
+        this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_COLOR,
+            (color: Color) => {
+                this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_TANK_COLOR, color);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYERS_CHANGED,

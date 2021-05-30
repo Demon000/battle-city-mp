@@ -11,6 +11,8 @@ export interface PlayerOptions {
     deaths?: number;
     kills?: number;
     points?: number;
+    requestedTankTier?: TankTier;
+    requestedTankColor?: Color;
 }
 
 export type PartialPlayerOptions = Partial<PlayerOptions>;
@@ -27,8 +29,8 @@ export default class Player {
     lastIsShooting = false;
     requestedSpawnStatus = PlayerSpawnStatus.NONE;
     requestedServerStatus = false;
-    requestedTankTier = TankTier.LIGHT;
-    requestedTankColor?: Color;
+    requestedTankTier: TankTier;
+    requestedTankColor: Color;
     disconnected = false;
     tankId: number | null;
     teamId: string | null;
@@ -48,6 +50,8 @@ export default class Player {
         this.deaths = options.deaths ?? 0;
         this.points = options.points ?? 0;
         this.mapEditorEnabled = false;
+        this.requestedTankTier = options.requestedTankTier ?? TankTier.NORMAL;
+        this.requestedTankColor = options.requestedTankColor ?? [231, 156, 33];
     }
 
     get displayName(): string {
@@ -63,6 +67,8 @@ export default class Player {
             kills: this.kills,
             deaths: this.deaths,
             points: this.points,
+            requestedTankColor: this.requestedTankColor,
+            requestedTankTier: this.requestedTankTier,
         };
     }
 
@@ -73,5 +79,7 @@ export default class Player {
         if (options.kills !== undefined) this.kills = options.kills;
         if (options.deaths !== undefined) this.deaths = options.deaths;
         if (options.points !== undefined) this.points = options.points;
+        if (options.requestedTankTier !== undefined) this.requestedTankTier = options.requestedTankTier;
+        if (options.requestedTankColor !== undefined) this.requestedTankColor = options.requestedTankColor;
     }
 }

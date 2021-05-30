@@ -19,6 +19,14 @@ export enum PlayerServiceEvent {
     PLAYER_REQUESTED_SPAWN_STATUS = 'player-requested-spawn-status',
 
     PLAYER_REQUESTED_SERVER_STATUS = 'player-requested-server-status',
+
+    OWN_PLAYER_ADDED = 'own-player-added',
+    OWN_PLAYER_SPAWNED = 'own-player-spawned',
+    OWN_PLAYER_DESPAWNED = 'own-player-despawned',
+    OWN_PLAYER_CHANGED_TANK_ID = 'own-player-changd-tank-id',
+    OWN_PLAYER_CHANGED_TEAM_ID = 'own-player-changd-team-id',
+    OWN_PLAYER_CHANGED_TANK_TIER = 'own-player-changed-tank-tier',
+    OWN_PLAYER_CHANGED_TANK_COLOR = 'own-player-changed-tank-color',
 }
 
 interface PlayerServiceEvents {
@@ -31,6 +39,11 @@ interface PlayerServiceEvents {
     [PlayerServiceEvent.PLAYER_REQUESTED_SHOOT]: (playerId: string, isShooting: boolean) => void,
     [PlayerServiceEvent.PLAYER_REQUESTED_SPAWN_STATUS]: (playerId: string, spawnStatus: PlayerSpawnStatus) => void,
     [PlayerServiceEvent.PLAYER_REQUESTED_SERVER_STATUS]: (playerId: string) => void,
+    [PlayerServiceEvent.OWN_PLAYER_ADDED]: (player: Player) => void,
+    [PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_ID]: (tankId: number | null) => void,
+    [PlayerServiceEvent.OWN_PLAYER_CHANGED_TEAM_ID]: (teamId: string | null) => void,
+    [PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_TIER]: (tier: TankTier) => void,
+    [PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_COLOR]: (color: Color) => void,
 }
 
 export default class PlayerService {
@@ -60,6 +73,12 @@ export default class PlayerService {
         this.repository.add(player.id, player);
         this.emitter.emit(PlayerServiceEvent.PLAYER_ADDED, player);
         this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
+
+        if (player.id === this.ownPlayerId) {
+            this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_ADDED, player);
+            this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_TIER, player.requestedTankTier);
+            this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_COLOR, player.requestedTankColor);
+        }
     }
 
     addPlayers(players: Iterable<Player>): void {
@@ -83,7 +102,16 @@ export default class PlayerService {
 
     setPlayerTankId(playerId: string, tankId: number | null): void {
         const player = this.repository.get(playerId);
+        if (player.tankId === tankId) {
+            return;
+        }
+
         player.tankId = tankId;
+
+        if (player.id === this.ownPlayerId) {
+            this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_ID, tankId);
+        }
+
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
             tankId,
         });
@@ -95,11 +123,42 @@ export default class PlayerService {
         player.setOptions(playerOptions);
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, playerOptions);
         this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
+
+        if (player.id === this.ownPlayerId) {
+            if (playerOptions.tankId !== undefined) {
+                this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_ID,
+                    playerOptions.tankId);
+            }
+
+            if (playerOptions.teamId !== undefined) {
+                this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_CHANGED_TEAM_ID,
+                    playerOptions.teamId);
+            }
+
+            if (playerOptions.requestedTankTier !== undefined) {
+                this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_TIER,
+                    playerOptions.requestedTankTier);
+            }
+
+            if (playerOptions.requestedTankColor !== undefined) {
+                this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_COLOR,
+                    playerOptions.requestedTankColor);
+            }
+        }
     }
 
-    setPlayerTeam(playerId: string, teamId: string): void {
+    setPlayerTeamId(playerId: string, teamId: string | null): void {
         const player = this.repository.get(playerId);
+        if (player.teamId === teamId) {
+            return;
+        }
+
         player.teamId = teamId;
+
+        if (player.id === this.ownPlayerId) {
+            this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_CHANGED_TEAM_ID, teamId);
+        }
+
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
             teamId,
         });
@@ -132,12 +191,36 @@ export default class PlayerService {
 
     setPlayerRequestedTankTier(playerId: string, tier: TankTier): void {
         const player = this.repository.get(playerId);
+        if (player.requestedTankTier === tier) {
+            return;
+        }
+
         player.requestedTankTier = tier;
+
+        if (player.id === this.ownPlayerId) {
+            this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_TIER, tier);
+        }
+
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
+            requestedTankTier: tier,
+        });
     }
 
     setPlayerRequestedTankColor(playerId: string, color: Color): void {
         const player = this.repository.get(playerId);
+        if (player.requestedTankColor === color) {
+            return;
+        }
+
         player.requestedTankColor = color;
+
+        if (player.id === this.ownPlayerId) {
+            this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_COLOR, color);
+        }
+
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
+            requestedTankColor: color,
+        });
     }
 
     addPlayerButtonPressAction(playerId: string, action: ButtonPressAction): void {
