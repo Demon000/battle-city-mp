@@ -229,6 +229,8 @@ export default class Settings extends Vue {
 
     display: flex;
     justify-content: center;
+
+    overflow: auto;
 }
 
 .logo-container {
