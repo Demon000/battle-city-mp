@@ -6,7 +6,7 @@ import GameObject, { GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
 
-export interface ITankTierProperties {
+export interface TankTierProperties {
     maxSpeed: number;
     accelerationFactor: number;
     decelerationFactor: number;
@@ -23,7 +23,7 @@ export interface ITankTierProperties {
     maxHealth: number;
 }
 
-const tierToPropertiesMap: Record<TankTier, ITankTierProperties> = {
+export const tierToPropertiesMap: Record<TankTier, TankTierProperties> = {
     [TankTier.NORMAL]: {
         maxSpeed: 114,
         accelerationFactor: 3,
@@ -173,7 +173,7 @@ export default class Tank extends GameObject {
         if (options.flagColor !== undefined) this.flagColor = options.flagColor;
     }
 
-    get tierProperties(): ITankTierProperties {
+    get tierProperties(): TankTierProperties {
         return tierToPropertiesMap[this.tier];
     }
 
