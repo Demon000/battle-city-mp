@@ -359,7 +359,8 @@ export default class App extends Vue {
             repeated = true;
         }
 
-        if (!repeated && event.key.toLowerCase() === 'b'
+        const lowerKey = event.key.toLowerCase();
+        if (!repeated && lowerKey === 'b'
             && event.type === 'keyup') {
             this.isBuilding = !this.isBuilding;
             this.gameClientSocket?.mapEditorEnable(this.isBuilding);
@@ -367,7 +368,7 @@ export default class App extends Vue {
             handled = true;
         }
 
-        if (!repeated && event.key.toLowerCase() === 'tab') {
+        if (!repeated && lowerKey === 'tab') {
             if (event.type === 'keydown') {
                 this.isStatsOpen = true;
                 this.updatePlayers();
