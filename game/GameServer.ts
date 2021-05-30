@@ -589,7 +589,7 @@ export default class GameServer {
                 this.gameEventBatcher.flush();
             });
 
-        this.gameModeService.setGameMode('capture-the-flag');
+        this.gameModeService.setGameMode('deathmatch');
         this.gameMapService.loadFromFile('./maps/simple.json');
     }
 

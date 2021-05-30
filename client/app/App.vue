@@ -13,58 +13,27 @@
             ></canvas>
         </div>
 
+        <settings
+            id="game-settings"
+            v-if="showSettings"
+            :tankTier="tankTier"
+            :tankColor="tankColor"
+            :playerTeamId="playerTeamId"
+            :hasTankDiedOnce="hasTankDiedOnce"
+            :isTankDead="isTankDead"
+            :teams="teams"
+            @player-name-change="onPlayerNameChanged"
+            @player-team-change="onPlayerTeamChanged"
+            @tank-tier-change="onPlayerTierChanged"
+            @tank-color-change="onPlayerColorChanged"
+            @spawn-click="onSpawnButtonClick"
+        ></settings>
         <div id="game-overlay">
-            <div id="game-controls" class="controls">
-                <button
-                    @click="onSpawnButtonClick"
-                >Spawn</button>
-                <button
-                    @click="onDespawnButtonClick"
-                >Despawn</button>
-                <label>Name</label>
-                <input
-                    type="text"
-                    v-model="playerName"
-                    @change="onPlayerNameChanged"
-                >
-                <label>Color</label>
-                <input
-                    type="color"
-                    v-model="playerColor"
-                    @change="onPlayerColorChanged"
-                >
-
-                <button
-                    v-for="tier in Object.values(TankTier)"
-                    :key="tier"
-                    @click="onPlayerTierClick(tier)"
-                >
-                    {{ tier }}
-                </button>
-
-                <template v-if="teams">
-                    <label>Team</label>
-
-                    <button
-                        v-for="team in teams"
-                        :key="team.id"
-                        @click="onPlayerTeamClick(team.id)"
-                    >
-                        <span
-                            class="team-color"
-                            :style="{
-                                background: colorToString(team.color),
-                            }"
-                        >
-                        </span>
-                    </button>
-                </template>
-            </div>
 
             <div id="fullscreen-controls" class="controls">
                 <img
                     class="image-button"
-                    :src="`${CLIENT_SPRITES_RELATIVE_URL}/fullscreen_button.png`"
+                    :src="WebpackUtils.getImageUrl('fullscreen_button')"
                     alt="Enter fullscreen"
                     v-if="!isFullscreen"
                     @click="onFullscreenButtonClick"
@@ -72,7 +41,7 @@
 
                 <img
                     class="image-button"
-                    :src="`${CLIENT_SPRITES_RELATIVE_URL}/fullscreen_exit_button.png`"
+                    :src="WebpackUtils.getImageUrl('fullscreen_exit_button')"
                     alt="Exit fullscreen"
                     v-if="isFullscreen"
                     @click="onFullscreenButtonClick"
@@ -160,7 +129,7 @@
                                     <span
                                         class="team-color"
                                         :style="{
-                                            background: colorToString(team.color),
+                                            background: ColorUtils.getRgbFromColor(team.color),
                                         }"
                                     >
                                     </span>
@@ -191,6 +160,7 @@
 </template>
 
 <script lang="ts">
+import Settings from './Settings.vue';
 import ActionFactory from '@/actions/ActionFactory';
 import { Color } from '@/drawable/Color';
 import GameClient, { GameClientEvent } from '@/game/GameClient';
@@ -207,32 +177,48 @@ import RatioUtils from '@/utils/RatioUtils';
 import screenfull from 'screenfull';
 import { io, Socket } from 'socket.io-client';
 import { markRaw } from 'vue';
-import { Vue } from 'vue-class-component';
+import { Options } from 'vue-class-component';
 import { CLIENT_CONFIG_SOCKET_BASE_URL, CLIENT_SPRITES_RELATIVE_URL } from '../../config';
 import DirectionalJoystickWrapper, { DirectionalJoystickEvent } from '../DirectionalJoystickWrapper';
+import ColorUtils from '@/utils/ColorUtils';
+import { Vue } from 'vue-property-decorator';
+import WebpackUtils from '../utils/WebpackUtils';
 
+@Options({
+    components: {
+        'settings': Settings,
+    },
+})
 export default class App extends Vue {
+    WebpackUtils = WebpackUtils;
     socket?: Socket<GameSocketEvents>;
+
     gameClient?: GameClient;
     gameClientSocket?: GameClientSocket;
     joystick?: DirectionalJoystickWrapper;
     isFullscreen = false;
     CLIENT_SPRITES_RELATIVE_URL = CLIENT_SPRITES_RELATIVE_URL;
+    ColorUtils = ColorUtils;
     GameMapGridSizes = GameMapGridSizes;
     GameShortObjectType = GameShortObjectType;
     GameObjectType = GameObjectType;
     TankTier = TankTier;
     RenderPass = RenderPass;
-    playerColor = '';
-    playerName = '';
     isBuilding = false;
     isStatsOpen = false;
     gridSize = 0;
     selectedObjectType = GameObjectType.NONE;
     ownPlayer: Player | null = null;
     playersStats: PlayerStats[] | null = null;
-    teams: Team[] | null = null;
     canvases: HTMLCanvasElement[] = [];
+
+    teams: Team[] | null = null;
+    tankTier: TankTier | null = null;
+    tankColor: Color | null = null;
+    playerTeamId: string | null = null;
+    hasTankDiedOnce = false;
+    isTankDead = true;
+    showSettings = false;
 
     mounted(): void {
         const canvasContainer = this.$refs.canvasContainer as HTMLDivElement;
@@ -255,6 +241,31 @@ export default class App extends Vue {
                 this.detachMouseEvents();
             }
         });
+        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_ADDED, () => {
+            this.showSettings = true;
+        });
+        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID,
+            (tankId: number | null) => {
+                this.showSettings = tankId === null;
+                this.isTankDead = tankId === null;
+
+
+                if (tankId === null && !this.hasTankDiedOnce) {
+                    this.hasTankDiedOnce = true;
+                }
+            });
+        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TEAM_ID,
+            (teamId: string | null) => {
+                this.playerTeamId = teamId;
+            });
+        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_TIER,
+            (tier: TankTier) => {
+                this.tankTier = tier;
+            });
+        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_COLOR,
+            (color: Color) => {
+                this.tankColor = color;
+            });
 
         this.gameClientSocket = new GameClientSocket(this.socket, this.gameClient);
         this.joystick = new DirectionalJoystickWrapper({
@@ -298,10 +309,6 @@ export default class App extends Vue {
         canvasContainer.removeEventListener('click', this.onMouseClickEvent);
         canvasContainer.removeEventListener('contextmenu', this.onMouseRightClickEvent);
         canvasContainer.removeEventListener('mousemove', this.onMouseMoveEvent);
-    }
-
-    colorToString(color: Color): string {
-        return `rgb(${color.join(', ')})`;
     }
 
     addCanvasRef(canvas: HTMLCanvasElement): void {
@@ -382,6 +389,14 @@ export default class App extends Vue {
             handled = true;
         }
 
+        if (!repeated && lowerKey === 'escape') {
+            if (event.type === 'keyup') {
+                this.showSettings = !this.showSettings;
+            }
+
+            handled = true;
+        }
+
         if (repeated || handled) {
             event.preventDefault();
         }
@@ -427,23 +442,20 @@ export default class App extends Vue {
         this.gameClientSocket?.requestPlayerTankDespawn();
     }
 
-    onPlayerColorChanged(): void {
-        const r = parseInt(this.playerColor.substr(1, 2), 16);
-        const g = parseInt(this.playerColor.substr(3, 2), 16);
-        const b = parseInt(this.playerColor.substr(5, 2), 16);
-        this.gameClientSocket?.requestPlayerTankColor(r, g, b);
+    onPlayerColorChanged(color: Color): void {
+        this.gameClientSocket?.requestPlayerTankColor(color);
     }
 
-    onPlayerTierClick(tier: TankTier): void {
+    onPlayerTierChanged(tier: TankTier): void {
         this.gameClientSocket?.requestPlayerTankTier(tier);
     }
 
-    onPlayerTeamClick(teamId: string): void {
+    onPlayerTeamChanged(teamId: string): void {
         this.gameClientSocket?.requestPlayerTeam(teamId);
     }
 
-    onPlayerNameChanged(): void {
-        this.gameClientSocket?.setPlayerName(this.playerName);
+    onPlayerNameChanged(name: string): void {
+        this.gameClientSocket?.setPlayerName(name);
     }
 
     onFullscreenButtonClick(): void {
@@ -517,36 +529,59 @@ export default class App extends Vue {
 
 <style>
 #app-content {
+    width: 100%;
+    height: 100%;
+
     user-select: none;
 }
 
-#app-content,
-button {
-    font-family: 'Press Start 2P';
-}
+#game-canvas-container {
+    position: absolute;
+    top: 0;
+    left: 0;
 
-#app-content,
-#game-canvas-container,
-#game-overlay,
-.game-canvas {
     width: 100%;
     height: 100%;
-}
 
-#game-canvas-container {
     background: #000000;
 
     outline: none;
+
+    z-index: 1;
 }
 
-#game-overlay,
 .game-canvas {
     position: absolute;
     top: 0;
     left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 2;
+}
+
+#game-settings {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 4;
 }
 
 #game-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 3;
+
     pointer-events: none;
 }
 

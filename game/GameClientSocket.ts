@@ -1,4 +1,5 @@
 import Action from '@/actions/Action';
+import { Color } from '@/drawable/Color';
 import Point from '@/physics/point/Point';
 import { TankTier } from '@/tank/TankTier';
 import { Socket } from 'socket.io-client';
@@ -70,8 +71,8 @@ export default class GameClientSocket {
         this.socket.emit(GameSocketEvent.PLAYER_REQUEST_TANK_SPAWN);
     }
 
-    requestPlayerTankColor(r: number, g: number, b: number): void {
-        this.socket.emit(GameSocketEvent.PLAYER_REQUEST_TANK_COLOR, [r, g, b]);
+    requestPlayerTankColor(color: Color): void {
+        this.socket.emit(GameSocketEvent.PLAYER_REQUEST_TANK_COLOR, color);
     }
 
     requestPlayerTankDespawn(): void {
