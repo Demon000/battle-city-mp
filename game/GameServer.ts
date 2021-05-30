@@ -698,7 +698,7 @@ export default class GameServer {
 
     onPlayerRequestTankColor(playerId: string, color: Color): void {
         const gameModeProperties = this.gameModeService.getGameModeProperties();
-        if (!gameModeProperties.hasTeams) {
+        if (gameModeProperties.hasTeams) {
             return;
         }
 
