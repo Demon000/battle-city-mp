@@ -144,6 +144,11 @@ export default class GameServer {
 
         this.gameMapService.emitter.on(GameMapServiceEvent.MAP_TEAMS_OPTIONS,
             (teamsOptions: TeamOptions[]) => {
+                const gameModeProperties = this.gameModeService.getGameModeProperties();
+                if (!gameModeProperties.hasTeams) {
+                    return;
+                }
+
                 const teams = teamsOptions.map(o => new Team(o));
                 this.teamService.addTeams(teams);
             });
