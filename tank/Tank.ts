@@ -59,7 +59,7 @@ export const tierToPropertiesMap: Record<TankTier, TankTierProperties> = {
     [TankTier.HEAVY]: {
         maxSpeed: 96,
         accelerationFactor: 1,
-        bulletSpeed: 128,
+        bulletSpeed: 192,
         decelerationFactor: 1,
         maxBullets: 1,
         bulletCooldown: 500,
