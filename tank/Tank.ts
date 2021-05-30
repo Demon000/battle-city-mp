@@ -91,7 +91,7 @@ export interface TankOptions extends GameObjectOptions {
     lastSmokeTime?: number;
     bulletIds?: number[];
     teamId?: string | null;
-    color?: Color;
+    color: Color;
     health?: number;
     flagTeamId?: string | null;
     flagColor?: Color | null;
@@ -135,7 +135,7 @@ export default class Tank extends GameObject {
         this.lastSmokeTime = options.lastSmokeTime ?? 0;
         this.bulletIds = options.bulletIds ?? new Array<number>();
         this.teamId = options.teamId ?? null;
-        this.color = options.color ?? [231, 156, 33];
+        this.color = options.color;
         this.health = options.health ?? this.maxHealth;
         this.flagTeamId = options.flagTeamId ?? null;
         this._flagColor = options.flagColor ?? null;
