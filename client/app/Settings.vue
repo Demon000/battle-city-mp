@@ -10,6 +10,7 @@
                     <label>Name</label>
                     <input
                         type="text"
+                        maxlength="16"
                         v-model.lazy="playerName"
                     >
                 </div>
