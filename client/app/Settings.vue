@@ -186,8 +186,17 @@ export default class Settings extends Vue {
             handled = true;
         }
 
+        if (!repeated && lowerKey === ' ') {
+            if (event.type === 'keyup' && this.isTankDead) {
+                this.$emit('spawn-click');
+            }
+            handled = true;
+        }
+
         if (!repeated && lowerKey === 'escape') {
-            this.$emit('escape-keyup', event);
+            if (event.type === 'keyup') {
+                this.$emit('escape-keyup', event);
+            }
             handled = true;
         }
 
