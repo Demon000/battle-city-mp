@@ -144,6 +144,7 @@ import Team from '@/team/Team';
         'player-name-change',
         'player-team-change',
         'spawn-click',
+        'escape-keyup',
     ],
 })
 export default class Settings extends Vue {
@@ -170,6 +171,34 @@ export default class Settings extends Vue {
     playerTeamId: string | null = null;
 
     playerName: string | null = null;
+
+    mounted(): void {
+        this.$el.addEventListener('keydown', this.onKeyboardEvent);
+        this.$el.addEventListener('keyup', this.onKeyboardEvent);
+    }
+
+    onKeyboardEvent(event: KeyboardEvent): void {
+        const lowerKey = event.key.toLowerCase();
+        let repeated = event.repeat;
+        let handled = false;
+
+        if (!repeated && lowerKey === 'tab') {
+            handled = true;
+        }
+
+        if (!repeated && lowerKey === 'escape') {
+            this.$emit('escape-keyup', event);
+            handled = true;
+        }
+
+        if (repeated) {
+            handled = true;
+        }
+
+        if (handled) {
+            event.preventDefault();
+        }
+    }
 
     onTankTierChanged(tier: TankTier): void {
         this.$emit('tank-tier-change', tier);

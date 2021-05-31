@@ -79,7 +79,7 @@ export default class GameMapEditorService {
         this.updateGhostObjects();
     }
 
-    isEnabled(): boolean {
+    getEnabled(): boolean {
         return this.enabled;
     }
 

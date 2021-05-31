@@ -2,7 +2,7 @@
     <div id="app-content">
         <div
             id="game-canvas-container"
-            ref="canvasContainer"
+            ref="canvasContainerElement"
             tabindex="1"
         >
             <canvas
@@ -11,151 +11,154 @@
                 :key="index"
                 :ref="addCanvasRef"
             ></canvas>
+
+            <div id="game-overlay">
+                <div id="fullscreen-controls" class="controls">
+                    <img
+                        class="image-button"
+                        :src="WebpackUtils.getImageUrl('fullscreen_button')"
+                        alt="Enter fullscreen"
+                        v-if="!isFullscreen"
+                        @click="onFullscreenButtonClick"
+                    >
+
+                    <img
+                        class="image-button"
+                        :src="WebpackUtils.getImageUrl('fullscreen_exit_button')"
+                        alt="Exit fullscreen"
+                        v-if="isFullscreen"
+                        @click="onFullscreenButtonClick"
+                    >
+                </div>
+
+                <div
+                    id="building-controls"
+                    class="controls"
+                    v-if="isBuilding"
+                >
+                    <label>Grid size</label>
+                    <br>
+                    <select
+                        @change="onGridSizeChanged"
+                        v-model="gridSize"
+                    >
+                        <option
+                            v-for="size in GameMapGridSizes"
+                            :key="size"
+                            :value="size"
+                        >
+                            {{ size }}
+                        </option>
+                    </select>
+
+                    <br>
+
+                    <label>Block type</label>
+                    <br>
+                    <select
+                        @change="onSelectedObjectTypeChanged"
+                        v-model="selectedObjectType"
+                    >
+                        <option
+                            v-for="type in Object.keys(GameShortObjectType)"
+                            :key="type"
+                            :value="GameObjectType[type]"
+                        >
+                            {{ type }}
+                        </option>
+                    </select>
+
+                    <br>
+
+                    <button
+                        @click="onSaveButtonClick"
+                    >
+                        Save
+                    </button>
+                </div>
+
+                <div
+                    id="stats-container"
+                    v-if="isStatsOpen"
+                >
+                    <div
+                        id="stats"
+                        class="controls"
+                    >
+                        <table>
+                            <tr class="header">
+                                <td>Player name</td>
+                                <td>Kills</td>
+                                <td>Deaths</td>
+                                <td>Points</td>
+                                <td>Team</td>
+                                <td>Tank</td>
+                            </tr>
+                            <tr
+                                v-for="{player, team, tier} of playersStats"
+                                :key="player.id"
+                                :class="{
+                                    'is-own-player': player.id === ownPlayer.id,
+                                }"
+                            >
+                                <td>{{ player.displayName }}</td>
+                                <td>{{ player.kills }}</td>
+                                <td>{{ player.deaths }}</td>
+                                <td>{{ player.points }}</td>
+                                <td class="team-cell">
+                                    <template
+                                        v-if="team"
+                                    >
+                                        <span
+                                            class="team-color"
+                                            :style="{
+                                                background: ColorUtils.getRgbFromColor(team.color),
+                                            }"
+                                        >
+                                        </span>
+                                    </template>
+                                </td>
+                                <td>
+                                    {{ tier }}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="virtual-controls">
+                    <div
+                        ref="dpad"
+                        id="virtual-dpad"
+                    >
+                    </div>
+                    <div
+                        id="virtual-shoot-button"
+                        ref="shootButton"
+                    >
+                    </div>
+                </div>
+            </div>
         </div>
 
         <settings
+            tabindex="2"
             id="game-settings"
-            v-if="showSettings"
+            v-if="isShowingSettings"
             :tankTier="tankTier"
             :tankColor="tankColor"
             :playerTeamId="playerTeamId"
             :hasTankDiedOnce="hasTankDiedOnce"
             :isTankDead="isTankDead"
             :teams="teams"
+            ref="settingsElement"
             @player-name-change="onPlayerNameChanged"
             @player-team-change="onPlayerTeamChanged"
-            @tank-tier-change="onPlayerTierChanged"
-            @tank-color-change="onPlayerColorChanged"
+            @tank-tier-change="onPlayerColorChanged"
+            @tank-color-change="onTankColorChanged"
             @spawn-click="onSpawnButtonClick"
+            @escape-keyup="onKeyboardEvent"
         ></settings>
-        <div id="game-overlay">
-
-            <div id="fullscreen-controls" class="controls">
-                <img
-                    class="image-button"
-                    :src="WebpackUtils.getImageUrl('fullscreen_button')"
-                    alt="Enter fullscreen"
-                    v-if="!isFullscreen"
-                    @click="onFullscreenButtonClick"
-                >
-
-                <img
-                    class="image-button"
-                    :src="WebpackUtils.getImageUrl('fullscreen_exit_button')"
-                    alt="Exit fullscreen"
-                    v-if="isFullscreen"
-                    @click="onFullscreenButtonClick"
-                >
-            </div>
-
-            <div
-                id="building-controls"
-                class="controls"
-                v-if="isBuilding"
-            >
-                <label>Grid size</label>
-                <br>
-                <select
-                    @change="onGridSizeChanged"
-                    v-model="gridSize"
-                >
-                    <option
-                        v-for="size in GameMapGridSizes"
-                        :key="size"
-                        :value="size"
-                    >
-                        {{ size }}
-                    </option>
-                </select>
-
-                <br>
-
-                <label>Block type</label>
-                <br>
-                <select
-                    @change="onSelectedObjectTypeChanged"
-                    v-model="selectedObjectType"
-                >
-                    <option
-                        v-for="type in Object.keys(GameShortObjectType)"
-                        :key="type"
-                        :value="GameObjectType[type]"
-                    >
-                        {{ type }}
-                    </option>
-                </select>
-
-                <br>
-
-                <button
-                    @click="onSaveButtonClick"
-                >
-                    Save
-                </button>
-            </div>
-
-            <div
-                id="stats-container"
-                v-if="isStatsOpen"
-            >
-                <div
-                    id="stats"
-                    class="controls"
-                >
-                    <table>
-                        <tr class="header">
-                            <td>Player name</td>
-                            <td>Kills</td>
-                            <td>Deaths</td>
-                            <td>Points</td>
-                            <td>Team</td>
-                            <td>Tank</td>
-                        </tr>
-                        <tr
-                            v-for="{player, team, tier} of playersStats"
-                            :key="player.id"
-                            :class="{
-                                'is-own-player': player.id === ownPlayer.id,
-                            }"
-                        >
-                            <td>{{ player.displayName }}</td>
-                            <td>{{ player.kills }}</td>
-                            <td>{{ player.deaths }}</td>
-                            <td>{{ player.points }}</td>
-                            <td class="team-cell">
-                                <template
-                                    v-if="team"
-                                >
-                                    <span
-                                        class="team-color"
-                                        :style="{
-                                            background: ColorUtils.getRgbFromColor(team.color),
-                                        }"
-                                    >
-                                    </span>
-                                </template>
-                            </td>
-                            <td>
-                                {{ tier }}
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-
-            <div id="virtual-controls">
-                <div
-                    ref="dpad"
-                    id="virtual-dpad"
-                >
-                </div>
-                <div
-                    id="virtual-shoot-button"
-                    ref="shootButton"
-                >
-                </div>
-            </div>
-        </div>
     </div>
 </template>
 
@@ -218,10 +221,10 @@ export default class App extends Vue {
     playerTeamId: string | null = null;
     hasTankDiedOnce = false;
     isTankDead = true;
-    showSettings = false;
+    isShowingSettings = false;
 
     mounted(): void {
-        const canvasContainer = this.$refs.canvasContainer as HTMLDivElement;
+        const canvasContainerElement = this.$refs.canvasContainerElement as HTMLDivElement;
 
         this.socket = io(CLIENT_CONFIG_SOCKET_BASE_URL, {
             transports: ['websocket'],
@@ -235,20 +238,20 @@ export default class App extends Vue {
             this.updateTeams();
         });
         this.gameClient.emitter.on(GameClientEvent.MAP_EDITOR_ENABLED_CHANGED, (enabled: boolean) => {
-            if (enabled) {
-                this.attachMouseEvents();
-            } else {
-                this.detachMouseEvents();
-            }
+            this.isBuilding = enabled;
         });
         this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_ADDED, () => {
-            this.showSettings = true;
+            this.showSettings();
         });
         this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID,
             (tankId: number | null) => {
-                this.showSettings = tankId === null;
                 this.isTankDead = tankId === null;
 
+                if (tankId === null) {
+                    this.showSettings();
+                } else {
+                    this.hideSettings();
+                }
 
                 if (tankId === null && !this.hasTankDiedOnce) {
                     this.hasTankDiedOnce = true;
@@ -274,12 +277,14 @@ export default class App extends Vue {
         });
 
         window.addEventListener('resize', this.onWindowResize);
-        window.addEventListener('keydown', this.onNonGameKeyboardEvent);
-        window.addEventListener('keyup', this.onNonGameKeyboardEvent);
-        canvasContainer.addEventListener('blur', this.onCanvasBlurEvent);
-        canvasContainer.addEventListener('keydown', this.onKeyboardEvent);
-        canvasContainer.addEventListener('keyup', this.onKeyboardEvent);
-        canvasContainer.focus();
+        canvasContainerElement.addEventListener('blur', this.onCanvasBlurEvent);
+        canvasContainerElement.addEventListener('keydown', this.onKeyboardEvent);
+        canvasContainerElement.addEventListener('keyup', this.onKeyboardEvent);
+        canvasContainerElement.addEventListener('click', this.onMouseClickEvent);
+        canvasContainerElement.addEventListener('contextmenu', this.onMouseRightClickEvent);
+        canvasContainerElement.addEventListener('mousemove', this.onMouseMoveEvent, {
+            passive: true,
+        });
 
         const shootButton = this.$refs.shootButton as HTMLElement;
         shootButton.addEventListener('touchstart', this.onShootButtonTouchEvent);
@@ -293,22 +298,26 @@ export default class App extends Vue {
         }
     }
 
-    attachMouseEvents(): void {
-        const canvasContainer = this.$refs.canvasContainer as HTMLDivElement;
+    hideSettings(): void {
+        this.isShowingSettings = false;
+        const canvasContainerElement = this.$refs.canvasContainerElement as HTMLElement;
+        canvasContainerElement.focus();
+    }
 
-        canvasContainer.addEventListener('click', this.onMouseClickEvent);
-        canvasContainer.addEventListener('contextmenu', this.onMouseRightClickEvent);
-        canvasContainer.addEventListener('mousemove', this.onMouseMoveEvent, {
-            passive: true,
+    showSettings(): void {
+        this.isShowingSettings = true;
+        this.$nextTick(() => {
+            const settingsElement = (this.$refs.settingsElement as Vue).$el as HTMLElement;
+            settingsElement.focus();
         });
     }
 
-    detachMouseEvents(): void {
-        const canvasContainer = this.$refs.canvasContainer as HTMLDivElement;
-
-        canvasContainer.removeEventListener('click', this.onMouseClickEvent);
-        canvasContainer.removeEventListener('contextmenu', this.onMouseRightClickEvent);
-        canvasContainer.removeEventListener('mousemove', this.onMouseMoveEvent);
+    toggleSettings(): void {
+        if (this.isShowingSettings) {
+            this.hideSettings();
+        } else {
+            this.showSettings();
+        }
     }
 
     addCanvasRef(canvas: HTMLCanvasElement): void {
@@ -347,30 +356,14 @@ export default class App extends Vue {
     }
 
     onKeyboardEvent(event: KeyboardEvent): void {
-        if (event.repeat) {
-            return;
-        }
-
-        const action = ActionFactory.buildFromKeyboardEvent(event);
-        if (action !== undefined) {
-            this.gameClientSocket?.requestPlayerAction(action);
-            return;
-        }
-    }
-
-    onNonGameKeyboardEvent(event: KeyboardEvent): void {
-        let handled = false;
-        let repeated = false;
-
-        if (event.repeat) {
-            repeated = true;
-        }
-
         const lowerKey = event.key.toLowerCase();
-        if (!repeated && lowerKey === 'b'
-            && event.type === 'keyup') {
-            this.isBuilding = !this.isBuilding;
-            this.gameClientSocket?.mapEditorEnable(this.isBuilding);
+        let repeated = event.repeat;
+        let handled = false;
+
+        if (!repeated && lowerKey === 'b') {
+            if (event.type === 'keyup') {
+                this.gameClientSocket?.toggleMapEditor();
+            }
 
             handled = true;
         }
@@ -391,13 +384,25 @@ export default class App extends Vue {
 
         if (!repeated && lowerKey === 'escape') {
             if (event.type === 'keyup') {
-                this.showSettings = !this.showSettings;
+                this.toggleSettings();
             }
 
             handled = true;
         }
 
-        if (repeated || handled) {
+        if (!repeated) {
+            const action = ActionFactory.buildFromKeyboardEvent(event);
+            if (action !== undefined) {
+                this.gameClientSocket?.requestPlayerAction(action);
+                handled = true;
+            }
+        }
+
+        if (repeated) {
+            handled = true;
+        }
+
+        if (handled) {
             event.preventDefault();
         }
     }
@@ -442,11 +447,11 @@ export default class App extends Vue {
         this.gameClientSocket?.requestPlayerTankDespawn();
     }
 
-    onPlayerColorChanged(color: Color): void {
+    onTankColorChanged(color: Color): void {
         this.gameClientSocket?.requestPlayerTankColor(color);
     }
 
-    onPlayerTierChanged(tier: TankTier): void {
+    onPlayerColorChanged(tier: TankTier): void {
         this.gameClientSocket?.requestPlayerTankTier(tier);
     }
 
@@ -472,22 +477,7 @@ export default class App extends Vue {
         this.gameClient?.setMapEditorSelectedObjectType(this.selectedObjectType);
     }
 
-    focusCanvasContainer(): boolean {
-        const canvasContainer = this.$refs.canvasContainer as HTMLDivElement;
-        if (document.activeElement !== canvasContainer) {
-            canvasContainer.focus();
-            return true;
-        }
-
-        return false;
-    }
-
     onMouseMoveEvent(event: MouseEvent): void {
-        const focused = this.focusCanvasContainer();
-        if (focused) {
-            return;
-        }
-
         this.gameClient?.setMapEditorHoverPosition({
             x: RatioUtils.scaleForDevicePixelRatio(event.offsetX),
             y: RatioUtils.scaleForDevicePixelRatio(event.offsetY),
@@ -495,30 +485,20 @@ export default class App extends Vue {
     }
 
     onMouseClickEvent(): void {
-        const focused = this.focusCanvasContainer();
-        if (focused) {
-            return;
-        }
-
         if (this.isBuilding) {
             this.gameClientSocket?.mapEditorCreateObjects();
         }
     }
 
     onMouseRightClickEvent(event: MouseEvent): void {
-        event.preventDefault();
-
-        const focused = this.focusCanvasContainer();
-        if (focused) {
-            return;
-        }
-
         if (this.isBuilding) {
             this.gameClientSocket?.mapEditorDestroyObjects({
                 x: RatioUtils.scaleForDevicePixelRatio(event.offsetX),
                 y: RatioUtils.scaleForDevicePixelRatio(event.offsetY),
             });
         }
+
+        event.preventDefault();
     }
 
     onSaveButtonClick(): void {
@@ -531,6 +511,8 @@ export default class App extends Vue {
 #app-content {
     width: 100%;
     height: 100%;
+
+    font-family: 'Press Start 2P';
 
     user-select: none;
 }

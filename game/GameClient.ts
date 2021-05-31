@@ -220,7 +220,7 @@ export default class GameClient {
         this.gameGraphicsService.renderObjectsOver(viewableObjects);
         this.gameAudioService.playObjectsAudioEffect(viewableObjects, position, box);
 
-        if (this.gameMapEditorService.isEnabled()) {
+        if (this.gameMapEditorService.getEnabled()) {
             const gridSize = this.gameMapEditorService.getGridSize();
             if (gridSize !== 0) {
                 this.gameGraphicsService.renderGrid(gridSize);
@@ -280,6 +280,12 @@ export default class GameClient {
         this.gameMapEditorService.setEnabled(enabled);
         this.gameGraphicsService.setShowInvisible(enabled);
         this.emitter.emit(GameClientEvent.MAP_EDITOR_ENABLED_CHANGED, enabled);
+    }
+
+    toggleMapEditorEnabled(): boolean {
+        const enabled = !this.gameMapEditorService.getEnabled();
+        this.setMapEditorEnabled(enabled);
+        return enabled;
     }
 
     setMapEditorGridSize(gridSize: number): void {
