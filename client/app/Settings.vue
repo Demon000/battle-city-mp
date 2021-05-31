@@ -182,7 +182,7 @@ export default class Settings extends Vue {
         let repeated = event.repeat;
         let handled = false;
 
-        if (!repeated && lowerKey === 'tab') {
+        if (lowerKey === 'tab') {
             handled = true;
         }
 
@@ -197,10 +197,6 @@ export default class Settings extends Vue {
             if (event.type === 'keyup') {
                 this.$emit('escape-keyup', event);
             }
-            handled = true;
-        }
-
-        if (repeated) {
             handled = true;
         }
 

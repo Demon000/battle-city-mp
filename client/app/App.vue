@@ -368,15 +368,17 @@ export default class App extends Vue {
             handled = true;
         }
 
-        if (!repeated && lowerKey === 'tab') {
-            if (event.type === 'keydown') {
-                this.isStatsOpen = true;
-                this.updatePlayers();
-            }
+        if (lowerKey === 'tab') {
+            if (!repeated) {
+                if (event.type === 'keydown') {
+                    this.isStatsOpen = true;
+                    this.updatePlayers();
+                }
 
-            if (event.type === 'keyup') {
-                this.isStatsOpen = false;
-                this.clearPlayers();
+                if (event.type === 'keyup') {
+                    this.isStatsOpen = false;
+                    this.clearPlayers();
+                }
             }
 
             handled = true;
@@ -396,10 +398,6 @@ export default class App extends Vue {
                 this.gameClientSocket?.requestPlayerAction(action);
                 handled = true;
             }
-        }
-
-        if (repeated) {
-            handled = true;
         }
 
         if (handled) {
