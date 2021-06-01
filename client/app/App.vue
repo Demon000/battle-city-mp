@@ -120,7 +120,7 @@
 
                 <div
                     id="stats-container"
-                    v-if="isStatsOpen"
+                    v-if="isShowingStats"
                 >
                     <div
                         id="stats"
@@ -249,7 +249,7 @@ export default class App extends Vue {
     TankTier = TankTier;
     RenderPass = RenderPass;
     isBuilding = false;
-    isStatsOpen = false;
+    isShowingStats = false;
     gridSize = 0;
     selectedObjectType = GameObjectType.NONE;
     ownPlayer: Player | null = null;
@@ -384,6 +384,7 @@ export default class App extends Vue {
 
     showSettings(): void {
         this.isShowingSettings = true;
+        this.isShowingStats = false;
         this.$nextTick(() => {
             const settingsElement = (this.$refs.settingsElement as Vue).$el as HTMLElement;
             settingsElement.focus();
@@ -403,7 +404,7 @@ export default class App extends Vue {
     }
 
     updatePlayers(): void {
-        if (this.gameClient === undefined || !this.isStatsOpen) {
+        if (this.gameClient === undefined || !this.isShowingStats) {
             return;
         }
 
@@ -449,12 +450,12 @@ export default class App extends Vue {
         if (lowerKey === 'tab') {
             if (!repeated) {
                 if (event.type === 'keydown') {
-                    this.isStatsOpen = true;
+                    this.isShowingStats = true;
                     this.updatePlayers();
                 }
 
                 if (event.type === 'keyup') {
-                    this.isStatsOpen = false;
+                    this.isShowingStats = false;
                     this.clearPlayers();
                 }
             }
