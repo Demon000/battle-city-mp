@@ -169,6 +169,9 @@ export default class Settings extends Vue {
     teams: Team[] | null = [];
 
     @Prop()
+    hasTeams = false;
+
+    @Prop()
     playerTeamId: string | null = null;
 
     playerName: string | null = null;
@@ -224,10 +227,6 @@ export default class Settings extends Vue {
         }
 
         return tierToPropertiesMap[this.tankTier];
-    }
-
-    get hasTeams(): boolean {
-        return this.teams !== null && this.teams.length !== 0;
     }
 
     get rgbTankColor(): string | null {

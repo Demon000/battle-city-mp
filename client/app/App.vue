@@ -132,7 +132,11 @@
                                 <td>Kills</td>
                                 <td>Deaths</td>
                                 <td>Points</td>
-                                <td>Team</td>
+                                <td
+                                    v-if="hasTeams"
+                                >
+                                    Team
+                                </td>
                                 <td>Tank</td>
                             </tr>
                             <tr
@@ -146,7 +150,10 @@
                                 <td>{{ player.kills }}</td>
                                 <td>{{ player.deaths }}</td>
                                 <td>{{ player.points }}</td>
-                                <td class="team-cell">
+                                <td
+                                    class="team-cell"
+                                    v-if="hasTeams"
+                                >
                                     <template
                                         v-if="team"
                                     >
@@ -192,6 +199,7 @@
             :hasTankDiedOnce="hasTankDiedOnce"
             :isTankDead="isTankDead"
             :teams="teams"
+            :hasTeams="hasTeams"
             ref="settingsElement"
             @player-name-change="onPlayerNameChanged"
             @player-team-change="onPlayerTeamChanged"
@@ -358,6 +366,10 @@ export default class App extends Vue {
         if (screenfull.isEnabled) {
             screenfull.on('change', this.onFullscreenChanged);
         }
+    }
+
+    get hasTeams(): boolean {
+        return this.teams !== null && this.teams.length !== 0;
     }
 
     get tankMissingHearts(): number | null {
