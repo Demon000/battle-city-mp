@@ -32,6 +32,46 @@
                 </div>
 
                 <div
+                    id="tank-stats"
+                >
+                    <div class="tank-stats-group">
+                        <label>Health</label>
+                        <div>
+                            <img
+                                class="tank-stats-icon"
+                                v-for="i in tankHealth"
+                                :key="i"
+                                :src="WebpackUtils.getImageUrl('heart_full')"
+                            >
+                            <img
+                                class="tank-stats-icon"
+                                v-for="i in tankMissingHearts"
+                                :key="i"
+                                :src="WebpackUtils.getImageUrl('heart_empty')"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="tank-stats-group">
+                        <label>Bullets</label>
+                        <div class="tank-bullet">
+                            <img
+                                class="tank-stats-icon"
+                                v-for="i in tankMissingBullets"
+                                :key="i"
+                                :src="WebpackUtils.getImageUrl('bullet_full')"
+                            >
+                            <img
+                                class="tank-stats-icon"
+                                v-for="i in tankBullets"
+                                :key="i"
+                                :src="WebpackUtils.getImageUrl('bullet_empty')"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div
                     id="building-controls"
                     class="controls"
                     v-if="isBuilding"
@@ -218,6 +258,10 @@ export default class App extends Vue {
     teams: Team[] | null = null;
     tankTier: TankTier | null = null;
     tankColor: Color | null = null;
+    tankMaxHealth: number | null = null;
+    tankHealth: number | null = null;
+    tankMaxBullets: number | null = null;
+    tankBullets: number | null = null;
     playerTeamId: string | null = null;
     hasTankDiedOnce = false;
     isTankDead = true;
@@ -270,6 +314,23 @@ export default class App extends Vue {
                 this.tankColor = color;
             });
 
+        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
+            (maxHealth: number) => {
+                this.tankMaxHealth = maxHealth;
+            });
+        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
+            (health: number) => {
+                this.tankHealth = health;
+            });
+        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
+            (maxBullets: number) => {
+                this.tankMaxBullets = maxBullets;
+            });
+        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
+            (bullets: number) => {
+                this.tankBullets = bullets;
+            });
+
         this.gameClientSocket = new GameClientSocket(this.socket, this.gameClient);
         this.joystick = new DirectionalJoystickWrapper({
             zone: this.$refs.dpad as HTMLElement,
@@ -296,6 +357,22 @@ export default class App extends Vue {
         if (screenfull.isEnabled) {
             screenfull.on('change', this.onFullscreenChanged);
         }
+    }
+
+    get tankMissingHearts(): number | null {
+        if (this.tankMaxHealth === null || this.tankHealth === null) {
+            return null;
+        }
+
+        return this.tankMaxHealth - this.tankHealth;
+    }
+
+    get tankMissingBullets(): number | null {
+        if (this.tankMaxBullets === null || this.tankBullets === null) {
+            return null;
+        }
+
+        return this.tankMaxBullets - this.tankBullets;
     }
 
     hideSettings(): void {
@@ -675,6 +752,37 @@ export default class App extends Vue {
     top: 0;
 
     padding: 8px;
+}
+
+#tank-stats {
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+
+    color: #ffffff;
+}
+
+.tank-stats-group {
+    padding: 8px;
+
+    background: rgba(255, 255, 255, 0.45);
+    border-radius: 5px;
+}
+
+.tank-stats-group label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.tank-stats-group + .tank-stats-group {
+    margin-top: 16px;
+}
+
+.tank-stats-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 4px;
+    image-rendering: pixelated;
 }
 
 @media (pointer: coarse) {

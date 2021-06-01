@@ -501,7 +501,7 @@ export default class GameServer {
                     const tankHealth = tank.health;
                     const bulletDamage = bullet.damage;
 
-                    tank.health -= bulletDamage;
+                    this.tankService.decreaseTankHealth(tankId, bulletDamage);
                     bullet.damage -= tankHealth;
                 }
 

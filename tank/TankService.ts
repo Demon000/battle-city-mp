@@ -11,16 +11,25 @@ export enum TankServiceEvent {
     TANK_REQUESTED_BULLET_SPAWN = 'tank-requested-bullet-spawn',
     TANK_REQUESTED_SMOKE_SPAWN = 'tank-requested-smoke-spawn',
     TANK_UPDATED = 'tank-updated',
+    OWN_PLAYER_TANK_CHANGED_MAX_HEALTH = 'own-player-tank-changed-max-health',
+    OWN_PLAYER_TANK_CHANGED_HEALTH = 'own-player-tank-changed-health',
+    OWN_PLAYER_TANK_CHANGED_MAX_BULLETS = 'own-player-tank-changed-max-bullets',
+    OWN_PLAYER_TANK_CHANGED_BULLETS = 'own-player-tank-changed-bullets',
 }
 
 interface TankServiceEvents {
     [TankServiceEvent.TANK_REQUESTED_BULLET_SPAWN]: (tankId: number) => void,
     [TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN]: (tankId: number) => void,
     [TankServiceEvent.TANK_UPDATED]: (tankId: number, options: PartialTankOptions) => void,
+    [TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH]: (maxHealth: number) => void,
+    [TankServiceEvent.OWN_PLAYER_TANK_CHANGED_HEALTH]: (health: number) => void,
+    [TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS]: (maxBullets: number) => void,
+    [TankServiceEvent.OWN_PLAYER_TANK_CHANGED_BULLETS]: (bullets: number) => void,
 }
 
 export default class TankService {
     private repository;
+    private ownPlayerTankId: number | null = null;
     emitter = new EventEmitter<TankServiceEvents>();
 
     constructor(repository: MapRepository<number, GameObject>) {
@@ -56,15 +65,49 @@ export default class TankService {
         return object as Tank;
     }
 
-    addTankBullet(tankId: number, bulletId: number): void {
+    setOwnPlayerTankId(tankId: number | null): void {
+        this.ownPlayerTankId = tankId;
+
+        if (tankId !== null) {
+            const tank = this.getTank(tankId);
+
+            this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
+                tank.maxHealth);
+            this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
+                tank.health);
+            this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
+                tank.maxBullets);
+            this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
+                tank.bulletIds.length);
+        }
+    }
+
+    addRemoveTankBullets(tankId: number, bulletId: number, add: boolean) {
         const tank = this.getTank(tankId);
-        tank.bulletIds.push(bulletId);
+
+        if (add) {
+            tank.bulletIds.push(bulletId);
+        } else {
+            const bulletIndex = tank.bulletIds.findIndex(b => b === bulletId);
+            tank.bulletIds.splice(bulletIndex, 1);
+        }
+
+        if (tankId === this.ownPlayerTankId) {
+            this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
+                tank.bulletIds.length);
+        }
+
+        this.emitter.emit(TankServiceEvent.TANK_UPDATED, tankId, {
+            bulletIds: tank.bulletIds,
+        });
+    }
+
+    addTankBullet(tankId: number, bulletId: number): void {
+        this.addRemoveTankBullets(tankId, bulletId, true);
     }
 
     removeTankBullet(tankId: number, bulletId: number): void {
-        const tank = this.getTank(tankId);
-        const bulletIndex = tank.bulletIds.findIndex(b => b === bulletId);
-        tank.bulletIds.splice(bulletIndex, 1);
+        this.addRemoveTankBullets(tankId, bulletId, false);
     }
 
     private canTankSpawnBullet(tank: Tank): boolean {
@@ -110,6 +153,20 @@ export default class TankService {
         tank.lastSmokeTime = Date.now();
     }
 
+    updateTank(tankId: number, tankOptions: PartialTankOptions): void {
+        if (tankId === this.ownPlayerTankId) {
+            if (tankOptions.health !== undefined) {
+                this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
+                    tankOptions.health);
+            }
+
+            if (tankOptions.bulletIds !== undefined) {
+                this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
+                    tankOptions.bulletIds.length);
+            }
+        }
+    }
+
     updateTankCollisions(tankId: number, tracker: CollisionTracker): void {
         const tank = this.getTank(tankId);
 
@@ -153,5 +210,18 @@ export default class TankService {
 
     clearTankFlag(tankId: number): void {
         this.setTankFlag(tankId, null, null, null);
+    }
+
+    decreaseTankHealth(tankId: number, value: number): void {
+        const tank = this.getTank(tankId);
+        tank.health -= value;
+
+        if (tankId === this.ownPlayerTankId) {
+            this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_HEALTH, tank.health);
+        }
+
+        this.emitter.emit(TankServiceEvent.TANK_UPDATED, tankId, {
+            health: tank.health,
+        });
     }
 }

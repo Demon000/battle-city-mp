@@ -20,11 +20,12 @@ import EventEmitter from 'eventemitter3';
 import Team from '@/team/Team';
 import TeamService, { TeamServiceEvent } from '@/team/TeamService';
 import PlayerStats from '@/player/PlayerStats';
-import TankService from '@/tank/TankService';
+import TankService, { TankServiceEvent } from '@/tank/TankService';
 import LazyIterable from '@/utils/LazyIterable';
 import GameObjectAudioRendererFactory from '@/object/GameObjectAudioRendererFactory';
 import { TankTier } from '@/tank/TankTier';
 import { Color } from '@/drawable/Color';
+import { PartialTankOptions } from '@/tank/Tank';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -36,6 +37,11 @@ export enum GameClientEvent {
     OWN_PLAYER_CHANGED_TEAM_ID = 'own-player-changed-team-id',
     OWN_PLAYER_CHANGED_TANK_TIER = 'own-player-changed-tank-tier',
     OWN_PLAYER_CHANGED_TANK_COLOR = 'own-player-changed-tank-color',
+
+    OWN_PLAYER_TANK_CHANGED_MAX_HEALTH = 'own-player-tank-changed-max-health',
+    OWN_PLAYER_TANK_CHANGED_HEALTH = 'own-player-tank-changed-health',
+    OWN_PLAYER_TANK_CHANGED_MAX_BULLETS = 'own-player-tank-changed-max-bullets',
+    OWN_PLAYER_TANK_CHANGED_BULLETS = 'own-player-tank-changed-bullets',
 }
 
 export interface GameClientEvents {
@@ -48,6 +54,11 @@ export interface GameClientEvents {
     [GameClientEvent.OWN_PLAYER_CHANGED_TEAM_ID]: (teamId: string | null) => void;
     [GameClientEvent.OWN_PLAYER_CHANGED_TANK_TIER]: (tier: TankTier) => void;
     [GameClientEvent.OWN_PLAYER_CHANGED_TANK_COLOR]: (color: Color) => void;
+
+    [GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH]: (maxHealth: number) => void,
+    [GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH]: (health: number) => void,
+    [GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS]: (maxBullets: number) => void,
+    [GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS]: (bullets: number) => void,
 }
 
 export default class GameClient {
@@ -105,6 +116,7 @@ export default class GameClient {
         this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_ID,
             (tankId: number | null) => {
                 this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID, tankId);
+                this.tankService.setOwnPlayerTankId(tankId);
             });
         this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_CHANGED_TEAM_ID,
             (teamId: string | null) => {
@@ -117,6 +129,31 @@ export default class GameClient {
         this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_COLOR,
             (color: Color) => {
                 this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_TANK_COLOR, color);
+            });
+
+        this.tankService.emitter.on(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
+            (maxHealth: number) => {
+                console.log(maxHealth);
+                this.emitter.emit(GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
+                    maxHealth);
+            });
+        this.tankService.emitter.on(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
+            (health: number) => {
+                console.log(health);
+                this.emitter.emit(GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
+                    health);
+            });
+        this.tankService.emitter.on(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
+            (maxBullets: number) => {
+                console.log(maxBullets);
+                this.emitter.emit(GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
+                    maxBullets);
+            });
+        this.tankService.emitter.on(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
+            (bullets: number) => {
+                console.log(bullets);
+                this.emitter.emit(GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
+                    bullets);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYERS_CHANGED,
@@ -134,6 +171,12 @@ export default class GameClient {
 
     onObjectChanged(objectId: number, objectOptions: PartialGameObjectOptions): void {
         this.gameObjectService.updateObject(objectId, objectOptions);
+
+        const object = this.gameObjectService.getObject(objectId);
+        switch (object.type) {
+            case GameObjectType.TANK:
+                this.tankService.updateTank(objectId, objectOptions as PartialTankOptions);
+        }
     }
 
     onObjectRegistered(objectOptions: GameObjectOptions): void {
