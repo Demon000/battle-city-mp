@@ -33,6 +33,7 @@
 
                 <div
                     id="tank-stats"
+                    v-if="!isTankDead"
                 >
                     <div class="tank-stats-group">
                         <label>Health</label>
