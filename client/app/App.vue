@@ -773,6 +773,8 @@ export default class App extends Vue {
     left: 16px;
     bottom: 16px;
 
+    display: flex;
+
     color: #ffffff;
 }
 
@@ -789,7 +791,7 @@ export default class App extends Vue {
 }
 
 .tank-stats-group + .tank-stats-group {
-    margin-top: 16px;
+    margin-left: 16px;
 }
 
 .tank-stats-icon {
