@@ -133,25 +133,21 @@ export default class GameClient {
 
         this.tankService.emitter.on(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
             (maxHealth: number) => {
-                console.log(maxHealth);
                 this.emitter.emit(GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
                     maxHealth);
             });
         this.tankService.emitter.on(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
             (health: number) => {
-                console.log(health);
                 this.emitter.emit(GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
                     health);
             });
         this.tankService.emitter.on(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
             (maxBullets: number) => {
-                console.log(maxBullets);
                 this.emitter.emit(GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
                     maxBullets);
             });
         this.tankService.emitter.on(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
             (bullets: number) => {
-                console.log(bullets);
                 this.emitter.emit(GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
                     bullets);
             });
