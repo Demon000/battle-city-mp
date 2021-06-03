@@ -186,6 +186,11 @@ export default class Settings extends Vue {
         let repeated = event.repeat;
         let handled = false;
 
+        const target = event.target as HTMLElement;
+        if (target !== null && target.tagName.toLowerCase() === 'input') {
+            return;
+        }
+
         if (lowerKey === 'tab') {
             handled = true;
         }
