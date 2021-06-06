@@ -27,15 +27,19 @@ export default class ActionFactory {
         let buttonType;
         switch (event.key.toLowerCase()) {
             case 'w':
+            case 'arrowup':
                 buttonType = ButtonType.UP;
                 break;
             case 'a':
+            case 'arrowleft':
                 buttonType = ButtonType.LEFT;
                 break;
             case 's':
+            case 'arrowdown':
                 buttonType = ButtonType.DOWN;
                 break;
             case 'd':
+            case 'arrowright':
                 buttonType = ButtonType.RIGHT;
                 break;
             case ' ':
