@@ -82,7 +82,7 @@ export default class TankService {
         }
     }
 
-    addRemoveTankBullets(tankId: number, bulletId: number, add: boolean) {
+    addRemoveTankBullets(tankId: number, bulletId: number, add: boolean): void {
         const tank = this.getTank(tankId);
 
         if (add) {
