@@ -114,12 +114,12 @@ export default class GameServer {
         this.gameEventBatcher = new GameEventBatcher();
         this.ticker = new Ticker(SERVER_CONFIG_TPS);
 
-        console.log(this.entityFactory.buildBrickWall(
-            {
-                x: 0,
-                y: 0,
-            },
-        ));
+        // console.log(this.entityFactory.buildBrickWall(
+        //     {
+        //         x: 0,
+        //         y: 0,
+        //     },
+        // ));
 
         /**
          * GameMapService event handlers
