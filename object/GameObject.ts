@@ -92,6 +92,10 @@ export default class GameObject {
 
     set position(value: Point) {
         this._position = value;
+        this._boundingBox.tl.x = value.x;
+        this._boundingBox.tl.y = value.y;
+        this._boundingBox.br.x = value.x + this.width;
+        this._boundingBox.br.y = value.y + this.height;
     }
 
     get width(): number {
@@ -196,17 +200,7 @@ export default class GameObject {
     }
 
     getBoundingBox(): BoundingBox {
-        const boundingBox = this._boundingBox;
-        const position = this._position;
-        if (boundingBox.tl.x === position.x && boundingBox.tl.y === position.y) {
-            return boundingBox;
-        }
-
-        boundingBox.tl.x = position.x;
-        boundingBox.tl.y = position.y;
-        boundingBox.br.x = position.x + this.width;
-        boundingBox.br.y = position.y + this.height;
-        return boundingBox;
+        return this._boundingBox;
     }
 
     getPositionedBoundingBox(position: Point): BoundingBox {
