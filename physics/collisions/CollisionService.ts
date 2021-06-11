@@ -72,7 +72,7 @@ export default class CollisionService {
 
     registerObjectCollisions(objectId: number): void {
         const object = this.gameObjectRepository.get(objectId);
-        this.boundingBoxRepository.addBoxValue(objectId, object.getBoundingBox());
+        this.boundingBoxRepository.addBoxValue(objectId, object.boundingBox);
     }
 
     registerObjectsCollisions(objectIds: Iterable<number>): void {
@@ -183,7 +183,7 @@ export default class CollisionService {
         }
 
         const movingDirection = direction ?? movingObject.direction;
-        const originalBoundingBox = movingObject.getBoundingBox();
+        const originalBoundingBox = movingObject.boundingBox;
         const movedBoundingBox = movingObject.getPositionedBoundingBox(position);
         const mergedBoundingBox = BoundingBoxUtils.combine(originalBoundingBox, movedBoundingBox);
         const overlappingObjectIds = this.getOverlappingObjects(mergedBoundingBox);
@@ -208,7 +208,7 @@ export default class CollisionService {
 
             for (const result of rule.result) {
                 if (result.type === CollisionResultEvent.PREVENT_MOVEMENT) {
-                    const overlappingBoundingBox = overlappingObject.getBoundingBox();
+                    const overlappingBoundingBox = overlappingObject.boundingBox;
                     const isAlreadyInside = BoundingBoxUtils.overlaps(originalBoundingBox,
                         overlappingBoundingBox);
 
@@ -238,7 +238,7 @@ export default class CollisionService {
          * movement preventing object.
          */
         if (movementPreventingObject !== undefined) {
-            const preventingBoundingBox = movementPreventingObject.getBoundingBox();
+            const preventingBoundingBox = movementPreventingObject.boundingBox;
             this.snapObjectToBoundingBoxEdge(movingObject, position,
                 preventingBoundingBox, movingDirection);
         }
@@ -260,7 +260,7 @@ export default class CollisionService {
 
         const preventedBoundingBox = movingObject.getPositionedBoundingBox(position);
         for (const [name, overlappingObject] of collidingObjectNotifications) {
-            const overlappingBoundingBox = overlappingObject.getBoundingBox();
+            const overlappingBoundingBox = overlappingObject.boundingBox;
             if (this.isObjectOverlapping(isValidPosition, preventedBoundingBox, movedBoundingBox,
                 overlappingBoundingBox)) {
                 this.emitter.emit(name, movingObject.id, overlappingObject.id, position);
@@ -269,7 +269,7 @@ export default class CollisionService {
 
         const collisionTracker = new CollisionTracker();
         for (const overlappingObject of collidingObjectTrackings) {
-            const overlappingBoundingBox = overlappingObject.getBoundingBox();
+            const overlappingBoundingBox = overlappingObject.boundingBox;
             if (this.isObjectOverlapping(isValidPosition, preventedBoundingBox, movedBoundingBox,
                 overlappingBoundingBox)) {
                 collisionTracker.markTypeObject(overlappingObject.type, overlappingObject.id);

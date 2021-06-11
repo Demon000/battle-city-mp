@@ -81,7 +81,7 @@ export default class GameObjectService {
         this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
             position,
         } as PartialGameObjectOptions);
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, objectId, object.getBoundingBox());
+        this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, objectId, object.boundingBox);
     }
 
     setObjectDirection(objectId: number, direction: Direction): void {
@@ -102,7 +102,7 @@ export default class GameObjectService {
         object.setOptions(objectOptions);
         this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, objectOptions);
         if (objectOptions.position !== undefined) {
-            this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, object.id, object.getBoundingBox());
+            this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, object.id, object.boundingBox);
         }
     }
 

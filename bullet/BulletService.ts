@@ -38,7 +38,7 @@ export default class BulletService {
     getBulletBrickWallDestroyBox(bulletId: number, brickWallId: number): BoundingBox {
         const bullet = this.getBullet(bulletId);
         const brickWall = this.repository.get(brickWallId);
-        const box = BoundingBoxUtils.clone(brickWall.getBoundingBox());
+        const box = BoundingBoxUtils.clone(brickWall.boundingBox);
 
         const bulletCenter = bullet.centerPosition;
         const brickWallCenterPosition = brickWall.centerPosition;

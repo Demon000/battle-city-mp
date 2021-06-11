@@ -87,7 +87,7 @@ export default class GameAudioService {
         CartesianUtils.setCartesianPositions(this.context.listener, point);
 
         for (const object of this.objectsPlayingAudioEffects) {
-            if (BoundingBoxUtils.overlaps(box, object.getBoundingBox())) {
+            if (BoundingBoxUtils.overlaps(box, object.boundingBox)) {
                 continue;
             }
 

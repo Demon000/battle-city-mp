@@ -199,7 +199,7 @@ export default class GameObject {
         return this._audioMeta;
     }
 
-    getBoundingBox(): BoundingBox {
+    get boundingBox(): BoundingBox {
         return this._boundingBox;
     }
 
