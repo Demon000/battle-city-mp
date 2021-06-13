@@ -1,9 +1,9 @@
-import ComponentRegistry from '@/components/ComponentRegistry';
+import { ComponentRegistry } from '@/components/ComponentRegistry';
 import { ComponentClassType } from '@/ecs/Component';
 import { assert } from '@/utils/assert';
 import { EntityType } from './EntityType';
 
-export default class EntityBlueprint {
+export class EntityBlueprint {
     constructor(
         private componentRegistry: ComponentRegistry,
         private typesBlueprintDataMap: Record<string, Record<string, any>>,

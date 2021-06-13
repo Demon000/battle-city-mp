@@ -1,5 +1,5 @@
-import Entity from './Entity';
-import Registry from './Registry';
+import { Entity } from './Entity';
+import { Registry } from './Registry';
 
 export class Component<C extends Component<C>> {
     constructor(

@@ -213,28 +213,28 @@
 
 <script lang="ts">
 import Settings from './Settings.vue';
-import ActionFactory from '@/actions/ActionFactory';
+import { ActionFactory } from '@/actions/ActionFactory';
 import { Color } from '@/drawable/Color';
-import GameClient, { GameClientEvent } from '@/game/GameClient';
-import GameClientSocket from '@/game/GameClientSocket';
+import { GameClient, GameClientEvent } from '@/game/GameClient';
+import { GameClientSocket } from '@/game/GameClientSocket';
 import { GameSocketEvents } from '@/game/GameSocketEvent';
 import { GameMapGridSizes } from '@/maps/GameMapGridSizes';
 import { GameObjectType, GameShortObjectType } from '@/object/GameObjectType';
 import { RenderPass } from '@/object/RenderPass';
-import Player from '@/player/Player';
-import PlayerStats from '@/player/PlayerStats';
+import { Player } from '@/player/Player';
+import { PlayerStats } from '@/player/PlayerStats';
 import { TankTier } from '@/tank/TankTier';
-import Team from '@/team/Team';
-import RatioUtils from '@/utils/RatioUtils';
+import { Team } from '@/team/Team';
+import { RatioUtils } from '@/utils/RatioUtils';
 import screenfull from 'screenfull';
 import { io, Socket } from 'socket.io-client';
 import { markRaw } from 'vue';
 import { Options } from 'vue-class-component';
 import { CLIENT_CONFIG_SOCKET_BASE_URL, CLIENT_SPRITES_RELATIVE_URL } from '../../config';
-import DirectionalJoystickWrapper, { DirectionalJoystickEvent } from '../DirectionalJoystickWrapper';
-import ColorUtils from '@/utils/ColorUtils';
+import { DirectionalJoystickWrapper, DirectionalJoystickEvent } from '../DirectionalJoystickWrapper';
+import { ColorUtils } from '@/utils/ColorUtils';
 import { Vue } from 'vue-property-decorator';
-import WebpackUtils from '../utils/WebpackUtils';
+import { WebpackUtils } from '../utils/WebpackUtils';
 
 @Options({
     components: {

@@ -1,4 +1,4 @@
-import Point from '@/physics/point/Point';
+import { Point } from '@/physics/point/Point';
 
 interface CartesianPositioned {
     readonly positionX: AudioParam;
@@ -7,7 +7,7 @@ interface CartesianPositioned {
     setPosition(x: number, y: number, z: number): void;
 }
 
-export default class CartesianUtils {
+export class CartesianUtils {
     static setCartesianPositions(positioned: CartesianPositioned, point: Point): void {
         if (positioned.positionX !== undefined) {
             positioned.positionX.value = point.y;

@@ -9,7 +9,7 @@ interface TickerEvents {
     [TickerEvent.TICK]: (deltaSeconds: number) => void,
 }
 
-export default class Ticker {
+export class Ticker {
     tickTime?: number;
     lastRequestId?: number;
     lastTickTime = 0;

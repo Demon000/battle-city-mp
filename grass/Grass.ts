@@ -1,7 +1,7 @@
-import GameObject from '@/object/GameObject';
-import Point from '@/physics/point/Point';
+import { GameObject } from '@/object/GameObject';
+import { Point } from '@/physics/point/Point';
 
-export default class Grass extends GameObject {
+export class Grass extends GameObject {
     get position(): Point {
         return super.position;
     }

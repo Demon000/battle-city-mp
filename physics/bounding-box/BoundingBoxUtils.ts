@@ -1,7 +1,7 @@
-import BoundingBox from './BoundingBox';
-import PointUtils from '../point/PointUtils';
+import { BoundingBox } from './BoundingBox';
+import { PointUtils } from '../point/PointUtils';
 
-export default class BoundingBoxUtils {
+export class BoundingBoxUtils {
     static create(tlx: number, tly: number, brx: number, bry: number): BoundingBox {
         return {
             tl: {

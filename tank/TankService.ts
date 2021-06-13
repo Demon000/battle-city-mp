@@ -1,11 +1,11 @@
 import { Color } from '@/drawable/Color';
-import GameObject from '@/object/GameObject';
+import { GameObject } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
-import CollisionTracker from '@/physics/collisions/CollisionTracker';
-import LazyIterable from '@/utils/LazyIterable';
-import MapRepository from '@/utils/MapRepository';
-import { EventEmitter } from 'eventemitter3';
-import Tank, { PartialTankOptions } from './Tank';
+import { CollisionTracker } from '@/physics/collisions/CollisionTracker';
+import { LazyIterable } from '@/utils/LazyIterable';
+import { MapRepository } from '@/utils/MapRepository';
+import EventEmitter from 'eventemitter3';
+import { Tank, PartialTankOptions } from './Tank';
 
 export enum TankServiceEvent {
     TANK_REQUESTED_BULLET_SPAWN = 'tank-requested-bullet-spawn',
@@ -27,7 +27,7 @@ interface TankServiceEvents {
     [TankServiceEvent.OWN_PLAYER_TANK_CHANGED_BULLETS]: (bullets: number) => void,
 }
 
-export default class TankService {
+export class TankService {
     private repository;
     private ownPlayerTankId: number | null = null;
     emitter = new EventEmitter<TankServiceEvents>();

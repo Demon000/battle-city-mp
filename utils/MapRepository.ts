@@ -1,6 +1,6 @@
-import LazyIterable from './LazyIterable';
+import { LazyIterable } from './LazyIterable';
 
-export default class MapRepository<K, V> {
+export class MapRepository<K, V> {
     private map = new Map<K, V>();
 
     exists(key: K): boolean {

@@ -1,15 +1,15 @@
-import GameObject from '@/object/GameObject';
+import { GameObject } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
-import MapRepository from '@/utils/MapRepository';
+import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
-import BoundingBox from '../bounding-box/BoundingBox';
-import BoundingBoxRepository from '../bounding-box/BoundingBoxRepository';
-import BoundingBoxUtils from '../bounding-box/BoundingBoxUtils';
+import { BoundingBox } from '../bounding-box/BoundingBox';
+import { BoundingBoxRepository } from '../bounding-box/BoundingBoxRepository';
+import { BoundingBoxUtils } from '../bounding-box/BoundingBoxUtils';
 import { Direction } from '../Direction';
-import Point from '../point/Point';
-import CollisionTracker from './CollisionTracker';
-import DirectionUtils from './DirectionUtils';
-import ICollisionRule, { CollisionEvent, CollisionEvents, CollisionResultEvent } from './ICollisionRule';
+import { Point } from '../point/Point';
+import { CollisionTracker } from './CollisionTracker';
+import { DirectionUtils } from './DirectionUtils';
+import { ICollisionRule, CollisionEvent, CollisionEvents, CollisionResultEvent } from './ICollisionRule';
 
 export enum CollisionServiceEvent {
     OBJECT_TRACKED_COLLISIONS = 'object-tracked-collisions',
@@ -23,7 +23,7 @@ interface CollisionServiceEvents extends CollisionEvents {
     [CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED]: (movingObjectId: number, direction: Direction) => void;
 }
 
-export default class CollisionService {
+export class CollisionService {
     private gameObjectRepository;
     private boundingBoxRepository;
     private rulesMap?: Map<GameObjectType, Map<GameObjectType, ICollisionRule>>;

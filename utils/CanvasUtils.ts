@@ -1,7 +1,7 @@
 export type Canvas = OffscreenCanvas | HTMLCanvasElement;
 export type Context2D = OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D;
 
-export default class CanvasUtils {
+export class CanvasUtils {
     static create(width: number, height: number, dump?: false): Canvas;
     static create(width: number, height: number, dump: true): HTMLCanvasElement;
     static create(width: number, height: number, dump = false): Canvas {

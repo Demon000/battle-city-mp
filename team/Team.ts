@@ -8,7 +8,7 @@ export interface TeamOptions {
 
 export type PartialTeamOptions = Partial<TeamOptions>;
 
-export default class Team {
+export class Team {
     id: string;
     color: Color;
     playerIds: string[];

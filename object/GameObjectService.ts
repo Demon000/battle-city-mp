@@ -1,12 +1,12 @@
-import BoundingBox from '@/physics/bounding-box/BoundingBox';
-import PlayerSpawn from '@/player-spawn/PlayerSpawn';
-import MapRepository from '@/utils/MapRepository';
-import Random from '@/utils/Random';
+import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
+import { PlayerSpawn } from '@/player-spawn/PlayerSpawn';
+import { MapRepository } from '@/utils/MapRepository';
+import { Random } from '@/utils/Random';
 import EventEmitter from 'eventemitter3';
 import { Direction } from '../physics/Direction';
-import Point from '../physics/point/Point';
-import PointUtils from '../physics/point/PointUtils';
-import GameObject, { PartialGameObjectOptions } from './GameObject';
+import { Point } from '../physics/point/Point';
+import { PointUtils } from '../physics/point/PointUtils';
+import { GameObject, PartialGameObjectOptions } from './GameObject';
 import { GameObjectType } from './GameObjectType';
 
 export enum GameObjectServiceEvent {
@@ -29,7 +29,7 @@ interface GameObjectServiceEvents {
     [GameObjectServiceEvent.OBJECT_UNREGISTERED]: (objectId: number) => void,
 }
 
-export default class GameObjectService {
+export class GameObjectService {
     private repository;
     emitter = new EventEmitter<GameObjectServiceEvents>();
 

@@ -1,8 +1,8 @@
-import GameObject, { GameObjectOptions } from '@/object/GameObject';
+import { GameObject, GameObjectOptions } from '@/object/GameObject';
 import { TeamOptions } from '@/team/Team';
-import LazyIterable from '@/utils/LazyIterable';
+import { LazyIterable } from '@/utils/LazyIterable';
 import EventEmitter from 'eventemitter3';
-import GameMap from './GameMap';
+import { GameMap } from './GameMap';
 
 
 export enum GameMapServiceEvent {
@@ -15,7 +15,7 @@ interface GameMapServiceEvents {
     [GameMapServiceEvent.MAP_TEAMS_OPTIONS]: (teamsOptions: TeamOptions[]) => void;
 }
 
-export default class GameMapService {
+export class GameMapService {
     private map?: GameMap;
     emitter = new EventEmitter<GameMapServiceEvents>();
 

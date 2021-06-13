@@ -1,7 +1,7 @@
-import Action, { ActionOptions, ActionType } from './Action';
-import ButtonPressAction, { ButtonPressActionOptions, ButtonState, ButtonType } from './ButtonPressAction';
+import { Action, ActionOptions, ActionType } from './Action';
+import { ButtonPressAction, ButtonPressActionOptions, ButtonState, ButtonType } from './ButtonPressAction';
 
-export default class ActionFactory {
+export class ActionFactory {
     static buildFromOptions(options: ActionOptions): Action {
         if (options.type === ActionType.BUTTON_PRESS) {
             return new ButtonPressAction(options as ButtonPressActionOptions);

@@ -1,10 +1,10 @@
-import CartesianUtils from '@/utils/CartesianUtils';
-import GameObject from './GameObject';
-import GameObjectProperties from './GameObjectProperties';
+import { CartesianUtils } from '@/utils/CartesianUtils';
+import { GameObject } from './GameObject';
+import { GameObjectProperties } from './GameObjectProperties';
 import { GameObjectType } from './GameObjectType';
 import { IAudioEffect, ResourceMeta } from './IGameObjectProperties';
 
-export default class GameObjectAudioRenderer {
+export class GameObjectAudioRenderer {
     private context;
     private finalNode;
     private panner?: PannerNode;

@@ -1,5 +1,5 @@
 import { EntityId } from './EntityId';
 
-export default abstract class RegistryIDGenerator {
+export abstract class RegistryIdGenerator {
     abstract generate(): EntityId;
 }

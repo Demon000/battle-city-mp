@@ -131,12 +131,12 @@
 
 <script lang="ts">
 import { Color } from '@/drawable/Color';
-import ColorUtils from '@/utils/ColorUtils';
-import WebpackUtils from '@/client/utils/WebpackUtils';
+import { ColorUtils } from '@/utils/ColorUtils';
+import { WebpackUtils } from '@/client/utils/WebpackUtils';
 import { TankTierProperties, tierToPropertiesMap } from '@/tank/Tank';
 import { TankTier } from '@/tank/TankTier';
 import { Vue, Prop, Watch, Options } from 'vue-property-decorator';
-import Team from '@/team/Team';
+import { Team } from '@/team/Team';
 
 @Options({
     emits: [

@@ -6,7 +6,7 @@ export interface DirectionalJoystickEvent {
     angle: string;
 }
 
-export default class DirectionalJoystickWrapper extends EventEmitter {
+export class DirectionalJoystickWrapper extends EventEmitter {
     private manager: JoystickManager;
     private lastDirectionAngle?: string;
 

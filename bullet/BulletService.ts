@@ -1,13 +1,13 @@
-import GameObject from '@/object/GameObject';
+import { GameObject } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
-import BoundingBox from '@/physics/bounding-box/BoundingBox';
-import BoundingBoxUtils from '@/physics/bounding-box/BoundingBoxUtils';
-import DirectionUtils from '@/physics/collisions/DirectionUtils';
+import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
+import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
+import { DirectionUtils } from '@/physics/collisions/DirectionUtils';
 import { Direction } from '@/physics/Direction';
-import Tank from '@/tank/Tank';
-import MapRepository from '@/utils/MapRepository';
-import { EventEmitter } from 'eventemitter3';
-import Bullet from './Bullet';
+import { Tank } from '@/tank/Tank';
+import { MapRepository } from '@/utils/MapRepository';
+import EventEmitter from 'eventemitter3';
+import { Bullet } from './Bullet';
 import { BulletPower } from './BulletPower';
 
 export enum BulletServiceEvent {
@@ -18,7 +18,7 @@ interface BulletServiceEvents {
     [BulletServiceEvent.BULLET_SPAWNED]: (bullet: Bullet) => void,
 }
 
-export default class BulletService {
+export class BulletService {
     private repository;
     emitter = new EventEmitter<BulletServiceEvents>();
 

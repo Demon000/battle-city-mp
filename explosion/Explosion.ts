@@ -1,4 +1,4 @@
-import GameObject, { GameObjectOptions } from '@/object/GameObject';
+import { GameObject, GameObjectOptions } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 import { ExplosionType } from './ExplosionType';
 
@@ -9,7 +9,7 @@ export interface ExplosionOptions extends GameObjectOptions {
 
 export type PartialExplosionOptions = Partial<ExplosionOptions>;
 
-export default class Explosion extends GameObject {
+export class Explosion extends GameObject {
     explosionType: ExplosionType;
     destroyedObjectType?: GameObjectType;
 

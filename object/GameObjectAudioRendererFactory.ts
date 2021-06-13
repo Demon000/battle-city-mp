@@ -1,10 +1,10 @@
 import { GameObjectType } from './GameObjectType';
-import GameObject from './GameObject';
-import GameObjectAudioRenderer from './GameObjectAudioRenderer';
-import TankAudioRenderer from '@/tank/TankAudioRenderer';
-import ExplosionAudioRenderer from '@/explosion/ExplosionAudioRenderer';
+import { GameObject } from './GameObject';
+import { GameObjectAudioRenderer } from './GameObjectAudioRenderer';
+import { TankAudioRenderer } from '@/tank/TankAudioRenderer';
+import { ExplosionAudioRenderer } from '@/explosion/ExplosionAudioRenderer';
 
-export default class GameObjectAudioRendererFactory {
+export class GameObjectAudioRendererFactory {
     buildFromObject(
         object: GameObject,
         context: AudioContext,

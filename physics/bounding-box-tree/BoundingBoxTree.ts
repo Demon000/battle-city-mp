@@ -1,16 +1,16 @@
-import BoundingBox from '../bounding-box/BoundingBox';
-import BoundingBoxNode from './BoundingBoxNode';
-import Utils from '../bounding-box/BoundingBoxUtils';
+import { BoundingBox } from '../bounding-box/BoundingBox';
+import { BoundingBoxNode } from './BoundingBoxNode';
+import { BoundingBoxUtils } from '../bounding-box/BoundingBoxUtils';
 import { BoundingBoxTreeIterator } from './BoundingBoxTreeIterator';
 
-export default class BoundingBoxTree<V> {
+export class BoundingBoxTree<V> {
     root?: BoundingBoxNode<V>;
 
     calculateBranchingCost(node: BoundingBoxNode<V>, box: BoundingBox): number {
-        const newNodeBox = Utils.combine(box, node.box);
-        let cost = Utils.volume(newNodeBox);
+        const newNodeBox = BoundingBoxUtils.combine(box, node.box);
+        let cost = BoundingBoxUtils.volume(newNodeBox);
         if (node.left !== undefined && node.right !== undefined) {
-            cost -= Utils.volume(node.box);
+            cost -= BoundingBoxUtils.volume(node.box);
         }
         return cost;
     }
@@ -109,10 +109,10 @@ export default class BoundingBoxTree<V> {
 
         let siblingNode = this.root;
         while (siblingNode.left !== undefined && siblingNode.right !== undefined) {
-            const currentNodeVolume = Utils.volume(siblingNode.box);
+            const currentNodeVolume = BoundingBoxUtils.volume(siblingNode.box);
 
-            const newParentNodeBox = Utils.combine(siblingNode.box, node.box);
-            const newParentNodeVolume = Utils.volume(newParentNodeBox);
+            const newParentNodeBox = BoundingBoxUtils.combine(siblingNode.box, node.box);
+            const newParentNodeVolume = BoundingBoxUtils.volume(newParentNodeBox);
             const newParentNodeCost = 2 * newParentNodeVolume;
 
             const minimumPushDownCost = newParentNodeCost - 2 * currentNodeVolume;

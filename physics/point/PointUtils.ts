@@ -1,6 +1,6 @@
-import Point from './Point';
+import { Point } from './Point';
 
-export default class PointUtils {
+export class PointUtils {
     static clone(point: Point): Point {
         return {...point};
     }

@@ -16,7 +16,7 @@ export interface IAudioEffect {
     meta?: ResourceMeta;
 }
 
-export default interface IGameObjectProperties {
+export interface IGameObjectProperties {
     type: GameObjectType;
     shortType?: GameShortObjectType;
 

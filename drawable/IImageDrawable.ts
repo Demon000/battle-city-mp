@@ -1,6 +1,6 @@
-import Point from '@/physics/point/Point';
+import { Point } from '@/physics/point/Point';
 import { Color } from './Color';
-import IDrawable, { DrawableProperties } from './IDrawable';
+import { IDrawable, DrawableProperties } from './IDrawable';
 
 export interface ImageDrawableProperties extends DrawableProperties {
     compositionType?: string;

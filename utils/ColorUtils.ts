@@ -1,6 +1,6 @@
 import { Color } from '@/drawable/Color';
 
-export default class ColorUtils {
+export class ColorUtils {
     static getRgbFromColor(color: Color): string {
         return '#' + color.map(n => {
             let s = n.toString(16);

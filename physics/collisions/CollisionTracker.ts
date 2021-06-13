@@ -1,6 +1,6 @@
 import { GameObjectType } from '@/object/GameObjectType';
 
-export default class CollisionTracker {
+export class CollisionTracker {
     private byTypeMap = new Map<GameObjectType, Array<number>>();
 
     clear(): void {

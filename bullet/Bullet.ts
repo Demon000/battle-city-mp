@@ -1,4 +1,4 @@
-import GameObject, { GameObjectOptions } from '@/object/GameObject';
+import { GameObject, GameObjectOptions } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 import { BulletPower } from './BulletPower';
 
@@ -15,7 +15,7 @@ export interface BulletOptions extends GameObjectOptions {
 
 export type PartialBulletOptions = Partial<BulletOptions>;
 
-export default class Bullet extends GameObject {
+export class Bullet extends GameObject {
     tankId: number;
     playerId?: string;
     power: BulletPower;

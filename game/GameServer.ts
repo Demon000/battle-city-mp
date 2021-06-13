@@ -1,50 +1,50 @@
-import Bullet from '@/bullet/Bullet';
+import { Bullet } from '@/bullet/Bullet';
 import { BulletPower } from '@/bullet/BulletPower';
-import BulletService, { BulletServiceEvent } from '@/bullet/BulletService';
+import { BulletService, BulletServiceEvent } from '@/bullet/BulletService';
 import { SERVER_CONFIG_TPS } from '@/config';
 import { Color } from '@/drawable/Color';
-import Explosion from '@/explosion/Explosion';
+import { Explosion } from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { GameModesProperties, SameTeamBulletHitMode } from '@/game-mode/IGameModeProperties';
-import GameObjectFactory from '@/object/GameObjectFactory';
+import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
-import BoundingBox from '@/physics/bounding-box/BoundingBox';
-import CollisionTracker from '@/physics/collisions/CollisionTracker';
+import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
+import { CollisionTracker } from '@/physics/collisions/CollisionTracker';
 import { Direction } from '@/physics/Direction';
-import Tank, { PartialTankOptions } from '@/tank/Tank';
-import TankService, { TankServiceEvent } from '@/tank/TankService';
+import { Tank, PartialTankOptions } from '@/tank/Tank';
+import { TankService, TankServiceEvent } from '@/tank/TankService';
 import { TankTier } from '@/tank/TankTier';
-import Team, { TeamOptions } from '@/team/Team';
-import TeamService, { TeamServiceEvent } from '@/team/TeamService';
-import LazyIterable from '@/utils/LazyIterable';
-import MapRepository from '@/utils/MapRepository';
-import Ticker, { TickerEvent } from '@/utils/Ticker';
+import { Team, TeamOptions } from '@/team/Team';
+import { TeamService, TeamServiceEvent } from '@/team/TeamService';
+import { LazyIterable } from '@/utils/LazyIterable';
+import { MapRepository } from '@/utils/MapRepository';
+import { Ticker, TickerEvent } from '@/utils/Ticker';
 import EventEmitter from 'eventemitter3';
-import Action, { ActionType } from '../actions/Action';
-import ButtonPressAction from '../actions/ButtonPressAction';
-import GameMapService, { GameMapServiceEvent } from '../maps/GameMapService';
-import GameObject, { GameObjectOptions, PartialGameObjectOptions } from '../object/GameObject';
-import GameObjectService, { GameObjectServiceEvent } from '../object/GameObjectService';
-import BoundingBoxRepository from '../physics/bounding-box/BoundingBoxRepository';
+import { Action, ActionType } from '../actions/Action';
+import { ButtonPressAction } from '../actions/ButtonPressAction';
+import { GameMapService, GameMapServiceEvent } from '../maps/GameMapService';
+import { GameObject, GameObjectOptions, PartialGameObjectOptions } from '../object/GameObject';
+import { GameObjectService, GameObjectServiceEvent } from '../object/GameObjectService';
+import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
 import { rules } from '../physics/collisions/CollisionRules';
-import CollisionService, { CollisionServiceEvent } from '../physics/collisions/CollisionService';
+import { CollisionService, CollisionServiceEvent } from '../physics/collisions/CollisionService';
 import { CollisionEvent } from '../physics/collisions/ICollisionRule';
-import Point from '../physics/point/Point';
-import Player, { PartialPlayerOptions, PlayerSpawnStatus } from '../player/Player';
-import PlayerService, { PlayerServiceEvent } from '../player/PlayerService';
+import { Point } from '../physics/point/Point';
+import { Player, PartialPlayerOptions, PlayerSpawnStatus } from '../player/Player';
+import { PlayerService, PlayerServiceEvent } from '../player/PlayerService';
 import { BroadcastBatchGameEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
-import GameEventBatcher, { GameEventBatcherEvent } from './GameEventBatcher';
+import { GameEventBatcher, GameEventBatcherEvent } from './GameEventBatcher';
 import JSON5 from 'json5';
-import GameModeService from '@/game-mode/GameModeService';
+import { GameModeService } from '@/game-mode/GameModeService';
 import { assertType } from 'typescript-is';
 import fs from 'fs';
-import EntityFactory from '@/entity/EntityFactory';
-import Registry from '@/ecs/Registry';
-import RegistryNumberIdGenerator from '@/ecs/RegistryNumberIdGenerator';
-import ComponentRegistry from '@/components/ComponentRegistry';
-import EntityBlueprint from '@/entity/EntityBlueprint';
-import Flag, { FlagType, PartialFlagOptions } from '@/flag/Flag';
-import FlagService, { FlagServiceEvent } from '@/flag/FlagService';
+import { EntityFactory } from '@/entity/EntityFactory';
+import { Registry } from '@/ecs/Registry';
+import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
+import { ComponentRegistry } from '@/components/ComponentRegistry';
+import { EntityBlueprint } from '@/entity/EntityBlueprint';
+import { Flag, FlagType, PartialFlagOptions } from '@/flag/Flag';
+import { FlagService, FlagServiceEvent } from '@/flag/FlagService';
 import { PlayerPointsEvent } from '@/player/PlayerPoints';
 
 export interface GameServerEvents {
@@ -52,7 +52,7 @@ export interface GameServerEvents {
     [GameEvent.PLAYER_BATCH]: (playerId: string, events: UnicastBatchGameEvent[]) => void,
 }
 
-export default class GameServer {
+export class GameServer {
     private registry;
     private entityFactory;
     private componentRegistry;
@@ -83,8 +83,8 @@ export default class GameServer {
     emitter = new EventEmitter<GameServerEvents>();
 
     constructor() {
-        const registryIdGenerator = new RegistryNumberIdGenerator();
-        this.registry = new Registry(registryIdGenerator);
+        const RegistryIdGenerator = new RegistryNumberIdGenerator();
+        this.registry = new Registry(RegistryIdGenerator);
 
         const entitiesBlueprintText = fs.readFileSync('./entity/entities-blueprint.json5', 'utf8');
         const entitiesBlueptintData = JSON5.parse(entitiesBlueprintText);

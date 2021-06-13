@@ -1,16 +1,16 @@
 import { BulletPower } from '@/bullet/BulletPower';
-import AnimatedImageDrawable from '@/drawable/AnimatedImageDrawable';
-import IDrawable, { DrawableProcessingFunction, DrawableTestFunction } from '@/drawable/IDrawable';
+import { AnimatedImageDrawable } from '@/drawable/AnimatedImageDrawable';
+import { IDrawable, DrawableProcessingFunction, DrawableTestFunction } from '@/drawable/IDrawable';
 import { IImageDrawable } from '@/drawable/IImageDrawable';
-import ImageDrawable from '@/drawable/ImageDrawable';
-import TextDrawable, { TextPositionReference } from '@/drawable/TextDrawable';
+import { ImageDrawable } from '@/drawable/ImageDrawable';
+import { TextDrawable, TextPositionReference } from '@/drawable/TextDrawable';
 import { ExplosionType } from '@/explosion/ExplosionType';
-import Flag from '@/flag/Flag';
+import { Flag } from '@/flag/Flag';
 import { Direction } from '@/physics/Direction';
-import Point from '@/physics/point/Point';
-import Tank from '@/tank/Tank';
+import { Point } from '@/physics/point/Point';
+import { Tank } from '@/tank/Tank';
 import { TankTier } from '@/tank/TankTier';
-import GameObject from './GameObject';
+import { GameObject } from './GameObject';
 import { GameObjectType } from './GameObjectType';
 import { ResourceMeta } from './IGameObjectProperties';
 import { RenderPass } from './RenderPass';
@@ -472,7 +472,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
     ],
 };
 
-export default class GameObjectDrawables {
+export class GameObjectDrawables {
     static getTypeDrawables(type: GameObjectType): IDrawable[] | undefined {
         return drawables[type];
     }

@@ -1,7 +1,7 @@
-import Point from '@/physics/point/Point';
-import IDrawable, { DrawableProperties } from './IDrawable';
+import { Point } from '@/physics/point/Point';
+import { IDrawable, DrawableProperties } from './IDrawable';
 
-export default abstract class BaseDrawable implements IDrawable {
+export abstract class BaseDrawable implements IDrawable {
     abstract type: string;
 
     private scaleCache = new Map<number, this>();

@@ -1,7 +1,7 @@
 import { Color } from '@/drawable/Color';
 import { Direction } from '@/physics/Direction';
 import { TankTier } from '@/tank/TankTier';
-import ButtonPressAction, { ButtonType } from '../actions/ButtonPressAction';
+import { ButtonPressAction, ButtonType } from '../actions/ButtonPressAction';
 
 export interface PlayerOptions {
     id: string;
@@ -23,7 +23,7 @@ export enum PlayerSpawnStatus {
     DESPAWN = 'despawn',
 }
 
-export default class Player {
+export class Player {
     map = new Map<ButtonType, ButtonPressAction>();
     lastRequestedDirection: Direction | undefined;
     lastIsShooting = false;

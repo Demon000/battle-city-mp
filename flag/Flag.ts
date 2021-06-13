@@ -1,5 +1,5 @@
 import { Color } from '@/drawable/Color';
-import GameObject, { GameObjectOptions } from '@/object/GameObject';
+import { GameObject, GameObjectOptions } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 
@@ -18,7 +18,7 @@ export interface FlagOptions extends GameObjectOptions {
 
 export type PartialFlagOptions = Partial<FlagOptions>;
 
-export default class Flag extends GameObject {
+export class Flag extends GameObject {
     protected _flagType: FlagType;
 
     teamId: string;

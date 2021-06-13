@@ -1,11 +1,11 @@
-import GameObject from '@/object/GameObject';
-import GameObjectFactory from '@/object/GameObjectFactory';
+import { GameObject } from '@/object/GameObject';
+import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
-import BoundingBox from '@/physics/bounding-box/BoundingBox';
-import BoundingBoxUtils from '@/physics/bounding-box/BoundingBoxUtils';
-import Point from '@/physics/point/Point';
+import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
+import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
+import { Point } from '@/physics/point/Point';
 
-export default class GameMapEditorService {
+export class GameMapEditorService {
     private gameObjectFactory;
     private enabled = false;
     private gridSize = 0;

@@ -1,7 +1,7 @@
-import Point from '../point/Point';
-import Size from './Size';
+import { Point } from '../point/Point';
+import { Size } from './Size';
 
-export default class SizeUtils {
+export class SizeUtils {
     static toPoint(size: Size): Point {
         return {
             x: size.width,

@@ -1,15 +1,15 @@
 import { Component } from '@/ecs/Component';
-import SizeComponent from '../size/SizeComponent';
-import PointUtils from '../point/PointUtils';
-import PositionComponent from '../point/PositionComponent';
-import BoundingBox from './BoundingBox';
-import SizeUtils from '../size/SizeUtils';
+import { SizeComponent } from '../size/SizeComponent';
+import { PointUtils } from '../point/PointUtils';
+import { PositionComponent } from '../point/PositionComponent';
+import { BoundingBox } from './BoundingBox';
+import { SizeUtils } from '../size/SizeUtils';
 
 export interface BoundingBoxComponentData {
     readonly value: BoundingBox;
 }
 
-export default class BoundingBoxComponent
+export class BoundingBoxComponent
     extends Component<BoundingBoxComponent>
     implements BoundingBoxComponentData {
     get value(): BoundingBox {

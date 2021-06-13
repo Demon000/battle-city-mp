@@ -1,11 +1,11 @@
-import Point from '@/physics/point/Point';
-import BaseImageDrawable from './BaseImageDrawable';
+import { Point } from '@/physics/point/Point';
+import { BaseImageDrawable } from './BaseImageDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
-import IDrawable from './IDrawable';
+import { IDrawable } from './IDrawable';
 import { IImageDrawable, ImageDrawableProperties } from './IImageDrawable';
 
-export default class AnimatedImageDrawable extends BaseImageDrawable {
+export class AnimatedImageDrawable extends BaseImageDrawable {
     readonly type = DrawableType.ANIMATED_IMAGE;
 
     drawables;

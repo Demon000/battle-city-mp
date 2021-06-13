@@ -1,28 +1,28 @@
 import { CLIENT_CONFIG_VISIBLE_GAME_SIZE } from '@/config';
-import BoundingBox from '@/physics/bounding-box/BoundingBox';
-import GameAudioService from '@/renderer/GameAudioService';
-import GameCamera from '@/renderer/GameCamera';
-import GameGraphicsService from '@/renderer/GameGraphicsService';
-import MapRepository from '@/utils/MapRepository';
-import Ticker, { TickerEvent } from '@/utils/Ticker';
-import GameObject, { GameObjectOptions, PartialGameObjectOptions } from '../object/GameObject';
-import GameObjectService, { GameObjectServiceEvent } from '../object/GameObjectService';
-import BoundingBoxRepository from '../physics/bounding-box/BoundingBoxRepository';
-import CollisionService from '../physics/collisions/CollisionService';
-import Player, { PartialPlayerOptions, PlayerOptions } from '../player/Player';
-import PlayerService, { PlayerServiceEvent } from '../player/PlayerService';
-import GameMapEditorService from '@/maps/GameMapEditorService';
+import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
+import { GameAudioService } from '@/renderer/GameAudioService';
+import { GameCamera } from '@/renderer/GameCamera';
+import { GameGraphicsService } from '@/renderer/GameGraphicsService';
+import { MapRepository } from '@/utils/MapRepository';
+import { Ticker, TickerEvent } from '@/utils/Ticker';
+import { GameObject, GameObjectOptions, PartialGameObjectOptions } from '../object/GameObject';
+import { GameObjectService, GameObjectServiceEvent } from '../object/GameObjectService';
+import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
+import { CollisionService } from '../physics/collisions/CollisionService';
+import { Player, PartialPlayerOptions, PlayerOptions } from '../player/Player';
+import { PlayerService, PlayerServiceEvent } from '../player/PlayerService';
+import { GameMapEditorService } from '@/maps/GameMapEditorService';
 import { GameObjectType } from '@/object/GameObjectType';
-import Point from '@/physics/point/Point';
+import { Point } from '@/physics/point/Point';
 import { GameServerStatus } from './GameServerStatus';
-import GameObjectFactory from '@/object/GameObjectFactory';
+import { GameObjectFactory } from '@/object/GameObjectFactory';
 import EventEmitter from 'eventemitter3';
-import Team from '@/team/Team';
-import TeamService, { TeamServiceEvent } from '@/team/TeamService';
-import PlayerStats from '@/player/PlayerStats';
-import TankService, { TankServiceEvent } from '@/tank/TankService';
-import LazyIterable from '@/utils/LazyIterable';
-import GameObjectAudioRendererFactory from '@/object/GameObjectAudioRendererFactory';
+import { Team } from '@/team/Team';
+import { TeamService, TeamServiceEvent } from '@/team/TeamService';
+import { PlayerStats } from '@/player/PlayerStats';
+import { TankService, TankServiceEvent } from '@/tank/TankService';
+import { LazyIterable } from '@/utils/LazyIterable';
+import { GameObjectAudioRendererFactory } from '@/object/GameObjectAudioRendererFactory';
 import { TankTier } from '@/tank/TankTier';
 import { Color } from '@/drawable/Color';
 import { PartialTankOptions } from '@/tank/Tank';
@@ -61,7 +61,7 @@ export interface GameClientEvents {
     [GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS]: (bullets: number) => void,
 }
 
-export default class GameClient {
+export class GameClient {
     private gameObjectFactory;
     private playerRepository;
     private playerService;

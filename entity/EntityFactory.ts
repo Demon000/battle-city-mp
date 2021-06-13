@@ -1,12 +1,12 @@
-import NewEntityComponent from '@/entity/NewEntityComponent';
-import Entity from '@/ecs/Entity';
-import Registry from '@/ecs/Registry';
-import Point from '@/physics/point/Point';
-import PositionComponent from '@/physics/point/PositionComponent';
-import EntityBlueprint from './EntityBlueprint';
+import { NewEntityComponent } from '@/entity/NewEntityComponent';
+import { Entity } from '@/ecs/Entity';
+import { Registry } from '@/ecs/Registry';
+import { Point } from '@/physics/point/Point';
+import { PositionComponent } from '@/physics/point/PositionComponent';
+import { EntityBlueprint } from './EntityBlueprint';
 import { EntityType } from './EntityType';
 
-export default class EntityFactory {
+export class EntityFactory {
     constructor(
         private registry: Registry,
         private entityBlueprints: EntityBlueprint,

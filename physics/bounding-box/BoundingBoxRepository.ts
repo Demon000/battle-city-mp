@@ -1,10 +1,10 @@
-import BoundingBox from './BoundingBox';
-import BoundingBoxNode from '../bounding-box-tree/BoundingBoxNode';
-import BoundingBoxTree from '../bounding-box-tree/BoundingBoxTree';
-import LazyIterable from '@/utils/LazyIterable';
-import BoundingBoxUtils from './BoundingBoxUtils';
+import { BoundingBox } from './BoundingBox';
+import { BoundingBoxNode } from '../bounding-box-tree/BoundingBoxNode';
+import { BoundingBoxTree } from '../bounding-box-tree/BoundingBoxTree';
+import { LazyIterable } from '@/utils/LazyIterable';
+import { BoundingBoxUtils } from './BoundingBoxUtils';
 
-export default class BoundingBoxRepository<V> {
+export class BoundingBoxRepository<V> {
     tree = new BoundingBoxTree<V>();
     map = new Map<V, BoundingBoxNode<V>>();
 

@@ -1,6 +1,6 @@
-import MapRepository from '@/utils/MapRepository';
+import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
-import Team from './Team';
+import { Team } from './Team';
 
 export enum TeamServiceEvent {
     TEAM_PLAYER_ADDED = 'team-player-added',
@@ -14,7 +14,7 @@ interface TeamServiceEvents {
     [TeamServiceEvent.TEAMS_CHANGED]: () => void,
 }
 
-export default class TeamService {
+export class TeamService {
     private repository;
     emitter = new EventEmitter<TeamServiceEvents>();
 

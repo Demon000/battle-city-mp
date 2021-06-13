@@ -1,15 +1,15 @@
 import { ActionOptions } from '@/actions/Action';
-import ActionFactory from '@/actions/ActionFactory';
+import { ActionFactory } from '@/actions/ActionFactory';
 import { Color } from '@/drawable/Color';
 import { GameObjectOptions } from '@/object/GameObject';
-import BoundingBox from '@/physics/bounding-box/BoundingBox';
+import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { PlayerSpawnStatus } from '@/player/Player';
 import { Server, Socket } from 'socket.io';
 import { BatchGameEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
-import GameServer from './GameServer';
+import { GameServer } from './GameServer';
 import { GameSocketEvent } from './GameSocketEvent';
 
-export default class GameServerSocket {
+export class GameServerSocket {
     private gameServer;
     private socketServer;
 

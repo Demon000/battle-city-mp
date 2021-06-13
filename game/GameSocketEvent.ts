@@ -1,7 +1,7 @@
 import { ActionOptions } from '@/actions/Action';
 import { Color } from '@/drawable/Color';
 import { PartialGameObjectOptions } from '@/object/GameObject';
-import BoundingBox from '@/physics/bounding-box/BoundingBox';
+import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { TankTier } from '@/tank/TankTier';
 import { BatchGameEvent } from './GameEvent';
 

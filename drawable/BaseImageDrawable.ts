@@ -1,9 +1,9 @@
-import Point from '@/physics/point/Point';
-import BaseDrawable from './BaseDrawable';
+import { Point } from '@/physics/point/Point';
+import { BaseDrawable } from './BaseDrawable';
 import { Color } from './Color';
 import { IImageDrawable } from './IImageDrawable';
 
-export default abstract class BaseImageDrawable extends BaseDrawable implements IImageDrawable {
+export abstract class BaseImageDrawable extends BaseDrawable implements IImageDrawable {
     private colorMaskCache = new Map<number, this>();
 
     protected abstract _colorMask(color: Color): this;

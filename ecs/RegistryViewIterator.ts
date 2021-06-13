@@ -1,7 +1,7 @@
 import { Component, ComponentClassType } from './Component';
-import Entity from './Entity';
+import { Entity } from './Entity';
 
-export default class RegistryViewIterator implements Iterator<Entity> {
+export class RegistryViewIterator implements Iterator<Entity> {
     constructor(
         private components: IterableIterator<Component<any>>,
         private clazzes: ComponentClassType[],

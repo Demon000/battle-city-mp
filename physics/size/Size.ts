@@ -1,4 +1,4 @@
-export default interface Size {
+export interface Size {
     width: number;
     height: number;
 }

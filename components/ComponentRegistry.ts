@@ -1,9 +1,9 @@
 import { Component, ComponentClassType } from '@/ecs/Component';
-import NewEntityComponent, { NewEntityComponentData } from '@/entity/NewEntityComponent';
-import BoundingBoxComponent, { BoundingBoxComponentData } from '@/physics/bounding-box/BoundingBoxComponent';
-import CollisionComponent, { CollisionComponentData } from '@/physics/collisions/CollisionComponent';
-import PositionComponent, { PositionComponentData } from '@/physics/point/PositionComponent';
-import SizeComponent, { SizeComponentData } from '@/physics/size/SizeComponent';
+import { NewEntityComponent, NewEntityComponentData } from '@/entity/NewEntityComponent';
+import { BoundingBoxComponent, BoundingBoxComponentData } from '@/physics/bounding-box/BoundingBoxComponent';
+import { CollisionComponent, CollisionComponentData } from '@/physics/collisions/CollisionComponent';
+import { PositionComponent, PositionComponentData } from '@/physics/point/PositionComponent';
+import { SizeComponent, SizeComponentData } from '@/physics/size/SizeComponent';
 import { assert } from '@/utils/assert';
 import { assertType } from 'typescript-is';
 
@@ -20,7 +20,7 @@ interface ProcessResults {
     tag: string;
 }
 
-export default class ComponentRegistry {
+export class ComponentRegistry {
     private process(tag?: string, clazz?: ComponentClassType<any>, data?: any): ProcessResults {
         assert(tag !== undefined || clazz !== undefined);
         

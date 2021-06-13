@@ -1,6 +1,6 @@
-import RegistryIDGenerator from './RegistryIdGenerator';
+import { RegistryIdGenerator } from './RegistryIdGenerator';
 
-export default class RegistryNumberIdGenerator extends RegistryIDGenerator {
+export class RegistryNumberIdGenerator extends RegistryIdGenerator {
     nextId = 0;
 
     generate(): number {

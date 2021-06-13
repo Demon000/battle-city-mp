@@ -1,5 +1,5 @@
 import { GameObjectType, GameShortObjectType } from './GameObjectType';
-import IGameObjectProperties from './IGameObjectProperties';
+import { IGameObjectProperties } from './IGameObjectProperties';
 
 const properties: IGameObjectProperties[] = [
     {
@@ -145,7 +145,7 @@ for (const property of properties) {
     }
 }
 
-export default class GameObjectProperties {
+export class GameObjectProperties {
     static getTypeProperties(type: GameObjectType): IGameObjectProperties {
         const properties = typePropertiesMap.get(type);
         if (!properties) {

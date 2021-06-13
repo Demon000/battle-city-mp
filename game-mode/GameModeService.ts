@@ -1,6 +1,6 @@
 import { IGameModeProperties } from '@/game-mode/IGameModeProperties';
 
-export default class GameModeService {
+export class GameModeService {
     private gameModesProperties;
     private gameMode?: string;
 

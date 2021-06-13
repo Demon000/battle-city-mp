@@ -55,7 +55,7 @@ class LazyIterableIterator<T> {
     }
 }
 
-export default class LazyIterable<T> implements Iterable<T> {
+export class LazyIterable<T> implements Iterable<T> {
     private iterable;
     private operations;
 

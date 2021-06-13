@@ -1,10 +1,10 @@
-import BoundingBox from '@/physics/bounding-box/BoundingBox';
-import BoundingBoxUtils from '@/physics/bounding-box/BoundingBoxUtils';
-import Point from '@/physics/point/Point';
+import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
+import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
+import { Point } from '@/physics/point/Point';
 import { Direction } from '../physics/Direction';
-import GameObjectProperties from './GameObjectProperties';
+import { GameObjectProperties } from './GameObjectProperties';
 import { GameObjectType } from './GameObjectType';
-import IGameObjectProperties, { ResourceMeta } from './IGameObjectProperties';
+import { IGameObjectProperties, ResourceMeta } from './IGameObjectProperties';
 
 export interface GameObjectOptions {
     id?: number;
@@ -19,7 +19,7 @@ export interface GameObjectOptions {
 
 export type PartialGameObjectOptions = Partial<GameObjectOptions>;
 
-export default class GameObject {
+export class GameObject {
     static globalId = 0;
 
     protected _graphicsMeta: ResourceMeta[] | undefined | null;

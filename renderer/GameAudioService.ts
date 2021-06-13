@@ -1,15 +1,15 @@
 import { CLIENT_CONFIG_VISIBLE_GAME_SIZE, CLIENT_SOUNDS_RELATIVE_URL } from '@/config';
-import GameObject from '@/object/GameObject';
-import GameObjectAudioRenderer from '@/object/GameObjectAudioRenderer';
-import GameObjectAudioRendererFactory from '@/object/GameObjectAudioRendererFactory';
+import { GameObject } from '@/object/GameObject';
+import { GameObjectAudioRenderer } from '@/object/GameObjectAudioRenderer';
+import { GameObjectAudioRendererFactory } from '@/object/GameObjectAudioRendererFactory';
 import { AudioEffectLoadingState, IAudioEffect } from '@/object/IGameObjectProperties';
-import BoundingBox from '@/physics/bounding-box/BoundingBox';
-import BoundingBoxUtils from '@/physics/bounding-box/BoundingBoxUtils';
-import Point from '@/physics/point/Point';
-import CartesianUtils from '@/utils/CartesianUtils';
+import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
+import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
+import { Point } from '@/physics/point/Point';
+import { CartesianUtils } from '@/utils/CartesianUtils';
 import axios from 'axios';
 
-export default class GameAudioService {
+export class GameAudioService {
     private rendererFactory;
     private context;
     private compressorNode;

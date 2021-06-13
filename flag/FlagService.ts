@@ -1,8 +1,8 @@
-import GameObject from '@/object/GameObject';
+import { GameObject } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
-import MapRepository from '@/utils/MapRepository';
-import { EventEmitter } from 'eventemitter3';
-import Flag, { FlagType, PartialFlagOptions } from './Flag';
+import { MapRepository } from '@/utils/MapRepository';
+import EventEmitter from 'eventemitter3';
+import { Flag, FlagType, PartialFlagOptions } from './Flag';
 
 export enum FlagServiceEvent {
     FLAG_UPDATED = 'flag-updated',
@@ -12,7 +12,7 @@ interface FlagServiceEvents {
     [FlagServiceEvent.FLAG_UPDATED]: (flagId: number, options: PartialFlagOptions) => void,
 }
 
-export default class FlagService {
+export class FlagService {
     private repository;
     emitter = new EventEmitter<FlagServiceEvents>();
 

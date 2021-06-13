@@ -1,4 +1,4 @@
-import { EventEmitter } from 'eventemitter3';
+import EventEmitter from 'eventemitter3';
 import { BroadcastBatchGameEvent, UnicastBatchGameEvent } from './GameEvent';
 
 export enum GameEventBatcherEvent {
@@ -11,7 +11,7 @@ interface GameEventBatcherEvents {
     [GameEventBatcherEvent.BROADCAST_BATCH]: (events: BroadcastBatchGameEvent[]) => void;
 }
 
-export default class GameEventBatcher {
+export class GameEventBatcher {
     broadcastEvents = new Array<BroadcastBatchGameEvent>();
     playersEvents = new Map<string, UnicastBatchGameEvent[]>();
     emitter = new EventEmitter<GameEventBatcherEvents>();

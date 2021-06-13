@@ -1,4 +1,4 @@
-export default class Random {
+export class Random {
     static getRandomArrayElement<T>(list: T[]): T {
         const index = Math.floor(Math.random() * list.length);
         return list[index];

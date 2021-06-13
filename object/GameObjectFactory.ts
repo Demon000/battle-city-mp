@@ -1,15 +1,15 @@
-import BrickWall from '@/brick-wall/BrickWall';
-import Bullet, { BulletOptions } from '@/bullet/Bullet';
-import Dirt from '@/dirt/Dirt';
-import Explosion, { ExplosionOptions } from '@/explosion/Explosion';
-import Flag, { FlagOptions } from '@/flag/Flag';
-import Grass from '@/grass/Grass';
-import PlayerSpawn, { PlayerSpawnOptions } from '@/player-spawn/PlayerSpawn';
-import Tank, { TankOptions } from '../tank/Tank';
-import GameObject, { GameObjectOptions } from './GameObject';
+import { BrickWall } from '@/brick-wall/BrickWall';
+import { Bullet, BulletOptions } from '@/bullet/Bullet';
+import { Dirt } from '@/dirt/Dirt';
+import { Explosion, ExplosionOptions } from '@/explosion/Explosion';
+import { Flag, FlagOptions } from '@/flag/Flag';
+import { Grass } from '@/grass/Grass';
+import { PlayerSpawn, PlayerSpawnOptions } from '@/player-spawn/PlayerSpawn';
+import { Tank, TankOptions } from '../tank/Tank';
+import { GameObject, GameObjectOptions } from './GameObject';
 import { GameObjectType } from './GameObjectType';
 
-export default class GameObjectFactory {
+export class GameObjectFactory {
     buildFromOptions(options: GameObjectOptions): GameObject {
         if (options.type === GameObjectType.TANK) {
             return new Tank(options as TankOptions);

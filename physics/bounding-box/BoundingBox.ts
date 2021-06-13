@@ -1,6 +1,6 @@
-import Point from '../point/Point';
+import { Point } from '../point/Point';
 
-export default interface BoundingBox {
+export interface BoundingBox {
     tl: Point;
     br: Point;
 }

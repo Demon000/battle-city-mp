@@ -1,13 +1,13 @@
 import { CLIENT_SPRITES_RELATIVE_URL } from '@/config';
-import BaseImageDrawable from './BaseImageDrawable';
+import { BaseImageDrawable } from './BaseImageDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
 import { ImageDrawableProperties } from './IImageDrawable';
-import ImageUtils, { Source } from '../utils/ImageUtils';
-import Point from '@/physics/point/Point';
-import CanvasUtils, { Context2D } from '@/utils/CanvasUtils';
+import { ImageUtils, Source } from '../utils/ImageUtils';
+import { Point } from '@/physics/point/Point';
+import { CanvasUtils, Context2D } from '@/utils/CanvasUtils';
 
-export default class ImageDrawable extends BaseImageDrawable {
+export class ImageDrawable extends BaseImageDrawable {
     readonly type = DrawableType.IMAGE;
     private baseCachedSource?: Source;
     private cachedSource?: Source;

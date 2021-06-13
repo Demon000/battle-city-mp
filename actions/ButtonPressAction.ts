@@ -1,5 +1,5 @@
 import { Direction } from '../physics/Direction';
-import Action, { ActionOptions, ActionType } from './Action';
+import { Action, ActionOptions, ActionType } from './Action';
 
 export enum ButtonType {
     UP = 'up',
@@ -34,7 +34,7 @@ export interface ButtonPressActionOptions extends ActionOptions {
     buttonState: ButtonState;
 }
 
-export default class ButtonPressAction extends Action {
+export class ButtonPressAction extends Action {
     buttonType: ButtonType;
     buttonState: ButtonState;
 

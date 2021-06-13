@@ -1,10 +1,10 @@
 import { assert } from '@/utils/assert';
 import EventEmitter from 'eventemitter3';
 import { Component, ComponentClassType } from './Component';
-import Entity from './Entity';
+import { Entity } from './Entity';
 import { EntityId } from './EntityId';
-import RegistryIDGenerator from './RegistryIdGenerator';
-import RegistryViewIterator from './RegistryViewIterator';
+import { RegistryIdGenerator } from './RegistryIdGenerator';
+import { RegistryViewIterator } from './RegistryViewIterator';
 
 export type ComponentInitialization =
     [ComponentClassType<any>, any] |
@@ -34,7 +34,7 @@ export interface RegistryComponentEvents {
     ) => void;
 }
 
-export default class Registry {
+export class Registry {
     private idGenerator;
     private tagsComponentsMap = new Map<string, Set<Component<any>>>();
     private componentsEmitterMap = new Map<string, EventEmitter<RegistryComponentEvents>>();
@@ -42,7 +42,7 @@ export default class Registry {
     private idsEntityMap = new Map<EntityId, Entity>();
     emitter = new EventEmitter<RegistryEvents>();
 
-    constructor(idGenerator: RegistryIDGenerator) {
+    constructor(idGenerator: RegistryIdGenerator) {
         this.idGenerator = idGenerator;
     }
 

@@ -1,10 +1,10 @@
-import BaseDrawable from './BaseDrawable';
+import { BaseDrawable } from './BaseDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
 import { DrawableProperties } from './IDrawable';
-import ImageUtils, { Source } from '../utils/ImageUtils';
+import { ImageUtils, Source } from '../utils/ImageUtils';
 import { CLIENT_FONTS_RELATIVE_URL } from '@/config';
-import CanvasUtils, { Canvas } from '@/utils/CanvasUtils';
+import { CanvasUtils, Canvas } from '@/utils/CanvasUtils';
 
 export interface FontFaceProperties {
     family: string;
@@ -27,7 +27,7 @@ export interface TextDrawableProperties extends DrawableProperties {
     positionYReference?: TextPositionReference,
 }
 
-export default class TextDrawable extends BaseDrawable {
+export class TextDrawable extends BaseDrawable {
     readonly type = DrawableType.TEXT;
     private textCache = new Map<string, this>();
     private positionXReferenceCache = new Map<string, this>();

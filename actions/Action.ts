@@ -8,7 +8,7 @@ export interface ActionOptions {
     type?: ActionType;
 }
 
-export default class Action {
+export class Action {
     timestamp: number;
     type: ActionType;
 

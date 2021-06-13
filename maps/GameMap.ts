@@ -1,8 +1,8 @@
 import fs from 'fs';
 import { GameObjectOptions } from '@/object/GameObject';
-import GameObjectProperties from '@/object/GameObjectProperties';
+import { GameObjectProperties } from '@/object/GameObjectProperties';
 import { GameShortObjectType, isGameShortObjectType } from '@/object/GameObjectType';
-import Team, { TeamOptions } from '@/team/Team';
+import { Team, TeamOptions } from '@/team/Team';
 
 export interface GameMapOptions {
     resolution?: number;
@@ -11,7 +11,7 @@ export interface GameMapOptions {
     objectsFromOptions?: GameObjectOptions[];
 }
 
-export default class GameMap {
+export class GameMap {
     path: string;
     options: GameMapOptions;
 

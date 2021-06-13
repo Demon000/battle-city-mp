@@ -1,13 +1,13 @@
-import Action from '@/actions/Action';
+import { Action } from '@/actions/Action';
 import { Color } from '@/drawable/Color';
-import Point from '@/physics/point/Point';
+import { Point } from '@/physics/point/Point';
 import { TankTier } from '@/tank/TankTier';
 import { Socket } from 'socket.io-client';
-import GameClient from './GameClient';
+import { GameClient } from './GameClient';
 import { BatchGameEvent, GameEvent } from './GameEvent';
 import { GameSocketEvent, GameSocketEvents } from './GameSocketEvent';
 
-export default class GameClientSocket {
+export class GameClientSocket {
     socket;
     gameClient;
     initialized = false;

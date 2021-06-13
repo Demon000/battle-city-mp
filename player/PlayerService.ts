@@ -1,10 +1,10 @@
 import { Color } from '@/drawable/Color';
 import { TankTier } from '@/tank/TankTier';
-import MapRepository from '@/utils/MapRepository';
+import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
-import ButtonPressAction, { MOVE_BUTTON_TYPES, ButtonState, BUTTON_TYPE_DIRECTION, ButtonType } from '../actions/ButtonPressAction';
+import { ButtonPressAction, MOVE_BUTTON_TYPES, ButtonState, BUTTON_TYPE_DIRECTION, ButtonType } from '../actions/ButtonPressAction';
 import { Direction } from '../physics/Direction';
-import Player, { PartialPlayerOptions, PlayerSpawnStatus } from './Player';
+import { Player, PartialPlayerOptions, PlayerSpawnStatus } from './Player';
 import { PlayerPoints, PlayerPointsEvent } from './PlayerPoints';
 
 export enum PlayerServiceEvent {
@@ -46,7 +46,7 @@ interface PlayerServiceEvents {
     [PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_COLOR]: (color: Color) => void,
 }
 
-export default class PlayerService {
+export class PlayerService {
     private repository;
     private ownPlayerId?: string;
     emitter = new EventEmitter<PlayerServiceEvents>();

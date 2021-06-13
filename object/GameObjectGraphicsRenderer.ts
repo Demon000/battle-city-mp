@@ -1,12 +1,12 @@
-import AnimatedImageDrawable from '@/drawable/AnimatedImageDrawable';
+import { AnimatedImageDrawable } from '@/drawable/AnimatedImageDrawable';
 import { DrawableType } from '@/drawable/DrawableType';
-import IDrawable from '@/drawable/IDrawable';
-import GameObject from '@/object/GameObject';
+import { IDrawable } from '@/drawable/IDrawable';
+import { GameObject } from '@/object/GameObject';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 import { Context2D } from '@/utils/CanvasUtils';
-import GameObjectDrawables from './GameObjectDrawables';
+import { GameObjectDrawables } from './GameObjectDrawables';
 
-export default class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
+export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
     object;
     drawables?: IDrawable[] | null = null;
     scale = 1;

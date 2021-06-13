@@ -1,7 +1,7 @@
-import BoundingBox from '../bounding-box/BoundingBox';
-import BoundingBoxUtils from '../bounding-box/BoundingBoxUtils';
+import { BoundingBox } from '../bounding-box/BoundingBox';
+import { BoundingBoxUtils } from '../bounding-box/BoundingBoxUtils';
 
-export default class BoundingBoxNode<V> {
+export class BoundingBoxNode<V> {
     box: BoundingBox;
     realBox?: BoundingBox;
     parent?: BoundingBoxNode<V>;

@@ -1,8 +1,8 @@
-import GameObject, { GameObjectOptions } from '@/object/GameObject';
+import { GameObject, GameObjectOptions } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
-import Point from '@/physics/point/Point';
+import { Point } from '@/physics/point/Point';
 
-export default class BrickWall extends GameObject {
+export class BrickWall extends GameObject {
     constructor(options: GameObjectOptions) {
         options.type = GameObjectType.BRICK_WALL;
 

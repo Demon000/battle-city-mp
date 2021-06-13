@@ -1,11 +1,11 @@
-import GameObject, { GameObjectOptions } from '@/object/GameObject';
+import { GameObject, GameObjectOptions } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 
 export interface PlayerSpawnOptions extends GameObjectOptions {
     teamId?: string | null;
 }
 
-export default class PlayerSpawn extends GameObject {
+export class PlayerSpawn extends GameObject {
     teamId: string | null;
 
     constructor(options: PlayerSpawnOptions) {

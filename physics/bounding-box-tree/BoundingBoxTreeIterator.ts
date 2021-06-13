@@ -1,6 +1,6 @@
-import BoundingBoxNode from './BoundingBoxNode';
-import BoundingBoxUtils from '../bounding-box/BoundingBoxUtils';
-import BoundingBox from '../bounding-box/BoundingBox';
+import { BoundingBoxNode } from './BoundingBoxNode';
+import { BoundingBoxUtils } from '../bounding-box/BoundingBoxUtils';
+import { BoundingBox } from '../bounding-box/BoundingBox';
 
 export class BoundingBoxTreeIterator<V> implements Iterator<BoundingBoxNode<V>> {
     private box: BoundingBox;

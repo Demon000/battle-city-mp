@@ -1,6 +1,6 @@
-import GameObject from '@/object/GameObject';
+import { GameObject } from '@/object/GameObject';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
-import Point from '@/physics/point/Point';
+import { Point } from '@/physics/point/Point';
 import { Context2D } from '@/utils/CanvasUtils';
 
 export type DrawableTestFunction = (meta: ResourceMeta) => boolean;
@@ -17,7 +17,7 @@ export interface DrawableProperties {
     scaleY?: number;
 }
 
-export default interface IDrawable {
+export interface IDrawable {
     readonly type: string;
 
     setInheritedProperties(properties: DrawableProperties): void;

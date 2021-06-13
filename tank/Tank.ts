@@ -2,7 +2,7 @@ import { BulletPower } from '@/bullet/BulletPower';
 import { Color } from '@/drawable/Color';
 import { ResourceMeta } from '@/object/IGameObjectProperties';
 import { Direction } from '@/physics/Direction';
-import GameObject, { GameObjectOptions } from '../object/GameObject';
+import { GameObject, GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
 
@@ -100,7 +100,7 @@ export interface TankOptions extends GameObjectOptions {
 
 export type PartialTankOptions = Partial<TankOptions>;
 
-export default class Tank extends GameObject {
+export class Tank extends GameObject {
     protected _isUnderBush: boolean;
     protected _flagColor: Color | null;
 

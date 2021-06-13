@@ -1,5 +1,5 @@
 import { Color } from '../drawable/Color';
-import CanvasUtils, { Canvas } from './CanvasUtils';
+import { CanvasUtils, Canvas } from './CanvasUtils';
 
 export type Source = HTMLImageElement | Canvas;
 
@@ -12,7 +12,7 @@ export interface ContentMeasurements {
     height: number;
 }
 
-export default class ImageUtils {
+export class ImageUtils {
     static measureContents(canvas: Canvas): ContentMeasurements {
         const context = canvas.getContext('2d');
         if (context === null) {

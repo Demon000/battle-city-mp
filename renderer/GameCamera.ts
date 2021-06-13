@@ -1,6 +1,6 @@
-import Point from '@/physics/point/Point';
+import { Point } from '@/physics/point/Point';
 
-export default class GameCamera {
+export class GameCamera {
     position?: Point;
 
     setPosition(position: Point): void {

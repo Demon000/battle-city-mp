@@ -1,6 +1,6 @@
 import { Direction } from '../Direction';
 
-export default class DirectionUtils {
+export class DirectionUtils {
     static isVerticalAxis(direction: Direction): boolean {
         return [Direction.UP, Direction.DOWN].includes(direction);
     }

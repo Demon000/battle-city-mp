@@ -1,13 +1,13 @@
-import GameObject from '@/object/GameObject';
+import { GameObject } from '@/object/GameObject';
 import { RenderPass } from '@/object/RenderPass';
-import BoundingBox from '@/physics/bounding-box/BoundingBox';
-import BoundingBoxUtils from '@/physics/bounding-box/BoundingBoxUtils';
-import Point from '@/physics/point/Point';
-import CanvasUtils, { Context2D } from '@/utils/CanvasUtils';
-import RatioUtils from '@/utils/RatioUtils';
-import GameObjectGraphicsRenderer from '../object/GameObjectGraphicsRenderer';
+import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
+import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
+import { Point } from '@/physics/point/Point';
+import { CanvasUtils, Context2D } from '@/utils/CanvasUtils';
+import { RatioUtils } from '@/utils/RatioUtils';
+import { GameObjectGraphicsRenderer } from '../object/GameObjectGraphicsRenderer';
 
-export default class GameGraphicsService {
+export class GameGraphicsService {
     private scale = 0;
     private gameWidth = 0;
     private gameHeight = 0;
