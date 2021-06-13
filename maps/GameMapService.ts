@@ -10,7 +10,7 @@ export enum GameMapServiceEvent {
     MAP_TEAMS_OPTIONS = 'map-teams-options',
 }
 
-interface GameMapServiceEvents {
+export interface GameMapServiceEvents {
     [GameMapServiceEvent.MAP_OBJECTS_OPTIONS]: (objectsOptions: GameObjectOptions[]) => void;
     [GameMapServiceEvent.MAP_TEAMS_OPTIONS]: (teamsOptions: TeamOptions[]) => void;
 }

@@ -29,7 +29,7 @@ export enum PlayerServiceEvent {
     OWN_PLAYER_CHANGED_TANK_COLOR = 'own-player-changed-tank-color',
 }
 
-interface PlayerServiceEvents {
+export interface PlayerServiceEvents {
     [PlayerServiceEvent.PLAYER_ADDED]: (player: Player) => void,
     [PlayerServiceEvent.PLAYER_CHANGED]: (playerId: string, playerOptions: PartialPlayerOptions) => void,
     [PlayerServiceEvent.PLAYER_BEFORE_REMOVE]: (playerId: string) => void,

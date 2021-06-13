@@ -19,7 +19,7 @@ export enum GameObjectServiceEvent {
     OBJECT_UNREGISTERED = 'object-unregistered',
 }
 
-interface GameObjectServiceEvents {
+export interface GameObjectServiceEvents {
     [GameObjectServiceEvent.OBJECT_REQUESTED_POSITION]: (objectId: number, position: Point) => void,
     [GameObjectServiceEvent.OBJECT_REQUESTED_DIRECTION]: (objectId: number, direction: Direction) => void,
     [GameObjectServiceEvent.OBJECT_CHANGED]: (objectId: number, options: PartialGameObjectOptions) => void,

@@ -11,7 +11,7 @@ export type IterableOperation = {
     fn: (value: any) => boolean;
 };
 
-class LazyIterableIterator<T> {
+export class LazyIterableIterator<T> {
     private iterator;
     private operations;
 

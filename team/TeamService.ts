@@ -8,7 +8,7 @@ export enum TeamServiceEvent {
     TEAMS_CHANGED = 'teams-changed',
 }
 
-interface TeamServiceEvents {
+export interface TeamServiceEvents {
     [TeamServiceEvent.TEAM_PLAYER_ADDED]: (teamId: string, playerId: string) => void,
     [TeamServiceEvent.TEAM_PLAYER_REMOVED]: (teamId: string, playerId: string) => void,
     [TeamServiceEvent.TEAMS_CHANGED]: () => void,

@@ -8,7 +8,7 @@ export enum FlagServiceEvent {
     FLAG_UPDATED = 'flag-updated',
 }
 
-interface FlagServiceEvents {
+export interface FlagServiceEvents {
     [FlagServiceEvent.FLAG_UPDATED]: (flagId: number, options: PartialFlagOptions) => void,
 }
 

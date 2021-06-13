@@ -6,7 +6,7 @@ export enum GameEventBatcherEvent {
     BROADCAST_BATCH = 'broadcast-batch',
 }
 
-interface GameEventBatcherEvents {
+export interface GameEventBatcherEvents {
     [GameEventBatcherEvent.PLAYER_BATCH]: (playerId: string, events: UnicastBatchGameEvent[]) => void;
     [GameEventBatcherEvent.BROADCAST_BATCH]: (events: BroadcastBatchGameEvent[]) => void;
 }

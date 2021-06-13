@@ -5,7 +5,7 @@ export enum TickerEvent {
     TICK = 'tick',
 }
 
-interface TickerEvents {
+export interface TickerEvents {
     [TickerEvent.TICK]: (deltaSeconds: number) => void,
 }
 

@@ -1,6 +1,6 @@
 import { Point } from '@/physics/point/Point';
 
-interface CartesianPositioned {
+export interface CartesianPositioned {
     readonly positionX: AudioParam;
     readonly positionY: AudioParam;
     readonly positionZ: AudioParam;

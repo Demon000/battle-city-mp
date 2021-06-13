@@ -15,7 +15,7 @@ export type DataOfComponent<T> =
                     T extends SizeComponent ? SizeComponentData :
                         never;
 
-interface ProcessResults {
+export interface ProcessResults {
     clazz: ComponentClassType<any>;
     tag: string;
 }

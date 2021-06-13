@@ -17,7 +17,7 @@ export enum TankServiceEvent {
     OWN_PLAYER_TANK_CHANGED_BULLETS = 'own-player-tank-changed-bullets',
 }
 
-interface TankServiceEvents {
+export interface TankServiceEvents {
     [TankServiceEvent.TANK_REQUESTED_BULLET_SPAWN]: (tankId: number) => void,
     [TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN]: (tankId: number) => void,
     [TankServiceEvent.TANK_UPDATED]: (tankId: number, options: PartialTankOptions) => void,

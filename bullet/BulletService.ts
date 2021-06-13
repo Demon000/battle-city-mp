@@ -14,7 +14,7 @@ export enum BulletServiceEvent {
     BULLET_SPAWNED = 'bullet-spawned',
 }
 
-interface BulletServiceEvents {
+export interface BulletServiceEvents {
     [BulletServiceEvent.BULLET_SPAWNED]: (bullet: Bullet) => void,
 }
 
