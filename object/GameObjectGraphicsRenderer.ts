@@ -75,9 +75,9 @@ export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
         }
 
         this.scale = scale;
-        const drawables = this.findDrawablesMatchingObject();
-        if (drawables !== undefined) {
-            this.drawables = this.processDrawables(drawables);
+        this.drawables = this.findDrawablesMatchingObject();
+        if (this.drawables !== undefined) {
+            this.drawables = this.processDrawables(this.drawables);
         }
 
         this.object.graphicsDirty = false;
