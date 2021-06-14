@@ -310,6 +310,11 @@ export default class Settings extends Vue {
     margin-left: 16px;
 }
 
+.input-wrapper,
+.input-wrapper input {
+    width: 100%;
+}
+
 .tank-tiers-container label,
 .player-teams-container label {
     display: block;
