@@ -93,9 +93,9 @@ export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
         drawX: number,
         drawY: number,
         showInvisible: boolean,
-    ): boolean {
+    ): void {
         if (drawable === undefined) {
-            return false;
+            return;
         }
 
         if (drawable.type === DrawableType.ANIMATED_IMAGE) {
@@ -103,19 +103,17 @@ export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
         }
 
         if (drawable === undefined) {
-            return false;
+            return;
         }
 
         if (drawable.properties.isInvisible && !showInvisible) {
-            return false;
+            return;
         }
 
         const renderPass = drawable.getRenderPass();
         const context = layersContext[renderPass];
 
         drawable.draw(context, drawX, drawY);
-
-        return false;
     }
 
     render(
