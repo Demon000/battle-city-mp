@@ -2,7 +2,6 @@ import { AnimatedImageDrawable } from '@/drawable/AnimatedImageDrawable';
 import { DrawableType } from '@/drawable/DrawableType';
 import { IDrawable } from '@/drawable/IDrawable';
 import { GameObject } from '@/object/GameObject';
-import { ResourceMeta } from '@/object/IGameObjectProperties';
 import { Context2D } from '@/utils/CanvasUtils';
 import { GameObjectDrawables } from './GameObjectDrawables';
 
@@ -15,13 +14,13 @@ export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
         this.object = object;
     }
 
-    isDrawableMatchingMeta(drawable: IDrawable, objectMeta: ResourceMeta): boolean {
+    private filterDrawableMatchingObject(drawable: IDrawable): boolean {
         if (drawable.properties.tests === undefined) {
             return true;
         }
 
         for (const test of drawable.properties.tests) {
-            if (!test(objectMeta)) {
+            if (!test(this.object)) {
                 return false;
             }
         }
@@ -29,27 +28,17 @@ export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
         return true;
     }
 
-    private findDrawableMatchingMeta(meta: ResourceMeta): IDrawable | undefined | null {
-        const drawables = GameObjectDrawables.getTypeDrawables(this.object.type);
-        if (drawables === undefined) {
-            return undefined;
-        }
-
-        const drawable = drawables
-            .find(d => this.isDrawableMatchingMeta(d, meta));
-        if (drawable === undefined) {
-            return null;
-        }
-
-        return drawable;
-    }
-
     private filterOutMissingDrawable(drawable: IDrawable | undefined | null): boolean {
         return drawable !== undefined && drawable !== null;
     }
 
-    private findDrawablesMatchingMetas(metas: ResourceMeta[]): IDrawable[] | undefined {
-        const drawables = metas.map(this.findDrawableMatchingMeta, this);
+    private findDrawablesMatchingObject(): IDrawable[] | undefined {
+        let drawables = GameObjectDrawables.getTypeDrawables(this.object.type);
+        if (drawables === undefined) {
+            return undefined;
+        }
+
+        drawables = drawables.filter(this.filterDrawableMatchingObject, this);
 
         if (drawables[0] === undefined) {
             return undefined;
@@ -77,34 +66,21 @@ export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
     }
 
     update(scale: number): void {
-        /*
-         * Metas were undefined, meaning that this game object will never have a sprite.
-         */
         if (this.drawables === undefined) {
             return;
         }
 
-        /*
-         * Metas were either undefined, meaning that the game object will never have a sprite,
-         * or null, meaning that it has no sprite right now.
-         */
-        const metas = this.object.graphicsMeta;
-        if (metas === undefined || metas === null) {
-            this.drawables = metas;
-            return;
-        }
-
-        if (!this.object.graphicsMetaUpdated && this.scale === scale) {
+        if (!this.object.graphicsDirty && this.scale === scale) {
             return;
         }
 
         this.scale = scale;
-        const drawables = this.findDrawablesMatchingMetas(metas);
+        const drawables = this.findDrawablesMatchingObject();
         if (drawables !== undefined) {
             this.drawables = this.processDrawables(drawables);
         }
 
-        this.object.graphicsMetaUpdated = false;
+        this.object.graphicsDirty = false;
     }
 
     isRenderable(): boolean {

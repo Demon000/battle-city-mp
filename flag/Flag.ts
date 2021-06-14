@@ -1,7 +1,6 @@
 import { Color } from '@/drawable/Color';
 import { GameObject, GameObjectOptions } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
-import { ResourceMeta } from '@/object/IGameObjectProperties';
 
 export enum FlagType {
     FULL = 'full',
@@ -59,33 +58,6 @@ export class Flag extends GameObject {
 
     set flagType(type: FlagType) {
         this._flagType = type;
-        this.markGraphicsMetaUpdated();
-    }
-
-    protected updateGraphicsMeta(): void {
-        const metas: ResourceMeta[] = [];
-        const flagType = this._flagType;
-
-        if (flagType === FlagType.FULL
-            || flagType === FlagType.BASE_ONLY) {
-            metas.push({
-                isFlagBase: true,
-            });
-        }
-
-        if (flagType === FlagType.FULL
-            || flagType === FlagType.POLE_ONLY) {
-            metas.push(
-                {
-                    isFlagPole: true,
-                },
-                {
-                    isFlagCloth: true,
-                    color: this.color,
-                },
-            );
-        }
-
-        this._graphicsMeta = metas;
+        this.markGraphicsDirty();
     }
 }

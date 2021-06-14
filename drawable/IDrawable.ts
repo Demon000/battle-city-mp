@@ -1,9 +1,8 @@
 import { GameObject } from '@/object/GameObject';
-import { ResourceMeta } from '@/object/IGameObjectProperties';
 import { Point } from '@/physics/point/Point';
 import { Context2D } from '@/utils/CanvasUtils';
 
-export type DrawableTestFunction = (meta: ResourceMeta) => boolean;
+export type DrawableTestFunction = (object: GameObject) => boolean;
 export type DrawableProcessingFunction = (this: IDrawable, object: GameObject) => IDrawable | undefined;
 
 export interface DrawableProperties {

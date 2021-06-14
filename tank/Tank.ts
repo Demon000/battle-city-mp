@@ -1,6 +1,5 @@
 import { BulletPower } from '@/bullet/BulletPower';
 import { Color } from '@/drawable/Color';
-import { ResourceMeta } from '@/object/IGameObjectProperties';
 import { Direction } from '@/physics/Direction';
 import { GameObject, GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
@@ -253,7 +252,7 @@ export class Tank extends GameObject {
 
     set isUnderBush(value: boolean) {
         this._isUnderBush = value;
-        this.markGraphicsMetaUpdated();
+        this.markGraphicsDirty();
     }
 
     get flagColor(): Color | null {
@@ -262,7 +261,7 @@ export class Tank extends GameObject {
 
     set flagColor(value: Color | null) {
         this._flagColor = value;
-        this.markGraphicsMetaUpdated();
+        this.markGraphicsDirty();
     }
 
     get isMoving(): boolean {
@@ -271,7 +270,7 @@ export class Tank extends GameObject {
 
     set isMoving(value: boolean) {
         super.isMoving = value;
-        this.markGraphicsMetaUpdated();
+        this.markGraphicsDirty();
         this.updateAudioMeta();
     }
 
@@ -281,36 +280,7 @@ export class Tank extends GameObject {
 
     set direction(value: Direction) {
         super.direction = value;
-        this.markGraphicsMetaUpdated();
-    }
-
-    protected updateGraphicsMeta(): void {
-        const metas: ResourceMeta[] = [{
-            isTank: true,
-            direction: this.direction,
-            isMoving: this.isMoving,
-            tier: this.tier,
-        }];
-
-        if (!this.isUnderBush) {
-            metas.push({
-                isText: true,
-            });
-        }
-
-        if (this.flagColor) {
-            metas.push(
-                {
-                    isFlagPole: true,
-                },
-                {
-                    isFlagCloth: true,
-                    color: this.flagColor,
-                },
-            );
-        }
-
-        this._graphicsMeta = metas;
+        this.markGraphicsDirty();
     }
 
     protected updateAudioMeta(): void {

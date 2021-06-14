@@ -1,40 +1,33 @@
+import { Bullet } from '@/bullet/Bullet';
 import { BulletPower } from '@/bullet/BulletPower';
 import { AnimatedImageDrawable } from '@/drawable/AnimatedImageDrawable';
 import { IDrawable, DrawableProcessingFunction, DrawableTestFunction } from '@/drawable/IDrawable';
 import { IImageDrawable } from '@/drawable/IImageDrawable';
 import { ImageDrawable } from '@/drawable/ImageDrawable';
 import { TextDrawable, TextPositionReference } from '@/drawable/TextDrawable';
+import { Explosion } from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
-import { Flag } from '@/flag/Flag';
+import { Flag, FlagType } from '@/flag/Flag';
 import { Direction } from '@/physics/Direction';
 import { Point } from '@/physics/point/Point';
 import { Tank } from '@/tank/Tank';
 import { TankTier } from '@/tank/TankTier';
 import { GameObject } from './GameObject';
 import { GameObjectType } from './GameObjectType';
-import { ResourceMeta } from './IGameObjectProperties';
 import { RenderPass } from './RenderPass';
 
 const positionTest = (mod: number, divide: number, points: Point[]): DrawableTestFunction => {
-    return (meta: ResourceMeta): boolean => {
-        if (meta.position === undefined) {
-            return false;
-        }
-
-        const position = meta.position;
+    return (object: GameObject): boolean => {
+        const position = object.position;
         const x = Math.floor(Math.abs(position.x % mod / divide));
         const y = Math.floor(Math.abs(position.y % mod / divide));
         return points.some(p => p.x === x && p.y === y);
     };
 };
 
-const directionTest = (direction: Direction): DrawableTestFunction => {
-    return (meta: ResourceMeta): boolean => {
-        if (meta.direction === undefined) {
-            return false;
-        }
-
-        return meta.direction === direction;
+const directionTest = (targetDirection: Direction): DrawableTestFunction => {
+    return (object: GameObject): boolean => {
+        return object.direction === targetDirection;
     };
 };
 
@@ -163,8 +156,15 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             offsetX: 2,
             offsetY: 2,
             tests: [
-                (meta: ResourceMeta): boolean => {
-                    return meta.isFlagBase === true;
+                (object: GameObject): boolean => {
+                    const flag = object as Flag;
+
+                    if (flag.flagType !== FlagType.FULL
+                        && flag.flagType !== FlagType.BASE_ONLY) {
+                        return false;
+                    }
+
+                    return true;
                 },
             ],
         }),
@@ -173,8 +173,15 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             offsetX: 7,
             offsetY: -15,
             tests: [
-                (meta: ResourceMeta): boolean => {
-                    return meta.isFlagPole === true;
+                (object: GameObject): boolean => {
+                    const flag = object as Flag;
+
+                    if (flag.flagType !== FlagType.FULL
+                        && flag.flagType !== FlagType.POLE_ONLY) {
+                        return false;
+                    }
+
+                    return true;
                 },
             ],
         }),
@@ -188,8 +195,15 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                 return drawable.colorMask(flag.color);
             },
             tests: [
-                (meta: ResourceMeta): boolean => {
-                    return meta.isFlagCloth === true;
+                (object: GameObject): boolean => {
+                    const flag = object as Flag;
+
+                    if (flag.flagType !== FlagType.FULL
+                        && flag.flagType !== FlagType.POLE_ONLY) {
+                        return false;
+                    }
+
+                    return true;
                 },
             ],
             overlays: [
@@ -209,16 +223,14 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             ) => {
                 return [
                     directionTest(direction),
-                    (meta: ResourceMeta): boolean => {
-                        if (!meta.isTank) {
+                    (object: GameObject): boolean => {
+                        const tank = object as Tank;
+
+                        if (tank.isMoving !== isMoving) {
                             return false;
                         }
 
-                        if (meta.isMoving !== isMoving) {
-                            return false;
-                        }
-
-                        if (meta.tier !== tier) {
+                        if (tank.tier !== tier) {
                             return false;
                         }
 
@@ -299,8 +311,10 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             paddingY: 1,
             positionXReference: 'center',
             tests: [
-                (meta: ResourceMeta): boolean => {
-                    if (!meta.isText) {
+                (object: GameObject): boolean => {
+                    const tank = object as Tank;
+
+                    if (tank.isUnderBush) {
                         return false;
                     }
 
@@ -343,8 +357,14 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             offsetX: 8,
             offsetY: -5,
             tests: [
-                (meta: ResourceMeta): boolean => {
-                    return meta.isFlagPole === true;
+                (object: GameObject): boolean => {
+                    const tank = object as Tank;
+
+                    if (tank.flagColor === null) {
+                        return false;
+                    }
+
+                    return true;
                 },
             ],
         }),
@@ -362,8 +382,13 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                 return drawable.colorMask(tank.flagColor);
             },
             tests: [
-                (meta: ResourceMeta): boolean => {
-                    return meta.isFlagCloth === true;
+                (object: GameObject): boolean => {
+                    const tank = object as Tank;
+                    if (tank.flagColor === null) {
+                        return false;
+                    }
+
+                    return true;
                 },
             ],
             overlays: [
@@ -404,8 +429,14 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                             scaleY: 0.5,
                             tests: [
                                 directionTest(direction),
-                                (meta: ResourceMeta): boolean => {
-                                    return meta.power === power;
+                                (object: GameObject): boolean => {
+                                    const bullet = object as Bullet;
+
+                                    if (bullet.power !== power) {
+                                        return false;
+                                    }
+
+                                    return true;
                                 },
                             ],
                         }),
@@ -423,8 +454,14 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             const generateExplosionDrawableTests = (
                 type: ExplosionType,
             ) => [
-                (meta: ResourceMeta): boolean => {
-                    return meta.explosionType === type;
+                (object: GameObject): boolean => {
+                    const explosion = object as Explosion;
+
+                    if (explosion.explosionType !== type) {
+                        return false;
+                    }
+
+                    return true;
                 },
             ];
 

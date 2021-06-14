@@ -37,13 +37,6 @@ export class Explosion extends GameObject {
         if (options.destroyedObjectType !== undefined) this.destroyedObjectType = options.destroyedObjectType;
     }
 
-    protected updateGraphicsMeta(): void {
-        this._graphicsMeta = [{
-            direction: this.direction,
-            explosionType: this.explosionType,
-        }];
-    }
-
     protected updateAudioMeta(): void {
         this._audioMeta = {
             destroyedObjectType: this.destroyedObjectType,

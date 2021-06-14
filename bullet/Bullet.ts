@@ -47,13 +47,6 @@ export class Bullet extends GameObject {
         if (options.power !== undefined) this.power = options.power;
     }
 
-    protected updateGraphicsMeta(): void {
-        this._graphicsMeta = [{
-            direction: this.direction,
-            power: this.power,
-        }];
-    }
-
     protected updateAudioMeta(): void {
         this._audioMeta = {};
     }

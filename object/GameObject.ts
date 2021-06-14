@@ -22,14 +22,13 @@ export type PartialGameObjectOptions = Partial<GameObjectOptions>;
 export class GameObject {
     static globalId = 0;
 
-    protected _graphicsMeta: ResourceMeta[] | undefined | null;
     protected _audioMeta: ResourceMeta | undefined | null;
     protected _position: Point;
     protected _boundingBox: BoundingBox;
     protected _direction: Direction;
     protected _movementSpeed: number;
     protected _isMoving: boolean;
-    graphicsMetaUpdated = false;
+    graphicsDirty = true;
 
     id: number;
     type: GameObjectType;
@@ -170,25 +169,12 @@ export class GameObject {
         return this.properties.automaticDestroyTime;
     }
 
-    protected updateGraphicsMeta(): void {
-        this._graphicsMeta = [{}];
-    }
-
-    protected markGraphicsMetaUpdated(): void {
-        this.updateGraphicsMeta();
-        this.graphicsMetaUpdated = true;
+    protected markGraphicsDirty(): void {
+        this.graphicsDirty = true;
     }
 
     protected updateAudioMeta(): void {
         this._audioMeta = undefined;
-    }
-
-    get graphicsMeta(): ResourceMeta[] | undefined | null {
-        if (this._graphicsMeta === undefined) {
-            this.markGraphicsMetaUpdated();
-        }
-
-        return this._graphicsMeta;
     }
 
     get audioMeta(): ResourceMeta | undefined | null {

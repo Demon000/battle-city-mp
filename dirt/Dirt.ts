@@ -8,12 +8,6 @@ export class Dirt extends GameObject {
 
     set position(value: Point) {
         super.position = value;
-        this.markGraphicsMetaUpdated();
-    }
-
-    protected updateGraphicsMeta(): void {
-        this._graphicsMeta = [{
-            position: this.position,
-        }];
+        this.markGraphicsDirty();
     }
 }
