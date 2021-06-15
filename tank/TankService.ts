@@ -2,10 +2,13 @@ import { Color } from '@/drawable/Color';
 import { GameObject } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 import { CollisionTracker } from '@/physics/collisions/CollisionTracker';
+import { Point } from '@/physics/point/Point';
+import { Player } from '@/player/Player';
 import { LazyIterable } from '@/utils/LazyIterable';
 import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import { Tank, PartialTankOptions } from './Tank';
+import { TankTier } from './TankTier';
 
 export enum TankServiceEvent {
     TANK_REQUESTED_BULLET_SPAWN = 'tank-requested-bullet-spawn',
@@ -41,6 +44,22 @@ export class TankService {
 
         return LazyIterable.from(objects)
             .filter(o => o.type === GameObjectType.TANK) as Iterable<Tank>;
+    }
+
+    createTankForPlayer(
+        player: Player,
+        position: Point,
+        color: Color,
+    ): Tank {
+        return new Tank({
+            position,
+            color,
+            playerId: player.id,
+            playerName: player.displayName,
+            teamId: player.teamId,
+            tier: player.requestedTankTier,
+            collisionsDisabled: player.mapEditorEnabled,
+        });
     }
 
     getTank(tankId: number): Tank {

@@ -1,6 +1,6 @@
 import { Bullet } from '@/bullet/Bullet';
 import { BulletPower } from '@/bullet/BulletPower';
-import { BulletService, BulletServiceEvent } from '@/bullet/BulletService';
+import { BulletService } from '@/bullet/BulletService';
 import { SERVER_CONFIG_TPS } from '@/config';
 import { Color } from '@/drawable/Color';
 import { Explosion } from '@/explosion/Explosion';
@@ -253,15 +253,7 @@ export class GameServer {
                     }
 
                     const position = this.gameObjectService.getRandomSpawnPosition(player.teamId);
-                    const tank = new Tank({
-                        position,
-                        playerId,
-                        playerName: player.displayName,
-                        teamId: player.teamId,
-                        color: tankColor,
-                        tier: player.requestedTankTier,
-                        collisionsDisabled: player.mapEditorEnabled,
-                    });
+                    const tank = this.tankService.createTankForPlayer(player, position, tankColor);
                     this.gameObjectService.registerObject(tank);
                 } else if (status === PlayerSpawnStatus.DESPAWN && player.tankId !== null) {
                     this.gameObjectService.unregisterObject(player.tankId);
@@ -337,16 +329,12 @@ export class GameServer {
                     case GameObjectType.TANK: {
                         const tank = object as Tank;
                         this.playerService.setPlayerTankId(tank.playerId, null);
-                        if (tank.flagTeamId !== null && tank.flagColor !== null) {
-                            const flag = new Flag({
-                                position: tank.position,
-                                teamId: tank.flagTeamId,
-                                color: tank.flagColor,
-                                flagType: FlagType.POLE_ONLY,
-                                sourceId: tank.flagSourceId,
-                            });
-                            this.gameObjectService.registerObject(flag);
+                        const flag = this.flagService.createFlagForTank(tank);
+                        if (flag === null) {
+                            break;
                         }
+
+                        this.gameObjectService.registerObject(flag);
                         break;
                     }
                     case GameObjectType.BULLET: {
@@ -368,7 +356,8 @@ export class GameServer {
         this.tankService.emitter.on(TankServiceEvent.TANK_REQUESTED_BULLET_SPAWN,
             (tankId: number) => {
                 const tank = this.tankService.getTank(tankId);
-                this.bulletService.spawnBulletForTank(tank);
+                const bullet = this.bulletService.createBulletForTank(tank);
+                this.gameObjectService.registerObject(bullet);
             });
 
         this.tankService.emitter.on(TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN,
@@ -389,14 +378,6 @@ export class GameServer {
         this.flagService.emitter.on(FlagServiceEvent.FLAG_UPDATED,
             (flagId: number, flagOptions: PartialFlagOptions) => {
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_CHANGED, flagId, flagOptions]);
-            });
-
-        /**
-         * BulletService event handlers
-         */
-        this.bulletService.emitter.on(BulletServiceEvent.BULLET_SPAWNED,
-            (bullet: Bullet) => {
-                this.gameObjectService.registerObject(bullet);
             });
 
         /**

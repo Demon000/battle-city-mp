@@ -6,21 +6,11 @@ import { DirectionUtils } from '@/physics/collisions/DirectionUtils';
 import { Direction } from '@/physics/Direction';
 import { Tank } from '@/tank/Tank';
 import { MapRepository } from '@/utils/MapRepository';
-import EventEmitter from 'eventemitter3';
 import { Bullet } from './Bullet';
 import { BulletPower } from './BulletPower';
 
-export enum BulletServiceEvent {
-    BULLET_SPAWNED = 'bullet-spawned',
-}
-
-export interface BulletServiceEvents {
-    [BulletServiceEvent.BULLET_SPAWNED]: (bullet: Bullet) => void,
-}
-
 export class BulletService {
     private repository;
-    emitter = new EventEmitter<BulletServiceEvents>();
 
     constructor(repository: MapRepository<number, GameObject>) {
         this.repository = repository;
@@ -82,7 +72,7 @@ export class BulletService {
         return box;
     }
 
-    spawnBulletForTank(tank: Tank): void {
+    createBulletForTank(tank: Tank): Bullet {
         const objectCenterPosition = tank.centerPosition;
         const bullet = new Bullet({
             direction: tank.direction,
@@ -101,6 +91,6 @@ export class BulletService {
             x: bulletX,
         };
 
-        this.emitter.emit(BulletServiceEvent.BULLET_SPAWNED, bullet);
+        return bullet;
     }
 }

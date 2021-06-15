@@ -1,5 +1,6 @@
 import { GameObject } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
+import { Tank } from '@/tank/Tank';
 import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import { Flag, FlagType, PartialFlagOptions } from './Flag';
@@ -18,6 +19,20 @@ export class FlagService {
 
     constructor(repository: MapRepository<number, GameObject>) {
         this.repository = repository;
+    }
+
+    createFlagForTank(tank: Tank): Flag | null {
+        if (tank.flagTeamId === null || tank.flagColor === null) {
+            return null;
+        }
+
+        return new Flag({
+            position: tank.position,
+            teamId: tank.flagTeamId,
+            color: tank.flagColor,
+            flagType: FlagType.POLE_ONLY,
+            sourceId: tank.flagSourceId,
+        });
     }
 
     getFlag(flagId: number): Flag {
