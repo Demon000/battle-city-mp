@@ -8,7 +8,6 @@ import { LazyIterable } from '@/utils/LazyIterable';
 import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import { Tank, PartialTankOptions } from './Tank';
-import { TankTier } from './TankTier';
 
 export enum TankServiceEvent {
     TANK_REQUESTED_BULLET_SPAWN = 'tank-requested-bullet-spawn',
