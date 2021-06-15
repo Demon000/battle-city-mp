@@ -38,11 +38,11 @@ import JSON5 from 'json5';
 import { GameModeService } from '@/game-mode/GameModeService';
 import { assertType } from 'typescript-is';
 import fs from 'fs';
-import { EntityFactory } from '@/entity/EntityFactory';
-import { Registry } from '@/ecs/Registry';
-import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
-import { ComponentRegistry } from '@/components/ComponentRegistry';
-import { EntityBlueprint } from '@/entity/EntityBlueprint';
+// import { EntityFactory } from '@/entity/EntityFactory';
+// import { Registry } from '@/ecs/Registry';
+// import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
+// import { ComponentRegistry } from '@/components/ComponentRegistry';
+// import { EntityBlueprint } from '@/entity/EntityBlueprint';
 import { FlagType, PartialFlagOptions } from '@/flag/Flag';
 import { FlagService, FlagServiceEvent } from '@/flag/FlagService';
 import { PlayerPointsEvent } from '@/player/PlayerPoints';
@@ -53,11 +53,11 @@ export interface GameServerEvents {
 }
 
 export class GameServer {
-    private registry;
-    private entityFactory;
-    private componentRegistry;
+    // private registry;
+    // private entityFactory;
+    // private componentRegistry;
 
-    private entityBlueprints;
+    // private entityBlueprints;
 
     private gameModesPropertiesText;
     private gameModesPropertiesData;
@@ -83,14 +83,14 @@ export class GameServer {
     emitter = new EventEmitter<GameServerEvents>();
 
     constructor() {
-        const RegistryIdGenerator = new RegistryNumberIdGenerator();
-        this.registry = new Registry(RegistryIdGenerator);
+        // const RegistryIdGenerator = new RegistryNumberIdGenerator();
+        // this.registry = new Registry(RegistryIdGenerator);
 
-        const entitiesBlueprintText = fs.readFileSync('./entity/entities-blueprint.json5', 'utf8');
-        const entitiesBlueptintData = JSON5.parse(entitiesBlueprintText);
-        this.componentRegistry = new ComponentRegistry();
-        this.entityBlueprints = new EntityBlueprint(this.componentRegistry, entitiesBlueptintData);
-        this.entityFactory = new EntityFactory(this.registry, this.entityBlueprints);
+        // const entitiesBlueprintText = fs.readFileSync('./entity/entities-blueprint.json5', 'utf8');
+        // const entitiesBlueptintData = JSON5.parse(entitiesBlueprintText);
+        // this.componentRegistry = new ComponentRegistry();
+        // this.entityBlueprints = new EntityBlueprint(this.componentRegistry, entitiesBlueptintData);
+        // this.entityFactory = new EntityFactory(this.registry, this.entityBlueprints);
 
         this.gameModesPropertiesText = fs.readFileSync('./game-mode/game-modes-properties.json5', 'utf8');
         this.gameModesPropertiesData = JSON5.parse(this.gameModesPropertiesText);
