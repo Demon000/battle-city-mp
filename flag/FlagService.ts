@@ -13,6 +13,13 @@ export interface FlagServiceEvents {
     [FlagServiceEvent.FLAG_UPDATED]: (flagId: number, options: PartialFlagOptions) => void,
 }
 
+export enum FlagTankInteraction {
+    STEAL,
+    PICK,
+    CAPTURE,
+    RETURN,
+}
+
 export class FlagService {
     private repository;
     emitter = new EventEmitter<FlagServiceEvents>();
@@ -51,5 +58,25 @@ export class FlagService {
         this.emitter.emit(FlagServiceEvent.FLAG_UPDATED, flagId, {
             flagType: type,
         });
+    }
+
+    getFlagTankInteractionType(flag: Flag, tank: Tank): FlagTankInteraction | null {
+        if (tank.flagTeamId === null) {
+            if (tank.teamId !== flag.teamId && flag.flagType === FlagType.FULL) {
+                return FlagTankInteraction.STEAL;
+            } else if (flag.flagType === FlagType.POLE_ONLY) {
+                return FlagTankInteraction.PICK;
+            }
+        }
+
+        if (tank.flagTeamId !== null && tank.teamId === flag.teamId) {
+            if (tank.flagTeamId === tank.teamId && flag.flagType === FlagType.BASE_ONLY) {
+                return FlagTankInteraction.RETURN;
+            } else if (tank.flagTeamId !== tank.teamId && flag.flagType === FlagType.FULL) {
+                return FlagTankInteraction.CAPTURE;
+            }
+        }
+
+        return null;
     }
 }

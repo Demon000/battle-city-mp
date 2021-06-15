@@ -44,7 +44,7 @@ import fs from 'fs';
 // import { ComponentRegistry } from '@/components/ComponentRegistry';
 // import { EntityBlueprint } from '@/entity/EntityBlueprint';
 import { FlagType, PartialFlagOptions } from '@/flag/Flag';
-import { FlagService, FlagServiceEvent } from '@/flag/FlagService';
+import { FlagService, FlagServiceEvent, FlagTankInteraction } from '@/flag/FlagService';
 import { PlayerPointsEvent } from '@/player/PlayerPoints';
 
 export interface GameServerEvents {
@@ -520,29 +520,31 @@ export class GameServer {
             (tankId: number, flagId: number) => {
                 const tank = this.tankService.getTank(tankId);
                 const flag = this.flagService.getFlag(flagId);
+                const interaction = this.flagService.getFlagTankInteractionType(flag, tank);
 
-                if (tank.flagTeamId === null) {
-                    if (tank.teamId !== flag.teamId && flag.flagType === FlagType.FULL) {
+                switch (interaction) {
+                    case FlagTankInteraction.STEAL:
                         this.tankService.setTankFlag(tankId, flag.teamId, flag.color, flag.id);
                         this.flagService.setFlagType(flagId, FlagType.BASE_ONLY);
-                    } else if (flag.flagType === FlagType.POLE_ONLY) {
+                        break;
+                    case FlagTankInteraction.PICK:
                         this.tankService.setTankFlag(tankId, flag.teamId, flag.color, flag.sourceId);
                         this.gameObjectService.setObjectDestroyed(flagId);
-                    }
-                }
-
-                if (tank.flagTeamId !== null && tank.teamId === flag.teamId) {
-                    if (tank.flagTeamId === tank.teamId && flag.flagType === FlagType.BASE_ONLY) {
+                        break;
+                    case FlagTankInteraction.RETURN:
                         this.tankService.clearTankFlag(tankId);
                         this.flagService.setFlagType(flagId, FlagType.FULL);
                         this.playerService.addPlayerPoints(tank.playerId, PlayerPointsEvent.RETURN_FLAG);
-                    } else if (tank.flagTeamId !== tank.teamId && flag.flagType === FlagType.FULL) {
+                        break;
+                    case FlagTankInteraction.CAPTURE:
                         this.playerService.addPlayerPoints(tank.playerId, PlayerPointsEvent.CAPTURE_FLAG);
                         if (tank.flagSourceId !== null) {
                             this.flagService.setFlagType(tank.flagSourceId, FlagType.FULL);
                         }
                         this.tankService.clearTankFlag(tankId);
-                    }
+                        break;
+                    default:
+                        break;
                 }
             });
 
