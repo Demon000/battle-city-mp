@@ -93,23 +93,7 @@ export class CollisionService {
         return this.boundingBoxRepository.getBoxOverlappingValues(box);
     }
 
-    objectsCompareLtr(first: GameObject, second: GameObject): number {
-        return first.position.x - second.position.x;
-    }
-
-    objectsCompareRtl(first: GameObject, second: GameObject): number {
-        return second.position.x - first.position.x;
-    }
-
-    objectsCompareUtd(first: GameObject, second: GameObject): number {
-        return first.position.y - second.position.y;
-    }
-
-    objectsCompareDtu(first: GameObject, second: GameObject): number {
-        return second.position.y - first.position.y;
-    }
-
-    isPositionCloserToDirection(newPosition: Point, oldPosition: Point, direction: Direction): boolean {
+    private isPositionCloserToDirection(newPosition: Point, oldPosition: Point, direction: Direction): boolean {
         switch (direction) {
             case Direction.UP:
                 if (newPosition.y > oldPosition.y) {
@@ -136,7 +120,7 @@ export class CollisionService {
         return false;
     }
 
-    snapObjectToBoundingBoxEdge(
+    private snapObjectToBoundingBoxEdge(
         object: GameObject,
         position: Point,
         box: BoundingBox,
@@ -158,7 +142,7 @@ export class CollisionService {
         }
     }
 
-    isObjectOverlapping(
+    private isObjectOverlapping(
         isValidPosition: boolean,
         preventedBoundingBox: BoundingBox,
         movedBoundingBox: BoundingBox,
@@ -177,7 +161,7 @@ export class CollisionService {
         return false;
     }
 
-    _validateObjectMovement(movingObject: GameObject, position: Point, direction?: Direction, trySnapping=true): void {
+    private _validateObjectMovement(movingObject: GameObject, position: Point, direction?: Direction, trySnapping=true): void {
         if (this.rulesMap === undefined) {
             throw new Error('Cannot validate object movement when rules map is not set');
         }
@@ -291,7 +275,7 @@ export class CollisionService {
         this._validateObjectMovement(movingObject, position, direction, trySnapping);
     }
 
-    calculateSnappedCoordinates(value: number, snapping: number): number {
+    private calculateSnappedCoordinates(value: number, snapping: number): number {
         const overSnapping = value % snapping;
         let snapped = value - overSnapping;
         if (overSnapping > snapping / 2) {
