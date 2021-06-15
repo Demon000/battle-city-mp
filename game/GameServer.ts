@@ -43,7 +43,7 @@ import { Registry } from '@/ecs/Registry';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { ComponentRegistry } from '@/components/ComponentRegistry';
 import { EntityBlueprint } from '@/entity/EntityBlueprint';
-import { Flag, FlagType, PartialFlagOptions } from '@/flag/Flag';
+import { FlagType, PartialFlagOptions } from '@/flag/Flag';
 import { FlagService, FlagServiceEvent } from '@/flag/FlagService';
 import { PlayerPointsEvent } from '@/player/PlayerPoints';
 
