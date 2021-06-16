@@ -301,8 +301,9 @@ export default class Settings extends Vue {
     padding: 32px;
 }
 
-.inputs-container.inline > * {
-    display: inline-block;
+
+.inputs-container.inline {
+    display: flex;
     vertical-align: top;
 }
 
@@ -310,9 +311,9 @@ export default class Settings extends Vue {
     margin-left: 16px;
 }
 
-.input-wrapper,
-.input-wrapper input {
-    width: 100%;
+.tank-tiers-container .tank-tiers {
+    display: flex;
+    justify-content: space-between;
 }
 
 .tank-tiers-container label,
@@ -329,12 +330,16 @@ export default class Settings extends Vue {
 
     box-sizing: border-box;
     padding: 16px;
-    margin-right: 24px;
     margin-bottom: 24px;
 
     position: relative;
 
     cursor: pointer;
+}
+
+.tank-tiers-container .tier + .tier,
+.player-teams-container .team + .team {
+    margin-left: 24px;
 }
 
 .player-teams-container .team.selected,
