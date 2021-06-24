@@ -200,6 +200,8 @@
             :isTankDead="isTankDead"
             :teams="teams"
             :hasTeams="hasTeams"
+            :playerRequestedSpawnStatus="playerRequestedSpawnStatus"
+            :playerRespawnTimeout="playerRespawnTimeout"
             ref="settingsElement"
             @player-name-change="onPlayerNameChanged"
             @player-team-change="onPlayerTeamChanged"
@@ -221,7 +223,7 @@ import { GameSocketEvents } from '@/game/GameSocketEvent';
 import { GameMapGridSizes } from '@/maps/GameMapGridSizes';
 import { GameObjectType, GameShortObjectType } from '@/object/GameObjectType';
 import { RenderPass } from '@/object/RenderPass';
-import { Player } from '@/player/Player';
+import { Player, PlayerSpawnStatus } from '@/player/Player';
 import { PlayerStats } from '@/player/PlayerStats';
 import { TankTier } from '@/tank/TankTier';
 import { Team } from '@/team/Team';
@@ -272,6 +274,8 @@ export default class App extends Vue {
     tankMaxBullets: number | null = null;
     tankBullets: number | null = null;
     playerTeamId: string | null = null;
+    playerRespawnTimeout: number | null = null;
+    playerRequestedSpawnStatus: PlayerSpawnStatus | null = null;
     hasTankDiedOnce = false;
     isTankDead = true;
     isShowingSettings = false;
@@ -321,6 +325,14 @@ export default class App extends Vue {
         this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_COLOR,
             (color: Color) => {
                 this.tankColor = color;
+            });
+        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT,
+            (respawnTimeout: number) => {
+                this.playerRespawnTimeout = respawnTimeout;
+            });
+        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS,
+            (requestedSpawnStatus: PlayerSpawnStatus) => {
+                this.playerRequestedSpawnStatus = requestedSpawnStatus;
             });
 
         this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,

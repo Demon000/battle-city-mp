@@ -112,16 +112,7 @@
                         class="text-button"
                         @click="onSpawnButtonClick"
                     >
-                        <template
-                            v-if="hasTankDiedOnce"
-                        >
-                            RESPAWN
-                        </template>
-                        <template
-                            v-else
-                        >
-                            SPAWN
-                        </template>
+                        {{ respawnString }}
                     </button>
                 </template>
             </div>
@@ -137,6 +128,7 @@ import { TankTierProperties, tierToPropertiesMap } from '@/tank/Tank';
 import { TankTier } from '@/tank/TankTier';
 import { Vue, Prop, Watch, Options } from 'vue-property-decorator';
 import { Team } from '@/team/Team';
+import { PlayerSpawnStatus } from '@/player/Player';
 
 @Options({
     emits: [
@@ -173,6 +165,12 @@ export default class Settings extends Vue {
 
     @Prop()
     playerTeamId: string | null = null;
+
+    @Prop()
+    playerRequestedSpawnStatus: PlayerSpawnStatus | null = null;
+
+    @Prop()
+    playerRespawnTimeout: number | null = null;
 
     playerName: string | null = null;
 
@@ -249,6 +247,26 @@ export default class Settings extends Vue {
 
         const color = ColorUtils.getColorFromRgb(rgb);
         this.$emit('tank-color-change', color);
+    }
+
+    get respawnString(): string {
+        let str = '';
+
+        if (this.hasTankDiedOnce) {
+            str += 'Respawn';
+        } else {
+            str += 'Spawn';
+        }
+
+        if (this.playerRequestedSpawnStatus === PlayerSpawnStatus.SPAWN) {
+            str += `ing in ${this.playerRespawnTimeout} seconds`;
+        } else {
+            if (this.playerRespawnTimeout !== null && this.playerRespawnTimeout > 0) {
+                str += ` in ${this.playerRespawnTimeout} seconds`;
+            }
+        }
+
+        return str.toUpperCase();
     }
 
     @Watch('playerName')

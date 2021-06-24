@@ -9,7 +9,7 @@ import { GameObject, GameObjectOptions, PartialGameObjectOptions } from '../obje
 import { GameObjectService, GameObjectServiceEvent } from '../object/GameObjectService';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
 import { CollisionService } from '../physics/collisions/CollisionService';
-import { Player, PartialPlayerOptions, PlayerOptions } from '../player/Player';
+import { Player, PartialPlayerOptions, PlayerOptions, PlayerSpawnStatus } from '../player/Player';
 import { PlayerService, PlayerServiceEvent } from '../player/PlayerService';
 import { GameMapEditorService } from '@/maps/GameMapEditorService';
 import { GameObjectType } from '@/object/GameObjectType';
@@ -26,6 +26,7 @@ import { GameObjectAudioRendererFactory } from '@/object/GameObjectAudioRenderer
 import { TankTier } from '@/tank/TankTier';
 import { Color } from '@/drawable/Color';
 import { PartialTankOptions } from '@/tank/Tank';
+import { Config } from '@/config/Config';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -42,6 +43,8 @@ export enum GameClientEvent {
     OWN_PLAYER_TANK_CHANGED_HEALTH = 'own-player-tank-changed-health',
     OWN_PLAYER_TANK_CHANGED_MAX_BULLETS = 'own-player-tank-changed-max-bullets',
     OWN_PLAYER_TANK_CHANGED_BULLETS = 'own-player-tank-changed-bullets',
+    OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT = 'own-player-changed-respawn-timeout',
+    OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS = 'own-player-changed-requested-spawn-status',
 }
 
 export interface GameClientEvents {
@@ -59,9 +62,12 @@ export interface GameClientEvents {
     [GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH]: (health: number) => void,
     [GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS]: (maxBullets: number) => void,
     [GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS]: (bullets: number) => void,
+    [GameClientEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT]: (respawnTimeout: number) => void,
+    [GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS]: (requestedSpawnStatus: PlayerSpawnStatus) => void,
 }
 
 export class GameClient {
+    private config;
     private gameObjectFactory;
     private playerRepository;
     private playerService;
@@ -81,6 +87,7 @@ export class GameClient {
     ticker;
 
     constructor(canvases: HTMLCanvasElement[]) {
+        this.config = new Config();
         this.gameObjectFactory = new GameObjectFactory();
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>();
@@ -88,7 +95,7 @@ export class GameClient {
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
         this.tankService = new TankService(this.gameObjectRepository);
         this.playerRepository = new MapRepository<string, Player>();
-        this.playerService = new PlayerService(this.playerRepository);
+        this.playerService = new PlayerService(this.config, this.playerRepository);
         this.teamRepository = new MapRepository<string, Team>();
         this.teamService = new TeamService(this.teamRepository);
         this.gameCamera = new GameCamera();
@@ -129,6 +136,14 @@ export class GameClient {
         this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_COLOR,
             (color: Color) => {
                 this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_TANK_COLOR, color);
+            });
+        this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT,
+            (respawnTimeout: number) => {
+                this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT, respawnTimeout);
+            });
+        this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS,
+            (requestedSpawnStatus: PlayerSpawnStatus) => {
+                this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS, requestedSpawnStatus);
             });
 
         this.tankService.emitter.on(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,

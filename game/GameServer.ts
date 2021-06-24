@@ -46,6 +46,7 @@ import fs from 'fs';
 import { FlagType, PartialFlagOptions } from '@/flag/Flag';
 import { FlagService, FlagServiceEvent, FlagTankInteraction } from '@/flag/FlagService';
 import { PlayerPointsEvent } from '@/player/PlayerPoints';
+import { Config } from '@/config/Config';
 
 export interface GameServerEvents {
     [GameEvent.BROADCAST_BATCH]: (events: BroadcastBatchGameEvent[]) => void,
@@ -59,6 +60,7 @@ export class GameServer {
 
     // private entityBlueprints;
 
+    private config;
     private gameModesPropertiesText;
     private gameModesPropertiesData;
     private gameModesProperties;
@@ -92,6 +94,9 @@ export class GameServer {
         // this.entityBlueprints = new EntityBlueprint(this.componentRegistry, entitiesBlueptintData);
         // this.entityFactory = new EntityFactory(this.registry, this.entityBlueprints);
 
+        this.config = new Config();
+        this.config.loadAll('./configs');
+
         this.gameModesPropertiesText = fs.readFileSync('./game-mode/game-modes-properties.json5', 'utf8');
         this.gameModesPropertiesData = JSON5.parse(this.gameModesPropertiesText);
         this.gameModesProperties = assertType<GameModesProperties>(this.gameModesPropertiesData);
@@ -108,7 +113,7 @@ export class GameServer {
         this.bulletService = new BulletService(this.gameObjectRepository);
         this.gameMapService = new GameMapService();
         this.playerRepository = new MapRepository<string, Player>();
-        this.playerService = new PlayerService(this.playerRepository);
+        this.playerService = new PlayerService(this.config, this.playerRepository);
         this.teamRepository = new MapRepository<string, Team>();
         this.teamService = new TeamService(this.teamRepository);
         this.gameEventBatcher = new GameEventBatcher();
@@ -566,7 +571,7 @@ export class GameServer {
          */
         this.ticker.emitter.on(TickerEvent.TICK,
             (deltaSeconds: number) => {
-                this.playerService.processPlayersStatus();
+                this.playerService.processPlayersStatus(deltaSeconds);
                 this.tankService.processTanksStatus();
                 this.gameObjectService.processObjectsStatus(deltaSeconds);
                 this.gameEventBatcher.flush();

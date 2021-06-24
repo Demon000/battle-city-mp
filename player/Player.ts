@@ -13,6 +13,8 @@ export interface PlayerOptions {
     points?: number;
     requestedTankTier?: TankTier;
     requestedTankColor?: Color;
+    respawnTimeout?: number;
+    requestedSpawnStatus?: PlayerSpawnStatus;
 }
 
 export type PartialPlayerOptions = Partial<PlayerOptions>;
@@ -27,7 +29,8 @@ export class Player {
     map = new Map<ButtonType, ButtonPressAction>();
     lastRequestedDirection: Direction | undefined;
     lastIsShooting = false;
-    requestedSpawnStatus = PlayerSpawnStatus.NONE;
+    requestedSpawnStatus: PlayerSpawnStatus;
+    dirtyRequestedSpawnStatus = false;
     requestedServerStatus = false;
     requestedTankTier: TankTier;
     requestedTankColor: Color;
@@ -40,6 +43,7 @@ export class Player {
     deaths: number;
     points: number;
     mapEditorEnabled = false;
+    respawnTimeout;
 
     constructor(options: PlayerOptions) {
         this.id = options.id;
@@ -51,6 +55,8 @@ export class Player {
         this.points = options.points ?? 0;
         this.requestedTankTier = options.requestedTankTier ?? TankTier.NORMAL;
         this.requestedTankColor = options.requestedTankColor ?? [231, 156, 33];
+        this.requestedSpawnStatus = options.requestedSpawnStatus ?? PlayerSpawnStatus.NONE;
+        this.respawnTimeout = options.respawnTimeout ?? 0;
     }
 
     get displayName(): string {
@@ -68,6 +74,8 @@ export class Player {
             points: this.points,
             requestedTankColor: this.requestedTankColor,
             requestedTankTier: this.requestedTankTier,
+            respawnTimeout: this.respawnTimeout,
+            requestedSpawnStatus: this.requestedSpawnStatus,
         };
     }
 
@@ -80,5 +88,7 @@ export class Player {
         if (options.points !== undefined) this.points = options.points;
         if (options.requestedTankTier !== undefined) this.requestedTankTier = options.requestedTankTier;
         if (options.requestedTankColor !== undefined) this.requestedTankColor = options.requestedTankColor;
+        if (options.respawnTimeout !== undefined) this.respawnTimeout = options.respawnTimeout;
+        if (options.requestedSpawnStatus !== undefined) this.requestedSpawnStatus = options.requestedSpawnStatus;
     }
 }

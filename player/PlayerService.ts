@@ -1,3 +1,4 @@
+import { Config } from '@/config/Config';
 import { Color } from '@/drawable/Color';
 import { TankTier } from '@/tank/TankTier';
 import { MapRepository } from '@/utils/MapRepository';
@@ -25,6 +26,8 @@ export enum PlayerServiceEvent {
     OWN_PLAYER_CHANGED_TEAM_ID = 'own-player-changd-team-id',
     OWN_PLAYER_CHANGED_TANK_TIER = 'own-player-changed-tank-tier',
     OWN_PLAYER_CHANGED_TANK_COLOR = 'own-player-changed-tank-color',
+    OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT = 'own-player-changed-respawn-timeout',
+    OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS = 'own-player-changed-requested-spawn-status',
 }
 
 export interface PlayerServiceEvents {
@@ -42,16 +45,18 @@ export interface PlayerServiceEvents {
     [PlayerServiceEvent.OWN_PLAYER_CHANGED_TEAM_ID]: (teamId: string | null) => void,
     [PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_TIER]: (tier: TankTier) => void,
     [PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_COLOR]: (color: Color) => void,
+    [PlayerServiceEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT]: (respawnTimeout: number) => void,
+    [PlayerServiceEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS]: (requestedSpawnStatus: PlayerSpawnStatus) => void,
 }
 
 export class PlayerService {
-    private repository;
     private ownPlayerId?: string;
     emitter = new EventEmitter<PlayerServiceEvents>();
 
-    constructor(repository: MapRepository<string, Player>) {
-        this.repository = repository;
-    }
+    constructor(
+        private config: Config,
+        private repository: MapRepository<string, Player>,
+    ) {}
 
     getPlayer(playerId: string): Player {
         return this.repository.get(playerId);
@@ -106,6 +111,9 @@ export class PlayerService {
 
         player.tankId = tankId;
 
+        if (player.tankId === null) {
+            player.respawnTimeout = this.config.get('player', 'respawnTimeout');
+        }
 
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
             tankId,
@@ -139,6 +147,16 @@ export class PlayerService {
                 this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_COLOR,
                     playerOptions.requestedTankColor);
             }
+
+            if (playerOptions.respawnTimeout !== undefined) {
+                this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT,
+                    playerOptions.respawnTimeout);
+            }
+
+            if (playerOptions.requestedSpawnStatus !== undefined) {
+                this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS,
+                    playerOptions.requestedSpawnStatus);
+            }
         }
     }
 
@@ -168,6 +186,7 @@ export class PlayerService {
     setPlayerRequestedSpawnStatus(playerId: string, spawnStatus: PlayerSpawnStatus): void {
         const player = this.repository.get(playerId);
         player.requestedSpawnStatus = spawnStatus;
+        player.dirtyRequestedSpawnStatus = true;
     }
 
     setPlayerRequestedDisconnect(playerId: string): void {
@@ -284,12 +303,37 @@ export class PlayerService {
     }
 
     private processPlayerSpawnStatus(player: Player): void {
-        if ((player.requestedSpawnStatus === PlayerSpawnStatus.SPAWN && player.tankId === null)
-            || (player.requestedSpawnStatus === PlayerSpawnStatus.DESPAWN && player.tankId !== null)) {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_SPAWN_STATUS, player.id, player.requestedSpawnStatus);
+        if (player.dirtyRequestedSpawnStatus) {
+            this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player.id, {
+                requestedSpawnStatus: player.requestedSpawnStatus,
+            });
+
+            player.dirtyRequestedSpawnStatus =  false;
         }
 
+        let handleRequestedSpawnStatus = false;
+        if (player.requestedSpawnStatus === PlayerSpawnStatus.SPAWN
+            && player.tankId === null
+            && player.respawnTimeout == 0) {
+            handleRequestedSpawnStatus = true;
+        }
+
+        if (player.requestedSpawnStatus === PlayerSpawnStatus.DESPAWN
+            && player.tankId !== null) {
+            handleRequestedSpawnStatus = true;
+        }
+
+        if (!handleRequestedSpawnStatus) {
+            return;
+        }
+
+        this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_SPAWN_STATUS, player.id, player.requestedSpawnStatus);
+
         player.requestedSpawnStatus = PlayerSpawnStatus.NONE;
+
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player.id, {
+            requestedSpawnStatus: player.requestedSpawnStatus,
+        });
     }
 
     private processPlayerDisconnectStatus(player: Player): boolean {
@@ -328,9 +372,33 @@ export class PlayerService {
         player.requestedServerStatus = false;
     }
 
-    processPlayersStatus(): void {
+    private processPlayerRespawnTimeout(player: Player, deltaSeconds: number): void {
+        if (player.tankId !== null) {
+            return;
+        }
+
+        if (player.respawnTimeout == 0) {
+            return;
+        }
+
+        const oldRespawnTimeout = Math.floor(player.respawnTimeout);
+        player.respawnTimeout -= deltaSeconds;
+        if (player.respawnTimeout < 0) {
+            player.respawnTimeout = 0;
+        }
+        const newRespawnTimeout = Math.floor(player.respawnTimeout);
+
+        if (oldRespawnTimeout !== newRespawnTimeout) {
+            this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player.id, {
+                respawnTimeout: newRespawnTimeout,
+            });
+        }
+    }
+
+    processPlayersStatus(deltaSeconds: number): void {
         const players = this.repository.getAll();
         for (const player of players) {
+            this.processPlayerRespawnTimeout(player, deltaSeconds);
             this.processPlayerSpawnStatus(player);
             const disconnected = this.processPlayerDisconnectStatus(player);
             if (disconnected) {
