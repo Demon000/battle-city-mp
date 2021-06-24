@@ -21,8 +21,6 @@ export enum PlayerServiceEvent {
     PLAYER_REQUESTED_SERVER_STATUS = 'player-requested-server-status',
 
     OWN_PLAYER_ADDED = 'own-player-added',
-    OWN_PLAYER_SPAWNED = 'own-player-spawned',
-    OWN_PLAYER_DESPAWNED = 'own-player-despawned',
     OWN_PLAYER_CHANGED_TANK_ID = 'own-player-changd-tank-id',
     OWN_PLAYER_CHANGED_TEAM_ID = 'own-player-changd-team-id',
     OWN_PLAYER_CHANGED_TANK_TIER = 'own-player-changed-tank-tier',
@@ -108,9 +106,6 @@ export class PlayerService {
 
         player.tankId = tankId;
 
-        if (player.id === this.ownPlayerId) {
-            this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_ID, tankId);
-        }
 
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
             tankId,
@@ -155,10 +150,6 @@ export class PlayerService {
 
         player.teamId = teamId;
 
-        if (player.id === this.ownPlayerId) {
-            this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_CHANGED_TEAM_ID, teamId);
-        }
-
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
             teamId,
         });
@@ -197,10 +188,6 @@ export class PlayerService {
 
         player.requestedTankTier = tier;
 
-        if (player.id === this.ownPlayerId) {
-            this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_TIER, tier);
-        }
-
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
             requestedTankTier: tier,
         });
@@ -213,10 +200,6 @@ export class PlayerService {
         }
 
         player.requestedTankColor = color;
-
-        if (player.id === this.ownPlayerId) {
-            this.emitter.emit(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_COLOR, color);
-        }
 
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
             requestedTankColor: color,

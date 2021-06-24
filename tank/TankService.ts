@@ -110,11 +110,6 @@ export class TankService {
             tank.bulletIds.splice(bulletIndex, 1);
         }
 
-        if (tankId === this.ownPlayerTankId) {
-            this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
-                tank.bulletIds.length);
-        }
-
         this.emitter.emit(TankServiceEvent.TANK_UPDATED, tankId, {
             bulletIds: tank.bulletIds,
         });
@@ -233,10 +228,6 @@ export class TankService {
     decreaseTankHealth(tankId: number, value: number): void {
         const tank = this.getTank(tankId);
         tank.health -= value;
-
-        if (tankId === this.ownPlayerTankId) {
-            this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_HEALTH, tank.health);
-        }
 
         this.emitter.emit(TankServiceEvent.TANK_UPDATED, tankId, {
             health: tank.health,
