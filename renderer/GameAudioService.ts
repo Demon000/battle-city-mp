@@ -111,7 +111,11 @@ export class GameAudioService {
 
     clear(): void {
         for (const object of this.objectsPlayingAudioEffects) {
-            const audioRenderer = this.getOrCreateAudioRenderer(object);
+            const audioRenderer = this.findAudioRenderer(object);
+            if (audioRenderer === undefined) {
+                return;
+            }
+
             audioRenderer.stop();
         }
     }
