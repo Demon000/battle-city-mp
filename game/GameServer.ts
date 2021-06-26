@@ -85,7 +85,7 @@ export class GameServer {
 
     emitter = new EventEmitter<GameServerEvents>();
 
-    constructor() {
+    constructor(mapName: string, gameMode: string) {
         // const RegistryIdGenerator = new RegistryNumberIdGenerator();
         // this.registry = new Registry(RegistryIdGenerator);
 
@@ -506,10 +506,6 @@ export class GameServer {
             (roundTime: number) => {
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.ROUND_TIME_UPDATED, roundTime]);
             });
-        this.timeService.emitter.on(TimeServiceEvent.ROUND_ENDED,
-            () => {
-                this.reloadMapAndGameMode();
-            });
 
         /**
          * Game Event Batcher event handlers
@@ -533,10 +529,15 @@ export class GameServer {
                 this.tankService.processTanksStatus();
                 this.gameObjectService.processObjectsStatus(deltaSeconds);
                 this.timeService.decreaseRoundTime(deltaSeconds);
+                if (this.timeService.isRoundEnded()) {
+                    this.reload();
+                }
                 this.gameEventBatcher.flush();
             });
 
-        this.reloadMapAndGameMode();
+        this.gameModeService.setGameMode(gameMode);
+        this.gameMapService.loadFromFile(mapName);
+        this.reload();
     }
 
     sendRequestedServerStatus(playerId?: string): void {
@@ -696,10 +697,6 @@ export class GameServer {
         this.playerService.setPlayerRequestedTankTier(playerId, tier);
     }
 
-    clear(): void {
-
-    }
-
     loadMap(gameMap: GameMap): void {
         const objectsOptions = gameMap.getObjectsOptions();
         const objects = objectsOptions
@@ -717,11 +714,19 @@ export class GameServer {
         this.teamService.addTeams(teams);
     }
 
-    reloadMapAndGameMode(): void {
-        this.gameModeService.setGameMode('deathmatch');
-        const gameMap = this.gameMapService.loadFromFile('./maps/simple.json');
+    reload(): void {
+        this.ticker.stop();
+
+        this.gameObjectService.unregisterAll();
+        this.playerService.resetFields();
+
+        const gameMap = this.gameMapService.getLoadedMap();
+        if (gameMap === undefined) {
+            throw new Error('Cannot reload game without a loaded map');
+        }
         this.loadMap(gameMap);
+
+        this.ticker.start();
         this.timeService.restartRoundTime();
-        this.sendRequestedServerStatus();
     }
 }

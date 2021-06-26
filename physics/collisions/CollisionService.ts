@@ -308,4 +308,8 @@ export class CollisionService {
             }, oldDirection, false);
         }
     }
+
+    clear(): void {
+        this.boundingBoxRepository.clear();
+    }
 }

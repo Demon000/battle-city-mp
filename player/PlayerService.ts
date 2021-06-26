@@ -103,6 +103,19 @@ export class PlayerService {
         this.addPlayer(player);
     }
 
+    private setPlayerRespawnTimeout(player: Player, respawnTimeout: number): void {
+        const oldRespawnTimeout = Math.floor(player.respawnTimeout);
+        const newRespawnTimeout = Math.floor(respawnTimeout);
+        if (oldRespawnTimeout === newRespawnTimeout) {
+            return;
+        }
+
+        player.respawnTimeout = respawnTimeout;
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player.id, {
+            respawnTimeout: newRespawnTimeout,
+        });
+    }
+
     setPlayerTankId(playerId: string, tankId: number | null): void {
         const player = this.repository.get(playerId);
         if (player.tankId === tankId) {
@@ -112,7 +125,8 @@ export class PlayerService {
         player.tankId = tankId;
 
         if (player.tankId === null) {
-            player.respawnTimeout = this.config.get('player', 'respawnTimeout');
+            const respawnTimeout = this.config.get<number>('player', 'respawnTimeout');
+            this.setPlayerRespawnTimeout(player, respawnTimeout);
         }
 
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
@@ -235,12 +249,23 @@ export class PlayerService {
         }
     }
 
+    private setPlayerPoints(player: Player, points: number): void {
+        player.points = points;
+
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player.id, {
+            points: player.points,
+        });
+    }
+
     addPlayerPoints(playerId: string, event: PlayerPointsEvent): void {
         const player = this.repository.get(playerId);
-        player.points += PlayerPoints[event];
+        this.setPlayerPoints(player, player.points + PlayerPoints[event]);
+    }
 
-        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
-            points: player.points,
+    private setPlayerKills(player: Player, kills: number): void {
+        player.kills = kills;
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player.id, {
+            kills: player.kills,
         });
     }
 
@@ -248,24 +273,23 @@ export class PlayerService {
         const player = this.repository.get(playerId);
 
         this.addPlayerPoints(playerId, PlayerPointsEvent.KILL);
-
-        player.kills += 1;
-        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
-            kills: player.kills,
-        });
+        this.setPlayerKills(player, player.kills + 1);
 
         this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
+    }
+
+    private setPlayerDeaths(player: Player, deaths: number): void {
+        player.deaths = deaths;
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player.id, {
+            deaths: player.deaths,
+        });
     }
 
     addPlayerDeath(playerId: string): void {
         const player = this.repository.get(playerId);
 
         this.addPlayerPoints(playerId, PlayerPointsEvent.DEATH);
-
-        player.deaths += 1;
-        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
-            deaths: player.deaths,
-        });
+        this.setPlayerDeaths(player, player.deaths + 1);
 
         this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
     }
@@ -381,18 +405,12 @@ export class PlayerService {
             return;
         }
 
-        const oldRespawnTimeout = Math.floor(player.respawnTimeout);
-        player.respawnTimeout -= deltaSeconds;
-        if (player.respawnTimeout < 0) {
-            player.respawnTimeout = 0;
+        let newRespawnTimeout = player.respawnTimeout - deltaSeconds;
+        if (newRespawnTimeout < 0) {
+            newRespawnTimeout = 0;
         }
-        const newRespawnTimeout = Math.floor(player.respawnTimeout);
 
-        if (oldRespawnTimeout !== newRespawnTimeout) {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player.id, {
-                respawnTimeout: newRespawnTimeout,
-            });
-        }
+        this.setPlayerRespawnTimeout(player, newRespawnTimeout);
     }
 
     processPlayersStatus(deltaSeconds: number): void {
@@ -435,5 +453,16 @@ export class PlayerService {
 
     clear(): void {
         this.repository.clear();
+    }
+
+    resetFields(): void {
+        const players = this.repository.getAll();
+
+        for (const player of players) {
+            this.setPlayerPoints(player, 0);
+            this.setPlayerKills(player, 0);
+            this.setPlayerDeaths(player, 0);
+            this.setPlayerRespawnTimeout(player, 0);
+        }
     }
 }

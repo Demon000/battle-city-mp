@@ -9,6 +9,10 @@ export class GameMapService {
         return this.map = new GameMap(path);
     }
 
+    getLoadedMap(): GameMap | undefined {
+        return this.map;
+    }
+
     setMapObjects(objects: Iterable<GameObject>): void {
         if (this.map === undefined) {
             return;

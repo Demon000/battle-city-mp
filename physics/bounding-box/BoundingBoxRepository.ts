@@ -26,7 +26,7 @@ export class BoundingBoxRepository<V> {
     private getNode(value: V): BoundingBoxNode<V> {
         const node = this.map.get(value);
         if (!node) {
-            throw new Error('Node does not exist for value');
+            throw new Error(`Node does not exist for value: ${value}`);
         }
 
         return node;
@@ -43,7 +43,7 @@ export class BoundingBoxRepository<V> {
 
     addBoxValue(value: V, box: BoundingBox): void {
         if (this.map.has(value)) {
-            throw new Error('Node already exists with value');
+            throw new Error(`Node already exists with value: ${value}`);
         }
 
         const fatBox = this.getFatBox(box);

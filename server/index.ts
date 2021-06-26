@@ -5,12 +5,23 @@ import Express from 'express';
 import Cors from 'cors';
 import Http from 'http';
 import { Server } from 'socket.io';
-import { GameServer } from '@/game/GameServer';
-import yargs from 'yargs';
+import { GameServer, GameServerEvent } from '@/game/GameServer';
+import yargs, { string } from 'yargs';
 import { GameServerSocket } from '@/game/GameServerSocket';
+import { Config } from '@/config/Config';
 
 const argv = yargs(process.argv.slice(2))
     .usage('Usage: $0 [options]')
+    .options('map', {
+        alias: 'm',
+        type: 'string',
+        default: './maps/simple.json',
+    })
+    .options('gamemode', {
+        alias: 'g',
+        type: 'string',
+        default: 'deathmatch',
+    })
     .options('host', {
         alias: 'h',
         type: 'string',
@@ -32,9 +43,8 @@ const serverSocket = new Server(http, {
         origin: '*',
     },
 });
-const gameServer = new GameServer();
+const gameServer = new GameServer(argv.map, argv.gamemode);
 new GameServerSocket(gameServer, serverSocket);
-gameServer.ticker.start();
 
 http.listen(argv.port, argv.host, () => {
     console.log(`Game server listening on ${argv.host}:${argv.port}`);

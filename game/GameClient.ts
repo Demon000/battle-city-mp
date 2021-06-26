@@ -33,7 +33,6 @@ export enum GameClientEvent {
     TEAMS_CHANGED = 'teams-changed',
     MAP_EDITOR_ENABLED_CHANGED = 'map-editor-enabled-changed',
     ROUND_TIME_UPDATED = 'round-time-updated',
-    SERVER_STATUS = 'server-status',
     SCOREBOARD_WATCH_TIME = 'scoreboard-watch-time',
 
     OWN_PLAYER_ADDED = 'own-player-added',
@@ -55,7 +54,6 @@ export interface GameClientEvents {
     [GameClientEvent.TEAMS_CHANGED]: () => void,
     [GameClientEvent.MAP_EDITOR_ENABLED_CHANGED]: (enabled: boolean) => void;
     [GameClientEvent.ROUND_TIME_UPDATED]: (roundTimeSeconds: number) => void;
-    [GameClientEvent.SERVER_STATUS]: () => void;
     [GameClientEvent.SCOREBOARD_WATCH_TIME]: () => void;
 
     [GameClientEvent.OWN_PLAYER_ADDED]: () => void,
@@ -240,10 +238,6 @@ export class GameClient {
     }
 
     onServerStatus(serverStatus: GameServerStatus): void {
-        this.clear();
-
-        this.emitter.emit(GameClientEvent.SERVER_STATUS);
-
         const players =
             LazyIterable.from(serverStatus.playersOptions)
                 .map(o => new Player(o));
@@ -401,14 +395,5 @@ export class GameClient {
 
     onRoundTimeUpdated(roundSeconds: number): void {
         this.timeService.setRoundTime(roundSeconds);
-    }
-
-    clear(): void {
-        this.playerService.clear();
-        this.teamService.clear();
-        this.gameObjectRepository.clear();
-        this.boundingBoxRepository.clear();
-        this.gameAudioService.clear();
-        this.gameCamera.clearPosition();
     }
 }

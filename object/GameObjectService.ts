@@ -75,6 +75,13 @@ export class GameObjectService {
         this.emitter.emit(GameObjectServiceEvent.OBJECT_UNREGISTERED, objectId);
     }
 
+    unregisterAll(): void {
+        const objects = this.repository.getAll();
+        for (const object of objects) {
+            this.unregisterObject(object.id);
+        }
+    }
+
     setObjectPosition(objectId: number, position: Point): void {
         const object = this.repository.get(objectId);
         object.position = position;
@@ -202,5 +209,9 @@ export class GameObjectService {
             this.processObjectDirection(object);
             this.processObjectMovement(object, delta);
         }
+    }
+
+    clear(): void {
+        this.repository.clear();
     }
 }
