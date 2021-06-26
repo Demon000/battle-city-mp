@@ -62,6 +62,9 @@ export class GameClientSocket {
             case GameEvent.OBJECT_UNREGISTERED:
                 this.gameClient.onObjectUnregistered(batch[1]);
                 break;
+            case GameEvent.ROUND_TIME_UPDATED:
+                this.gameClient.onRoundTimeUpdated(batch[1]);
+                break;
             default:
                 throw new Error('Invalid event');
         }

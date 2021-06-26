@@ -10,12 +10,3 @@ export const CLIENT_SOUNDS_RELATIVE_URL: string = process.env
 // eslint-disable-next-line
 export const CLIENT_FONTS_RELATIVE_URL: string = process.env
     .VUE_APP_FONTS_RELATIVE_URL as string;
-// eslint-disable-next-line
-export const CLIENT_CONFIG_VISIBLE_GAME_SIZE: number = Number.parseInt(process.env
-    .VUE_APP_VISIBLE_GAME_SIZE!);
-// eslint-disable-next-line
-export const SERVER_CONFIG_TPS: number = Number.parseInt(process.env
-    .SERVER_TPS!);
-// eslint-disable-next-line
-export const SERVER_CONFIG_ALLOW_MAP_EDITOR: number = Number.parseInt(process.env
-    .ALLOW_MAP_EDITOR!);

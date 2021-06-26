@@ -16,23 +16,29 @@ export enum GameEvent {
 
     SERVER_STATUS = 'server-status',
 
+    ROUND_TIME_UPDATED = 'round-time-updated',
+
     PLAYER_BATCH = 'player-batch',
     BROADCAST_BATCH = 'broadcast-batch',
 }
 
-export type UnicastBatchGameEvent =
+export type CommonBatchGameEvent =
     [name: GameEvent.SERVER_STATUS, serverStatus: GameServerStatus];
 
-export type BroadcastBatchGameEvent =
-    [name: GameEvent.PLAYER_ADDED, playerOptions: PlayerOptions] |
-    [name: GameEvent.PLAYER_CHANGED, playerId: string, playerOptions: PartialPlayerOptions] |
-    [name: GameEvent.PLAYER_REMOVED, playerId: string] |
 
-    [name: GameEvent.TEAM_PLAYER_ADDED, teamId: string, playerId: string] |
-    [name: GameEvent.TEAM_PLAYER_REMOVED, teamId: string, playerId: string] |
+export type UnicastBatchGameEvent = CommonBatchGameEvent;
 
-    [name: GameEvent.OBJECT_REGISTERED, objectOptions: GameObjectOptions] |
-    [name: GameEvent.OBJECT_CHANGED, objectId: number, options: PartialGameObjectOptions] |
-    [name: GameEvent.OBJECT_UNREGISTERED, objectId: number];
+export type BroadcastBatchGameEvent = CommonBatchGameEvent |
+[name: GameEvent.PLAYER_ADDED, playerOptions: PlayerOptions] |
+[name: GameEvent.PLAYER_CHANGED, playerId: string, playerOptions: PartialPlayerOptions] |
+[name: GameEvent.PLAYER_REMOVED, playerId: string] |
+
+[name: GameEvent.TEAM_PLAYER_ADDED, teamId: string, playerId: string] |
+[name: GameEvent.TEAM_PLAYER_REMOVED, teamId: string, playerId: string] |
+
+[name: GameEvent.OBJECT_REGISTERED, objectOptions: GameObjectOptions] |
+[name: GameEvent.OBJECT_CHANGED, objectId: number, options: PartialGameObjectOptions] |
+[name: GameEvent.OBJECT_UNREGISTERED, objectId: number] |
+[name: GameEvent.ROUND_TIME_UPDATED, roundTime: number];
 
 export type BatchGameEvent = UnicastBatchGameEvent | BroadcastBatchGameEvent;

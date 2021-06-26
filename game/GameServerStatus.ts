@@ -6,5 +6,5 @@ export interface GameServerStatus {
     playersOptions: Iterable<PlayerOptions>;
     objectsOptions: Iterable<GameObjectOptions>;
     teamsOptions: Iterable<TeamOptions> | undefined;
-    tps: number;
+    configsData: Record<string, any>;
 }

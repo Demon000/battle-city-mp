@@ -1,17 +1,14 @@
+import { Config } from '@/config/Config';
 import { IGameModeProperties } from '@/game-mode/IGameModeProperties';
 
 export class GameModeService {
-    private gameModesProperties;
     private gameMode?: string;
 
-    constructor(gameModesProperties: Record<string, IGameModeProperties>) {
-        this.gameModesProperties = gameModesProperties;
-    }
+    constructor(
+        private config: Config,
+    ) {}
 
     setGameMode(gameMode: string): void {
-        if (this.gameModesProperties[gameMode] === undefined) {
-            throw new Error(`Cannot find properties for game mode: ${gameMode}`);
-        }
         this.gameMode = gameMode;
     }
 
@@ -24,11 +21,6 @@ export class GameModeService {
             throw new Error('Cannot find properties for undefined game mode');
         }
 
-        const properties = this.gameModesProperties[this.gameMode];
-        if (properties === undefined) {
-            throw new Error(`Cannot find properties for game mode: ${this.gameMode}`);
-        }
-
-        return properties;
+        return this.config.get<IGameModeProperties>('game-modes-properties', this.gameMode);
     }
 }

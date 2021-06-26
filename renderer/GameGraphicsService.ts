@@ -15,10 +15,10 @@ export class GameGraphicsService {
     private canvasX = 0;
     private canvasY = 0;
     private showInvisible = false;
+    private targetGameSize = 0;
 
     constructor(
         private canvases: HTMLCanvasElement[],
-        private targetGameSize: number,
     ) {
         this.initializeContexts();
         this.calculateDimensions();
@@ -32,6 +32,11 @@ export class GameGraphicsService {
             context.imageSmoothingEnabled = false;
             this.contexts.push(context);
         }
+    }
+
+    setTargetGameSize(targetGameSize: number): void {
+        this.targetGameSize = targetGameSize;
+        this.calculateDimensions();
     }
 
     calculateDimensions(): void {
@@ -70,6 +75,10 @@ export class GameGraphicsService {
     }
 
     renderObject(object: GameObject): void {
+        if (this.scale === 0) {
+            return;
+        }
+
         const renderer = this.getObjectRenderer(object);
         const objectRelativeX = Math.floor(object.position.x) - this.canvasX;
         const objectRelativeY = Math.floor(object.position.y) - this.canvasY;

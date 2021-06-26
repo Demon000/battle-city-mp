@@ -1,4 +1,4 @@
-import { CLIENT_CONFIG_VISIBLE_GAME_SIZE, CLIENT_SOUNDS_RELATIVE_URL } from '@/config';
+import { CLIENT_SOUNDS_RELATIVE_URL } from '@/config';
 import { GameObject } from '@/object/GameObject';
 import { GameObjectAudioRenderer } from '@/object/GameObjectAudioRenderer';
 import { GameObjectAudioRendererFactory } from '@/object/GameObjectAudioRendererFactory';
@@ -15,7 +15,7 @@ export class GameAudioService {
     private compressorNode;
     private finalNode;
     private objectsPlayingAudioEffects = new Set<GameObject>();
-    private maxAudibleDistance = CLIENT_CONFIG_VISIBLE_GAME_SIZE / 2;
+    private maxAudibleDistance = 1;
 
     constructor(
         rendererFactory: GameObjectAudioRendererFactory,
@@ -36,6 +36,10 @@ export class GameAudioService {
         } else {
             this.context.listener.setOrientation(-1, 0, 0, 0, 1, 0);
         }
+    }
+
+    setMaxAudibleDistance(maxAudibleDistance: number): void {
+        this.maxAudibleDistance = maxAudibleDistance;
     }
 
     loadAudioEffectBuffer(audioEffect: IAudioEffect): boolean {

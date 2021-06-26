@@ -1,0 +1,4 @@
+{
+    ticksPerSecond: 'vsync',
+    visibleGameSize: 256,
+}

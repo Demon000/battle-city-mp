@@ -1,11 +1,10 @@
 import { Bullet } from '@/bullet/Bullet';
 import { BulletPower } from '@/bullet/BulletPower';
 import { BulletService } from '@/bullet/BulletService';
-import { SERVER_CONFIG_TPS } from '@/config';
 import { Color } from '@/drawable/Color';
 import { Explosion } from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
-import { GameModesProperties, SameTeamBulletHitMode } from '@/game-mode/IGameModeProperties';
+import { SameTeamBulletHitMode } from '@/game-mode/IGameModeProperties';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
@@ -32,12 +31,9 @@ import { CollisionEvent } from '../physics/collisions/ICollisionRule';
 import { Point } from '../physics/point/Point';
 import { Player, PartialPlayerOptions, PlayerSpawnStatus } from '../player/Player';
 import { PlayerService, PlayerServiceEvent } from '../player/PlayerService';
-import { BroadcastBatchGameEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
+import { BroadcastBatchGameEvent, CommonBatchGameEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
 import { GameEventBatcher, GameEventBatcherEvent } from './GameEventBatcher';
-import JSON5 from 'json5';
 import { GameModeService } from '@/game-mode/GameModeService';
-import { assertType } from 'typescript-is';
-import fs from 'fs';
 // import { EntityFactory } from '@/entity/EntityFactory';
 // import { Registry } from '@/ecs/Registry';
 // import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
@@ -47,6 +43,7 @@ import { FlagType, PartialFlagOptions } from '@/flag/Flag';
 import { FlagService, FlagServiceEvent, FlagTankInteraction } from '@/flag/FlagService';
 import { PlayerPointsEvent } from '@/player/PlayerPoints';
 import { Config } from '@/config/Config';
+import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 
 export interface GameServerEvents {
     [GameEvent.BROADCAST_BATCH]: (events: BroadcastBatchGameEvent[]) => void,
@@ -61,9 +58,6 @@ export class GameServer {
     // private entityBlueprints;
 
     private config;
-    private gameModesPropertiesText;
-    private gameModesPropertiesData;
-    private gameModesProperties;
     private gameModeService;
     private gameObjectFactory;
     private gameMapService;
@@ -80,6 +74,7 @@ export class GameServer {
     private gameEventBatcher;
     private teamRepository;
     private teamService;
+    private timeService;
     ticker;
 
     emitter = new EventEmitter<GameServerEvents>();
@@ -97,10 +92,7 @@ export class GameServer {
         this.config = new Config();
         this.config.loadAll('./configs');
 
-        this.gameModesPropertiesText = fs.readFileSync('./game-mode/game-modes-properties.json5', 'utf8');
-        this.gameModesPropertiesData = JSON5.parse(this.gameModesPropertiesText);
-        this.gameModesProperties = assertType<GameModesProperties>(this.gameModesPropertiesData);
-        this.gameModeService = new GameModeService(this.gameModesProperties);
+        this.gameModeService = new GameModeService(this.config);
         this.gameObjectFactory = new GameObjectFactory();
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>();
@@ -116,8 +108,11 @@ export class GameServer {
         this.playerService = new PlayerService(this.config, this.playerRepository);
         this.teamRepository = new MapRepository<string, Team>();
         this.teamService = new TeamService(this.teamRepository);
+        this.timeService = new TimeService(this.config);
         this.gameEventBatcher = new GameEventBatcher();
-        this.ticker = new Ticker(SERVER_CONFIG_TPS);
+
+        const ticksPerSecond = this.config.get<number>('game-server', 'ticksPerSecond');
+        this.ticker = new Ticker(ticksPerSecond);
 
         // console.log(this.entityFactory.buildBrickWall(
         //     {
@@ -163,30 +158,7 @@ export class GameServer {
          */
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_SERVER_STATUS,
             (playerId: string) => {
-                const objects = this.gameObjectService.getObjects();
-                const objectsOptions =
-                    LazyIterable.from(objects)
-                        .map(object => object.toOptions())
-                        .toArray();
-                const players = this.playerService.getPlayers();
-                const playersOptions =
-                    LazyIterable.from(players)
-                        .map(player => player.toOptions())
-                        .toArray();
-                const teams = this.teamService.getTeams();
-                let teamsOptions;
-                if (teams !== undefined) {
-                    teamsOptions =
-                        LazyIterable.from(teams)
-                            .map(team => team.toOptions())
-                            .toArray();
-                }
-                this.gameEventBatcher.addPlayerEvent(playerId, [GameEvent.SERVER_STATUS, {
-                    objectsOptions,
-                    playersOptions,
-                    teamsOptions,
-                    tps: SERVER_CONFIG_TPS,
-                }]);
+                this.sendRequestedServerStatus(playerId);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_ADDED,
@@ -553,8 +525,16 @@ export class GameServer {
                 }
             });
 
+        /*
+         * Time Service event handlers
+         */
+        this.timeService.emitter.on(TimeServiceEvent.ROUND_TIME_UPDATED,
+            (roundTime: number) => {
+                this.gameEventBatcher.addBroadcastEvent([GameEvent.ROUND_TIME_UPDATED, roundTime]);
+            });
+
         /**
-         * Game Event Batcher events
+         * Game Event Batcher event handlers
          */
         this.gameEventBatcher.emitter.on(GameEventBatcherEvent.BROADCAST_BATCH,
             (events: BroadcastBatchGameEvent[]) => {
@@ -577,8 +557,48 @@ export class GameServer {
                 this.gameEventBatcher.flush();
             });
 
-        this.gameModeService.setGameMode('deathmatch');
-        this.gameMapService.loadFromFile('./maps/simple.json');
+        this.loadMapAndGameMode();
+    }
+
+    sendRequestedServerStatus(playerId?: string): void {
+        const objects = this.gameObjectService.getObjects();
+        const objectsOptions =
+            LazyIterable.from(objects)
+                .map(object => object.toOptions())
+                .toArray();
+
+        const players = this.playerService.getPlayers();
+        const playersOptions =
+            LazyIterable.from(players)
+                .map(player => player.toOptions())
+                .toArray();
+
+        const teams = this.teamService.getTeams();
+        let teamsOptions;
+        if (teams !== undefined) {
+            teamsOptions =
+                LazyIterable.from(teams)
+                    .map(team => team.toOptions())
+                    .toArray();
+        }
+
+        const configsData = this.config.getDataMultiple([
+            'game-client',
+            'time',
+        ]);
+
+        const event: CommonBatchGameEvent = [GameEvent.SERVER_STATUS, {
+            objectsOptions,
+            playersOptions,
+            teamsOptions,
+            configsData,
+        }];
+
+        if (playerId === undefined) {
+            this.gameEventBatcher.addBroadcastEvent(event);
+        } else {
+            this.gameEventBatcher.addPlayerEvent(playerId, event);
+        }
     }
 
     onPlayerRequestedServerStatus(playerId: string): void {
@@ -695,5 +715,11 @@ export class GameServer {
 
     onPlayerRequestTankTier(playerId: string, tier: TankTier): void {
         this.playerService.setPlayerRequestedTankTier(playerId, tier);
+    }
+
+    loadMapAndGameMode(): void {
+        this.gameModeService.setGameMode('deathmatch');
+        this.gameMapService.loadFromFile('./maps/simple.json');
+        this.sendRequestedServerStatus();
     }
 }
