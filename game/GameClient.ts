@@ -33,6 +33,7 @@ export enum GameClientEvent {
     TEAMS_CHANGED = 'teams-changed',
     MAP_EDITOR_ENABLED_CHANGED = 'map-editor-enabled-changed',
     ROUND_TIME_UPDATED = 'round-time-updated',
+    SERVER_STATUS = 'server-status',
 
     OWN_PLAYER_ADDED = 'own-player-added',
     OWN_PLAYER_CHANGED_TANK_ID = 'own-player-changed-tank-id',
@@ -53,6 +54,7 @@ export interface GameClientEvents {
     [GameClientEvent.TEAMS_CHANGED]: () => void,
     [GameClientEvent.MAP_EDITOR_ENABLED_CHANGED]: (enabled: boolean) => void;
     [GameClientEvent.ROUND_TIME_UPDATED]: (roundTimeSeconds: number) => void;
+    [GameClientEvent.SERVER_STATUS]: () => void;
 
     [GameClientEvent.OWN_PLAYER_ADDED]: () => void,
     [GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID]: (tankId: number | null) => void;
@@ -234,6 +236,8 @@ export class GameClient {
     onServerStatus(serverStatus: GameServerStatus): void {
         this.clear();
 
+        this.emitter.emit(GameClientEvent.SERVER_STATUS);
+
         const players =
             LazyIterable.from(serverStatus.playersOptions)
                 .map(o => new Player(o));
@@ -399,5 +403,6 @@ export class GameClient {
         this.gameObjectRepository.clear();
         this.boundingBoxRepository.clear();
         this.gameAudioService.clear();
+        this.gameCamera.clearPosition();
     }
 }

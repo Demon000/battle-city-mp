@@ -7,6 +7,10 @@ export class GameCamera {
         this.position = position;
     }
 
+    clearPosition(): void {
+        this.position = undefined;
+    }
+
     getPosition(): Point | undefined {
         if (this.position === undefined) {
             return undefined;

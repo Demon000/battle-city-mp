@@ -288,6 +288,23 @@ export default class App extends Vue {
             autoConnect: false,
         });
         this.gameClient = new GameClient(this.canvases);
+        this.gameClient.emitter.on(GameClientEvent.SERVER_STATUS, () => {
+            this.ownPlayer = null;
+            this.playersStats = null;
+            this.teams = null;
+            this.tankTier = null;
+            this.tankColor = null;
+            this.tankMaxHealth = null;
+            this.tankHealth = null;
+            this.tankMaxBullets = null;
+            this.tankBullets = null;
+            this.playerTeamId = null;
+            this.playerRespawnTimeout = null;
+            this.playerRequestedSpawnStatus = null;
+            this.hasTankDiedOnce = false;
+            this.isTankDead = true;
+            this.isShowingSettings = false;
+        });
         this.gameClient.emitter.on(GameClientEvent.PLAYERS_CHANGED, () => {
             this.updatePlayers();
         });
