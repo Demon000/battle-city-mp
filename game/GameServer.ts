@@ -13,7 +13,7 @@ import { Direction } from '@/physics/Direction';
 import { Tank, PartialTankOptions } from '@/tank/Tank';
 import { TankService, TankServiceEvent } from '@/tank/TankService';
 import { TankTier } from '@/tank/TankTier';
-import { Team, TeamOptions } from '@/team/Team';
+import { Team } from '@/team/Team';
 import { TeamService, TeamServiceEvent } from '@/team/TeamService';
 import { LazyIterable } from '@/utils/LazyIterable';
 import { MapRepository } from '@/utils/MapRepository';
@@ -21,7 +21,7 @@ import { Ticker, TickerEvent } from '@/utils/Ticker';
 import EventEmitter from 'eventemitter3';
 import { Action, ActionType } from '../actions/Action';
 import { ButtonPressAction } from '../actions/ButtonPressAction';
-import { GameMapService, GameMapServiceEvent } from '../maps/GameMapService';
+import { GameMapService } from '../maps/GameMapService';
 import { GameObject, GameObjectOptions, PartialGameObjectOptions } from '../object/GameObject';
 import { GameObjectService, GameObjectServiceEvent } from '../object/GameObjectService';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
@@ -44,6 +44,7 @@ import { FlagService, FlagServiceEvent, FlagTankInteraction } from '@/flag/FlagS
 import { PlayerPointsEvent } from '@/player/PlayerPoints';
 import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
+import { GameMap } from '@/maps/GameMap';
 
 export interface GameServerEvents {
     [GameEvent.BROADCAST_BATCH]: (events: BroadcastBatchGameEvent[]) => void,
@@ -120,38 +121,6 @@ export class GameServer {
         //         y: 0,
         //     },
         // ));
-
-        /**
-         * GameMapService event handlers
-         */
-        this.gameMapService.emitter.on(GameMapServiceEvent.MAP_OBJECTS_OPTIONS,
-            (objectsOptions: GameObjectOptions[]) => {
-                const gameModeProperties = this.gameModeService.getGameModeProperties();
-                const objects = objectsOptions
-                    .filter(o => {
-                        if (gameModeProperties.ignoredObjectTypes === undefined
-                            || o.type === undefined) {
-                            return true;
-                        }
-
-                        return !gameModeProperties.ignoredObjectTypes.includes(o.type);
-                    })
-                    .map(o => {
-                        return this.gameObjectFactory.buildFromOptions(o);
-                    });
-                this.gameObjectService.registerObjects(objects);
-            });
-
-        this.gameMapService.emitter.on(GameMapServiceEvent.MAP_TEAMS_OPTIONS,
-            (teamsOptions: TeamOptions[]) => {
-                const gameModeProperties = this.gameModeService.getGameModeProperties();
-                if (!gameModeProperties.hasTeams) {
-                    return;
-                }
-
-                const teams = teamsOptions.map(o => new Team(o));
-                this.teamService.addTeams(teams);
-            });
 
         /**
          * PlayerService event handlers
@@ -722,9 +691,31 @@ export class GameServer {
         this.playerService.setPlayerRequestedTankTier(playerId, tier);
     }
 
+    clear(): void {
+
+    }
+
+    loadMap(gameMap: GameMap): void {
+        const objectsOptions = gameMap.getObjectsOptions();
+        const objects = objectsOptions
+            .filter(o => this.gameModeService.isIgnoredObjectType(o.type))
+            .map(o => this.gameObjectFactory.buildFromOptions(o));
+        this.gameObjectService.registerObjects(objects);
+
+        const teamsOptions = gameMap.getTeamsOptions();
+        const gameModeProperties = this.gameModeService.getGameModeProperties();
+        if (!gameModeProperties.hasTeams) {
+            return;
+        }
+
+        const teams = teamsOptions.map(o => new Team(o));
+        this.teamService.addTeams(teams);
+    }
+
     reloadMapAndGameMode(): void {
         this.gameModeService.setGameMode('deathmatch');
-        this.gameMapService.loadFromFile('./maps/simple.json');
+        const gameMap = this.gameMapService.loadFromFile('./maps/simple.json');
+        this.loadMap(gameMap);
         this.timeService.restartRoundTime();
         this.sendRequestedServerStatus();
     }

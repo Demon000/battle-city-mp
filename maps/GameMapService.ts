@@ -1,37 +1,12 @@
-import { GameObject, GameObjectOptions } from '@/object/GameObject';
-import { TeamOptions } from '@/team/Team';
+import { GameObject } from '@/object/GameObject';
 import { LazyIterable } from '@/utils/LazyIterable';
-import EventEmitter from 'eventemitter3';
 import { GameMap } from './GameMap';
-
-
-export enum GameMapServiceEvent {
-    MAP_OBJECTS_OPTIONS = 'map-objects-options',
-    MAP_TEAMS_OPTIONS = 'map-teams-options',
-}
-
-export interface GameMapServiceEvents {
-    [GameMapServiceEvent.MAP_OBJECTS_OPTIONS]: (objectsOptions: GameObjectOptions[]) => void;
-    [GameMapServiceEvent.MAP_TEAMS_OPTIONS]: (teamsOptions: TeamOptions[]) => void;
-}
 
 export class GameMapService {
     private map?: GameMap;
-    emitter = new EventEmitter<GameMapServiceEvents>();
 
-    loadFromFile(path: string): void {
-        let message = `Loaded map from ${path} with: `;
-        this.map = new GameMap(path);
-
-        const objectsOptions = this.map.getObjectsOptions();
-        this.emitter.emit(GameMapServiceEvent.MAP_OBJECTS_OPTIONS, objectsOptions);
-        message += `${objectsOptions.length} objects`;
-
-        const teamsOptions = this.map.getTeamsOptions();
-        this.emitter.emit(GameMapServiceEvent.MAP_TEAMS_OPTIONS, teamsOptions);
-        message += `, ${teamsOptions.length} teams`;
-
-        console.log(message);
+    loadFromFile(path: string): GameMap {
+        return this.map = new GameMap(path);
     }
 
     setMapObjects(objects: Iterable<GameObject>): void {
