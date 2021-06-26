@@ -34,6 +34,7 @@ export enum GameClientEvent {
     MAP_EDITOR_ENABLED_CHANGED = 'map-editor-enabled-changed',
     ROUND_TIME_UPDATED = 'round-time-updated',
     SERVER_STATUS = 'server-status',
+    SCOREBOARD_WATCH_TIME = 'scoreboard-watch-time',
 
     OWN_PLAYER_ADDED = 'own-player-added',
     OWN_PLAYER_CHANGED_TANK_ID = 'own-player-changed-tank-id',
@@ -55,6 +56,7 @@ export interface GameClientEvents {
     [GameClientEvent.MAP_EDITOR_ENABLED_CHANGED]: (enabled: boolean) => void;
     [GameClientEvent.ROUND_TIME_UPDATED]: (roundTimeSeconds: number) => void;
     [GameClientEvent.SERVER_STATUS]: () => void;
+    [GameClientEvent.SCOREBOARD_WATCH_TIME]: () => void;
 
     [GameClientEvent.OWN_PLAYER_ADDED]: () => void,
     [GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID]: (tankId: number | null) => void;
@@ -187,6 +189,10 @@ export class GameClient {
             (roundTimeSeconds: number) => {
                 this.emitter.emit(GameClientEvent.ROUND_TIME_UPDATED, roundTimeSeconds);
             });
+        this.timeService.emitter.on(TimeServiceEvent.SCOREBOARD_WATCH_TIME,
+            () => {
+                this.emitter.emit(GameClientEvent.SCOREBOARD_WATCH_TIME);
+            });
 
         this.ticker.emitter.on(TickerEvent.TICK, this.onTick, this);
     }
@@ -317,7 +323,7 @@ export class GameClient {
         this.playerService.setOwnPlayerId(playerId);
     }
 
-    getPlayersStats(): PlayerStats[] {
+    getStats(): PlayerStats[] {
         return this.playerService.getSortedPlayers()
             .map(player => {
                 let tank;

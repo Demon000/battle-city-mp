@@ -106,7 +106,7 @@
 
             <div class="spawn-button-container">
                 <template
-                    v-if="isTankDead"
+                    v-if="isPlayerDead"
                 >
                     <button
                         class="text-button"
@@ -149,7 +149,7 @@ export default class Settings extends Vue {
     hasTankDiedOnce = false;
 
     @Prop()
-    isTankDead = false;
+    isPlayerDead = false;
 
     @Prop()
     tankTier: TankTier | null = null;
@@ -194,7 +194,7 @@ export default class Settings extends Vue {
         }
 
         if (!repeated && lowerKey === ' ') {
-            if (event.type === 'keyup' && this.isTankDead) {
+            if (event.type === 'keyup' && this.isPlayerDead) {
                 this.$emit('spawn-click');
             }
             handled = true;

@@ -3,14 +3,22 @@ import EventEmitter from 'eventemitter3';
 
 export enum TimeServiceEvent {
     ROUND_TIME_UPDATED = 'round-time-updated',
+    MAP_VOTE_TIME = 'map-vote-time',
+    SCOREBOARD_WATCH_TIME = 'scoreboard-watch-time',
+    ROUND_ENDED = 'round-ended',
 }
 
 export interface TimeServiceEvents {
     [TimeServiceEvent.ROUND_TIME_UPDATED]: (roundTime: number) => void,
+    [TimeServiceEvent.MAP_VOTE_TIME]: () => void,
+    [TimeServiceEvent.SCOREBOARD_WATCH_TIME]: () => void,
+    [TimeServiceEvent.ROUND_ENDED]: () => void,
 }
 
 export class TimeService {
     private currentTime = 0;
+    private mapVotePassed = false;
+    private scoreboardWatchPassed = false;
 
     emitter = new EventEmitter<TimeServiceEvents>();
 
@@ -28,21 +36,29 @@ export class TimeService {
         }
 
         this.emitter.emit(TimeServiceEvent.ROUND_TIME_UPDATED, newRoundSeconds);
+
+        const mapVoteSeconds = this.config.get<number>('time', 'mapVoteSeconds');
+        if (newRoundSeconds <= mapVoteSeconds && !this.mapVotePassed) {
+            this.mapVotePassed = true;
+            this.emitter.emit(TimeServiceEvent.MAP_VOTE_TIME);
+        }
+
+        const scoreboardWatchSeconds = this.config.get<number>('time', 'scoreboardWatchSeconds');
+        if (newRoundSeconds <= scoreboardWatchSeconds && !this.scoreboardWatchPassed) {
+            this.scoreboardWatchPassed = true;
+            this.emitter.emit(TimeServiceEvent.SCOREBOARD_WATCH_TIME);
+        }
+
+        if (newRoundSeconds === 0) {
+            this.emitter.emit(TimeServiceEvent.MAP_VOTE_TIME);
+        }
     }
 
     restartRoundTime(): void {
         const roundTimeSeconds = this.config.get<number>('time', 'roundTimeSeconds');
         this.setRoundTime(roundTimeSeconds);
-    }
-
-    isVotingTime(): boolean {
-        const roundVoteSeconds = this.config.get<number>('time', 'mapVoteSeconds');
-        return this.currentTime <= roundVoteSeconds;
-    }
-
-    isScoreboardWatchTime(): boolean {
-        const scoreboardWatchSeconds = this.config.get<number>('time', 'scoreboardWatchSeconds');
-        return this.currentTime <= scoreboardWatchSeconds;
+        this.mapVotePassed = false;
+        this.scoreboardWatchPassed = false;
     }
 
     decreaseRoundTime(deltaSeconds: number): void {

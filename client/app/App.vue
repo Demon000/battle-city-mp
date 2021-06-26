@@ -39,7 +39,7 @@
 
                 <div
                     id="tank-stats"
-                    v-if="!isTankDead"
+                    v-if="!isPlayerDead"
                 >
                     <div class="tank-stats-group">
                         <label>Health</label>
@@ -126,7 +126,7 @@
 
                 <div
                     id="stats-container"
-                    v-if="isShowingStats"
+                    v-if="isShowingScoreboard"
                 >
                     <div
                         id="stats"
@@ -203,7 +203,7 @@
             :tankColor="tankColor"
             :playerTeamId="playerTeamId"
             :hasTankDiedOnce="hasTankDiedOnce"
-            :isTankDead="isTankDead"
+            :isPlayerDead="isPlayerDead"
             :teams="teams"
             :hasTeams="hasTeams"
             :playerRequestedSpawnStatus="playerRequestedSpawnStatus"
@@ -241,7 +241,7 @@ import { Options } from 'vue-class-component';
 import { CLIENT_CONFIG_SOCKET_BASE_URL, CLIENT_SPRITES_RELATIVE_URL } from '../../config';
 import { DirectionalJoystickWrapper, DirectionalJoystickEvent } from '../DirectionalJoystickWrapper';
 import { ColorUtils } from '@/utils/ColorUtils';
-import { Vue } from 'vue-property-decorator';
+import { Vue, Watch } from 'vue-property-decorator';
 import { WebpackUtils } from '../utils/WebpackUtils';
 
 @Options({
@@ -265,7 +265,7 @@ export default class App extends Vue {
     TankTier = TankTier;
     RenderPass = RenderPass;
     isBuilding = false;
-    isShowingStats = false;
+    isUserShowingScoreboard = false;
     gridSize = 0;
     selectedObjectType = GameObjectType.NONE;
     ownPlayer: Player | null = null;
@@ -283,9 +283,10 @@ export default class App extends Vue {
     playerRespawnTimeout: number | null = null;
     playerRequestedSpawnStatus: PlayerSpawnStatus | null = null;
     hasTankDiedOnce = false;
-    isTankDead = true;
-    isShowingSettings = false;
+    isPlayerDead = true;
+    isUserShowingSettings = false;
     roundTimeSeconds = 0;
+    isScoreboardWatchTime = false;
 
     mounted(): void {
         const canvasContainerElement = this.$refs.canvasContainerElement as HTMLDivElement;
@@ -309,8 +310,9 @@ export default class App extends Vue {
             this.playerRespawnTimeout = null;
             this.playerRequestedSpawnStatus = null;
             this.hasTankDiedOnce = false;
-            this.isTankDead = true;
-            this.isShowingSettings = false;
+            this.isPlayerDead = true;
+            this.isUserShowingSettings = false;
+            this.isScoreboardWatchTime = false;
         });
         this.gameClient.emitter.on(GameClientEvent.ROUND_TIME_UPDATED,
             (roundTimeSeconds: number) => {
@@ -318,7 +320,7 @@ export default class App extends Vue {
             });
         this.gameClient.emitter.on(GameClientEvent.PLAYERS_CHANGED,
             () => {
-                this.updatePlayers();
+                this.updateScoreboard();
             });
         this.gameClient.emitter.on(GameClientEvent.TEAMS_CHANGED,
             () => {
@@ -328,19 +330,14 @@ export default class App extends Vue {
             (enabled: boolean) => {
                 this.isBuilding = enabled;
             });
-        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_ADDED,
+        this.gameClient.emitter.on(GameClientEvent.SCOREBOARD_WATCH_TIME,
             () => {
-                this.showSettings();
+                this.isScoreboardWatchTime = true;
             });
+
         this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID,
             (tankId: number | null) => {
-                this.isTankDead = tankId === null;
-
-                if (tankId === null) {
-                    this.showSettings();
-                } else {
-                    this.hideSettings();
-                }
+                this.isPlayerDead = tankId === null;
 
                 if (tankId === null && !this.hasTankDiedOnce) {
                     this.hasTankDiedOnce = true;
@@ -431,51 +428,73 @@ export default class App extends Vue {
 
         return this.tankMaxBullets - this.tankBullets;
     }
-
+ 
     get roundTime(): string {
         const minutes = this.roundTimeSeconds / 60;
         const roundMinutes = Math.floor(minutes);
         const seconds = this.roundTimeSeconds % 60;
-        const paddedSeconds = String(seconds).padStart(2);
+        const paddedSeconds = String(seconds).padStart(2, '0');
         return roundMinutes + ':' + paddedSeconds;
     }
 
-    hideSettings(): void {
-        this.isShowingSettings = false;
+    get isShowingSettings(): boolean {
+        if (this.isPlayerDead) {
+            return true;
+        }
+
+        return this.isUserShowingSettings;
+    }
+
+    get isShowingScoreboard(): boolean {
+        if (this.isScoreboardWatchTime) {
+            return true;
+        }
+
+        return this.isUserShowingScoreboard;
+    }
+
+    updateScoreboard(): void {
+        if (this.gameClient === undefined || !this.isShowingScoreboard) {
+            return;
+        }
+
+        this.playersStats = markRaw(this.gameClient.getStats());
+
+        const ownPlayer = this.gameClient.getOwnPlayer();
+        this.ownPlayer = ownPlayer ? markRaw(ownPlayer) : null;
+    }
+
+    @Watch('isShowingScoreboard')
+    onScoreboardShownChanged(): void {
+        if (this.isShowingScoreboard) {
+            this.updateScoreboard();
+        }
+    }
+
+    @Watch('isShowingSettings')
+    onSettingsShownChanged(): void {
+        if (this.isShowingSettings) {
+            this.onSettingsShown();
+        } else {
+            this.onSettingsHidden();
+        }
+    }
+
+    onSettingsHidden(): void {
         const canvasContainerElement = this.$refs.canvasContainerElement as HTMLElement;
         canvasContainerElement.focus();
     }
 
-    showSettings(): void {
-        this.isShowingSettings = true;
-        this.isShowingStats = false;
+    onSettingsShown(): void {
+        this.isUserShowingScoreboard = false;
         this.$nextTick(() => {
             const settingsElement = (this.$refs.settingsElement as Vue).$el as HTMLElement;
             settingsElement.focus();
         });
     }
 
-    toggleSettings(): void {
-        if (this.isShowingSettings) {
-            this.hideSettings();
-        } else {
-            this.showSettings();
-        }
-    }
-
     addCanvasRef(canvas: HTMLCanvasElement): void {
         this.canvases.push(canvas);
-    }
-
-    updatePlayers(): void {
-        if (this.gameClient === undefined || !this.isShowingStats) {
-            return;
-        }
-
-        this.playersStats = markRaw(this.gameClient.getPlayersStats());
-
-        const ownPlayer = this.gameClient.getOwnPlayer();
-        this.ownPlayer = ownPlayer ? markRaw(ownPlayer) : null;
     }
 
     updateTeams(): void {
@@ -514,13 +533,11 @@ export default class App extends Vue {
         if (lowerKey === 'tab') {
             if (!repeated) {
                 if (event.type === 'keydown') {
-                    this.isShowingStats = true;
-                    this.updatePlayers();
+                    this.isUserShowingScoreboard = true;
                 }
 
                 if (event.type === 'keyup') {
-                    this.isShowingStats = false;
-                    this.clearPlayers();
+                    this.isUserShowingScoreboard = false;
                 }
             }
 
@@ -529,7 +546,7 @@ export default class App extends Vue {
 
         if (!repeated && lowerKey === 'escape') {
             if (event.type === 'keyup') {
-                this.toggleSettings();
+                this.isUserShowingSettings = !this.isUserShowingSettings;
             }
 
             handled = true;
