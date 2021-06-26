@@ -5,8 +5,8 @@ import { GameObjectOptions } from '@/object/GameObject';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { PlayerSpawnStatus } from '@/player/Player';
 import { Server, Socket } from 'socket.io';
-import { BatchGameEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
-import { GameServer } from './GameServer';
+import { BatchGameEvent, UnicastBatchGameEvent } from './GameEvent';
+import { GameServer, GameServerEvent } from './GameServer';
 import { GameSocketEvent } from './GameSocketEvent';
 
 export class GameServerSocket {
@@ -17,12 +17,12 @@ export class GameServerSocket {
         this.gameServer = gameServer;
         this.socketServer = socketServer;
 
-        gameServer.emitter.on(GameEvent.BROADCAST_BATCH,
+        gameServer.emitter.on(GameServerEvent.BROADCAST_BATCH,
             (events: BatchGameEvent[]) => {
                 this.socketServer.emit(GameSocketEvent.BATCH, events);
             });
 
-        gameServer.emitter.on(GameEvent.PLAYER_BATCH,
+        gameServer.emitter.on(GameServerEvent.PLAYER_BATCH,
             (playerId: string, events: UnicastBatchGameEvent[]) => {
                 this.socketServer.to(playerId).emit(GameSocketEvent.BATCH, events);
             });

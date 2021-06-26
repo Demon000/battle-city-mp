@@ -17,9 +17,6 @@ export enum GameEvent {
     SERVER_STATUS = 'server-status',
 
     ROUND_TIME_UPDATED = 'round-time-updated',
-
-    PLAYER_BATCH = 'player-batch',
-    BROADCAST_BATCH = 'broadcast-batch',
 }
 
 export type CommonBatchGameEvent =

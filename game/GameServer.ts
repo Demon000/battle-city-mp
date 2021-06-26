@@ -46,9 +46,14 @@ import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { GameMap } from '@/maps/GameMap';
 
+export enum GameServerEvent {
+    PLAYER_BATCH = 'player-batch',
+    BROADCAST_BATCH = 'broadcast-batch',
+}
+
 export interface GameServerEvents {
-    [GameEvent.BROADCAST_BATCH]: (events: BroadcastBatchGameEvent[]) => void,
-    [GameEvent.PLAYER_BATCH]: (playerId: string, events: UnicastBatchGameEvent[]) => void,
+    [GameServerEvent.BROADCAST_BATCH]: (events: BroadcastBatchGameEvent[]) => void;
+    [GameServerEvent.PLAYER_BATCH]: (playerId: string, events: UnicastBatchGameEvent[]) => void;
 }
 
 export class GameServer {
@@ -511,12 +516,12 @@ export class GameServer {
          */
         this.gameEventBatcher.emitter.on(GameEventBatcherEvent.BROADCAST_BATCH,
             (events: BroadcastBatchGameEvent[]) => {
-                this.emitter.emit(GameEvent.BROADCAST_BATCH, events);
+                this.emitter.emit(GameServerEvent.BROADCAST_BATCH, events);
             });
 
         this.gameEventBatcher.emitter.on(GameEventBatcherEvent.PLAYER_BATCH,
             (playerId: string, events: UnicastBatchGameEvent[]) => {
-                this.emitter.emit(GameEvent.PLAYER_BATCH, playerId, events);
+                this.emitter.emit(GameServerEvent.PLAYER_BATCH, playerId, events);
             });
 
         /**
