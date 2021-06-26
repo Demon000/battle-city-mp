@@ -31,6 +31,12 @@
                     >
                 </div>
 
+                <div id="round-time">
+                    <div class="round-time-group">
+                        {{ roundTime }}
+                    </div>
+                </div>
+
                 <div
                     id="tank-stats"
                     v-if="!isTankDead"
@@ -279,6 +285,7 @@ export default class App extends Vue {
     hasTankDiedOnce = false;
     isTankDead = true;
     isShowingSettings = false;
+    roundTimeSeconds = 0;
 
     mounted(): void {
         const canvasContainerElement = this.$refs.canvasContainerElement as HTMLDivElement;
@@ -305,6 +312,10 @@ export default class App extends Vue {
             this.isTankDead = true;
             this.isShowingSettings = false;
         });
+        this.gameClient.emitter.on(GameClientEvent.ROUND_TIME_UPDATED,
+            (roundTimeSeconds: number) => {
+                this.roundTimeSeconds = roundTimeSeconds;
+            });
         this.gameClient.emitter.on(GameClientEvent.PLAYERS_CHANGED,
             () => {
                 this.updatePlayers();
@@ -419,6 +430,14 @@ export default class App extends Vue {
         }
 
         return this.tankMaxBullets - this.tankBullets;
+    }
+
+    get roundTime(): string {
+        const minutes = this.roundTimeSeconds / 60;
+        const roundMinutes = Math.floor(minutes);
+        const seconds = this.roundTimeSeconds % 60;
+        const paddedSeconds = String(seconds).padStart(2);
+        return roundMinutes + ':' + paddedSeconds;
     }
 
     hideSettings(): void {
@@ -801,17 +820,27 @@ export default class App extends Vue {
     padding: 8px;
 }
 
-#tank-stats {
+#tank-stats,
+#round-time {
     position: absolute;
-    left: 16px;
-    bottom: 16px;
-
     display: flex;
-
     color: #ffffff;
 }
 
-.tank-stats-group {
+#tank-stats {
+    left: 16px;
+    bottom: 16px;
+}
+
+#round-time {
+    width: 100%;
+    top: 16px;
+
+    justify-content: center;
+}
+
+.tank-stats-group,
+.round-time-group {
     padding: 8px;
 
     background: rgba(255, 255, 255, 0.45);

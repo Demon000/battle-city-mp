@@ -554,6 +554,7 @@ export class GameServer {
                 this.playerService.processPlayersStatus(deltaSeconds);
                 this.tankService.processTanksStatus();
                 this.gameObjectService.processObjectsStatus(deltaSeconds);
+                this.timeService.decreaseRoundTime(deltaSeconds);
                 this.gameEventBatcher.flush();
             });
 
@@ -720,6 +721,7 @@ export class GameServer {
     loadMapAndGameMode(): void {
         this.gameModeService.setGameMode('deathmatch');
         this.gameMapService.loadFromFile('./maps/simple.json');
+        this.timeService.restartRoundTime();
         this.sendRequestedServerStatus();
     }
 }
