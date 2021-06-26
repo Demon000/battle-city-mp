@@ -305,18 +305,22 @@ export default class App extends Vue {
             this.isTankDead = true;
             this.isShowingSettings = false;
         });
-        this.gameClient.emitter.on(GameClientEvent.PLAYERS_CHANGED, () => {
-            this.updatePlayers();
-        });
-        this.gameClient.emitter.on(GameClientEvent.TEAMS_CHANGED, () => {
-            this.updateTeams();
-        });
-        this.gameClient.emitter.on(GameClientEvent.MAP_EDITOR_ENABLED_CHANGED, (enabled: boolean) => {
-            this.isBuilding = enabled;
-        });
-        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_ADDED, () => {
-            this.showSettings();
-        });
+        this.gameClient.emitter.on(GameClientEvent.PLAYERS_CHANGED,
+            () => {
+                this.updatePlayers();
+            });
+        this.gameClient.emitter.on(GameClientEvent.TEAMS_CHANGED,
+            () => {
+                this.updateTeams();
+            });
+        this.gameClient.emitter.on(GameClientEvent.MAP_EDITOR_ENABLED_CHANGED,
+            (enabled: boolean) => {
+                this.isBuilding = enabled;
+            });
+        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_ADDED,
+            () => {
+                this.showSettings();
+            });
         this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID,
             (tankId: number | null) => {
                 this.isTankDead = tankId === null;
