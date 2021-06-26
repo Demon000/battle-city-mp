@@ -15,7 +15,7 @@ export class Config {
 
             const fileExtension = path.extname(fileName);
             const fileBaseName = path.basename(fileName, fileExtension);
-            this.nameToData.set(fileBaseName, data);
+            this.nameToData[fileBaseName] = data;
         }
     }
 
@@ -28,15 +28,19 @@ export class Config {
         return data;
     }
 
+    setMultiple(multipleNameToData: Record<string, any>): void {
+        Object.assign(this.nameToData, multipleNameToData);
+    }
+
     getDataMultiple(names: Array<string>): Record<string, any> {
-        const data = {};
+        const multipleNameToData: Record<string, any> = {};
 
         for (const name of names) {
             const data = this.getData(name);
-            this.nameToData[name] = data;
+            multipleNameToData[name] = data;
         }
 
-        return data;
+        return multipleNameToData;
     }
 
     getDataPath<T>(data: any, path: string): T {
@@ -50,6 +54,6 @@ export class Config {
 
     get<T>(name: string, path: string): T {
         const data = this.getData(name);
-        return this.getDataPath(name, path);
+        return this.getDataPath(data, path);
     }
 }
