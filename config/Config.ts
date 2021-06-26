@@ -6,6 +6,12 @@ import JSON5 from 'json5';
 export class Config {
     private nameToData = {} as Record<string, any>;
 
+    constructor(dirPath?: string) {
+        if (dirPath !== undefined) {
+            this.loadAll(dirPath);
+        }
+    }
+
     loadAll(dirPath: string): void {
         const files = fs.readdirSync(dirPath);
         for (const fileName of files) {
