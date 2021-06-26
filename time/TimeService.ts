@@ -50,7 +50,7 @@ export class TimeService {
         }
 
         if (newRoundSeconds === 0) {
-            this.emitter.emit(TimeServiceEvent.MAP_VOTE_TIME);
+            this.emitter.emit(TimeServiceEvent.ROUND_ENDED);
         }
     }
 
