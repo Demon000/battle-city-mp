@@ -10,6 +10,11 @@ export class Config {
         const files = fs.readdirSync(dirPath);
         for (const fileName of files) {
             const filePath = path.join(dirPath, fileName);
+            const fileStats = fs.lstatSync(filePath);
+            if (fileStats.isDirectory()) {
+                continue;
+            }
+
             const rawData = fs.readFileSync(filePath, 'utf8');
             const data = JSON5.parse(rawData);
 

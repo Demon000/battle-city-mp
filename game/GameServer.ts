@@ -532,6 +532,10 @@ export class GameServer {
             (roundTime: number) => {
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.ROUND_TIME_UPDATED, roundTime]);
             });
+        this.timeService.emitter.on(TimeServiceEvent.ROUND_ENDED,
+            () => {
+                this.reloadMapAndGameMode();
+            });
 
         /**
          * Game Event Batcher event handlers
@@ -558,7 +562,7 @@ export class GameServer {
                 this.gameEventBatcher.flush();
             });
 
-        this.loadMapAndGameMode();
+        this.reloadMapAndGameMode();
     }
 
     sendRequestedServerStatus(playerId?: string): void {
@@ -718,7 +722,7 @@ export class GameServer {
         this.playerService.setPlayerRequestedTankTier(playerId, tier);
     }
 
-    loadMapAndGameMode(): void {
+    reloadMapAndGameMode(): void {
         this.gameModeService.setGameMode('deathmatch');
         this.gameMapService.loadFromFile('./maps/simple.json');
         this.timeService.restartRoundTime();
