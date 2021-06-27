@@ -3,12 +3,14 @@ import EventEmitter from 'eventemitter3';
 
 export enum TimeServiceEvent {
     ROUND_TIME_UPDATED = 'round-time-updated',
+    ROUND_TIME_RESTART = 'round-time-restart',
     MAP_VOTE_TIME = 'map-vote-time',
     SCOREBOARD_WATCH_TIME = 'scoreboard-watch-time',
 }
 
 export interface TimeServiceEvents {
     [TimeServiceEvent.ROUND_TIME_UPDATED]: (roundTime: number) => void,
+    [TimeServiceEvent.ROUND_TIME_RESTART]: () => void,
     [TimeServiceEvent.MAP_VOTE_TIME]: (value: boolean) => void,
     [TimeServiceEvent.SCOREBOARD_WATCH_TIME]: (value: boolean) => void,
 }
@@ -65,6 +67,7 @@ export class TimeService {
     restartRoundTime(): void {
         const roundTimeSeconds = this.config.get<number>('time', 'roundTimeSeconds');
         this.setRoundTime(roundTimeSeconds);
+        this.emitter.emit(TimeServiceEvent.ROUND_TIME_RESTART);
     }
 
     decreaseRoundTime(deltaSeconds: number): void {

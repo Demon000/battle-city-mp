@@ -33,6 +33,7 @@ export enum GameClientEvent {
     TEAMS_CHANGED = 'teams-changed',
     MAP_EDITOR_ENABLED_CHANGED = 'map-editor-enabled-changed',
     ROUND_TIME_UPDATED = 'round-time-updated',
+    ROUND_TIME_RESTART = 'round-time-restart',
     SCOREBOARD_WATCH_TIME = 'scoreboard-watch-time',
 
     OWN_PLAYER_ADDED = 'own-player-added',
@@ -54,6 +55,7 @@ export interface GameClientEvents {
     [GameClientEvent.TEAMS_CHANGED]: () => void,
     [GameClientEvent.MAP_EDITOR_ENABLED_CHANGED]: (enabled: boolean) => void;
     [GameClientEvent.ROUND_TIME_UPDATED]: (roundTimeSeconds: number) => void;
+    [GameClientEvent.ROUND_TIME_RESTART]: () => void;
     [GameClientEvent.SCOREBOARD_WATCH_TIME]: (value: boolean) => void;
 
     [GameClientEvent.OWN_PLAYER_ADDED]: () => void,
@@ -186,6 +188,10 @@ export class GameClient {
         this.timeService.emitter.on(TimeServiceEvent.ROUND_TIME_UPDATED,
             (roundTimeSeconds: number) => {
                 this.emitter.emit(GameClientEvent.ROUND_TIME_UPDATED, roundTimeSeconds);
+            });
+        this.timeService.emitter.on(TimeServiceEvent.ROUND_TIME_RESTART,
+            () => {
+                this.emitter.emit(GameClientEvent.ROUND_TIME_RESTART);
             });
         this.timeService.emitter.on(TimeServiceEvent.SCOREBOARD_WATCH_TIME,
             (value: boolean) => {

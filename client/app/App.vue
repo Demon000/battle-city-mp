@@ -300,6 +300,10 @@ export default class App extends Vue {
             (roundTimeSeconds: number) => {
                 this.roundTimeSeconds = roundTimeSeconds;
             });
+        this.gameClient.emitter.on(GameClientEvent.ROUND_TIME_RESTART,
+            () => {
+                this.hasTankDiedOnce = false;
+            });
         this.gameClient.emitter.on(GameClientEvent.PLAYERS_CHANGED,
             () => {
                 this.updateScoreboard();
