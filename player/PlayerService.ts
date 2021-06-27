@@ -239,11 +239,15 @@ export class PlayerService {
         });
     }
 
+    private cancelPlayerActions(player: Player): void {
+        player.map.clear();
+    }
+
     addPlayerButtonPressAction(playerId: string, action: ButtonPressAction): void {
         const player = this.repository.get(playerId);
         if (action.buttonType === ButtonType.ALL
             && action.buttonState === ButtonState.UNPRESSED) {
-            player.map.clear();
+            this.cancelPlayerActions(player);
         } else {
             player.map.set(action.buttonType, action);
         }
@@ -411,6 +415,13 @@ export class PlayerService {
         }
 
         this.setPlayerRespawnTimeout(player, newRespawnTimeout);
+    }
+
+    cancelPlayersActions(): void {
+        const players = this.repository.getAll();
+        for (const player of players) {
+            this.cancelPlayerActions(player);
+        }
     }
 
     processPlayersStatus(deltaSeconds: number): void {

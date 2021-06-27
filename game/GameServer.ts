@@ -506,6 +506,12 @@ export class GameServer {
             (roundTime: number) => {
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.ROUND_TIME_UPDATED, roundTime]);
             });
+        this.timeService.emitter.on(TimeServiceEvent.SCOREBOARD_WATCH_TIME,
+            (value: boolean) => {
+                if (value) {
+                    this.playerService.cancelPlayersActions();
+                }
+            });
 
         /**
          * Game Event Batcher event handlers
@@ -586,6 +592,10 @@ export class GameServer {
     }
 
     onPlayerAction(playerId: string, action: Action): void {
+        if (this.timeService.isScoreboardWatchTime()) {
+            return;
+        }
+
         if (action.type === ActionType.BUTTON_PRESS) {
             this.playerService.addPlayerButtonPressAction(playerId, action as ButtonPressAction);
         }
