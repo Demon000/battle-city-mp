@@ -313,8 +313,8 @@ export default class App extends Vue {
                 this.isBuilding = enabled;
             });
         this.gameClient.emitter.on(GameClientEvent.SCOREBOARD_WATCH_TIME,
-            () => {
-                this.isScoreboardWatchTime = true;
+            (value: boolean) => {
+                this.isScoreboardWatchTime = value;
             });
 
         this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID,

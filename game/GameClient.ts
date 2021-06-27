@@ -54,7 +54,7 @@ export interface GameClientEvents {
     [GameClientEvent.TEAMS_CHANGED]: () => void,
     [GameClientEvent.MAP_EDITOR_ENABLED_CHANGED]: (enabled: boolean) => void;
     [GameClientEvent.ROUND_TIME_UPDATED]: (roundTimeSeconds: number) => void;
-    [GameClientEvent.SCOREBOARD_WATCH_TIME]: () => void;
+    [GameClientEvent.SCOREBOARD_WATCH_TIME]: (value: boolean) => void;
 
     [GameClientEvent.OWN_PLAYER_ADDED]: () => void,
     [GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID]: (tankId: number | null) => void;
@@ -188,8 +188,8 @@ export class GameClient {
                 this.emitter.emit(GameClientEvent.ROUND_TIME_UPDATED, roundTimeSeconds);
             });
         this.timeService.emitter.on(TimeServiceEvent.SCOREBOARD_WATCH_TIME,
-            () => {
-                this.emitter.emit(GameClientEvent.SCOREBOARD_WATCH_TIME);
+            (value: boolean) => {
+                this.emitter.emit(GameClientEvent.SCOREBOARD_WATCH_TIME, value);
             });
 
         this.ticker.emitter.on(TickerEvent.TICK, this.onTick, this);

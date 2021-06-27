@@ -9,8 +9,8 @@ export enum TimeServiceEvent {
 
 export interface TimeServiceEvents {
     [TimeServiceEvent.ROUND_TIME_UPDATED]: (roundTime: number) => void,
-    [TimeServiceEvent.MAP_VOTE_TIME]: () => void,
-    [TimeServiceEvent.SCOREBOARD_WATCH_TIME]: () => void,
+    [TimeServiceEvent.MAP_VOTE_TIME]: (value: boolean) => void,
+    [TimeServiceEvent.SCOREBOARD_WATCH_TIME]: (value: boolean) => void,
 }
 
 export class TimeService {
@@ -23,6 +23,16 @@ export class TimeService {
     constructor(
         private config: Config,
     ) {}
+
+    setMapVotePassed(value: boolean): void {
+        this.mapVotePassed = value;
+        this.emitter.emit(TimeServiceEvent.MAP_VOTE_TIME, value);
+    }
+
+    setScoreboardWatchPassed(value: boolean): void {
+        this.scoreboardWatchPassed = value;
+        this.emitter.emit(TimeServiceEvent.SCOREBOARD_WATCH_TIME, value);
+    }
 
     setRoundTime(roundSeconds: number): void {
         const lastRoundSeconds = Math.floor(this.currentTime);
@@ -37,22 +47,20 @@ export class TimeService {
 
         const mapVoteSeconds = this.config.get<number>('time', 'mapVoteSeconds');
         if (newRoundSeconds <= mapVoteSeconds && !this.mapVotePassed) {
-            this.mapVotePassed = true;
-            this.emitter.emit(TimeServiceEvent.MAP_VOTE_TIME);
+            this.setMapVotePassed(true);
         }
 
         const scoreboardWatchSeconds = this.config.get<number>('time', 'scoreboardWatchSeconds');
         if (newRoundSeconds <= scoreboardWatchSeconds && !this.scoreboardWatchPassed) {
-            this.scoreboardWatchPassed = true;
-            this.emitter.emit(TimeServiceEvent.SCOREBOARD_WATCH_TIME);
+            this.setScoreboardWatchPassed(true);
         }
     }
 
     restartRoundTime(): void {
         const roundTimeSeconds = this.config.get<number>('time', 'roundTimeSeconds');
         this.setRoundTime(roundTimeSeconds);
-        this.mapVotePassed = false;
-        this.scoreboardWatchPassed = false;
+        this.setMapVotePassed(false);
+        this.setScoreboardWatchPassed(false);
     }
 
     decreaseRoundTime(deltaSeconds: number): void {
