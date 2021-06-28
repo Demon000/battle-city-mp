@@ -32,7 +32,7 @@ export class TimeService {
         return this.roundSeconds <= mapVoteSeconds;
     }
 
-    updateMapVotePassed(): void {
+    triggerMapVoteTime(): void {
         const value = this.isMapVoteTime();
         if (this.mapVotePassed === value) {
             return;
@@ -47,7 +47,7 @@ export class TimeService {
         return this.roundSeconds <= scoreboardWatchSeconds;
     }
 
-    updateScoreboardWatchPassed(): void {
+    triggerScoreboardWatchTime(): void {
         const value = this.isScoreboardWatchTime();
         if (this.scoreboardWatchPassed === value) {
             return;
@@ -72,8 +72,8 @@ export class TimeService {
         this.roundSeconds = roundSeconds;
         this.emitter.emit(TimeServiceEvent.ROUND_TIME_UPDATED, roundSeconds);
 
-        this.updateMapVotePassed();
-        this.updateScoreboardWatchPassed();
+        this.triggerMapVoteTime();
+        this.triggerScoreboardWatchTime();
         this.triggerRoundRestart();
     }
 
