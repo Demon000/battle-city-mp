@@ -253,6 +253,7 @@ export class GameClient {
 
         this.emitter.emit(GameClientEvent.CONFIG_CHANGED);
 
+        this.playerService.clear();
         const players =
             LazyIterable.from(serverStatus.playersOptions)
                 .map(o => new Player(o));
@@ -265,16 +266,20 @@ export class GameClient {
             this.teamService.addTeams(teams);
         }
 
+        this.gameObjectService.clear();
         const objects =
             LazyIterable.from(serverStatus.objectsOptions)
                 .map(o => this.gameObjectFactory.buildFromOptions(o));
         this.gameObjectService.registerObjects(objects);
 
+        this.collisionService.clear();
         const objectIds = objects.map(o => o.id);
         this.collisionService.registerObjectsCollisions(objectIds);
 
         const visibleGameSize = this.config.get<number>('game-client', 'visibleGameSize');
         this.gameGraphicsService.setTargetGameSize(visibleGameSize);
+
+        this.gameAudioService.clear();
         this.gameAudioService.setMaxAudibleDistance(visibleGameSize);
     }
 
