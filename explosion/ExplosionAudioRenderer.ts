@@ -1,5 +1,5 @@
 import { GameObjectAudioRenderer } from '@/object/GameObjectAudioRenderer';
-import { ResourceMeta } from '@/object/IGameObjectProperties';
+import { ResourceMeta } from '@/object/GameObjectProperties';
 
 export class ExplosionAudioRenderer extends GameObjectAudioRenderer {
     isAudioEffectMetaEqual(audioEffectMeta: ResourceMeta, objectMeta: ResourceMeta): boolean {

@@ -124,7 +124,7 @@
 import { Color } from '@/drawable/Color';
 import { ColorUtils } from '@/utils/ColorUtils';
 import { WebpackUtils } from '@/client/utils/WebpackUtils';
-import { TankTierProperties, tierToPropertiesMap } from '@/tank/Tank';
+import { TankProperties, TankTierProperties } from '@/tank/Tank';
 import { TankTier } from '@/tank/TankTier';
 import { Vue, Prop, Watch, Options } from 'vue-property-decorator';
 import { Team } from '@/team/Team';
@@ -171,6 +171,9 @@ export default class Settings extends Vue {
 
     @Prop()
     playerRespawnTimeout: number | null = null;
+
+    @Prop()
+    tankProperties: TankProperties | null = null;
 
     playerName: string | null = null;
 
@@ -229,7 +232,11 @@ export default class Settings extends Vue {
             return null;
         }
 
-        return tierToPropertiesMap[this.tankTier];
+        if (this.tankProperties === null) {
+            return null;
+        }
+
+        return this.tankProperties.tiers[this.tankTier];
     }
 
     get rgbTankColor(): string | null {

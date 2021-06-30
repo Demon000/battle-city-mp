@@ -1,4 +1,5 @@
 import { GameObject, GameObjectOptions } from '@/object/GameObject';
+import { GameObjectProperties } from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
 import { BulletPower } from './BulletPower';
 
@@ -21,10 +22,10 @@ export class Bullet extends GameObject {
     power: BulletPower;
     damage: number;
 
-    constructor(options: BulletOptions) {
+    constructor(options: BulletOptions, properties: GameObjectProperties) {
         options.type = GameObjectType.BULLET;
 
-        super(options);
+        super(options, properties);
 
         this.tankId = options.tankId;
         this.playerId = options.playerId;

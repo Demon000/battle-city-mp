@@ -1,15 +1,13 @@
 import { CartesianUtils } from '@/utils/CartesianUtils';
 import { GameObject } from './GameObject';
-import { GameObjectProperties } from './GameObjectProperties';
-import { GameObjectType } from './GameObjectType';
-import { IAudioEffect, ResourceMeta } from './IGameObjectProperties';
+import { AudioEffect, ResourceMeta } from './GameObjectProperties';
 
 export class GameObjectAudioRenderer {
     private context;
     private finalNode;
     private panner?: PannerNode;
     private bufferSource?: AudioBufferSourceNode;
-    private audioEffect?: IAudioEffect | null = null;
+    private audioEffect?: AudioEffect | null = null;
     private maxAudibleDistance;
     object;
 
@@ -24,7 +22,7 @@ export class GameObjectAudioRenderer {
         return true;
     }
 
-    private isAudioEffectMatchingMeta(audioEffect: IAudioEffect, objectMeta: ResourceMeta): boolean {
+    private isAudioEffectMatchingMeta(audioEffect: AudioEffect, objectMeta: ResourceMeta): boolean {
         if (audioEffect.meta === undefined) {
             return true;
         }
@@ -32,13 +30,8 @@ export class GameObjectAudioRenderer {
         return this.isAudioEffectMetaEqual(audioEffect.meta, objectMeta);
     }
 
-    private findAudioEffects(type: GameObjectType): IAudioEffect[] | undefined {
-        const properties = GameObjectProperties.getTypeProperties(type);
-        return properties.audioEffects;
-    }
-
-    private findAudioEffectMatchingMeta(type: GameObjectType, objectMeta: ResourceMeta): IAudioEffect | undefined | null {
-        const audioEffects = this.findAudioEffects(type);
+    private findAudioEffectMatchingMeta(objectMeta: ResourceMeta): AudioEffect | undefined | null {
+        const audioEffects = this.object.audioEffects;
         if (audioEffects === undefined) {
             return undefined;
         }
@@ -102,7 +95,7 @@ export class GameObjectAudioRenderer {
         return true;
     }
 
-    update(): IAudioEffect | null | undefined {
+    update(): AudioEffect | null | undefined {
         if (this.audioEffect === undefined) {
             return;
         }
@@ -123,8 +116,7 @@ export class GameObjectAudioRenderer {
             return this.audioEffect;
         }
 
-        this.audioEffect = this.findAudioEffectMatchingMeta(this.object.type, objectMeta);
-        return this.audioEffect;
+        return this.audioEffect = this.findAudioEffectMatchingMeta(objectMeta);
     }
 
     play(): void {

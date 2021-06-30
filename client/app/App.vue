@@ -208,6 +208,7 @@
             :hasTeams="hasTeams"
             :playerRequestedSpawnStatus="playerRequestedSpawnStatus"
             :playerRespawnTimeout="playerRespawnTimeout"
+            :tankProperties="tankProperties"
             ref="settingsElement"
             @player-name-change="onPlayerNameChanged"
             @player-team-change="onPlayerTeamChanged"
@@ -243,6 +244,7 @@ import { DirectionalJoystickWrapper, DirectionalJoystickEvent } from '../Directi
 import { ColorUtils } from '@/utils/ColorUtils';
 import { Vue, Watch } from 'vue-property-decorator';
 import { WebpackUtils } from '../utils/WebpackUtils';
+import { TankProperties } from '@/tank/Tank';
 
 @Options({
     components: {
@@ -287,41 +289,46 @@ export default class App extends Vue {
     isUserShowingSettings = false;
     roundTimeSeconds = 0;
     isScoreboardWatchTime = false;
+    tankProperties: TankProperties | null = null;
 
     mounted(): void {
         const canvasContainerElement = this.$refs.canvasContainerElement as HTMLDivElement;
 
-        this.socket = io(CLIENT_CONFIG_SOCKET_BASE_URL, {
+        const socket = io(CLIENT_CONFIG_SOCKET_BASE_URL, {
             transports: ['websocket'],
             autoConnect: false,
         });
-        this.gameClient = new GameClient(this.canvases);
-        this.gameClient.emitter.on(GameClientEvent.ROUND_TIME_UPDATED,
+        this.socket = markRaw(socket);
+
+        const gameClient = new GameClient(this.canvases);
+        this.gameClient = markRaw(gameClient);
+
+        gameClient.emitter.on(GameClientEvent.ROUND_TIME_UPDATED,
             (roundTimeSeconds: number) => {
                 this.roundTimeSeconds = roundTimeSeconds;
             });
-        this.gameClient.emitter.on(GameClientEvent.ROUND_TIME_RESTART,
+        gameClient.emitter.on(GameClientEvent.ROUND_TIME_RESTART,
             () => {
                 this.hasTankDiedOnce = false;
             });
-        this.gameClient.emitter.on(GameClientEvent.PLAYERS_CHANGED,
+        gameClient.emitter.on(GameClientEvent.PLAYERS_CHANGED,
             () => {
                 this.updateScoreboard();
             });
-        this.gameClient.emitter.on(GameClientEvent.TEAMS_CHANGED,
+        gameClient.emitter.on(GameClientEvent.TEAMS_CHANGED,
             () => {
                 this.updateTeams();
             });
-        this.gameClient.emitter.on(GameClientEvent.MAP_EDITOR_ENABLED_CHANGED,
+        gameClient.emitter.on(GameClientEvent.MAP_EDITOR_ENABLED_CHANGED,
             (enabled: boolean) => {
                 this.isBuilding = enabled;
             });
-        this.gameClient.emitter.on(GameClientEvent.SCOREBOARD_WATCH_TIME,
+        gameClient.emitter.on(GameClientEvent.SCOREBOARD_WATCH_TIME,
             (value: boolean) => {
                 this.isScoreboardWatchTime = value;
             });
 
-        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID,
+        gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID,
             (tankId: number | null) => {
                 this.isPlayerDead = tankId === null;
 
@@ -329,49 +336,58 @@ export default class App extends Vue {
                     this.hasTankDiedOnce = true;
                 }
             });
-        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TEAM_ID,
+        gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TEAM_ID,
             (teamId: string | null) => {
                 this.playerTeamId = teamId;
             });
-        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_TIER,
+        gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_TIER,
             (tier: TankTier) => {
                 this.tankTier = tier;
             });
-        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_COLOR,
+        gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_COLOR,
             (color: Color) => {
                 this.tankColor = color;
             });
-        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT,
+        gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT,
             (respawnTimeout: number) => {
                 this.playerRespawnTimeout = respawnTimeout;
             });
-        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS,
+        gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS,
             (requestedSpawnStatus: PlayerSpawnStatus) => {
                 this.playerRequestedSpawnStatus = requestedSpawnStatus;
             });
 
-        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
+        gameClient.emitter.on(GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
             (maxHealth: number) => {
                 this.tankMaxHealth = maxHealth;
             });
-        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
+        gameClient.emitter.on(GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
             (health: number) => {
                 this.tankHealth = health;
             });
-        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
+        gameClient.emitter.on(GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
             (maxBullets: number) => {
                 this.tankMaxBullets = maxBullets;
             });
-        this.gameClient.emitter.on(GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
+        gameClient.emitter.on(GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
             (bullets: number) => {
                 this.tankBullets = bullets;
             });
+        gameClient.emitter.on(GameClientEvent.CONFIG_CHANGED,
+            () => {
+                this.tankProperties = gameClient.getTankProperties();
+            });
 
-        this.gameClientSocket = new GameClientSocket(this.socket, this.gameClient);
-        this.joystick = new DirectionalJoystickWrapper({
+        const gameClientSocket = new GameClientSocket(this.socket, this.gameClient);
+        this.gameClientSocket = markRaw(gameClientSocket);
+
+        const joystick = new DirectionalJoystickWrapper({
             zone: this.$refs.dpad as HTMLElement,
             threshold: 0.2,
         });
+        joystick.on('dirdown', this.onJoystickEvent);
+        joystick.on('dirup', this.onJoystickEvent);
+        this.joystick = markRaw(joystick);
 
         window.addEventListener('resize', this.onWindowResize);
         canvasContainerElement.addEventListener('blur', this.onCanvasBlurEvent);
@@ -386,9 +402,6 @@ export default class App extends Vue {
         const shootButton = this.$refs.shootButton as HTMLElement;
         shootButton.addEventListener('touchstart', this.onShootButtonTouchEvent);
         shootButton.addEventListener('touchend', this.onShootButtonTouchEvent);
-
-        this.joystick.on('dirdown', this.onJoystickEvent);
-        this.joystick.on('dirup', this.onJoystickEvent);
 
         if (screenfull.isEnabled) {
             screenfull.on('change', this.onFullscreenChanged);

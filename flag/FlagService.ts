@@ -1,9 +1,10 @@
 import { GameObject } from '@/object/GameObject';
+import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { Tank } from '@/tank/Tank';
 import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
-import { Flag, FlagType, PartialFlagOptions } from './Flag';
+import { Flag, FlagOptions, FlagType, PartialFlagOptions } from './Flag';
 
 export enum FlagServiceEvent {
     FLAG_UPDATED = 'flag-updated',
@@ -21,25 +22,26 @@ export enum FlagTankInteraction {
 }
 
 export class FlagService {
-    private repository;
     emitter = new EventEmitter<FlagServiceEvents>();
 
-    constructor(repository: MapRepository<number, GameObject>) {
-        this.repository = repository;
-    }
+    constructor(
+        private repository: MapRepository<number, GameObject>,
+        private gameObjectFactory: GameObjectFactory,
+    ) {}
 
     createFlagForTank(tank: Tank): Flag | null {
         if (tank.flagTeamId === null || tank.flagColor === null) {
             return null;
         }
 
-        return new Flag({
+        return this.gameObjectFactory.buildFromOptions({
+            type: GameObjectType.FLAG,
             position: tank.position,
             teamId: tank.flagTeamId,
             color: tank.flagColor,
             flagType: FlagType.POLE_ONLY,
             sourceId: tank.flagSourceId,
-        });
+        } as FlagOptions) as Flag;
     }
 
     getFlag(flagId: number): Flag {

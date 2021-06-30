@@ -2,7 +2,7 @@ import { Bullet } from '@/bullet/Bullet';
 import { BulletPower } from '@/bullet/BulletPower';
 import { BulletService } from '@/bullet/BulletService';
 import { Color } from '@/drawable/Color';
-import { Explosion } from '@/explosion/Explosion';
+import { ExplosionOptions } from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { SameTeamBulletHitMode } from '@/game-mode/IGameModeProperties';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
@@ -99,17 +99,17 @@ export class GameServer {
         this.config.loadAll('./configs');
 
         this.gameModeService = new GameModeService(this.config);
-        this.gameObjectFactory = new GameObjectFactory();
+        this.gameObjectFactory = new GameObjectFactory(this.config);
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>();
         this.collisionRules = rules;
         this.collisionService = new CollisionService(this.gameObjectRepository,
             this.boundingBoxRepository, this.collisionRules);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
-        this.tankService = new TankService(this.gameObjectRepository);
-        this.flagService = new FlagService(this.gameObjectRepository);
-        this.bulletService = new BulletService(this.gameObjectRepository);
-        this.gameMapService = new GameMapService();
+        this.tankService = new TankService(this.gameObjectRepository, this.gameObjectFactory);
+        this.flagService = new FlagService(this.gameObjectRepository, this.gameObjectFactory);
+        this.bulletService = new BulletService(this.gameObjectRepository, this.gameObjectFactory);
+        this.gameMapService = new GameMapService(this.config);
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.config, this.playerRepository);
         this.teamRepository = new MapRepository<string, Team>();
@@ -314,7 +314,7 @@ export class GameServer {
         this.tankService.emitter.on(TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN,
             (tankId: number) => {
                 const tank = this.tankService.getTank(tankId);
-                const smoke = new GameObject({
+                const smoke = this.gameObjectFactory.buildFromOptions({
                     type: GameObjectType.SMOKE,
                     position: tank.centerPosition,
                 });
@@ -335,11 +335,12 @@ export class GameServer {
          * CollisionService event handlers
          */
         const spawnExplosion = (position: Point, type: ExplosionType, destroyedObjectType?: GameObjectType) => {
-            const explosion = new Explosion({
+            const explosion = this.gameObjectFactory.buildFromOptions({
+                type: GameObjectType.EXPLOSION,
                 explosionType: type,
                 position: position,
                 destroyedObjectType,
-            });
+            } as ExplosionOptions);
             this.gameObjectService.registerObject(explosion);
         };
 
@@ -569,6 +570,7 @@ export class GameServer {
         }
 
         const configsData = this.config.getDataMultiple([
+            'game-object-properties',
             'game-client',
             'time',
         ]);

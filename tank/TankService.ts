@@ -1,5 +1,6 @@
 import { Color } from '@/drawable/Color';
 import { GameObject } from '@/object/GameObject';
+import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { CollisionTracker } from '@/physics/collisions/CollisionTracker';
 import { Point } from '@/physics/point/Point';
@@ -7,7 +8,7 @@ import { Player } from '@/player/Player';
 import { LazyIterable } from '@/utils/LazyIterable';
 import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
-import { Tank, PartialTankOptions } from './Tank';
+import { Tank, PartialTankOptions, TankOptions } from './Tank';
 
 export enum TankServiceEvent {
     TANK_REQUESTED_BULLET_SPAWN = 'tank-requested-bullet-spawn',
@@ -30,13 +31,13 @@ export interface TankServiceEvents {
 }
 
 export class TankService {
-    private repository;
     private ownPlayerTankId: number | null = null;
     emitter = new EventEmitter<TankServiceEvents>();
 
-    constructor(repository: MapRepository<number, GameObject>) {
-        this.repository = repository;
-    }
+    constructor(
+        private repository: MapRepository<number, GameObject>,
+        private gameObjectFactory: GameObjectFactory,
+    ) {}
 
     private getTanks(): Iterable<Tank> {
         const objects = this.repository.getAll();
@@ -50,7 +51,8 @@ export class TankService {
         position: Point,
         color: Color,
     ): Tank {
-        return new Tank({
+        return this.gameObjectFactory.buildFromOptions({
+            type: GameObjectType.TANK,
             position,
             color,
             playerId: player.id,
@@ -58,7 +60,7 @@ export class TankService {
             teamId: player.teamId,
             tier: player.requestedTankTier,
             collisionsDisabled: player.mapEditorEnabled,
-        });
+        } as TankOptions) as Tank;
     }
 
     getTank(tankId: number): Tank {

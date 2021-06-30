@@ -2,7 +2,7 @@ import { CLIENT_SOUNDS_RELATIVE_URL } from '@/config';
 import { GameObject } from '@/object/GameObject';
 import { GameObjectAudioRenderer } from '@/object/GameObjectAudioRenderer';
 import { GameObjectAudioRendererFactory } from '@/object/GameObjectAudioRendererFactory';
-import { AudioEffectLoadingState, IAudioEffect } from '@/object/IGameObjectProperties';
+import { AudioEffectLoadingState, AudioEffect } from '@/object/GameObjectProperties';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { Point } from '@/physics/point/Point';
@@ -42,7 +42,7 @@ export class GameAudioService {
         this.maxAudibleDistance = maxAudibleDistance;
     }
 
-    loadAudioEffectBuffer(audioEffect: IAudioEffect): boolean {
+    loadAudioEffectBuffer(audioEffect: AudioEffect): boolean {
         if (audioEffect.state === AudioEffectLoadingState.LOADED) {
             return true;
         }

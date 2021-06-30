@@ -1,5 +1,6 @@
 import { Color } from '@/drawable/Color';
 import { GameObject, GameObjectOptions } from '@/object/GameObject';
+import { GameObjectProperties } from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
 
 export enum FlagType {
@@ -24,10 +25,10 @@ export class Flag extends GameObject {
     color: Color;
     sourceId: number | null;
 
-    constructor(options: FlagOptions) {
+    constructor(options: FlagOptions, properties: GameObjectProperties) {
         options.type = GameObjectType.FLAG;
 
-        super(options);
+        super(options, properties);
 
         this.teamId = options.teamId;
         this.color = options.color ?? [255, 255, 255] as Color;

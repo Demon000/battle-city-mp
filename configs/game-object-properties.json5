@@ -1,0 +1,172 @@
+{
+    'steel-wall': {
+        shortType: 'S',
+        width: 8,
+        height: 8,
+        savable: true,
+    },
+    'bush': {
+        shortType: 'B',
+        width: 8,
+        height: 8,
+        savable: true,
+    },
+    'player-spawn': {
+        shortType: 'O',
+        width: 16,
+        height: 16,
+        savable: true,
+    },
+    'level-border': {
+        shortType: '#',
+        width: 16,
+        height: 16,
+        savable: true,
+    },
+    'ice': {
+        shortType: 'I',
+        width: 8,
+        height: 8,
+        savable: true,
+    },
+    'sand': {
+        shortType: 'A',
+        width: 8,
+        height: 8,
+        savable: true,
+    },
+    'grass': {
+        shortType: 'G',
+        width: 8,
+        height: 8,
+        savable: true,
+    },
+    'dirt': {
+        shortType: 'D',
+        width: 8,
+        height: 8,
+        savable: true,
+    },
+    'water': {
+        shortType: 'W',
+        width: 8,
+        height: 8,
+        savable: true,
+    },
+    'brick-wall': {
+        shortType: 'B',
+        width: 4,
+        height: 4,
+        savable: true,
+    },
+    'flag': {
+        shortType: 'F',
+        width: 16,
+        height: 16,
+        savable: true,
+    },
+    'smoke': {
+        width: 0,
+        height: 0,
+        automaticDestroyTime: 1000,
+    },
+    'bullet': {
+        width: 2,
+        height: 2,
+        audioEffects: [
+            {
+                filename: 'shoot_bullet.wav',
+            },
+        ],
+    },
+    'explosion': {
+        width: 0,
+        height: 0,
+        automaticDestroyTime: 240,
+        audioEffects: [
+            {
+                filename: 'destroy_tank.wav',
+                meta: {
+                    destroyedObjectType: 'tank',
+                },
+            },
+            {
+                filename: 'bullet_hit.wav',
+                meta: {
+                    destroyedObjectType: 'none',
+                },
+            },
+            {
+                filename: 'destroy.wav',
+            },
+        ],
+    },
+    'tank': {
+        width: 16,
+        height: 16,
+        directionAxisSnapping: 4,
+        // audioEffects: [
+        //     {
+        //         filename: 'tank_moving.wav',
+        //         loop: true,
+        //         meta: {
+        //             isMoving: true,
+        //         },
+        //     },
+        // ],
+        tiers: {
+            normal: {
+                maxSpeed: 114,
+                accelerationFactor: 3,
+                decelerationFactor: 3,
+                bulletSpeed: 128,
+                maxBullets: 3,
+                bulletCooldown: 250,
+                bulletPower: 'light',
+                sandMaxSpeedFactor: 0.5,
+                sandAccelerationFactor: 1,
+                sandDecelerationFactor: 2,
+                iceMaxSpeedFactor: 1.5,
+                iceAccelerationFactor: 2,
+                iceDecelerationFactor: 0.5,
+                maxHealth: 2,
+            },
+            light: {
+                maxSpeed: 128,
+                accelerationFactor: 2,
+                bulletSpeed: 128,
+                decelerationFactor: 2,
+                maxBullets: 2,
+                bulletCooldown: 250,
+                bulletPower: 'light',
+                sandMaxSpeedFactor: 0.25,
+                sandAccelerationFactor: 1,
+                sandDecelerationFactor: 2,
+                iceMaxSpeedFactor: 1.5,
+                iceAccelerationFactor: 2,
+                iceDecelerationFactor: 0.5,
+                maxHealth: 1,
+            },
+            heavy: {
+                maxSpeed: 96,
+                accelerationFactor: 1,
+                bulletSpeed: 192,
+                decelerationFactor: 1,
+                maxBullets: 1,
+                bulletCooldown: 500,
+                bulletPower: 'heavy',
+                sandMaxSpeedFactor: 1,
+                sandAccelerationFactor: 1,
+                sandDecelerationFactor: 2,
+                iceMaxSpeedFactor: 1.5,
+                iceAccelerationFactor: 2,
+                iceDecelerationFactor: 0.5,
+                maxHealth: 3,
+            },
+        },
+        healthSmokeTime: {
+            '1': 500,
+            '2': 1000,
+        },
+    },
+}

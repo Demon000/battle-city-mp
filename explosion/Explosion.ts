@@ -1,4 +1,5 @@
 import { GameObject, GameObjectOptions } from '@/object/GameObject';
+import { GameObjectProperties } from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
 import { ExplosionType } from './ExplosionType';
 
@@ -13,10 +14,10 @@ export class Explosion extends GameObject {
     explosionType: ExplosionType;
     destroyedObjectType?: GameObjectType;
 
-    constructor(options: ExplosionOptions) {
+    constructor(options: ExplosionOptions, properties: GameObjectProperties) {
         options.type = GameObjectType.EXPLOSION;
 
-        super(options);
+        super(options, properties);
 
         this.explosionType = options.explosionType;
         this.destroyedObjectType = options.destroyedObjectType;

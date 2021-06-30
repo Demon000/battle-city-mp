@@ -1,4 +1,5 @@
 import { GameObject } from '@/object/GameObject';
+import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
@@ -6,15 +7,14 @@ import { DirectionUtils } from '@/physics/collisions/DirectionUtils';
 import { Direction } from '@/physics/Direction';
 import { Tank } from '@/tank/Tank';
 import { MapRepository } from '@/utils/MapRepository';
-import { Bullet } from './Bullet';
+import { Bullet, BulletOptions } from './Bullet';
 import { BulletPower } from './BulletPower';
 
 export class BulletService {
-    private repository;
-
-    constructor(repository: MapRepository<number, GameObject>) {
-        this.repository = repository;
-    }
+    constructor(
+        private repository: MapRepository<number, GameObject>,
+        private gameObjectFactory: GameObjectFactory,
+    ) {}
 
     getBullet(bulletId: number): Bullet {
         const object = this.repository.get(bulletId);
@@ -74,14 +74,15 @@ export class BulletService {
 
     createBulletForTank(tank: Tank): Bullet {
         const objectCenterPosition = tank.centerPosition;
-        const bullet = new Bullet({
+        const bullet = this.gameObjectFactory.buildFromOptions({
+            type: GameObjectType.BULLET,
             direction: tank.direction,
             movementDirection: tank.direction,
             movementSpeed: tank.bulletSpeed,
             tankId: tank.id,
             playerId: tank.playerId,
             power: tank.bulletPower,
-        });
+        } as BulletOptions);
 
         const bulletY = objectCenterPosition.y - bullet.height / 2;
         const bulletX = objectCenterPosition.x - bullet.width / 2;
@@ -91,6 +92,6 @@ export class BulletService {
             x: bulletX,
         };
 
-        return bullet;
+        return bullet as Bullet;
     }
 }

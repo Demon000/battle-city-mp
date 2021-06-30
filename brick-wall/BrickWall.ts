@@ -1,12 +1,13 @@
 import { GameObject, GameObjectOptions } from '@/object/GameObject';
+import { GameObjectProperties } from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
 import { Point } from '@/physics/point/Point';
 
 export class BrickWall extends GameObject {
-    constructor(options: GameObjectOptions) {
+    constructor(options: GameObjectOptions, properties: GameObjectProperties) {
         options.type = GameObjectType.BRICK_WALL;
 
-        super(options);
+        super(options, properties);
     }
 
     get position(): Point {

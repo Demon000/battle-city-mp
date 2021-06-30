@@ -1,5 +1,6 @@
 import { BulletPower } from '@/bullet/BulletPower';
 import { Color } from '@/drawable/Color';
+import { GameObjectProperties } from '@/object/GameObjectProperties';
 import { Direction } from '@/physics/Direction';
 import { GameObject, GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
@@ -22,61 +23,10 @@ export interface TankTierProperties {
     maxHealth: number;
 }
 
-export const tierToPropertiesMap: Record<TankTier, TankTierProperties> = {
-    [TankTier.NORMAL]: {
-        maxSpeed: 114,
-        accelerationFactor: 3,
-        decelerationFactor: 3,
-        bulletSpeed: 128,
-        maxBullets: 3,
-        bulletCooldown: 250,
-        bulletPower: BulletPower.LIGHT,
-        sandMaxSpeedFactor: 0.5,
-        sandAccelerationFactor: 1,
-        sandDecelerationFactor: 2,
-        iceMaxSpeedFactor: 1.5,
-        iceAccelerationFactor: 2,
-        iceDecelerationFactor: 0.5,
-        maxHealth: 2,
-    },
-    [TankTier.LIGHT]: {
-        maxSpeed: 128,
-        accelerationFactor: 2,
-        bulletSpeed: 128,
-        decelerationFactor: 2,
-        maxBullets: 2,
-        bulletCooldown: 250,
-        bulletPower: BulletPower.LIGHT,
-        sandMaxSpeedFactor: 0.25,
-        sandAccelerationFactor: 1,
-        sandDecelerationFactor: 2,
-        iceMaxSpeedFactor: 1.5,
-        iceAccelerationFactor: 2,
-        iceDecelerationFactor: 0.5,
-        maxHealth: 1,
-    },
-    [TankTier.HEAVY]: {
-        maxSpeed: 96,
-        accelerationFactor: 1,
-        bulletSpeed: 192,
-        decelerationFactor: 1,
-        maxBullets: 1,
-        bulletCooldown: 500,
-        bulletPower: BulletPower.HEAVY,
-        sandMaxSpeedFactor: 1,
-        sandAccelerationFactor: 1,
-        sandDecelerationFactor: 2,
-        iceMaxSpeedFactor: 1.5,
-        iceAccelerationFactor: 2,
-        iceDecelerationFactor: 0.5,
-        maxHealth: 3,
-    },
-};
-
-const tierHealthToSmokeTime = new Map([
-    [1, 500],
-    [2, 1000],
-]);
+export interface TankProperties extends GameObjectProperties {
+    tiers: Record<TankTier, TankTierProperties>;
+    healthSmokeTime: Record<number, number>,
+}
 
 export interface TankOptions extends GameObjectOptions {
     tier: TankTier;
@@ -117,12 +67,14 @@ export class Tank extends GameObject {
     health: number;
     flagTeamId: string | null;
     flagSourceId: number | null;
+    properties: TankProperties;
 
-    constructor(options: TankOptions) {
+    constructor(options: TankOptions, properties: TankProperties) {
         options.type = GameObjectType.TANK;
 
-        super(options);
+        super(options, properties);
 
+        this.properties = properties;
         this.tier = options.tier;
         this.playerId = options.playerId;
         this.playerName = options.playerName;
@@ -173,7 +125,7 @@ export class Tank extends GameObject {
     }
 
     get tierProperties(): TankTierProperties {
-        return tierToPropertiesMap[this.tier];
+        return this.properties.tiers[this.tier];
     }
 
     get maxHealth(): number {
@@ -185,7 +137,7 @@ export class Tank extends GameObject {
             return undefined;
         }
 
-        return tierHealthToSmokeTime.get(this.health);
+        return this.properties.healthSmokeTime[this.health];
     }
 
     get maxMovementSpeed(): number {

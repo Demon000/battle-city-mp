@@ -5,10 +5,9 @@ import Express from 'express';
 import Cors from 'cors';
 import Http from 'http';
 import { Server } from 'socket.io';
-import { GameServer, GameServerEvent } from '@/game/GameServer';
-import yargs, { string } from 'yargs';
+import { GameServer } from '@/game/GameServer';
+import yargs from 'yargs';
 import { GameServerSocket } from '@/game/GameServerSocket';
-import { Config } from '@/config/Config';
 
 const argv = yargs(process.argv.slice(2))
     .usage('Usage: $0 [options]')

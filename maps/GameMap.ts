@@ -3,6 +3,7 @@ import { GameObjectOptions } from '@/object/GameObject';
 import { GameObjectProperties } from '@/object/GameObjectProperties';
 import { GameShortObjectType, isGameShortObjectType } from '@/object/GameObjectType';
 import { Team, TeamOptions } from '@/team/Team';
+import { Config } from '@/config/Config';
 
 export interface GameMapOptions {
     resolution?: number;
@@ -12,10 +13,12 @@ export interface GameMapOptions {
 }
 
 export class GameMap {
-    path: string;
     options: GameMapOptions;
 
-    constructor(path: string) {
+    constructor(
+        private path: string,
+        private config: Config,
+    ) {
         const fileBuffer = fs.readFileSync(path);
         const fileData = fileBuffer.toString();
 
@@ -34,6 +37,18 @@ export class GameMap {
 
     setObjectsFromBlocks(objectsFromBlocks: string[]): void {
         this.options.objectsFromBlocks = objectsFromBlocks;
+    }
+
+    getObjectProperties(shortType: GameShortObjectType): GameObjectProperties {
+        const gameObjectsProperties = this.config.getData<GameObjectProperties[]>('game-object-properties');
+
+        for (const gameObjectProperties of gameObjectsProperties) {
+            if (gameObjectProperties.shortType === shortType) {
+                return gameObjectProperties;
+            }
+        }
+
+        throw new Error(`Cannot get properties of invalid short object type: ${shortType}`);
     }
 
     getObjectssOptionsFromBlocks(): GameObjectOptions[] {
@@ -67,7 +82,7 @@ export class GameMap {
                 }
 
                 const shortType = shortTypeString as GameShortObjectType;
-                const properties = GameObjectProperties.getShortTypeProperties(shortType);
+                const properties = this.getObjectProperties(shortType);
                 for (let smallY = bigY; smallY < bigY + resolution; smallY += properties.height) {
                     for (let smallX = bigX; smallX < bigX + resolution; smallX += properties.width) {
                         objectsOptions.push({

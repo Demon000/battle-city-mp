@@ -30,7 +30,7 @@ export class Config {
         }
     }
 
-    getData(name: string): any {
+    getData<T = any>(name: string): T {
         const data = this.nameToData[name];
         if (data === undefined) {
             throw new Error(`Invalid configuration name '${name}'`);
@@ -54,10 +54,10 @@ export class Config {
         return multipleNameToData;
     }
 
-    getDataPath<T>(data: any, path: string): T {
-        const value = jp.value(data, path);
+    getDataMember<T>(data: any, member: string): T {
+        const value = jp.value(data, `$['${member}']`);
         if (value === undefined) {
-            throw new Error(`Invalid value for path '${path}'`);
+            throw new Error(`Invalid value for member '${member}'`);
         }
 
         return value;
@@ -65,6 +65,6 @@ export class Config {
 
     get<T>(name: string, path: string): T {
         const data = this.getData(name);
-        return this.getDataPath(data, path);
+        return this.getDataMember(data, path);
     }
 }

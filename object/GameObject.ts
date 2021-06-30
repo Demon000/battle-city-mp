@@ -2,9 +2,8 @@ import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { Point } from '@/physics/point/Point';
 import { Direction } from '../physics/Direction';
-import { GameObjectProperties } from './GameObjectProperties';
 import { GameObjectType } from './GameObjectType';
-import { IGameObjectProperties, ResourceMeta } from './IGameObjectProperties';
+import { AudioEffect, GameObjectProperties, ResourceMeta } from './GameObjectProperties';
 
 export interface GameObjectOptions {
     id?: number;
@@ -31,6 +30,7 @@ export class GameObject {
     graphicsDirty = true;
 
     id: number;
+    properties;
     type: GameObjectType;
     movementDirection: Direction | null;
     spawnTime: number;
@@ -41,12 +41,13 @@ export class GameObject {
     graphicsRenderer?: any;
     audioRenderer?: any;
 
-    constructor(options: GameObjectOptions) {
+    constructor(options: GameObjectOptions, properties: GameObjectProperties) {
         if (options.type === undefined) {
             throw new Error('Cannot construct object without a type');
         }
 
         this.id = options.id ?? GameObject.globalId++;
+        this.properties = properties;
         this.type = options.type;
         this._position = options.position ?? {x: 0, y: 0};
         this._boundingBox = this.getPositionedBoundingBox(this._position);
@@ -149,10 +150,6 @@ export class GameObject {
         };
     }
 
-    private get properties(): IGameObjectProperties {
-        return GameObjectProperties.getTypeProperties(this.type);
-    }
-
     get maxMovementSpeed(): number {
         return this.movementSpeed;
     }
@@ -187,6 +184,10 @@ export class GameObject {
 
     get boundingBox(): BoundingBox {
         return this._boundingBox;
+    }
+
+    get audioEffects(): AudioEffect[] | undefined {
+        return this.properties.audioEffects;
     }
 
     getPositionedBoundingBox(position: Point): BoundingBox {

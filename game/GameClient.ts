@@ -24,7 +24,7 @@ import { LazyIterable } from '@/utils/LazyIterable';
 import { GameObjectAudioRendererFactory } from '@/object/GameObjectAudioRendererFactory';
 import { TankTier } from '@/tank/TankTier';
 import { Color } from '@/drawable/Color';
-import { PartialTankOptions } from '@/tank/Tank';
+import { PartialTankOptions, TankProperties } from '@/tank/Tank';
 import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 
@@ -48,6 +48,8 @@ export enum GameClientEvent {
     OWN_PLAYER_TANK_CHANGED_BULLETS = 'own-player-tank-changed-bullets',
     OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT = 'own-player-changed-respawn-timeout',
     OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS = 'own-player-changed-requested-spawn-status',
+
+    CONFIG_CHANGED = 'config-changed',
 }
 
 export interface GameClientEvents {
@@ -70,6 +72,8 @@ export interface GameClientEvents {
     [GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS]: (bullets: number) => void,
     [GameClientEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT]: (respawnTimeout: number) => void,
     [GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS]: (requestedSpawnStatus: PlayerSpawnStatus) => void,
+
+    [GameClientEvent.CONFIG_CHANGED]: () => void,
 }
 
 export class GameClient {
@@ -95,12 +99,12 @@ export class GameClient {
 
     constructor(canvases: HTMLCanvasElement[]) {
         this.config = new Config();
-        this.gameObjectFactory = new GameObjectFactory();
+        this.gameObjectFactory = new GameObjectFactory(this.config);
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>();
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
-        this.tankService = new TankService(this.gameObjectRepository);
+        this.tankService = new TankService(this.gameObjectRepository, this.gameObjectFactory);
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.config, this.playerRepository);
         this.teamRepository = new MapRepository<string, Team>();
@@ -244,6 +248,11 @@ export class GameClient {
     }
 
     onServerStatus(serverStatus: GameServerStatus): void {
+        const configsData = serverStatus.configsData;
+        this.config.setMultiple(configsData);
+
+        this.emitter.emit(GameClientEvent.CONFIG_CHANGED);
+
         const players =
             LazyIterable.from(serverStatus.playersOptions)
                 .map(o => new Player(o));
@@ -263,9 +272,6 @@ export class GameClient {
 
         const objectIds = objects.map(o => o.id);
         this.collisionService.registerObjectsCollisions(objectIds);
-
-        const configsData = serverStatus.configsData;
-        this.config.setMultiple(configsData);
 
         const visibleGameSize = this.config.get<number>('game-client', 'visibleGameSize');
         this.gameGraphicsService.setTargetGameSize(visibleGameSize);
@@ -401,5 +407,9 @@ export class GameClient {
 
     onRoundTimeUpdated(roundSeconds: number): void {
         this.timeService.setRoundTime(roundSeconds);
+    }
+
+    getTankProperties(): TankProperties {
+        return this.config.get('game-object-properties', GameObjectType.TANK);
     }
 }
