@@ -543,7 +543,7 @@ export class GameServer {
             });
 
         this.gameModeService.setGameMode(gameMode);
-        this.gameMapService.loadFromFile(mapName);
+        this.gameMapService.loadByName(mapName);
         this.reload();
     }
 
@@ -641,9 +641,9 @@ export class GameServer {
     }
 
     onMapEditorSave(): void {
-        const objects = this.gameObjectService.getObjects();
-        this.gameMapService.setMapObjects(objects);
-        this.gameMapService.saveToFile();
+        // const objects = this.gameObjectService.getObjects();
+        // this.gameMapService.setMapObjects(objects);
+        // this.gameMapService.saveToFile();
     }
 
     onPlayerRequestSpawnStatus(playerId: string, spawnStatus: PlayerSpawnStatus): void {

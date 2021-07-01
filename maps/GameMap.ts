@@ -1,54 +1,98 @@
 import fs from 'fs';
 import { GameObjectOptions } from '@/object/GameObject';
 import { GameObjectProperties } from '@/object/GameObjectProperties';
-import { GameShortObjectType, isGameShortObjectType } from '@/object/GameObjectType';
+import { GameObjectType, GameShortObjectType, isGameObjectType, isGameShortObjectType } from '@/object/GameObjectType';
 import { Team, TeamOptions } from '@/team/Team';
 import { Config } from '@/config/Config';
+import { Color } from '@/drawable/Color';
+import { PNG } from 'pngjs';
 
 export interface GameMapOptions {
-    resolution?: number;
-    teamsOptions?: TeamOptions[];
+    name: string;
+    resolution: number;
+    layerFiles?: string[];
+    colorsObjectTypesMap?: Record<string, Color>;
+    objectTypesColorsMap?: Map<number, string>;
     objectsFromBlocks?: string[];
     objectsFromOptions?: GameObjectOptions[];
+    teamsOptions?: TeamOptions[];
 }
 
 export class GameMap {
     options: GameMapOptions;
 
     constructor(
-        private path: string,
+        private name: string,
         private config: Config,
     ) {
-        const fileBuffer = fs.readFileSync(path);
-        const fileData = fileBuffer.toString();
+        this.name = name;
+        this.options = this.config.get('maps', name);
 
-        this.path = path;
-        this.options = JSON.parse(fileData) as GameMapOptions;
+        if (this.options.colorsObjectTypesMap !== undefined) {
+            this.options.objectTypesColorsMap = new Map();
+
+            for (const [type, color] of Object.entries(this.options.colorsObjectTypesMap)) {
+                if (!isGameObjectType(type)) {
+                    console.log(`Invalid game object type: ${type}`);
+                }
+
+                const colorIndex = this.getColorIndex(color);
+                this.options.objectTypesColorsMap.set(colorIndex, type);
+            }
+        }
     }
 
-    write(path = this.path): void {
-        const fileData = JSON.stringify(this.options, null, 4);
-        fs.writeFileSync(path, fileData);
+    getColorIndex(color: Color): number {
+        return color[0] << 16 | color[1] << 8 | color[2];
     }
 
-    setObjectsFromOptions(objectsOptions: Iterable<GameObjectOptions>): void {
-        this.options.objectsFromOptions = Array.from(objectsOptions);
+    getColorGameObjectType(color: Color): GameObjectType {
+        if (this.options.objectTypesColorsMap  === undefined) {
+            throw new Error('Cannot retrieve game object type of color when missing map');
+        }
+
+        const colorIndex = this.getColorIndex(color);
+        const type = this.options.objectTypesColorsMap.get(colorIndex);
+        if (type === undefined) {
+            throw new Error(`Cannot retrieve game object type for invalid color: ${color}`);
+        }
+
+        return type as GameObjectType;
     }
 
-    setObjectsFromBlocks(objectsFromBlocks: string[]): void {
-        this.options.objectsFromBlocks = objectsFromBlocks;
-    }
+    // write(path = this.name): void {
+    //     const fileData = JSON.stringify(this.options, null, 4);
+    //     fs.writeFileSync(path, fileData);
+    // }
 
-    getObjectProperties(shortType: GameShortObjectType): GameObjectProperties {
-        const gameObjectsProperties = this.config.getData<GameObjectProperties[]>('game-object-properties');
+    // setObjectsFromOptions(objectsOptions: Iterable<GameObjectOptions>): void {
+    //     this.options.objectsFromOptions = Array.from(objectsOptions);
+    // }
 
-        for (const gameObjectProperties of gameObjectsProperties) {
+    // setObjectsFromBlocks(objectsFromBlocks: string[]): void {
+    //     this.options.objectsFromBlocks = objectsFromBlocks;
+    // }
+
+    getShortTypeObjectProperties(shortType: GameShortObjectType): GameObjectProperties {
+        const gameObjectsProperties = this.config.getData<Record<GameObjectType, GameObjectProperties>>('game-object-properties');
+
+        for (const gameObjectProperties of Object.values(gameObjectsProperties)) {
             if (gameObjectProperties.shortType === shortType) {
                 return gameObjectProperties;
             }
         }
 
         throw new Error(`Cannot get properties of invalid short object type: ${shortType}`);
+    }
+
+    getTypeObjectProperties(type: GameObjectType): GameObjectProperties {
+        const gameObjectsProperties = this.config.getData<Record<GameObjectType, GameObjectProperties>>('game-object-properties');
+        const gameObjectProperties = gameObjectsProperties[type];
+        if (gameObjectsProperties === undefined) {
+            throw new Error(`Cannot get properties of invalid object type: ${type}`);
+        }
+
+        return gameObjectProperties;
     }
 
     getObjectssOptionsFromBlocks(): GameObjectOptions[] {
@@ -82,7 +126,7 @@ export class GameMap {
                 }
 
                 const shortType = shortTypeString as GameShortObjectType;
-                const properties = this.getObjectProperties(shortType);
+                const properties = this.getShortTypeObjectProperties(shortType);
                 for (let smallY = bigY; smallY < bigY + resolution; smallY += properties.height) {
                     for (let smallX = bigX; smallX < bigX + resolution; smallX += properties.width) {
                         objectsOptions.push({
@@ -104,10 +148,71 @@ export class GameMap {
         return this.options.objectsFromOptions ?? [];
     }
 
+    getLayerPath(layerFile: string): string {
+        return `./configs/maps/${this.name}/${layerFile}`;
+    }
+
+    getObjectsOptionsFromLayers(): GameObjectOptions[] {
+        const objectsOptions: GameObjectOptions[] = [];
+
+        if (this.options.layerFiles === undefined
+            || this.options.colorsObjectTypesMap === undefined) {
+            return objectsOptions;
+        }
+
+        const resolution = this.options.resolution;
+        for (const layerFile of this.options.layerFiles) {
+            const layerPath = this.getLayerPath(layerFile);
+            const data = fs.readFileSync(layerPath);
+            const png = PNG.sync.read(data);
+
+            for (let pngY = 0; pngY < png.height; pngY++) {
+                for (let pngX = 0; pngX < png.width; pngX++) {
+                    const id = (png.width * pngY + pngX) << 2;
+                    const r = png.data[id];
+                    const g = png.data[id + 1];
+                    const b = png.data[id + 2];
+                    const a = png.data[id + 3];
+                    if (r === 0 && g === 0 && b === 0) {
+                        continue;
+                    }
+
+                    const bigX = pngX * this.options.resolution;
+                    const bigY = pngY * this.options.resolution;
+                    const type = this.getColorGameObjectType([r, g, b]);
+                    const properties = this.getTypeObjectProperties(type);
+
+                    for (let smallY = bigY; smallY < bigY + resolution; smallY += properties.height) {
+                        for (let smallX = bigX; smallX < bigX + resolution; smallX += properties.width) {
+                            objectsOptions.push({
+                                type,
+                                position: {
+                                    y: smallY,
+                                    x: smallX,
+                                },
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        return objectsOptions;
+    }
+
     getObjectsOptions(): GameObjectOptions[] {
+        let objectsOptions: GameObjectOptions[] = [];
+
         const objectsOptionsFromBlocks = this.getObjectssOptionsFromBlocks();
+        objectsOptions = objectsOptions.concat(objectsOptionsFromBlocks);
+
         const objectsOptionsFromOptions = this.getObjectsOptionsFromOptions();
-        return objectsOptionsFromOptions.concat(objectsOptionsFromBlocks);
+        objectsOptions = objectsOptions.concat(objectsOptionsFromOptions);
+
+        const objectsOptionsFromLayers = this.getObjectsOptionsFromLayers();
+        objectsOptions = objectsOptions.concat(objectsOptionsFromLayers);
+
+        return objectsOptions;
     }
 
     getTeamsOptions(): Team[] {

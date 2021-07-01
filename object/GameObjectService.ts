@@ -142,6 +142,10 @@ export class GameObjectService {
         }
 
         const playerSpawnObject = Random.getRandomArrayElement(playerSpawnObjects);
+        if (playerSpawnObject === undefined) {
+            throw new Error('Failed to get random spawn object');
+        }
+
         return playerSpawnObject.position;
     }
 

@@ -14,7 +14,7 @@ const argv = yargs(process.argv.slice(2))
     .options('map', {
         alias: 'm',
         type: 'string',
-        default: './maps/simple.json',
+        default: 'lingor',
     })
     .options('gamemode', {
         alias: 'g',
