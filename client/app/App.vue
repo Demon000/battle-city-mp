@@ -62,18 +62,28 @@
                     <div class="tank-stats-group">
                         <label>Bullets</label>
                         <div class="tank-bullet">
-                            <img
-                                class="tank-stats-icon"
-                                v-for="i in tankMissingBullets"
-                                :key="i"
-                                :src="WebpackUtils.getImageUrl('bullet_full')"
+                            <template
+                                v-if="tankMaxBullets > 5"
                             >
-                            <img
-                                class="tank-stats-icon"
-                                v-for="i in tankBullets"
-                                :key="i"
-                                :src="WebpackUtils.getImageUrl('bullet_empty')"
+                                {{ tankMissingBullets }} / {{ tankMaxBullets }}
+                            </template>
+
+                            <template
+                                v-else
                             >
+                                <img
+                                    class="tank-stats-icon"
+                                    v-for="i in tankMissingBullets"
+                                    :key="i"
+                                    :src="WebpackUtils.getImageUrl('bullet_full')"
+                                >
+                                <img
+                                    class="tank-stats-icon"
+                                    v-for="i in tankBullets"
+                                    :key="i"
+                                    :src="WebpackUtils.getImageUrl('bullet_empty')"
+                                >
+                            </template>
                         </div>
                     </div>
                 </div>
