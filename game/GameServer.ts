@@ -70,6 +70,8 @@ export class GameServer {
     private playerRepository;
     private playerService;
     private gameObjectRepository;
+    private movingGameObjectRepository;
+    private destroyedGameObjectRepository;
     private gameObjectService;
     private tankService;
     private flagService;
@@ -101,11 +103,17 @@ export class GameServer {
         this.gameModeService = new GameModeService(this.config);
         this.gameObjectFactory = new GameObjectFactory(this.config);
         this.gameObjectRepository = new MapRepository<number, GameObject>();
+        this.movingGameObjectRepository = new MapRepository<number, GameObject>();
+        this.destroyedGameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>();
         this.collisionRules = rules;
         this.collisionService = new CollisionService(this.gameObjectRepository,
             this.boundingBoxRepository, this.collisionRules);
-        this.gameObjectService = new GameObjectService(this.gameObjectRepository);
+        this.gameObjectService = new GameObjectService(
+            this.gameObjectRepository,
+            this.movingGameObjectRepository,
+            this.destroyedGameObjectRepository,
+        );
         this.tankService = new TankService(this.gameObjectRepository, this.gameObjectFactory);
         this.flagService = new FlagService(this.gameObjectRepository, this.gameObjectFactory);
         this.bulletService = new BulletService(this.gameObjectRepository, this.gameObjectFactory);

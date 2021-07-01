@@ -30,12 +30,13 @@ export interface GameObjectServiceEvents {
 }
 
 export class GameObjectService {
-    private repository;
     emitter = new EventEmitter<GameObjectServiceEvents>();
 
-    constructor(repository: MapRepository<number, GameObject>) {
-        this.repository = repository;
-    }
+    constructor(
+        private repository: MapRepository<number, GameObject>,
+        private movingRespository?: MapRepository<number, GameObject>,
+        private destroyedRepository?: MapRepository<number, GameObject>,
+    ) {}
 
     findObject(objectId: number): GameObject | undefined {
         return this.repository.find(objectId);
@@ -55,6 +56,12 @@ export class GameObjectService {
 
     registerObject(object: GameObject): void {
         this.repository.add(object.id, object);
+        if (object.movementDirection !== null || object.movementSpeed !== 0) {
+            this.movingRespository?.add(object.id, object);
+        }
+        if (object.automaticDestroyTime !== undefined) {
+            this.destroyedRepository?.add(object.id, object);
+        }
         this.emitter.emit(GameObjectServiceEvent.OBJECT_REGISTERED, object);
     }
 
@@ -72,6 +79,8 @@ export class GameObjectService {
 
         this.emitter.emit(GameObjectServiceEvent.OBJECT_BEFORE_UNREGISTER, objectId);
         this.repository.remove(objectId);
+        this.movingRespository?.remove(object.id);
+        this.destroyedRepository?.remove(object.id);
         this.emitter.emit(GameObjectServiceEvent.OBJECT_UNREGISTERED, objectId);
     }
 
@@ -102,6 +111,8 @@ export class GameObjectService {
     setObjectDestroyed(objectId: number): void {
         const object = this.repository.get(objectId);
         object.destroyed = true;
+
+        this.destroyedRepository?.add(object.id, object);
     }
 
     updateObject(objectId: number, objectOptions: PartialGameObjectOptions): void {
@@ -116,6 +127,11 @@ export class GameObjectService {
     setObjectMovementDirection(objectId: number, direction: Direction | null): void {
         const object = this.repository.get(objectId);
         object.movementDirection = direction;
+
+        if (object.movementDirection !== null) {
+            this.movingRespository?.add(object.id, object);
+        }
+
         this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
             movementDirection: direction,
         } as PartialGameObjectOptions);
@@ -161,6 +177,13 @@ export class GameObjectService {
 
         if (object.movementSpeed !== newMovementSpeed) {
             object.movementSpeed = newMovementSpeed;
+
+            if (newMovementSpeed === 0 && object.movementDirection === null) {
+                this.movingRespository?.remove(object.id);
+            } else {
+                this.movingRespository?.add(object.id, object);
+            }
+
             this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
                 movementSpeed: newMovementSpeed,
             } as PartialGameObjectOptions);
@@ -203,15 +226,19 @@ export class GameObjectService {
     }
 
     processObjectsStatus(delta: number): void {
-        const objects = this.repository.getAll();
-        for (const object of objects) {
-            const destroyed = this.processObjectDestroy(object);
-            if (destroyed) {
-                continue;
+        const destroyedObjects = this.destroyedRepository?.getAll();
+        if (destroyedObjects !== undefined) {
+            for (const object of destroyedObjects) {
+                this.processObjectDestroy(object);
             }
+        }
 
-            this.processObjectDirection(object);
-            this.processObjectMovement(object, delta);
+        const movingObjects = this.movingRespository?.getAll();
+        if (movingObjects !== undefined) {
+            for (const object of movingObjects) {
+                this.processObjectDirection(object);
+                this.processObjectMovement(object, delta);
+            }
         }
     }
 
