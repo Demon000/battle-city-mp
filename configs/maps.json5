@@ -40,6 +40,19 @@
             'player-spawn': [89, 13, 121],
         },
     },
+    'performance_test': {
+        name: 'Performance Test',
+        resolution: 16,
+        layerFiles: [
+            'performance_test_walls.png',
+            'performance_test_player_spawns.png',
+        ],
+        colorsObjectTypesMap: {
+            'brick-wall': [156, 74, 0],
+            'level-border': [99, 99, 99],
+            'player-spawn': [89, 13, 121],
+        },
+    },
     'simple': {
         name: 'Simple',
         resolution: 16,
