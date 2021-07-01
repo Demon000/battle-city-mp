@@ -6,15 +6,16 @@ import { Team, TeamOptions } from '@/team/Team';
 import { Config } from '@/config/Config';
 import { Color } from '@/drawable/Color';
 import { PNG } from 'pngjs';
+import JSON5 from 'json5';
 
 export interface GameMapOptions {
     name: string;
     resolution: number;
     layerFiles?: string[];
+    objectsFromOptionsFile?: string;
     colorsObjectTypesMap?: Record<string, Color>;
     objectTypesColorsMap?: Map<number, string>;
     objectsFromBlocks?: string[];
-    objectsFromOptions?: GameObjectOptions[];
     teamsOptions?: TeamOptions[];
 }
 
@@ -145,11 +146,18 @@ export class GameMap {
     }
 
     getObjectsOptionsFromOptions(): GameObjectOptions[] {
-        return this.options.objectsFromOptions ?? [];
+        if (this.options.objectsFromOptionsFile === undefined) {
+            return [];
+        }
+
+        const filePath = this.getMapFilePath(this.options.objectsFromOptionsFile);
+        const fileData = fs.readFileSync(filePath, 'utf8');
+        const data = JSON5.parse(fileData);
+        return data;
     }
 
-    getLayerPath(layerFile: string): string {
-        return `./configs/maps/${this.name}/${layerFile}`;
+    getMapFilePath(fileName: string): string {
+        return `./configs/maps/${this.name}/${fileName}`;
     }
 
     getObjectsOptionsFromLayers(): GameObjectOptions[] {
@@ -162,7 +170,7 @@ export class GameMap {
 
         const resolution = this.options.resolution;
         for (const layerFile of this.options.layerFiles) {
-            const layerPath = this.getLayerPath(layerFile);
+            const layerPath = this.getMapFilePath(layerFile);
             const data = fs.readFileSync(layerPath);
             const png = PNG.sync.read(data);
 
