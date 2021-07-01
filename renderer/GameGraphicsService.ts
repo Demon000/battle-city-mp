@@ -39,6 +39,11 @@ export class GameGraphicsService {
         this.calculateDimensions();
     }
 
+    scaleTargetGameSize(scale: number): void {
+        this.targetGameSize += this.targetGameSize * scale;
+        this.calculateDimensions();
+    }
+
     calculateDimensions(): void {
         const visibleWidth = window.innerWidth;
         const visibleHeight = window.innerHeight;

@@ -405,6 +405,7 @@ export default class App extends Vue {
         canvasContainerElement.addEventListener('keyup', this.onKeyboardEvent);
         canvasContainerElement.addEventListener('click', this.onMouseClickEvent);
         canvasContainerElement.addEventListener('contextmenu', this.onMouseRightClickEvent);
+        canvasContainerElement.addEventListener('wheel', this.onMouseWheel);
         canvasContainerElement.addEventListener('mousemove', this.onMouseMoveEvent, {
             passive: true,
         });
@@ -524,6 +525,11 @@ export default class App extends Vue {
         if (screenfull.isEnabled) {
             this.isFullscreen = screenfull.isFullscreen;
         }
+    }
+
+    onMouseWheel(event: WheelEvent): void {
+        const scale = event.deltaY * -0.01;
+        this.gameClient?.scaleTargetGameSize(scale);
     }
 
     onKeyboardEvent(event: KeyboardEvent): void {

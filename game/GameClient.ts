@@ -417,4 +417,8 @@ export class GameClient {
     getTankProperties(): TankProperties {
         return this.config.get('game-object-properties', GameObjectType.TANK);
     }
+
+    scaleTargetGameSize(scale: number): void {
+        this.gameGraphicsService.scaleTargetGameSize(scale);
+    }
 }
