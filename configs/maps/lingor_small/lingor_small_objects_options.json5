@@ -1,0 +1,166 @@
+[
+    // Red team
+    {
+        type: 'flag',
+        position: {
+            x: 272,
+            y: 1024,
+        },
+        teamId: 'Red',
+        color: [
+            220,
+            20,
+            60,
+        ],
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 112,
+            y: 896,
+        },
+        teamId: 'Red',
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 112,
+            y: 992,
+        },
+        teamId: 'Red',
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 256,
+            y: 1008,
+        },
+        teamId: 'Red',
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 256,
+            y: 768,
+        },
+        teamId: 'Red',
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 464,
+            y: 896,
+        },
+        teamId: 'Red',
+    },
+
+    // Blue team
+    {
+        type: 'flag',
+        position: {
+            x: 848,
+            y: 704,
+        },
+        teamId: 'Blue',
+        color: [
+            65,
+            105,
+            255,
+        ],
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 736,
+            y: 864,
+        },
+        teamId: 'Blue',
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 992,
+            y: 864,
+        },
+        teamId: 'Blue',
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 832,
+            y: 720,
+        },
+        teamId: 'Blue',
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 720,
+            y: 560,
+        },
+        teamId: 'Blue',
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 1008,
+            y: 544,
+        },
+        teamId: 'Blue',
+    },
+
+    // Yellow team
+    {
+        type: 'flag',
+        position: {
+            x: 688,
+            y: 16,
+        },
+        teamId: 'Yellow',
+        color: [
+            249,
+            166,
+            2,
+        ],
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 112,
+            y: 16,
+        },
+        teamId: 'Yellow',
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 288,
+            y: 16,
+        },
+        teamId: 'Yellow',
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 480,
+            y: 16,
+        },
+        teamId: 'Yellow',
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 688,
+            y: 32,
+        },
+        teamId: 'Yellow',
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 720,
+            y: 112,
+        },
+        teamId: 'Yellow',
+    },
+]
