@@ -189,7 +189,7 @@ export class BoundingBoxTree<V> {
         this.fixTreeUpwards(grandParentNode);
     }
 
-    getOverlappingNodes(box: BoundingBox): Iterable<BoundingBoxNode<V>> {
+    getOverlappingNodeValues(box: BoundingBox): Iterable<V> {
         const root = this.root;
         return {
             [Symbol.iterator]() {

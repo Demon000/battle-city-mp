@@ -1,8 +1,9 @@
 import { BoundingBoxNode } from './BoundingBoxNode';
 import { BoundingBoxUtils } from '../bounding-box/BoundingBoxUtils';
 import { BoundingBox } from '../bounding-box/BoundingBox';
+import { assert } from '@/utils/assert';
 
-export class BoundingBoxTreeIterator<V> implements Iterator<BoundingBoxNode<V>> {
+export class BoundingBoxTreeIterator<V> implements Iterator<V> {
     private box: BoundingBox;
 
     private stack = new Array<BoundingBoxNode<V>>();
@@ -16,7 +17,7 @@ export class BoundingBoxTreeIterator<V> implements Iterator<BoundingBoxNode<V>> 
         }
     }
 
-    next(): IteratorResult<BoundingBoxNode<V>, undefined> {
+    next(): IteratorResult<V, undefined> {
         let foundNode = undefined;
 
         while (this.stack[this.i] !== undefined) {
@@ -50,9 +51,11 @@ export class BoundingBoxTreeIterator<V> implements Iterator<BoundingBoxNode<V>> 
                 value: undefined,
             };
         } else {
+            assert(foundNode.value !== undefined);
+
             return {
                 done: false,
-                value: foundNode,
+                value: foundNode.value,
             };
         }
     }

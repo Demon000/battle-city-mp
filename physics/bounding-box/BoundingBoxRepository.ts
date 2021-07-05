@@ -1,7 +1,6 @@
 import { BoundingBox } from './BoundingBox';
 import { BoundingBoxNode } from '../bounding-box-tree/BoundingBoxNode';
 import { BoundingBoxTree } from '../bounding-box-tree/BoundingBoxTree';
-import { LazyIterable } from '@/utils/LazyIterable';
 import { BoundingBoxUtils } from './BoundingBoxUtils';
 
 export class BoundingBoxRepository<V> {
@@ -13,14 +12,7 @@ export class BoundingBoxRepository<V> {
     ) {}
 
     getBoxOverlappingValues(box: BoundingBox): Iterable<V> {
-        return LazyIterable.from(this.tree.getOverlappingNodes(box))
-            .map((node => {
-                if (node.value === undefined) {
-                    throw new Error('Overlapping node does not contain a value');
-                }
-
-                return node.value;
-            }));
+        return this.tree.getOverlappingNodeValues(box);
     }
 
     private getNode(value: V): BoundingBoxNode<V> {
