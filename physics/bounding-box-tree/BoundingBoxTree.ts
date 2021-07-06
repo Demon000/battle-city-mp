@@ -7,10 +7,10 @@ export class BoundingBoxTree<V> {
     root?: BoundingBoxNode<V>;
 
     calculateBranchingCost(node: BoundingBoxNode<V>, box: BoundingBox): number {
-        const newNodeBox = BoundingBoxUtils.combine(box, node.box);
+        const newNodeBox = BoundingBoxUtils.combine(box, node.fatBox);
         let cost = BoundingBoxUtils.volume(newNodeBox);
         if (node.left !== undefined && node.right !== undefined) {
-            cost -= BoundingBoxUtils.volume(node.box);
+            cost -= BoundingBoxUtils.volume(node.fatBox);
         }
         return cost;
     }
@@ -109,16 +109,16 @@ export class BoundingBoxTree<V> {
 
         let siblingNode = this.root;
         while (siblingNode.left !== undefined && siblingNode.right !== undefined) {
-            const currentNodeVolume = BoundingBoxUtils.volume(siblingNode.box);
+            const currentNodeVolume = BoundingBoxUtils.volume(siblingNode.fatBox);
 
-            const newParentNodeBox = BoundingBoxUtils.combine(siblingNode.box, node.box);
+            const newParentNodeBox = BoundingBoxUtils.combine(siblingNode.fatBox, node.fatBox);
             const newParentNodeVolume = BoundingBoxUtils.volume(newParentNodeBox);
             const newParentNodeCost = 2 * newParentNodeVolume;
 
             const minimumPushDownCost = newParentNodeCost - 2 * currentNodeVolume;
 
-            const leftCost = this.calculateBranchingCost(siblingNode.left, node.box) + minimumPushDownCost;
-            const rightCost = this.calculateBranchingCost(siblingNode.right, node.box) + minimumPushDownCost;
+            const leftCost = this.calculateBranchingCost(siblingNode.left, node.fatBox) + minimumPushDownCost;
+            const rightCost = this.calculateBranchingCost(siblingNode.right, node.fatBox) + minimumPushDownCost;
 
             if (newParentNodeCost < leftCost && newParentNodeCost < rightCost) {
                 break;

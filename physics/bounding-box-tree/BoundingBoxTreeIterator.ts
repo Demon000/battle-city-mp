@@ -23,7 +23,7 @@ export class BoundingBoxTreeIterator<V> implements Iterator<V> {
         while (this.stack[this.i] !== undefined) {
             const node = this.stack[this.i];
 
-            if (BoundingBoxUtils.overlaps(node.box, this.box)) {
+            if (BoundingBoxUtils.overlaps(node.fatBox, this.box)) {
                 if (node.left === undefined || node.right === undefined) {
                     if (node.realBox === undefined) {
                         throw new Error('Leaf node has no real box');

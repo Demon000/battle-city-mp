@@ -60,12 +60,12 @@ export class BoundingBoxRepository<V> {
     updateBoxValue(value: V, box: BoundingBox): void {
         const node = this.getNode(value);
         node.realBox = box;
-        if (BoundingBoxUtils.contains(node.box, box)) {
+        if (BoundingBoxUtils.contains(node.fatBox, box)) {
             return;
         }
 
         this.tree.removeNode(node);
-        node.box = this.getFatBox(box);
+        node.fatBox = this.getFatBox(box);
         this.addNode(value, node);
     }
 

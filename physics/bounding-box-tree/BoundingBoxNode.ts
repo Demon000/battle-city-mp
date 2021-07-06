@@ -2,7 +2,7 @@ import { BoundingBox } from '../bounding-box/BoundingBox';
 import { BoundingBoxUtils } from '../bounding-box/BoundingBoxUtils';
 
 export class BoundingBoxNode<V> {
-    box: BoundingBox;
+    fatBox: BoundingBox;
     realBox?: BoundingBox;
     parent?: BoundingBoxNode<V>;
     left?: BoundingBoxNode<V>;
@@ -11,13 +11,13 @@ export class BoundingBoxNode<V> {
     maxHeight: number;
 
     constructor(
-        box: BoundingBox,
+        fatBox: BoundingBox,
         left?: BoundingBoxNode<V>,
         right?: BoundingBoxNode<V>,
         parent?: BoundingBoxNode<V>,
         maxHeight = 1,
     ) {
-        this.box = box;
+        this.fatBox = fatBox;
         this.left = left;
         this.right = right;
         this.parent = parent;
@@ -29,7 +29,7 @@ export class BoundingBoxNode<V> {
         right: BoundingBoxNode<V>,
         oldParentNode: BoundingBoxNode<V> | undefined,
     ): BoundingBoxNode<V> {
-        const box = BoundingBoxUtils.combine(left.box, right.box);
+        const box = BoundingBoxUtils.combine(left.fatBox, right.fatBox);
         const node = new BoundingBoxNode<V>(box, left, right, oldParentNode);
         node.recalculateHeight();
         return node;
@@ -48,7 +48,7 @@ export class BoundingBoxNode<V> {
             throw new Error('Cannot recalculate box of leaf node');
         }
 
-        this.box = BoundingBoxUtils.combine(this.left.box, this.right.box);
+        this.fatBox = BoundingBoxUtils.combine(this.left.fatBox, this.right.fatBox);
     }
 
     recalculate(): void {
