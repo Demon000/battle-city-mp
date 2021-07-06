@@ -21,10 +21,10 @@ export class LazyIterableIterator<T> {
     }
 
     next(): IteratorResult<T> {
-        let value;
-        while ((value = this.iterator.next().value)) {
+        let item;
+        while (!(item = this.iterator.next()).done) {
             let isFilteredOut = false;
-            let result: any = value;
+            let result: any = item.value;
 
             for (const operation of this.operations) {
                 if (operation.type === IterableOperationType.FILTER) {
