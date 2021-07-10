@@ -50,30 +50,34 @@ export enum GameClientEvent {
     OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS = 'own-player-changed-requested-spawn-status',
 
     CONFIG_CHANGED = 'config-changed',
+
+    TICK = 'tick',
 }
 
 export interface GameClientEvents {
     [GameClientEvent.PLAYERS_CHANGED]: () => void;
-    [GameClientEvent.TEAMS_CHANGED]: () => void,
+    [GameClientEvent.TEAMS_CHANGED]: () => void;
     [GameClientEvent.MAP_EDITOR_ENABLED_CHANGED]: (enabled: boolean) => void;
     [GameClientEvent.ROUND_TIME_UPDATED]: (roundTimeSeconds: number) => void;
     [GameClientEvent.ROUND_TIME_RESTART]: () => void;
     [GameClientEvent.SCOREBOARD_WATCH_TIME]: (value: boolean) => void;
 
-    [GameClientEvent.OWN_PLAYER_ADDED]: () => void,
+    [GameClientEvent.OWN_PLAYER_ADDED]: () => void;
     [GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID]: (tankId: number | null) => void;
     [GameClientEvent.OWN_PLAYER_CHANGED_TEAM_ID]: (teamId: string | null) => void;
     [GameClientEvent.OWN_PLAYER_CHANGED_TANK_TIER]: (tier: TankTier) => void;
     [GameClientEvent.OWN_PLAYER_CHANGED_TANK_COLOR]: (color: Color) => void;
 
-    [GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH]: (maxHealth: number) => void,
-    [GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH]: (health: number) => void,
-    [GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS]: (maxBullets: number) => void,
-    [GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS]: (bullets: number) => void,
-    [GameClientEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT]: (respawnTimeout: number) => void,
-    [GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS]: (requestedSpawnStatus: PlayerSpawnStatus) => void,
+    [GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH]: (maxHealth: number) => void;
+    [GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH]: (health: number) => void;
+    [GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS]: (maxBullets: number) => void;
+    [GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS]: (bullets: number) => void;
+    [GameClientEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT]: (respawnTimeout: number) => void;
+    [GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS]: (requestedSpawnStatus: PlayerSpawnStatus) => void;
 
-    [GameClientEvent.CONFIG_CHANGED]: () => void,
+    [GameClientEvent.CONFIG_CHANGED]: () => void;
+
+    [GameClientEvent.TICK]: () => void;
 }
 
 export class GameClient {
@@ -324,6 +328,8 @@ export class GameClient {
                 this.gameGraphicsService.renderObjectsOver(ghostObjects);
             }
         }
+
+        this.emitter.emit(GameClientEvent.TICK);
     }
 
     onWindowResize(): void {

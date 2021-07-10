@@ -251,6 +251,7 @@ import { markRaw } from 'vue';
 import { Options } from 'vue-class-component';
 import { CLIENT_CONFIG_SOCKET_BASE_URL, CLIENT_SPRITES_RELATIVE_URL } from '../../config';
 import { DirectionalJoystickWrapper, DirectionalJoystickEvent } from '../DirectionalJoystickWrapper';
+import { GamepadWrapper, GamepadWrapperEvent, GamepadWrapperEventData } from '../GamepadWrapper';
 import { ColorUtils } from '@/utils/ColorUtils';
 import { Vue, Watch } from 'vue-property-decorator';
 import { WebpackUtils } from '../utils/WebpackUtils';
@@ -312,6 +313,9 @@ export default class App extends Vue {
 
         const gameClient = new GameClient(this.canvases);
         this.gameClient = markRaw(gameClient);
+
+        const gamepad = new GamepadWrapper();
+        gamepad.emitter.on(GamepadWrapperEvent.CONTROLLER_EVENT, this.onControllerEvent);
 
         gameClient.emitter.on(GameClientEvent.ROUND_TIME_UPDATED,
             (roundTimeSeconds: number) => {
@@ -386,6 +390,10 @@ export default class App extends Vue {
         gameClient.emitter.on(GameClientEvent.CONFIG_CHANGED,
             () => {
                 this.tankProperties = gameClient.getTankProperties();
+            });
+        gameClient.emitter.on(GameClientEvent.TICK,
+            () => {
+                gamepad.processUpdates();
             });
 
         const gameClientSocket = new GameClientSocket(this.socket, this.gameClient);
@@ -595,6 +603,17 @@ export default class App extends Vue {
         if (action === undefined) {
             return;
         }
+
+        this.gameClientSocket?.requestPlayerAction(action);
+    }
+
+    onControllerEvent(event: GamepadWrapperEventData): void {
+        const action = ActionFactory.buildFromControllerEvent(event);
+        if (action === undefined) {
+            return;
+        }
+
+        console.log(action);
 
         this.gameClientSocket?.requestPlayerAction(action);
     }

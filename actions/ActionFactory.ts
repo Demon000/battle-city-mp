@@ -1,3 +1,5 @@
+import { ButtonNumber, GamepadWrapperEventData } from '@/client/GamepadWrapper';
+import { assert } from '@/utils/assert';
 import { Action, ActionOptions, ActionType } from './Action';
 import { ButtonPressAction, ButtonPressActionOptions, ButtonState, ButtonType } from './ButtonPressAction';
 
@@ -111,6 +113,35 @@ export class ActionFactory {
             timestamp: Date.now(),
             buttonState,
             buttonType: ButtonType.SHOOT,
+        });
+    }
+
+    static buildFromControllerEvent(event: GamepadWrapperEventData): ButtonPressAction | undefined {
+        let buttonType;
+        switch (event.buttonNumber) {
+            case ButtonNumber.ACTION_X:
+                buttonType = ButtonType.SHOOT;
+                break;
+            case ButtonNumber.DPAD_UP:
+                buttonType = ButtonType.UP;
+                break;
+            case ButtonNumber.DPAD_DOWN:
+                buttonType = ButtonType.DOWN;
+                break;
+            case ButtonNumber.DPAD_LEFT:
+                buttonType = ButtonType.LEFT;
+                break;
+            case ButtonNumber.DPAD_RIGHT:
+                buttonType = ButtonType.RIGHT;
+                break;
+        }
+        assert(buttonType !== undefined);
+
+        const buttonState = event.value ? ButtonState.PRESSED : ButtonState.UNPRESSED;
+        return new ButtonPressAction({
+            timestamp: Date.now(),
+            buttonState,
+            buttonType,
         });
     }
 
