@@ -2,13 +2,14 @@ import { BoundingBox } from './BoundingBox';
 import { BoundingBoxNode } from '../bounding-box-tree/BoundingBoxNode';
 import { BoundingBoxTree } from '../bounding-box-tree/BoundingBoxTree';
 import { BoundingBoxUtils } from './BoundingBoxUtils';
+import { Config } from '@/config/Config';
 
 export class BoundingBoxRepository<V> {
     tree = new BoundingBoxTree<V>();
     map = new Map<V, BoundingBoxNode<V>>();
 
     constructor(
-        private fatBoxFactor = 1,
+        private config: Config,
     ) {}
 
     getBoxOverlappingValues(box: BoundingBox): Iterable<V> {
@@ -29,19 +30,16 @@ export class BoundingBoxRepository<V> {
         this.map.set(value, node);
     }
 
-    getFatBox(box: BoundingBox): BoundingBox {
-        return BoundingBoxUtils.grow(box, this.fatBoxFactor);
-    }
-
     addBoxValue(value: V, box: BoundingBox): void {
         if (this.map.has(value)) {
             throw new Error(`Node already exists with value: ${value}`);
         }
 
-        const fatBox = this.getFatBox(box);
-        const node = new BoundingBoxNode<V>(fatBox);
-        node.value = value;
-        node.realBox = box;
+        const node = new BoundingBoxNode<V>({
+            fatGrowFactor: this.config.get('bounding-box', 'fatGrowFactor'),
+            realBox: box,
+            value,
+        });
         this.addNode(value, node);
     }
 
@@ -59,13 +57,13 @@ export class BoundingBoxRepository<V> {
 
     updateBoxValue(value: V, box: BoundingBox): void {
         const node = this.getNode(value);
-        node.realBox = box;
-        if (BoundingBoxUtils.contains(node.fatBox, box)) {
+        if (node.fatBox !== undefined
+            && BoundingBoxUtils.contains(node.fatBox, box)) {
             return;
         }
 
         this.tree.removeNode(node);
-        node.fatBox = this.getFatBox(box);
+        node.realBox = box;
         this.addNode(value, node);
     }
 

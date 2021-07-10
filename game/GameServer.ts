@@ -106,7 +106,7 @@ export class GameServer {
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.movingGameObjectRepository = new MapRepository<number, GameObject>();
         this.destroyedGameObjectRepository = new MapRepository<number, GameObject>();
-        this.boundingBoxRepository = new BoundingBoxRepository<number>();
+        this.boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
         this.collisionRules = rules;
         this.collisionService = new CollisionService(this.gameObjectRepository,
             this.boundingBoxRepository, this.collisionRules);
