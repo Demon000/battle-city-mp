@@ -101,7 +101,7 @@ export class GameClient {
         this.config = new Config();
         this.gameObjectFactory = new GameObjectFactory(this.config);
         this.gameObjectRepository = new MapRepository<number, GameObject>();
-        this.boundingBoxRepository = new BoundingBoxRepository<number>();
+        this.boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository);
         this.tankService = new TankService(this.gameObjectRepository, this.gameObjectFactory);
