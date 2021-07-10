@@ -1,58 +1,127 @@
+import { assert } from '@/utils/assert';
 import { BoundingBox } from '../bounding-box/BoundingBox';
 import { BoundingBoxUtils } from '../bounding-box/BoundingBoxUtils';
 
-export class BoundingBoxNode<V> {
-    fatBox: BoundingBox;
+export interface BoundingBoxNodeChildren<V> {
+    left: BoundingBoxNode<V>;
+    right: BoundingBoxNode<V>;
+}
+
+export interface BoundingBoxNodeOptions<V> {
+    fatBox?: BoundingBox;
+    fatGrowFactor?: number;
     realBox?: BoundingBox;
     parent?: BoundingBoxNode<V>;
-    left?: BoundingBoxNode<V>;
-    right?: BoundingBoxNode<V>;
+    children?: BoundingBoxNodeChildren<V>;
+    value?: V;
+    maxHeight?: number;
+}
+
+export class BoundingBoxNode<V> {
+    fatBox?: BoundingBox;
+    fatGrowFactor?: number;
+    realBox!: BoundingBox;
+    parent?: BoundingBoxNode<V>;
+    children?: BoundingBoxNodeChildren<V>;
     value?: V;
     maxHeight: number;
 
-    constructor(
-        fatBox: BoundingBox,
-        left?: BoundingBoxNode<V>,
-        right?: BoundingBoxNode<V>,
-        parent?: BoundingBoxNode<V>,
-        maxHeight = 1,
-    ) {
-        this.fatBox = fatBox;
-        this.left = left;
-        this.right = right;
-        this.parent = parent;
-        this.maxHeight = maxHeight;
-    }
-
-    static fromChildren<V>(
-        left: BoundingBoxNode<V>,
-        right: BoundingBoxNode<V>,
-        oldParentNode: BoundingBoxNode<V> | undefined,
-    ): BoundingBoxNode<V> {
-        const box = BoundingBoxUtils.combine(left.fatBox, right.fatBox);
-        const node = new BoundingBoxNode<V>(box, left, right, oldParentNode);
-        node.recalculateHeight();
-        return node;
-    }
-
-    recalculateHeight(): void {
-        if (this.left === undefined || this.right === undefined) {
-            throw new Error('Cannot recalculate height of leaf node');
+    constructor(options: BoundingBoxNodeOptions<V>) {
+        if (options.maxHeight === undefined) {
+            options.maxHeight = 1;
         }
 
-        this.maxHeight = 1 + Math.max(this.left.maxHeight, this.right.maxHeight);
-    }
-
-    recalculateBox(): void {
-        if (this.left === undefined || this.right === undefined) {
-            throw new Error('Cannot recalculate box of leaf node');
+        if (options.children !== undefined && options.realBox === undefined) {
+            options.realBox = BoundingBoxUtils.combine(options.children.left.box,
+                options.children.right.box);
         }
 
-        this.fatBox = BoundingBoxUtils.combine(this.left.fatBox, this.right.fatBox);
+        assert(options.realBox !== undefined);
+
+        this.realBox = options.realBox;
+        this.fatGrowFactor = options.fatGrowFactor;
+        this.children = options.children;
+        this.value = options.value;
+        this.parent = options.parent;
+        this.maxHeight = options.maxHeight;
+
+        this.recalculateFatBox();
+        this.recalculate(true);
     }
 
-    recalculate(): void {
-        this.recalculateBox();
-        this.recalculateHeight();
+    get box(): BoundingBox {
+        if (this.fatBox !== undefined) {
+            return this.fatBox;
+        }
+
+        assert(this.realBox !== undefined);
+        return this.realBox;
+    }
+
+    get left(): BoundingBoxNode<V> {
+        assert(this.children !== undefined);
+
+        return this.children.left;
+    }
+
+    set left(node: BoundingBoxNode<V>) {
+        assert(this.children !== undefined);
+
+        this.children.left = node;
+    }
+
+    get right(): BoundingBoxNode<V> {
+        assert(this.children !== undefined);
+
+        return this.children.right;
+    }
+
+    set right(node: BoundingBoxNode<V>) {
+        assert(this.children !== undefined);
+
+        this.children.right = node;
+    }
+
+    isFatBoxFitting(): boolean {
+        if (this.fatBox === undefined) {
+            return true;
+        }
+
+        return BoundingBoxUtils.contains(this.fatBox, this.realBox);
+    }
+
+    recalculateFatBox(): void {
+        if (this.fatGrowFactor === undefined) {
+            return;
+        }
+
+        this.fatBox = BoundingBoxUtils.grow(this.realBox, this.fatGrowFactor);
+    }
+
+    recalculateHeight(pass = false): void {
+        if (pass && this.children === undefined) {
+            return;
+        }
+
+        assert(this.children !== undefined);
+
+        this.maxHeight = 1 + Math.max(this.children.left.maxHeight,
+            this.children.right.maxHeight);
+    }
+
+    recalculateBox(pass = false): void {
+        if (pass && this.children === undefined) {
+            return;
+        }
+
+        assert(this.children !== undefined);
+
+        this.realBox = BoundingBoxUtils.combine(this.children.left.box,
+            this.children.right.box);
+    }
+
+    recalculate(pass = false): void {
+        this.recalculateHeight(pass);
+        this.recalculateBox(pass);
     }
 }

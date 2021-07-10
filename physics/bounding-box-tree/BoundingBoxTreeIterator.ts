@@ -20,29 +20,25 @@ export class BoundingBoxTreeIterator<V> implements Iterator<V> {
     next(): IteratorResult<V, undefined> {
         let foundNode = undefined;
 
-        while (this.stack[this.i] !== undefined) {
-            const node = this.stack[this.i];
+        while (foundNode === undefined && this.stack[this.i] !== undefined) {
+            const node = this.stack[this.i++];
 
-            if (BoundingBoxUtils.overlaps(node.fatBox, this.box)) {
-                if (node.left === undefined || node.right === undefined) {
-                    if (node.realBox === undefined) {
-                        throw new Error('Leaf node has no real box');
-                    }
-
-                    if (BoundingBoxUtils.overlaps(node.realBox, this.box)) {
-                        foundNode = node;
-                    }
-                } else {
-                    this.stack.push(node.left);
-                    this.stack.push(node.right);
-                }
+            if (!BoundingBoxUtils.overlaps(node.box, this.box)) {
+                continue;
             }
 
-            this.i++;
-
-            if (foundNode !== undefined) {
-                break;
+            if (node.children !== undefined) {
+                this.stack.push(node.left);
+                this.stack.push(node.right);
+                continue;
             }
+
+            if (node.fatBox !== undefined
+                && !BoundingBoxUtils.overlaps(node.realBox, this.box)) {
+                continue;
+            }
+
+            foundNode = node;
         }
 
         if (foundNode === undefined) {
