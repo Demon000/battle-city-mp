@@ -39,12 +39,13 @@ import { GameModeService } from '@/game-mode/GameModeService';
 // import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 // import { ComponentRegistry } from '@/components/ComponentRegistry';
 // import { EntityBlueprint } from '@/entity/EntityBlueprint';
-import { FlagType, PartialFlagOptions } from '@/flag/Flag';
+import { Flag, FlagType, PartialFlagOptions } from '@/flag/Flag';
 import { FlagService, FlagServiceEvent, FlagTankInteraction } from '@/flag/FlagService';
 import { PlayerPointsEvent } from '@/player/PlayerPoints';
 import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { GameMap } from '@/maps/GameMap';
+import { assert } from '@/utils/assert';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -115,7 +116,7 @@ export class GameServer {
             this.destroyedGameObjectRepository,
         );
         this.tankService = new TankService(this.gameObjectRepository, this.gameObjectFactory);
-        this.flagService = new FlagService(this.gameObjectRepository, this.gameObjectFactory);
+        this.flagService = new FlagService(this.gameObjectRepository, this.gameObjectFactory, this.config);
         this.bulletService = new BulletService(this.gameObjectRepository, this.gameObjectFactory);
         this.gameMapService = new GameMapService(this.config);
         this.playerRepository = new MapRepository<string, Player>();
@@ -219,6 +220,17 @@ export class GameServer {
                 }
             });
 
+        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_DROP_FLAG,
+            (playerId: string) => {
+                const player = this.playerService.getPlayer(playerId);
+                if (player.tankId === null) {
+                    return;
+                }
+
+                const tank = this.tankService.getTank(player.tankId);
+                this.handleFlagInteraction(tank, undefined, FlagTankInteraction.DROP);
+            });
+
         /**
          * TeamService event handlers
          */
@@ -287,13 +299,8 @@ export class GameServer {
                 switch (object.type) {
                     case GameObjectType.TANK: {
                         const tank = object as Tank;
+                        this.handleFlagInteraction(tank, undefined, FlagTankInteraction.DROP);
                         this.playerService.setPlayerTankId(tank.playerId, null);
-                        const flag = this.flagService.createFlagForTank(tank);
-                        if (flag === null) {
-                            break;
-                        }
-
-                        this.gameObjectService.registerObject(flag);
                         break;
                     }
                     case GameObjectType.BULLET: {
@@ -481,30 +488,8 @@ export class GameServer {
                 const tank = this.tankService.getTank(tankId);
                 const flag = this.flagService.getFlag(flagId);
                 const interaction = this.flagService.getFlagTankInteractionType(flag, tank);
-
-                switch (interaction) {
-                    case FlagTankInteraction.STEAL:
-                        this.tankService.setTankFlag(tankId, flag.teamId, flag.color, flag.id);
-                        this.flagService.setFlagType(flagId, FlagType.BASE_ONLY);
-                        break;
-                    case FlagTankInteraction.PICK:
-                        this.tankService.setTankFlag(tankId, flag.teamId, flag.color, flag.sourceId);
-                        this.gameObjectService.setObjectDestroyed(flagId);
-                        break;
-                    case FlagTankInteraction.RETURN:
-                        this.tankService.clearTankFlag(tankId);
-                        this.flagService.setFlagType(flagId, FlagType.FULL);
-                        this.playerService.addPlayerPoints(tank.playerId, PlayerPointsEvent.RETURN_FLAG);
-                        break;
-                    case FlagTankInteraction.CAPTURE:
-                        this.playerService.addPlayerPoints(tank.playerId, PlayerPointsEvent.CAPTURE_FLAG);
-                        if (tank.flagSourceId !== null) {
-                            this.flagService.setFlagType(tank.flagSourceId, FlagType.FULL);
-                        }
-                        this.tankService.clearTankFlag(tankId);
-                        break;
-                    default:
-                        break;
+                if (interaction !== undefined) {
+                    this.handleFlagInteraction(tank, flag, interaction);
                 }
             });
 
@@ -553,6 +538,47 @@ export class GameServer {
         this.gameModeService.setGameMode(gameMode);
         this.gameMapService.loadByName(mapName);
         this.reload();
+    }
+
+    handleFlagInteraction(
+        tank: Tank,
+        flag: Flag | undefined,
+        interaction: FlagTankInteraction,
+    ): void {
+        switch (interaction) {
+            case FlagTankInteraction.STEAL:
+                assert(flag !== undefined);
+                this.tankService.setTankFlag(tank.id, flag.teamId, flag.color, flag.id);
+                this.flagService.setFlagType(flag.id, FlagType.BASE_ONLY);
+                break;
+            case FlagTankInteraction.PICK:
+                assert(flag !== undefined);
+                this.tankService.setTankFlag(tank.id, flag.teamId, flag.color, flag.sourceId);
+                this.gameObjectService.setObjectDestroyed(flag.id);
+                break;
+            case FlagTankInteraction.RETURN:
+                assert(flag !== undefined);
+                this.tankService.clearTankFlag(tank.id);
+                this.flagService.setFlagType(flag.id, FlagType.FULL);
+                this.playerService.addPlayerPoints(tank.playerId, PlayerPointsEvent.RETURN_FLAG);
+                break;
+            case FlagTankInteraction.CAPTURE:
+                this.playerService.addPlayerPoints(tank.playerId, PlayerPointsEvent.CAPTURE_FLAG);
+                if (tank.flagSourceId !== null) {
+                    this.flagService.setFlagType(tank.flagSourceId, FlagType.FULL);
+                }
+                this.tankService.clearTankFlag(tank.id);
+                break;
+            case FlagTankInteraction.DROP:
+                flag = this.flagService.createFlagForTank(tank);
+                if (flag !== undefined) {
+                    this.tankService.clearTankFlag(tank.id);
+                    this.gameObjectService.registerObject(flag);
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     sendRequestedServerStatus(playerId?: string): void {

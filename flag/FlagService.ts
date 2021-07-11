@@ -1,7 +1,9 @@
+import { Config } from '@/config/Config';
 import { GameObject } from '@/object/GameObject';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { Tank } from '@/tank/Tank';
+import { assert } from '@/utils/assert';
 import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import { Flag, FlagOptions, FlagType, PartialFlagOptions } from './Flag';
@@ -19,6 +21,7 @@ export enum FlagTankInteraction {
     PICK,
     CAPTURE,
     RETURN,
+    DROP,
 }
 
 export class FlagService {
@@ -27,11 +30,12 @@ export class FlagService {
     constructor(
         private repository: MapRepository<number, GameObject>,
         private gameObjectFactory: GameObjectFactory,
+        private config: Config,
     ) {}
 
-    createFlagForTank(tank: Tank): Flag | null {
+    createFlagForTank(tank: Tank): Flag | undefined {
         if (tank.flagTeamId === null || tank.flagColor === null) {
-            return null;
+            return undefined;
         }
 
         return this.gameObjectFactory.buildFromOptions({
@@ -41,6 +45,7 @@ export class FlagService {
             color: tank.flagColor,
             flagType: FlagType.POLE_ONLY,
             sourceId: tank.flagSourceId,
+            droppedTankId: tank.id,
         } as FlagOptions) as Flag;
     }
 
@@ -62,23 +67,31 @@ export class FlagService {
         });
     }
 
-    getFlagTankInteractionType(flag: Flag, tank: Tank): FlagTankInteraction | null {
+    getFlagTankInteractionType(flag: Flag, tank: Tank): FlagTankInteraction | undefined {
+        let interaction;
+
         if (tank.flagTeamId === null) {
             if (tank.teamId !== flag.teamId && flag.flagType === FlagType.FULL) {
-                return FlagTankInteraction.STEAL;
+                interaction = FlagTankInteraction.STEAL;
             } else if (flag.flagType === FlagType.POLE_ONLY) {
-                return FlagTankInteraction.PICK;
+                interaction = FlagTankInteraction.PICK;
             }
         }
 
         if (tank.flagTeamId !== null && tank.teamId === flag.teamId) {
             if (tank.flagTeamId === tank.teamId && flag.flagType === FlagType.BASE_ONLY) {
-                return FlagTankInteraction.RETURN;
+                interaction = FlagTankInteraction.RETURN;
             } else if (tank.flagTeamId !== tank.teamId && flag.flagType === FlagType.FULL) {
-                return FlagTankInteraction.CAPTURE;
+                interaction = FlagTankInteraction.CAPTURE;
             }
         }
 
-        return null;
+        const pickupIgnoreTime = this.config.get<number>('flag', 'pickupIgnoreTime');
+        if (flag.droppedTankId === tank.id
+            && flag.spawnTime + pickupIgnoreTime >= Date.now()) {
+            interaction = undefined;
+        }
+
+        return interaction;
     }
 }

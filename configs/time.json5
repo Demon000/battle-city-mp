@@ -1,5 +1,5 @@
 {
-    roundTimeSeconds: 90,
+    roundTimeSeconds: 300,
     mapVoteSeconds: 20,
     scoreboardWatchSeconds: 10,
 }

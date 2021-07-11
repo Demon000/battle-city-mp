@@ -17,6 +17,7 @@ export enum PlayerServiceEvent {
 
     PLAYER_REQUESTED_MOVE = 'player-requested-move',
     PLAYER_REQUESTED_SHOOT = 'player-requested-shoot',
+    PLAYER_REQUESTED_DROP_FLAG = 'player-requested-drop-flag',
     PLAYER_REQUESTED_SPAWN_STATUS = 'player-requested-spawn-status',
 
     PLAYER_REQUESTED_SERVER_STATUS = 'player-requested-server-status',
@@ -31,22 +32,23 @@ export enum PlayerServiceEvent {
 }
 
 export interface PlayerServiceEvents {
-    [PlayerServiceEvent.PLAYER_ADDED]: (player: Player) => void,
-    [PlayerServiceEvent.PLAYER_CHANGED]: (playerId: string, playerOptions: PartialPlayerOptions) => void,
-    [PlayerServiceEvent.PLAYER_BEFORE_REMOVE]: (playerId: string) => void,
-    [PlayerServiceEvent.PLAYER_REMOVED]: (playerId: string) => void,
-    [PlayerServiceEvent.PLAYERS_CHANGED]: () => void,
-    [PlayerServiceEvent.PLAYER_REQUESTED_MOVE]: (playerId: string, direction: Direction | undefined) => void,
-    [PlayerServiceEvent.PLAYER_REQUESTED_SHOOT]: (playerId: string, isShooting: boolean) => void,
-    [PlayerServiceEvent.PLAYER_REQUESTED_SPAWN_STATUS]: (playerId: string, spawnStatus: PlayerSpawnStatus) => void,
-    [PlayerServiceEvent.PLAYER_REQUESTED_SERVER_STATUS]: (playerId: string) => void,
-    [PlayerServiceEvent.OWN_PLAYER_ADDED]: (player: Player) => void,
-    [PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_ID]: (tankId: number | null) => void,
-    [PlayerServiceEvent.OWN_PLAYER_CHANGED_TEAM_ID]: (teamId: string | null) => void,
-    [PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_TIER]: (tier: TankTier) => void,
-    [PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_COLOR]: (color: Color) => void,
-    [PlayerServiceEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT]: (respawnTimeout: number) => void,
-    [PlayerServiceEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS]: (requestedSpawnStatus: PlayerSpawnStatus) => void,
+    [PlayerServiceEvent.PLAYER_ADDED]: (player: Player) => void;
+    [PlayerServiceEvent.PLAYER_CHANGED]: (playerId: string, playerOptions: PartialPlayerOptions) => void;
+    [PlayerServiceEvent.PLAYER_BEFORE_REMOVE]: (playerId: string) => void;
+    [PlayerServiceEvent.PLAYER_REMOVED]: (playerId: string) => void;
+    [PlayerServiceEvent.PLAYERS_CHANGED]: () => void;
+    [PlayerServiceEvent.PLAYER_REQUESTED_MOVE]: (playerId: string, direction: Direction | undefined) => void;
+    [PlayerServiceEvent.PLAYER_REQUESTED_SHOOT]: (playerId: string, isShooting: boolean) => void;
+    [PlayerServiceEvent.PLAYER_REQUESTED_DROP_FLAG]: (playerId: string) => void;
+    [PlayerServiceEvent.PLAYER_REQUESTED_SPAWN_STATUS]: (playerId: string, spawnStatus: PlayerSpawnStatus) => void;
+    [PlayerServiceEvent.PLAYER_REQUESTED_SERVER_STATUS]: (playerId: string) => void;
+    [PlayerServiceEvent.OWN_PLAYER_ADDED]: (player: Player) => void;
+    [PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_ID]: (tankId: number | null) => void;
+    [PlayerServiceEvent.OWN_PLAYER_CHANGED_TEAM_ID]: (teamId: string | null) => void;
+    [PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_TIER]: (tier: TankTier) => void;
+    [PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_COLOR]: (color: Color) => void;
+    [PlayerServiceEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT]: (respawnTimeout: number) => void;
+    [PlayerServiceEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS]: (requestedSpawnStatus: PlayerSpawnStatus) => void;
 }
 
 export class PlayerService {
@@ -330,6 +332,15 @@ export class PlayerService {
         return action.buttonState === ButtonState.PRESSED;
     }
 
+    private isPlayerDroppingFlag(player: Player): boolean {
+        const action = player.map.get(ButtonType.DROP_FLAG);
+        if (!action) {
+            return false;
+        }
+
+        return action.buttonState === ButtonState.PRESSED;
+    }
+
     private processPlayerSpawnStatus(player: Player): void {
         if (player.dirtyRequestedSpawnStatus) {
             this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player.id, {
@@ -393,6 +404,15 @@ export class PlayerService {
         this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_SHOOT, player.id, isShooting);
     }
 
+    private processPlayerDroppingFlag(player: Player): void {
+        const isDroppingFlag = this.isPlayerDroppingFlag(player);
+        if (!isDroppingFlag) {
+            return;
+        }
+
+        this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_DROP_FLAG, player.id);
+    }
+
     private processPlayerServerStatusRequest(player: Player): void {
         if (player.requestedServerStatus) {
             this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_SERVER_STATUS, player.id);
@@ -437,6 +457,7 @@ export class PlayerService {
             this.processPlayerServerStatusRequest(player);
             this.processPlayerMovement(player);
             this.processPlayerShooting(player);
+            this.processPlayerDroppingFlag(player);
         }
     }
 

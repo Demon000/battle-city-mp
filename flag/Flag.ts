@@ -13,7 +13,8 @@ export interface FlagOptions extends GameObjectOptions {
     teamId: string;
     color: Color;
     flagType?: FlagType;
-    sourceId?: number | null;
+    sourceId?: number;
+    droppedTankId?: number;
 }
 
 export type PartialFlagOptions = Partial<FlagOptions>;
@@ -24,6 +25,7 @@ export class Flag extends GameObject {
     teamId: string;
     color: Color;
     sourceId: number | null;
+    droppedTankId: number | null;
 
     constructor(options: FlagOptions, properties: GameObjectProperties) {
         options.type = GameObjectType.FLAG;
@@ -34,6 +36,7 @@ export class Flag extends GameObject {
         this.color = options.color ?? [255, 255, 255] as Color;
         this._flagType = options.flagType ?? FlagType.FULL;
         this.sourceId = options.sourceId ?? null;
+        this.droppedTankId = options.droppedTankId ?? null;
     }
 
     toOptions(): FlagOptions {

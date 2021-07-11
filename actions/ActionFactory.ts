@@ -44,6 +44,9 @@ export class ActionFactory {
             case 'arrowright':
                 buttonType = ButtonType.RIGHT;
                 break;
+            case 'q':
+                buttonType = ButtonType.DROP_FLAG;
+                break;
             case ' ':
                 buttonType = ButtonType.SHOOT;
                 break;

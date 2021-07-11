@@ -8,6 +8,7 @@ export enum ButtonType {
     LEFT = 'left',
     SHOOT = 'shoot',
     ALL = 'all',
+    DROP_FLAG = 'drop-flag',
 }
 
 export const BUTTON_TYPE_DIRECTION: Partial<Record<ButtonType, Direction>> = {
