@@ -55,21 +55,18 @@ export class GamepadWrapper {
         return gamepad;
     }
 
-    getButtonValue(buttonNumber: ButtonNumber): number {
+    processUpdates(): void {
         const gamepad = this.getGamepad();
         if (gamepad === undefined) {
-            return 0;
+            return;
         }
 
-        return gamepad.buttons[buttonNumber].value;
-    }
-
-    processUpdates(): void {
         for (const buttonNumber of buttonNumbers) {
             const oldValue = this.buttons[buttonNumber];
-            const value = this.getButtonValue(buttonNumber);
+            const value = gamepad.buttons[buttonNumber].value;
 
             if (oldValue !== value) {
+                this.buttons[buttonNumber] = value;
                 this.emitter.emit(GamepadWrapperEvent.CONTROLLER_EVENT, {
                     buttonNumber,
                     value,

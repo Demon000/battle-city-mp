@@ -613,8 +613,6 @@ export default class App extends Vue {
             return;
         }
 
-        console.log(action);
-
         this.gameClientSocket?.requestPlayerAction(action);
     }
 
