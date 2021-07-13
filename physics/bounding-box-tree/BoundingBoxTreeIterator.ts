@@ -27,17 +27,18 @@ export class BoundingBoxTreeIterator<V> implements Iterator<V> {
                 continue;
             }
 
-            if (node.children !== undefined) {
-                this.stack.push(node.left);
-                this.stack.push(node.right);
+            if (node.fatBox !== undefined
+                && node.realBox !== undefined
+                && !BoundingBoxUtils.overlaps(node.realBox, this.box)) {
                 continue;
             }
 
-            if (!BoundingBoxUtils.overlaps(node.realBox, this.box)) {
-                continue;
+            if (node.children === undefined) {
+                foundNode = node;
+            } else {
+                this.stack.push(node.children.left);
+                this.stack.push(node.children.right);
             }
-
-            foundNode = node;
         }
 
         if (foundNode === undefined) {
