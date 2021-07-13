@@ -604,7 +604,6 @@ export class GameServer {
         }
 
         const configsData = this.config.getDataMultiple([
-            'bounding-box',
             'game-object-properties',
             'game-client',
             'time',
