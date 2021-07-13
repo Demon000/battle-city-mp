@@ -34,7 +34,7 @@ export class BoundingBoxTree<V> {
             } else if (down.parent.right === up) {
                 down.parent.right = down;
             } else {
-                throw new Error('Parent of node being rotated is inconsistent');
+                assert(false);
             }
         }
 
@@ -53,7 +53,7 @@ export class BoundingBoxTree<V> {
         } else if (up.left === down) {
             up.left = replaceOldDownNode;
         } else {
-            throw new Error('Parent of node being rotated is inconsistent');
+            assert(false);
         }
 
         down.right = newDownRightNode;
@@ -149,7 +149,7 @@ export class BoundingBoxTree<V> {
         } else if (oldParentNode.right === siblingNode) {
             oldParentNode.right = newParentNode;
         } else {
-            throw new Error('Parent of node being pushed down is inconsistent');
+            assert(false);
         }
 
         this.fixTreeUpwards(oldParentNode);
@@ -170,7 +170,7 @@ export class BoundingBoxTree<V> {
         } else if (parentNode.right === node) {
             siblingNode = parentNode.left;
         } else {
-            throw new Error('Parent of node being removed is inconsistent');
+            assert(false);
         }
 
         if (grandParentNode === undefined) {
@@ -181,7 +181,7 @@ export class BoundingBoxTree<V> {
             } else if (grandParentNode.right === parentNode) {
                 grandParentNode.right = siblingNode;
             } else {
-                throw new Error('Grand parent of node being removed is inconsistent');
+                assert(false);
             }
         }
 
