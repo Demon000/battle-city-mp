@@ -38,10 +38,6 @@ export class BoundingBoxNode<V> {
 
         assert(options.realBox !== undefined);
 
-        if (options.fatBox === undefined && options.fatGrowFactor !== undefined) {
-            options.fatBox = BoundingBoxUtils.grow(options.realBox, options.fatGrowFactor);
-        }
-
         this.fatBox = options.fatBox;
         this.realBox = options.realBox;
         this.children = options.children;
