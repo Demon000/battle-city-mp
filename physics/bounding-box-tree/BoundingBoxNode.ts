@@ -45,6 +45,11 @@ export class BoundingBoxNode<V> {
         this.parent = options.parent;
         this.maxHeight = options.maxHeight;
 
+        if (this.children !== undefined) {
+            this.children.left.parent = this;
+            this.children.right.parent = this;
+        }
+
         this.recalculateFatBox();
         this.recalculate(true);
     }

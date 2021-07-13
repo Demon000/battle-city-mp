@@ -137,7 +137,6 @@ export class BoundingBoxTree<V> {
                 right: siblingNode,
             },
         });
-        node.parent = siblingNode.parent = newParentNode;
 
         if (oldParentNode === undefined) {
             this.root = newParentNode;
