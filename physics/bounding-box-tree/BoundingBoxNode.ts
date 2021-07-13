@@ -122,19 +122,4 @@ export class BoundingBoxNode<V> {
         this.recalculateHeight(pass);
         this.recalculateBox(pass);
     }
-
-    childEqual(
-        value: BoundingBoxNode<V>,
-        leftFn: () => void,
-        rightFn: () => void,
-    ): void {
-        assert(this.children !== undefined);
-        assert(this.children.left === value || this.children.right === value);
-
-        if (this.children.left === value) {
-            leftFn();
-        } else if (this.children.right === value) {
-            rightFn();
-        }
-    }
 }

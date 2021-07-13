@@ -26,16 +26,16 @@ export class BoundingBoxTree<V> {
         down.parent = up.parent;
         up.parent = down;
 
-        const downParent = down.parent;
-        if (downParent === undefined) {
+        if (down.parent === undefined) {
             this.root = down;
         } else {
-            const downParentChildren = downParent.children;
-            assert(downParentChildren);
-            downParent.childEqual(up,
-                () => downParentChildren.left = down,
-                () => downParentChildren.right = down,
-            );
+            if (down.parent.left === up) {
+                down.parent.left = down;
+            } else if (down.parent.right === up) {
+                down.parent.right = down;
+            } else {
+                throw new Error('Parent of node being rotated is inconsistent');
+            }
         }
 
         let newDownRightNode: BoundingBoxNode<V>;
@@ -48,12 +48,13 @@ export class BoundingBoxTree<V> {
             replaceOldDownNode = left;
         }
 
-        const upChildren = up.children;
-        assert(upChildren !== undefined);
-        up.childEqual(down,
-            () => upChildren.right = replaceOldDownNode,
-            () => upChildren.left = replaceOldDownNode,
-        );
+        if (up.right === down) {
+            up.right = replaceOldDownNode;
+        } else if (up.left === down) {
+            up.left = replaceOldDownNode;
+        } else {
+            throw new Error('Parent of node being rotated is inconsistent');
+        }
 
         down.right = newDownRightNode;
         replaceOldDownNode.parent = up;
@@ -143,12 +144,13 @@ export class BoundingBoxTree<V> {
             return;
         }
 
-        const oldParentNodeChildren = oldParentNode.children;
-        assert(oldParentNodeChildren !== undefined);
-        oldParentNode.childEqual(siblingNode,
-            () => oldParentNodeChildren.left = newParentNode,
-            () => oldParentNodeChildren.right = newParentNode,
-        );
+        if (oldParentNode.left === siblingNode) {
+            oldParentNode.left = newParentNode;
+        } else if (oldParentNode.right === siblingNode) {
+            oldParentNode.right = newParentNode;
+        } else {
+            throw new Error('Parent of node being pushed down is inconsistent');
+        }
 
         this.fixTreeUpwards(oldParentNode);
     }
@@ -162,15 +164,14 @@ export class BoundingBoxTree<V> {
         const parentNode = node.parent;
         const grandParentNode = node.parent.parent;
 
-        let siblingNode: BoundingBoxNode<V> | undefined;
-        const parentNodeChildren = parentNode.children;
-        assert(parentNodeChildren);
-        parentNode.childEqual(node,
-            () => siblingNode = parentNodeChildren.right,
-            () => siblingNode = parentNodeChildren.left,
-        );
-
-        assert(siblingNode !== undefined);
+        let siblingNode;
+        if (parentNode.left === node) {
+            siblingNode = parentNode.right;
+        } else if (parentNode.right === node) {
+            siblingNode = parentNode.left;
+        } else {
+            throw new Error('Parent of node being removed is inconsistent');
+        }
 
         if (grandParentNode === undefined) {
             this.root = siblingNode;
