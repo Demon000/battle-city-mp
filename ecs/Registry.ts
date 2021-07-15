@@ -120,18 +120,39 @@ export class Registry {
         return tagComponents;
     }
 
-    addComponent<
+    setComponentData<
+        C extends Component<C>,
+    >(
+        component: C,
+        data?: Partial<C>,
+    ): void {
+        Object.assign(component, data);
+    }
+
+    _addUpsertComponent<
         C extends Component<C>,
     >(
         entity: Entity,
         clazz: ComponentClassType<C>,
         data?: Partial<C>,
+        upsert = false,
     ): C {
         let component = entity.findComponent(clazz);
-        assert(component === undefined);
+        const componentExisted = component !== undefined;
+        if (component !== undefined && !upsert) {
+            assert(false);
+        }
 
-        component = new clazz(this, entity, clazz);
-        Object.assign(component, data);
+        if (component === undefined) {
+            component = new clazz(this, entity, clazz);
+        }
+
+        this.setComponentData(component, data);
+
+        if (componentExisted) {
+            return component;
+        }
+
         entity.addLocalComponent(component);
 
         const tagComponents = this.getOrCreateComponentTypeSet(clazz);
@@ -143,6 +164,26 @@ export class Registry {
         }
 
         return component;
+    }
+
+    addComponent<
+        C extends Component<C>,
+    >(
+        entity: Entity,
+        clazz: ComponentClassType<C>,
+        data?: Partial<C>,
+    ): C {
+        return this._addUpsertComponent(entity, clazz, data, false);
+    }
+
+    upsertComponent<
+        C extends Component<C>,
+    >(
+        entity: Entity,
+        clazz: ComponentClassType<C>,
+        data?: Partial<C>,
+    ): C {
+        return this._addUpsertComponent(entity, clazz, data, true);
     }
 
     removeEntityComponent<C extends Component<C>>(

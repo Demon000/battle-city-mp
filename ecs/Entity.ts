@@ -50,6 +50,15 @@ export class Entity {
         return this.registry.addComponent(this, clazz, data);
     }
 
+    upsertComponent<
+        C extends Component<C>,
+    >(
+        clazz: ComponentClassType<C>,
+        data?: Partial<C>,
+    ): C {
+        return this.registry.upsertComponent(this, clazz, data);
+    }
+
     removeComponent<C extends Component<C>>(clazz: ComponentClassType<C>): C {
         const component = this.getComponent(clazz);
         return this.registry.removeComponent(component);
