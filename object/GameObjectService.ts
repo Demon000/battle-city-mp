@@ -225,8 +225,8 @@ export class GameObjectService {
     }
 
     processObjectsStatus(delta: number): void {
-        this.processObjectsDestroyed();
         this.processObjectsAutomaticDestroy();
+        this.processObjectsDestroyed();
 
         const movingObjects = this.movingRespository?.getAll();
         if (movingObjects !== undefined) {
