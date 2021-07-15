@@ -593,6 +593,7 @@ export class GameServer {
         }
 
         const configsData = this.config.getDataMultiple([
+            'entities-blueprint',
             'bounding-box',
             'game-object-properties',
             'game-client',

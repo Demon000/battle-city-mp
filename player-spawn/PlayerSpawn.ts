@@ -1,3 +1,4 @@
+import { Registry } from '@/ecs/Registry';
 import { GameObject, GameObjectOptions } from '@/object/GameObject';
 import { GameObjectProperties } from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
@@ -9,10 +10,10 @@ export interface PlayerSpawnOptions extends GameObjectOptions {
 export class PlayerSpawn extends GameObject {
     teamId: string | null;
 
-    constructor(options: PlayerSpawnOptions, properties: GameObjectProperties) {
+    constructor(options: PlayerSpawnOptions, properties: GameObjectProperties, registry: Registry) {
         options.type = GameObjectType.PLAYER_SPAWN;
 
-        super(options, properties);
+        super(options, properties, registry);
 
         this.teamId = options.teamId ?? null;
     }

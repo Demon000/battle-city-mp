@@ -1,3 +1,4 @@
+import { Registry } from '@/ecs/Registry';
 import { GameObject, GameObjectOptions } from '@/object/GameObject';
 import { GameObjectProperties } from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
@@ -14,10 +15,10 @@ export class Explosion extends GameObject {
     explosionType: ExplosionType;
     destroyedObjectType?: GameObjectType;
 
-    constructor(options: ExplosionOptions, properties: GameObjectProperties) {
+    constructor(options: ExplosionOptions, properties: GameObjectProperties, registry: Registry) {
         options.type = GameObjectType.EXPLOSION;
 
-        super(options, properties);
+        super(options, properties, registry);
 
         this.explosionType = options.explosionType;
         this.destroyedObjectType = options.destroyedObjectType;

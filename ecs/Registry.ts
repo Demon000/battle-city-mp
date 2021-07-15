@@ -184,8 +184,8 @@ export class Registry {
 
     getComponents<C extends Component<C>>(
         clazz: ComponentClassType<C>,
-    ): IterableIterator<Component<C>> {
-        return this.getOrCreateComponentTypeSet(clazz).keys();
+    ): IterableIterator<C> {
+        return this.getOrCreateComponentTypeSet(clazz).keys() as IterableIterator<C>;
     }
 
     getView<C extends Component<C>>(

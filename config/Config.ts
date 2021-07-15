@@ -54,8 +54,12 @@ export class Config {
         return multipleNameToData;
     }
 
-    getDataMember<T>(data: any, member: string): T {
-        const value = jp.value(data, `$['${member}']`);
+    findDataMember<T>(data: Record<string, any>, member: string): T | undefined {
+        return jp.value(data, `$['${member}']`);
+    }
+
+    getDataMember<T>(data: Record<string, any>, member: string): T {
+        const value = this.findDataMember<T>(data, member);
         if (value === undefined) {
             throw new Error(`Invalid value for member '${member}'`);
         }
@@ -66,5 +70,10 @@ export class Config {
     get<T>(name: string, path: string): T {
         const data = this.getData(name);
         return this.getDataMember(data, path);
+    }
+
+    find<T>(name: string, path: string): T | undefined {
+        const data = this.getData(name);
+        return this.findDataMember(data, path);
     }
 }

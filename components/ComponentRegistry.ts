@@ -15,6 +15,7 @@ export type DataOfComponent<T> =
     T extends CollisionComponent ? CollisionComponentData :
     T extends PositionComponent ? PositionComponentData :
     T extends SizeComponent ? SizeComponentData :
+    T extends AutomaticDestroyComponent ? AutomaticDestroyComponentData :
     never;
 
 export interface ProcessResults {
@@ -50,6 +51,10 @@ export class ComponentRegistry {
             case SizeComponent.tag:
                 clazz = SizeComponent;
                 if (data !== undefined) assertType<Partial<DataOfComponent<SizeComponent>>>(data);
+                break;
+            case AutomaticDestroyComponent.tag:
+                clazz = AutomaticDestroyComponent;
+                if (data !== undefined) assertType<Partial<DataOfComponent<AutomaticDestroyComponent>>>(data);
                 break;
             default:
                 throw new Error(`Invalid tag: ${tag}`);

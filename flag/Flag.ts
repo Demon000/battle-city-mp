@@ -1,4 +1,5 @@
 import { Color } from '@/drawable/Color';
+import { Registry } from '@/ecs/Registry';
 import { GameObject, GameObjectOptions } from '@/object/GameObject';
 import { GameObjectProperties } from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
@@ -27,10 +28,10 @@ export class Flag extends GameObject {
     sourceId: number | null;
     droppedTankId: number | null;
 
-    constructor(options: FlagOptions, properties: GameObjectProperties) {
+    constructor(options: FlagOptions, properties: GameObjectProperties, registry: Registry) {
         options.type = GameObjectType.FLAG;
 
-        super(options, properties);
+        super(options, properties, registry);
 
         this.teamId = options.teamId;
         this.color = options.color ?? [255, 255, 255] as Color;

@@ -23,7 +23,6 @@ export interface GameObjectProperties {
     height: number;
     savable?: boolean;
     directionAxisSnapping?: number;
-    automaticDestroyTime?: number;
 
     audioEffects?: AudioEffect[];
 }

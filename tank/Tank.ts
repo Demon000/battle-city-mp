@@ -1,5 +1,6 @@
 import { BulletPower } from '@/bullet/BulletPower';
 import { Color } from '@/drawable/Color';
+import { Registry } from '@/ecs/Registry';
 import { GameObjectProperties } from '@/object/GameObjectProperties';
 import { Direction } from '@/physics/Direction';
 import { GameObject, GameObjectOptions } from '../object/GameObject';
@@ -69,10 +70,10 @@ export class Tank extends GameObject {
     flagSourceId: number | null;
     properties: TankProperties;
 
-    constructor(options: TankOptions, properties: TankProperties) {
+    constructor(options: TankOptions, properties: TankProperties, registry: Registry) {
         options.type = GameObjectType.TANK;
 
-        super(options, properties);
+        super(options, properties, registry);
 
         this.properties = properties;
         this.tier = options.tier;

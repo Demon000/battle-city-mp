@@ -1,3 +1,4 @@
+import { Registry } from '@/ecs/Registry';
 import { GameObject, GameObjectOptions } from '@/object/GameObject';
 import { GameObjectProperties } from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
@@ -22,10 +23,10 @@ export class Bullet extends GameObject {
     power: BulletPower;
     damage: number;
 
-    constructor(options: BulletOptions, properties: GameObjectProperties) {
+    constructor(options: BulletOptions, properties: GameObjectProperties, registry: Registry) {
         options.type = GameObjectType.BULLET;
 
-        super(options, properties);
+        super(options, properties, registry);
 
         this.tankId = options.tankId;
         this.playerId = options.playerId;

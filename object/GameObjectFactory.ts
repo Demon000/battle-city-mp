@@ -23,18 +23,25 @@ export class GameObjectFactory {
         }
 
         const properties = this.config.get<GameObjectProperties>('game-object-properties', options.type);
+        let object;
+
         if (options.type === GameObjectType.TANK) {
-            return new Tank(options as TankOptions, properties as TankProperties);
+            object = new Tank(options as TankOptions, properties as TankProperties, this.registry);
         } else if (options.type === GameObjectType.BULLET) {
-            return new Bullet(options as BulletOptions, properties);
+            object = new Bullet(options as BulletOptions, properties, this.registry);
         } else if (options.type === GameObjectType.EXPLOSION) {
-            return new Explosion(options as ExplosionOptions, properties);
+            object = new Explosion(options as ExplosionOptions, properties, this.registry);
         } else if (options.type === GameObjectType.PLAYER_SPAWN) {
-            return new PlayerSpawn(options as PlayerSpawnOptions, properties);
+            object = new PlayerSpawn(options as PlayerSpawnOptions, properties, this.registry);
         } else if (options.type === GameObjectType.FLAG) {
-            return new Flag(options as FlagOptions, properties);
+            object = new Flag(options as FlagOptions, properties, this.registry);
         } else {
-            return new GameObject(options, properties);
+            object = new GameObject(options, properties, this.registry);
         }
+
+        const components = this.entityBlueprint.getComponents(options.type);
+        object.addComponents(components);
+
+        return object;
     }
 }

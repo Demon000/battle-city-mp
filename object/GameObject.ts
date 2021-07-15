@@ -4,6 +4,8 @@ import { Point } from '@/physics/point/Point';
 import { Direction } from '../physics/Direction';
 import { GameObjectType } from './GameObjectType';
 import { AudioEffect, GameObjectProperties, ResourceMeta } from './GameObjectProperties';
+import { Entity } from '@/ecs/Entity';
+import { Registry } from '@/ecs/Registry';
 
 export interface GameObjectOptions {
     id?: number;
@@ -18,7 +20,7 @@ export interface GameObjectOptions {
 
 export type PartialGameObjectOptions = Partial<GameObjectOptions>;
 
-export class GameObject {
+export class GameObject extends Entity {
     static globalId = 0;
 
     protected _audioMeta: ResourceMeta | undefined | null;
@@ -41,13 +43,14 @@ export class GameObject {
     graphicsRenderer?: any;
     audioRenderer?: any;
 
-    constructor(options: GameObjectOptions, properties: GameObjectProperties) {
+    constructor(options: GameObjectOptions, properties: GameObjectProperties, registry: Registry) {
         const id = options.id ?? GameObject.globalId++;
 
         if (options.type === undefined) {
             throw new Error('Cannot construct object without a type');
         }
 
+        super(id, registry);
 
         this.id = id;
         this.properties = properties;
@@ -165,10 +168,6 @@ export class GameObject {
 
     get decelerationFactor(): number {
         return 0;
-    }
-
-    get automaticDestroyTime(): number | undefined {
-        return this.properties.automaticDestroyTime;
     }
 
     protected markGraphicsDirty(): void {

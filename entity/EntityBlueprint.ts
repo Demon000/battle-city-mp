@@ -15,7 +15,11 @@ export class EntityBlueprint {
     ) {}
 
     getComponents(type: string): [ComponentClassType<any>, any][] {
-        const blueprintData = this.config.get<BlueprintData>('entities-blueprint', type);
+        const blueprintData = this.config.find<BlueprintData>('entities-blueprint', type);
+        if (blueprintData === undefined) {
+            return [];
+        }
+
         assert(blueprintData);
         return Object.entries(blueprintData.components).map(
             ([tag, data]) => [this.componentRegistry.getComponentClassByTag(tag), data],

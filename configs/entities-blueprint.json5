@@ -1,20 +1,16 @@
 {
-    'brick-wall': {
-        'extends': {},
-        'components': {
-            SizeComponent: {
-                width: 4,
-                height: 4,
-            },
-            BoundingBoxComponent: {},
-            CollisionComponent: {},
-        },
-    },
     'explosion': {
         components: {
-            AutomaticDestroy: {
-                
+            AutomaticDestroyComponent: {
+                timeMs: 240,
             },
         }
-    }
+    },
+    'smoke': {
+        components: {
+            AutomaticDestroyComponent: {
+                timeMs: 1000,
+            },
+        }
+    },
 }
