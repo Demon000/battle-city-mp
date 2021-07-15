@@ -20,7 +20,6 @@ export class EntityBlueprint {
             return [];
         }
 
-        assert(blueprintData);
         return Object.entries(blueprintData.components).map(
             ([tag, data]) => [this.componentRegistry.getComponentClassByTag(tag), data],
         );
