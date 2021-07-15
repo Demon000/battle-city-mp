@@ -8,5 +8,5 @@ export interface PositionComponentData {
 export class PositionComponent
     extends Component<PositionComponent>
     implements PositionComponentData {
-    value: Point = { x: 0, y: 0 };
+    value = { x: 0, y: 0 };
 }
