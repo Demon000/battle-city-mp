@@ -1,7 +1,6 @@
 import { ComponentRegistry } from '@/components/ComponentRegistry';
 import { Config } from '@/config/Config';
 import { ComponentClassType } from '@/ecs/Component';
-import { assert } from '@/utils/assert';
 
 export interface BlueprintData {
     components: Record<string, any>,
