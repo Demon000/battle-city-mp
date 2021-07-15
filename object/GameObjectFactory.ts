@@ -22,6 +22,10 @@ export class GameObjectFactory {
             throw new Error('Cannot create object from options without a type');
         }
 
+        if (options.id === undefined) {
+            options.id = this.registry.generateId();
+        }
+
         const properties = this.config.get<GameObjectProperties>('game-object-properties', options.type);
         let object;
 

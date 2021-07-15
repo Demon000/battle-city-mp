@@ -35,16 +35,15 @@ export interface RegistryComponentEvents {
 }
 
 export class Registry {
-    private idGenerator;
     private tagsComponentsMap = new Map<string, Set<Component<any>>>();
     private componentsEmitterMap = new Map<string, EventEmitter<RegistryComponentEvents>>();
 
     private idsEntityMap = new Map<EntityId, Entity>();
     emitter = new EventEmitter<RegistryEvents>();
 
-    constructor(idGenerator: RegistryIdGenerator) {
-        this.idGenerator = idGenerator;
-    }
+    constructor(
+        private idGenerator: RegistryIdGenerator,
+    ) {}
 
     componentEmitter<C extends Component<C>>(
         clazz: ComponentClassType<C>,
@@ -72,8 +71,12 @@ export class Registry {
         this.idsEntityMap.set(entity.id, entity);
     }
 
+    generateId(): EntityId {
+        return this.idGenerator.generate();
+    }
+
     createEntity(components: ComponentInitialization[]): Entity {
-        const id = this.idGenerator.generate();
+        const id = this.generateId();
         const entity = new Entity(id, this);
         this.registerEntity(entity);
 
