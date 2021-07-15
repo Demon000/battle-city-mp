@@ -107,7 +107,6 @@ export class GameServer {
             this.gameObjectRepository,
             this.registry,
             this.movingGameObjectRepository,
-            this.destroyedGameObjectRepository,
         );
         this.tankService = new TankService(this.gameObjectRepository, this.gameObjectFactory);
         this.flagService = new FlagService(this.gameObjectRepository, this.gameObjectFactory, this.config);

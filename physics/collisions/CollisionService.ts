@@ -1,3 +1,4 @@
+import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { GameObject } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 import { MapRepository } from '@/utils/MapRepository';
@@ -181,7 +182,7 @@ export class CollisionService {
                 continue;
             }
 
-            if (overlappingObject.destroyed) {
+            if (overlappingObject.hasComponent(DestroyedComponent)) {
                 continue;
             }
 

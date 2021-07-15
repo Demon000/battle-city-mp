@@ -38,7 +38,6 @@ export class GameObject extends Entity {
     spawnTime: number;
 
     collisionsDisabled: boolean;
-    destroyed: boolean;
 
     graphicsRenderer?: any;
     audioRenderer?: any;
@@ -64,7 +63,6 @@ export class GameObject extends Entity {
         this.spawnTime = Date.now();
         this.collisionsDisabled = options.collisionsDisabled ?? false;
         this.graphicsDirty = true;
-        this.destroyed = false;
     }
 
     toOptions(): GameObjectOptions {

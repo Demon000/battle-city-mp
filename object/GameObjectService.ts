@@ -1,4 +1,5 @@
 import { AutomaticDestroyComponent } from '@/components/AutomaticDestroyComponent';
+import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { Registry } from '@/ecs/Registry';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { PlayerSpawn } from '@/player-spawn/PlayerSpawn';
@@ -38,7 +39,6 @@ export class GameObjectService {
         private repository: MapRepository<number, GameObject>,
         private registry: Registry,
         private movingRespository?: MapRepository<number, GameObject>,
-        private destroyedRepository?: MapRepository<number, GameObject>,
     ) {}
 
     findObject(objectId: number): GameObject | undefined {
@@ -80,7 +80,6 @@ export class GameObjectService {
         this.emitter.emit(GameObjectServiceEvent.OBJECT_BEFORE_UNREGISTER, objectId);
         this.repository.remove(objectId);
         this.movingRespository?.remove(object.id);
-        this.destroyedRepository?.remove(object.id);
         this.emitter.emit(GameObjectServiceEvent.OBJECT_UNREGISTERED, objectId);
     }
 
@@ -110,9 +109,7 @@ export class GameObjectService {
 
     setObjectDestroyed(objectId: number): void {
         const object = this.repository.get(objectId);
-        object.destroyed = true;
-
-        this.destroyedRepository?.add(object.id, object);
+        object.upsertComponent(DestroyedComponent);
     }
 
     updateObject(objectId: number, objectOptions: PartialGameObjectOptions): void {
@@ -213,31 +210,22 @@ export class GameObjectService {
         return Date.now() - object.spawnTime > component.timeMs;
     }
 
-    private processObjectDestroy(object: GameObject): boolean {
-        if (object.destroyed) {
-            this.unregisterObject(object.id);
-            return true;
+    private processObjectsDestroyed(): void {
+        for (const component of this.registry.getComponents(DestroyedComponent)) {
+            this.unregisterObject(component.entity.id);
         }
-
-        return false;
     }
 
     private processObjectsAutomaticDestroy(): void {
         for (const component of this.registry.getComponents(AutomaticDestroyComponent)) {
             if (this.isPastAutomaticDestroy(component)) {
-                this.unregisterObject(component.entity.id);
+                component.entity.addComponent(DestroyedComponent);
             }
         }
     }
 
     processObjectsStatus(delta: number): void {
-        const destroyedObjects = this.destroyedRepository?.getAll();
-        if (destroyedObjects !== undefined) {
-            for (const object of destroyedObjects) {
-                this.processObjectDestroy(object);
-            }
-        }
-
+        this.processObjectsDestroyed();
         this.processObjectsAutomaticDestroy();
 
         const movingObjects = this.movingRespository?.getAll();
