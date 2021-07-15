@@ -27,7 +27,7 @@ export class GameObject {
     protected _direction: Direction;
     protected _movementSpeed: number;
     protected _isMoving: boolean;
-    graphicsDirty = true;
+    graphicsDirty: boolean;
 
     id: number;
     properties;
@@ -36,17 +36,20 @@ export class GameObject {
     spawnTime: number;
 
     collisionsDisabled: boolean;
-    destroyed = false;
+    destroyed: boolean;
 
     graphicsRenderer?: any;
     audioRenderer?: any;
 
     constructor(options: GameObjectOptions, properties: GameObjectProperties) {
+        const id = options.id ?? GameObject.globalId++;
+
         if (options.type === undefined) {
             throw new Error('Cannot construct object without a type');
         }
 
-        this.id = options.id ?? GameObject.globalId++;
+
+        this.id = id;
         this.properties = properties;
         this.type = options.type;
         this._position = options.position ?? {x: 0, y: 0};
@@ -57,6 +60,8 @@ export class GameObject {
         this.movementDirection = options.movementDirection ?? null;
         this.spawnTime = Date.now();
         this.collisionsDisabled = options.collisionsDisabled ?? false;
+        this.graphicsDirty = true;
+        this.destroyed = false;
     }
 
     toOptions(): GameObjectOptions {
