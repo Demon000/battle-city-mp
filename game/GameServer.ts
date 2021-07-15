@@ -34,11 +34,10 @@ import { PlayerService, PlayerServiceEvent } from '../player/PlayerService';
 import { BroadcastBatchGameEvent, CommonBatchGameEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
 import { GameEventBatcher, GameEventBatcherEvent } from './GameEventBatcher';
 import { GameModeService } from '@/game-mode/GameModeService';
-// import { EntityFactory } from '@/entity/EntityFactory';
-// import { Registry } from '@/ecs/Registry';
-// import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
-// import { ComponentRegistry } from '@/components/ComponentRegistry';
-// import { EntityBlueprint } from '@/entity/EntityBlueprint';
+import { Registry } from '@/ecs/Registry';
+import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
+import { ComponentRegistry } from '@/components/ComponentRegistry';
+import { EntityBlueprint } from '@/entity/EntityBlueprint';
 import { Flag, FlagType, PartialFlagOptions } from '@/flag/Flag';
 import { FlagService, FlagServiceEvent, FlagTankInteraction } from '@/flag/FlagService';
 import { PlayerPointsEvent } from '@/player/PlayerPoints';
@@ -58,11 +57,9 @@ export interface GameServerEvents {
 }
 
 export class GameServer {
-    // private registry;
-    // private entityFactory;
-    // private componentRegistry;
-
-    // private entityBlueprints;
+    private registry;
+    private componentRegistry;
+    private entityBlueprint;
 
     private config;
     private gameModeService;
@@ -89,20 +86,16 @@ export class GameServer {
     emitter = new EventEmitter<GameServerEvents>();
 
     constructor(mapName: string, gameMode: string) {
-        // const RegistryIdGenerator = new RegistryNumberIdGenerator();
-        // this.registry = new Registry(RegistryIdGenerator);
-
-        // const entitiesBlueprintText = fs.readFileSync('./entity/entities-blueprint.json5', 'utf8');
-        // const entitiesBlueptintData = JSON5.parse(entitiesBlueprintText);
-        // this.componentRegistry = new ComponentRegistry();
-        // this.entityBlueprints = new EntityBlueprint(this.componentRegistry, entitiesBlueptintData);
-        // this.entityFactory = new EntityFactory(this.registry, this.entityBlueprints);
-
         this.config = new Config();
         this.config.loadAll('./configs');
 
+        const RegistryIdGenerator = new RegistryNumberIdGenerator();
+        this.registry = new Registry(RegistryIdGenerator);
+        this.componentRegistry = new ComponentRegistry();
+        this.entityBlueprint = new EntityBlueprint(this.config, this.componentRegistry);
+
         this.gameModeService = new GameModeService(this.config);
-        this.gameObjectFactory = new GameObjectFactory(this.config);
+        this.gameObjectFactory = new GameObjectFactory(this.entityBlueprint, this.registry, this.config);
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.movingGameObjectRepository = new MapRepository<number, GameObject>();
         this.destroyedGameObjectRepository = new MapRepository<number, GameObject>();
@@ -112,6 +105,7 @@ export class GameServer {
             this.boundingBoxRepository, this.collisionRules);
         this.gameObjectService = new GameObjectService(
             this.gameObjectRepository,
+            this.registry,
             this.movingGameObjectRepository,
             this.destroyedGameObjectRepository,
         );
@@ -128,13 +122,6 @@ export class GameServer {
 
         const ticksPerSecond = this.config.get<number>('game-server', 'ticksPerSecond');
         this.ticker = new Ticker(ticksPerSecond);
-
-        // console.log(this.entityFactory.buildBrickWall(
-        //     {
-        //         x: 0,
-        //         y: 0,
-        //     },
-        // ));
 
         /**
          * PlayerService event handlers
@@ -264,6 +251,7 @@ export class GameServer {
 
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REGISTERED,
             (object: GameObject) => {
+                this.registry.registerEntity(object);
                 this.collisionService.registerObjectCollisions(object.id);
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_REGISTERED, object.toOptions()]);
 
@@ -295,7 +283,6 @@ export class GameServer {
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BEFORE_UNREGISTER,
             (objectId: number) => {
                 const object = this.gameObjectService.getObject(objectId);
-
                 switch (object.type) {
                     case GameObjectType.TANK: {
                         const tank = object as Tank;
@@ -314,6 +301,8 @@ export class GameServer {
                         break;
                     }
                 }
+
+                this.registry.destroyEntity(object);
             });
 
         /**

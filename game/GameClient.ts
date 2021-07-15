@@ -27,6 +27,10 @@ import { Color } from '@/drawable/Color';
 import { PartialTankOptions, TankProperties } from '@/tank/Tank';
 import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
+import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
+import { Registry } from '@/ecs/Registry';
+import { ComponentRegistry } from '@/components/ComponentRegistry';
+import { EntityBlueprint } from '@/entity/EntityBlueprint';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -82,6 +86,10 @@ export interface GameClientEvents {
 
 export class GameClient {
     private config;
+    private registry;
+    private componentRegistry;
+    private entityBlueprint;
+
     private gameObjectFactory;
     private playerRepository;
     private playerService;
@@ -103,11 +111,17 @@ export class GameClient {
 
     constructor(canvases: HTMLCanvasElement[]) {
         this.config = new Config();
-        this.gameObjectFactory = new GameObjectFactory(this.config);
+
+        const RegistryIdGenerator = new RegistryNumberIdGenerator();
+        this.registry = new Registry(RegistryIdGenerator);
+        this.componentRegistry = new ComponentRegistry();
+        this.entityBlueprint = new EntityBlueprint(this.config, this.componentRegistry);
+
+        this.gameObjectFactory = new GameObjectFactory(this.entityBlueprint, this.registry, this.config);
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);
-        this.gameObjectService = new GameObjectService(this.gameObjectRepository);
+        this.gameObjectService = new GameObjectService(this.gameObjectRepository, this.registry);
         this.tankService = new TankService(this.gameObjectRepository, this.gameObjectFactory);
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.config, this.playerRepository);

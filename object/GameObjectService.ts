@@ -1,3 +1,4 @@
+import { Registry } from '@/ecs/Registry';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { PlayerSpawn } from '@/player-spawn/PlayerSpawn';
 import { MapRepository } from '@/utils/MapRepository';

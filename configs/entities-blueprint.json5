@@ -1,0 +1,20 @@
+{
+    'brick-wall': {
+        'extends': {},
+        'components': {
+            SizeComponent: {
+                width: 4,
+                height: 4,
+            },
+            BoundingBoxComponent: {},
+            CollisionComponent: {},
+        },
+    },
+    'explosion': {
+        components: {
+            AutomaticDestroy: {
+                
+            },
+        }
+    }
+}
