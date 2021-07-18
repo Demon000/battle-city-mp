@@ -1,4 +1,4 @@
-import { ComponentRegistry } from '@/components/ComponentRegistry';
+import { ComponentRegistry } from './ComponentRegistry';
 import { assert } from '@/utils/assert';
 import EventEmitter from 'eventemitter3';
 import { Component, ComponentClassType } from './Component';

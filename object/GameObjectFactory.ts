@@ -1,7 +1,7 @@
 import { Bullet, BulletOptions } from '@/bullet/Bullet';
 import { Config } from '@/config/Config';
 import { Registry } from '@/ecs/Registry';
-import { EntityBlueprint } from '@/entity/EntityBlueprint';
+import { EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { Explosion, ExplosionOptions } from '@/explosion/Explosion';
 import { Flag, FlagOptions } from '@/flag/Flag';
 import { PlayerSpawn, PlayerSpawnOptions } from '@/player-spawn/PlayerSpawn';

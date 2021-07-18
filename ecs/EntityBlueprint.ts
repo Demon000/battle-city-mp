@@ -1,6 +1,6 @@
-import { ComponentRegistry } from '@/components/ComponentRegistry';
+import { ComponentRegistry } from './ComponentRegistry';
 import { Config } from '@/config/Config';
-import { ComponentClassType } from '@/ecs/Component';
+import { ComponentClassType } from './Component';
 
 export interface BlueprintData {
     components: Record<string, any>,

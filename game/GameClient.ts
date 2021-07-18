@@ -29,7 +29,7 @@ import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { Registry } from '@/ecs/Registry';
-import { ComponentRegistry } from '@/components/ComponentRegistry';
+import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
