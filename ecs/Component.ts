@@ -21,9 +21,7 @@ export class Component<C extends Component<C>> {
 
 export type ComponentClassType<C = any> = {
     readonly TAG?: string;
-    readonly serializable?: boolean;
     readonly tag: string;
-    readonly id?: number;
 
     new (
         registry: Registry,
