@@ -117,7 +117,10 @@ export class TextDrawable extends BaseDrawable {
         const scale = this.getScale();
         const paddingX = (properties.paddingX ?? 0) * scale.x;
         const paddingY = (properties.paddingY ?? 0) * scale.y;
-        const maxTextWidth = properties.maxTextWidth && properties.maxTextWidth * scale.x;
+        let maxTextWidth;
+        if (properties.maxTextWidth !== undefined) {
+            maxTextWidth = properties.maxTextWidth * scale.x;
+        }
         let textWidth = textMeasurements.width;
         if (maxTextWidth !== undefined
             && textWidth > maxTextWidth) {
@@ -222,7 +225,7 @@ export class TextDrawable extends BaseDrawable {
     }
 
     positionXReference(positionXReference: TextPositionReference): this | undefined {
-        if (!this.isLoaded) {
+        if (!this.isLoaded()) {
             return undefined;
         }
 
@@ -244,7 +247,7 @@ export class TextDrawable extends BaseDrawable {
     }
 
     positionYReference(positionYReference: TextPositionReference): this | undefined {
-        if (!this.isLoaded) {
+        if (!this.isLoaded()) {
             return undefined;
         }
 

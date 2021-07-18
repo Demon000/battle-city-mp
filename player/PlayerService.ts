@@ -316,7 +316,7 @@ export class PlayerService {
             .filter(a => a.buttonState === ButtonState.PRESSED)
             .sort((a, b) => b.timestamp - a.timestamp);
 
-        if (!actions[0]) {
+        if (actions[0] === undefined) {
             return undefined;
         }
 

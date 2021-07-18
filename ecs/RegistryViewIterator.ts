@@ -8,9 +8,9 @@ export class RegistryViewIterator implements Iterator<Entity> {
     ) {}
 
     next(): IteratorResult<Entity, undefined> {
-        let currentComponent;
-        let foundEntity;
-        while ((currentComponent = this.components.next().value)) {
+        let currentComponent: Component<any> | undefined;
+        let foundEntity: Entity | undefined;
+        while ((currentComponent = this.components.next().value) !== undefined) {
             let hasAllComponents = true;
 
             for (const clazz of this.clazzes) {
