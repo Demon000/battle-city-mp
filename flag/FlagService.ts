@@ -3,7 +3,6 @@ import { GameObject } from '@/object/GameObject';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { Tank } from '@/tank/Tank';
-import { assert } from '@/utils/assert';
 import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import { Flag, FlagOptions, FlagType, PartialFlagOptions } from './Flag';

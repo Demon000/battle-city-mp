@@ -200,10 +200,10 @@ export class Registry {
         const component = entity.removeLocalComponent(clazz);
 
         const tagComponents = this.tagsComponentsMap.get(clazz.tag);
-        assert(tagComponents);
+        assert(tagComponents !== undefined);
 
         const tagsHadComponent = tagComponents.delete(component);
-        assert(tagsHadComponent);
+        assert(tagsHadComponent !== undefined);
 
         const componentEmitter = this.componentEmitter(clazz);
         if (componentEmitter !== undefined) {
@@ -225,7 +225,7 @@ export class Registry {
 
     getEntityById(id: EntityId): Entity {
         const entity = this.getEntityById(id);
-        assert(entity);
+        assert(entity !== undefined);
         return entity;
     }
 

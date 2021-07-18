@@ -180,7 +180,6 @@ export class GameMap {
                     const r = png.data[id];
                     const g = png.data[id + 1];
                     const b = png.data[id + 2];
-                    const a = png.data[id + 3];
                     if (r === 0 && g === 0 && b === 0) {
                         continue;
                     }

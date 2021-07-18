@@ -29,7 +29,7 @@ export class Entity {
         clazz: ComponentClassType<C>,
     ): C {
         const component = this.tagComponentMap.get(clazz);
-        assert(component);
+        assert(component !== undefined);
 
         const hadComponent = this.tagComponentMap.delete(clazz);
         assert(hadComponent);
@@ -84,7 +84,7 @@ export class Entity {
 
     getComponent<C extends Component<C>>(clazz: ComponentClassType<C>): C {
         const component = this.findComponent(clazz);
-        assert(component);
+        assert(component !== undefined);
         return component;
     }
 
