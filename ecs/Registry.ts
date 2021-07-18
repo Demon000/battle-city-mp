@@ -151,7 +151,7 @@ export class Registry {
         tagComponents.add(component);
 
         const componentEmitter = this.componentEmitter(clazz);
-        if (componentEmitter) {
+        if (componentEmitter !== undefined) {
             componentEmitter.emit(RegistryEvent.COMPONENT_ADDED, this, component);
         }
 
