@@ -37,17 +37,13 @@ export class Entity {
         return component as C;
     }
 
-    addComponents(components: ComponentInitialization[]): void {
-        this.registry.addComponents(this, components);
-    }
-
     addComponent<
         C extends Component<C>,
     >(
-        clazz: ComponentClassType<C>,
+        clazzOrTag: ComponentClassType<C> | string,
         data?: Partial<C>,
     ): C {
-        return this.registry.addComponent(this, clazz, data);
+        return this.registry.addComponent(this, clazzOrTag, data);
     }
 
     upsertComponent<
@@ -57,6 +53,18 @@ export class Entity {
         data?: Partial<C>,
     ): C {
         return this.registry.upsertComponent(this, clazz, data);
+    }
+
+    addComponents(components: ComponentInitialization[]): void {
+        this.registry.addComponents(this, components);
+    }
+
+    getTagDataComponents(): [string, Partial<Component<any>>][] {
+        const tagsComponentsEncoding: [string, Partial<Component<any>>][] = [];
+        for (const [clazz, component] of this.tagComponentMap) {
+            tagsComponentsEncoding.push([clazz.tag, component.getData()]);
+        }
+        return tagsComponentsEncoding;
     }
 
     removeComponent<C extends Component<C>>(clazz: ComponentClassType<C>): C {

@@ -14,6 +14,14 @@ export class Component<C extends Component<C>> {
         return this.TAG ?? this.name;
     }
 
+    getData(): Partial<this> {
+        return {};
+    }
+
+    setData(encoding: Partial<this>): void {
+        Object.assign(this, encoding);
+    }
+
     remove(): C {
         return this.entity.removeComponent(this.clazz);
     }

@@ -12,9 +12,9 @@ import { GameObjectType } from './GameObjectType';
 
 export class GameObjectFactory {
     constructor(
-        private entityBlueprint: EntityBlueprint,
         private registry: Registry,
         private config: Config,
+        private entityBlueprint?: EntityBlueprint,
     ) {}
 
     buildFromOptions(options: GameObjectOptions): GameObject {
@@ -43,8 +43,10 @@ export class GameObjectFactory {
             object = new GameObject(options, properties, this.registry);
         }
 
-        const components = this.entityBlueprint.getComponents(options.type);
-        object.addComponents(components);
+        const components = this.entityBlueprint?.getComponents(options.type);
+        if (components !== undefined) {
+            object.addComponents(components);
+        }
 
         return object;
     }

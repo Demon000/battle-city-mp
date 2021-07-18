@@ -13,10 +13,10 @@ export class EntityBlueprint {
         private componentRegistry: ComponentRegistry,
     ) {}
 
-    getComponents(type: string): [ComponentClassType<any>, any][] {
+    getComponents(type: string): [ComponentClassType<any>, any][] | undefined {
         const blueprintData = this.config.find<BlueprintData>('entities-blueprint', type);
         if (blueprintData === undefined) {
-            return [];
+            return undefined;
         }
 
         return Object.entries(blueprintData.components).map(

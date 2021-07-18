@@ -57,8 +57,9 @@ export interface GameServerEvents {
 }
 
 export class GameServer {
-    private registry;
+    private registryIdGenerator;
     private componentRegistry;
+    private registry;
     private entityBlueprint;
 
     private config;
@@ -69,7 +70,6 @@ export class GameServer {
     private playerService;
     private gameObjectRepository;
     private movingGameObjectRepository;
-    private destroyedGameObjectRepository;
     private gameObjectService;
     private tankService;
     private flagService;
@@ -89,16 +89,15 @@ export class GameServer {
         this.config = new Config();
         this.config.loadAll('./configs');
 
-        const RegistryIdGenerator = new RegistryNumberIdGenerator();
-        this.registry = new Registry(RegistryIdGenerator);
+        this.registryIdGenerator = new RegistryNumberIdGenerator();
         this.componentRegistry = new ComponentRegistry();
+        this.registry = new Registry(this.registryIdGenerator, this.componentRegistry);
         this.entityBlueprint = new EntityBlueprint(this.config, this.componentRegistry);
 
         this.gameModeService = new GameModeService(this.config);
-        this.gameObjectFactory = new GameObjectFactory(this.entityBlueprint, this.registry, this.config);
+        this.gameObjectFactory = new GameObjectFactory(this.registry, this.config, this.entityBlueprint);
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.movingGameObjectRepository = new MapRepository<number, GameObject>();
-        this.destroyedGameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
         this.collisionRules = rules;
         this.collisionService = new CollisionService(this.gameObjectRepository,
@@ -592,7 +591,6 @@ export class GameServer {
         }
 
         const configsData = this.config.getDataMultiple([
-            'entities-blueprint',
             'bounding-box',
             'game-object-properties',
             'game-client',

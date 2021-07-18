@@ -1,3 +1,4 @@
+import { ComponentRegistry } from '@/components/ComponentRegistry';
 import { assert } from '@/utils/assert';
 import EventEmitter from 'eventemitter3';
 import { Component, ComponentClassType } from './Component';
@@ -7,8 +8,10 @@ import { RegistryIdGenerator } from './RegistryIdGenerator';
 import { RegistryViewIterator } from './RegistryViewIterator';
 
 export type ComponentInitialization =
-    [ComponentClassType<any>, any] |
-    ComponentClassType<any>;
+    [ComponentClassType<any>, Partial<Component<any>>] |
+    ComponentClassType<any> |
+    [string, Partial<Component<any>>] |
+    string;
 
 export enum RegistryEvent {
     ENTITY_ADDED = 'entity-added',
@@ -43,6 +46,7 @@ export class Registry {
 
     constructor(
         private idGenerator: RegistryIdGenerator,
+        private componentRegistry: ComponentRegistry,
     ) {}
 
     componentEmitter<C extends Component<C>>(
@@ -87,21 +91,6 @@ export class Registry {
         return entity;
     }
 
-    addComponents(entity: Entity, components: ComponentInitialization[]): void {
-        for (const clazzDataOrClazz of components) {
-            let clazz;
-            let data;
-
-            if (Array.isArray(clazzDataOrClazz)) {
-                [clazz, data] = clazzDataOrClazz;
-            } else {
-                clazz = clazzDataOrClazz;
-            }
-
-            this.addComponent(entity, clazz, data);
-        }
-    }
-
     destroyEntity(entity: Entity): void {
         entity.removeComponents();
         const entityIdExisted = this.idsEntityMap.delete(entity.id);
@@ -120,23 +109,24 @@ export class Registry {
         return tagComponents;
     }
 
-    setComponentData<
-        C extends Component<C>,
-    >(
-        component: C,
-        data?: Partial<C>,
-    ): void {
-        Object.assign(component, data);
-    }
-
     _addUpsertComponent<
         C extends Component<C>,
     >(
         entity: Entity,
-        clazz: ComponentClassType<C>,
+        clazzOrTag: ComponentClassType<C> | string,
         data?: Partial<C>,
         upsert = false,
     ): C {
+        let clazz;
+        if (typeof clazzOrTag === 'string') {
+            clazz = this.componentRegistry.getComponentClassByTag(clazzOrTag);
+            if (data !== undefined) {
+                this.componentRegistry.validateComponentData(clazz, data);
+            }
+        } else {
+            clazz = clazzOrTag;
+        }
+
         let component = entity.findComponent(clazz);
         const componentExisted = component !== undefined;
         if (component !== undefined && !upsert) {
@@ -147,7 +137,9 @@ export class Registry {
             component = new clazz(this, entity, clazz);
         }
 
-        this.setComponentData(component, data);
+        if (data !== undefined) {
+            component.setData(data);
+        }
 
         if (componentExisted) {
             return component;
@@ -170,20 +162,35 @@ export class Registry {
         C extends Component<C>,
     >(
         entity: Entity,
-        clazz: ComponentClassType<C>,
+        clazzOrTag: ComponentClassType<C> | string,
         data?: Partial<C>,
     ): C {
-        return this._addUpsertComponent(entity, clazz, data, false);
+        return this._addUpsertComponent(entity, clazzOrTag, data, false);
+    }
+
+    addComponents(entity: Entity, components: ComponentInitialization[]): void {
+        for (const clazzDataOrClazz of components) {
+            let clazz;
+            let data;
+
+            if (Array.isArray(clazzDataOrClazz)) {
+                [clazz, data] = clazzDataOrClazz;
+            } else {
+                clazz = clazzDataOrClazz;
+            }
+
+            this.addComponent(entity, clazz, data);
+        }
     }
 
     upsertComponent<
         C extends Component<C>,
     >(
         entity: Entity,
-        clazz: ComponentClassType<C>,
+        clazzOrTag: ComponentClassType<C> | string,
         data?: Partial<C>,
     ): C {
-        return this._addUpsertComponent(entity, clazz, data, true);
+        return this._addUpsertComponent(entity, clazzOrTag, data, true);
     }
 
     removeEntityComponent<C extends Component<C>>(
@@ -199,7 +206,7 @@ export class Registry {
         assert(tagsHadComponent);
 
         const componentEmitter = this.componentEmitter(clazz);
-        if (componentEmitter) {
+        if (componentEmitter !== undefined) {
             componentEmitter.emit(RegistryEvent.COMPONENT_REMOVED, this, component);
         }
 
