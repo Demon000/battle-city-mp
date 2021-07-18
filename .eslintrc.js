@@ -10,7 +10,8 @@ module.exports = {
         '@vue/typescript'
     ],
     'parserOptions': {
-        'parser': '@typescript-eslint/parser'
+        'parser': '@typescript-eslint/parser',
+        'project': './tsconfig.json',
     },
     'plugins': [
         '@typescript-eslint'
@@ -48,6 +49,8 @@ module.exports = {
 
         '@typescript-eslint/no-explicit-any': 'off',
         '@typescript-eslint/no-empty-interface': 'off',
+
+        '@typescript-eslint/strict-boolean-expressions': 'error',
 
         'vue/no-unused-components': ['warn'],
         'vue/comment-directive': 'off',
