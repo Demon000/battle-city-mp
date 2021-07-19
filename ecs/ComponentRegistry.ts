@@ -6,6 +6,7 @@ import { SizeComponent, SizeComponentData } from '@/physics/size/SizeComponent';
 import { AutomaticDestroyComponent, AutomaticDestroyComponentData } from '../components/AutomaticDestroyComponent';
 import { assert } from '@/utils/assert';
 import { assertType } from 'typescript-is';
+import { DestroyedComponent, DestroyedComponentData } from '@/components/DestroyedComponent';
 
 /* eslint-disable @typescript-eslint/indent */
 export type DataOfComponent<T> =
@@ -14,6 +15,7 @@ export type DataOfComponent<T> =
     T extends PositionComponent ? PositionComponentData :
     T extends SizeComponent ? SizeComponentData :
     T extends AutomaticDestroyComponent ? AutomaticDestroyComponentData :
+    T extends DestroyedComponent ? DestroyedComponentData :
     never;
 
 export interface ProcessResults {
@@ -49,6 +51,10 @@ export class ComponentRegistry {
             case AutomaticDestroyComponent.tag:
                 clazz = AutomaticDestroyComponent;
                 if (data !== undefined) assertType<Partial<DataOfComponent<AutomaticDestroyComponent>>>(data);
+                break;
+            case DestroyedComponent.tag:
+                clazz = DestroyedComponent;
+                if (data !== undefined) assertType<Partial<DataOfComponent<DestroyedComponent>>>(data);
                 break;
             default:
                 throw new Error(`Invalid tag: ${tag}`);
