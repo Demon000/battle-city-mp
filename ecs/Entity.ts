@@ -1,7 +1,7 @@
 import { assert } from '@/utils/assert';
-import { Component, ComponentClassType } from './Component';
+import { Component, ComponentClassType, ComponentInitialization } from './Component';
 import { EntityId } from './EntityId';
-import { Registry, ComponentInitialization } from './Registry';
+import { Registry } from './Registry';
 
 export class Entity {
     private tagComponentMap = new Map<ComponentClassType, Component<any>>();

@@ -1,6 +1,12 @@
 import { Entity } from './Entity';
 import { Registry } from './Registry';
 
+export type ComponentInitialization =
+    [ComponentClassType<any>, Partial<Component<any>>] |
+    ComponentClassType<any> |
+    [string, Partial<Component<any>>] |
+    string;
+
 export class Component<C extends Component<C>> {
     constructor(
         readonly registry: Registry,

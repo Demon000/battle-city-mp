@@ -1,17 +1,11 @@
 import { ComponentRegistry } from './ComponentRegistry';
 import { assert } from '@/utils/assert';
 import EventEmitter from 'eventemitter3';
-import { Component, ComponentClassType } from './Component';
+import { Component, ComponentClassType, ComponentInitialization } from './Component';
 import { Entity } from './Entity';
 import { EntityId } from './EntityId';
 import { RegistryIdGenerator } from './RegistryIdGenerator';
 import { RegistryViewIterator } from './RegistryViewIterator';
-
-export type ComponentInitialization =
-    [ComponentClassType<any>, Partial<Component<any>>] |
-    ComponentClassType<any> |
-    [string, Partial<Component<any>>] |
-    string;
 
 export enum RegistryEvent {
     ENTITY_ADDED = 'entity-added',
