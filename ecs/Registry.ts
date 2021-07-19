@@ -108,7 +108,7 @@ export class Registry {
     >(
         entity: Entity,
         clazzOrTag: ComponentClassType<C> | string,
-        data?: any,
+        data?: Record<string, any>,
         upsert = false,
     ): C {
         let clazz;
@@ -158,7 +158,7 @@ export class Registry {
     >(
         entity: Entity,
         clazzOrTag: ComponentClassType<C> | string,
-        data?: any,
+        data?: Record<string, any>,
     ): C {
         return this._addUpsertComponent(entity, clazzOrTag, data, false);
     }
@@ -183,7 +183,7 @@ export class Registry {
     >(
         entity: Entity,
         clazzOrTag: ComponentClassType<C> | string,
-        data?: any,
+        data?: Record<string, any>,
     ): C {
         return this._addUpsertComponent(entity, clazzOrTag, data, true);
     }

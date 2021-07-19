@@ -41,7 +41,7 @@ export class Entity {
         C extends Component<C>,
     >(
         clazzOrTag: ComponentClassType<C> | string,
-        data?: any,
+        data?: Record<string, any>,
     ): C {
         return this.registry.addComponent(this, clazzOrTag, data);
     }
@@ -50,7 +50,7 @@ export class Entity {
         C extends Component<C>,
     >(
         clazz: ComponentClassType<C> | string,
-        data?: any,
+        data?: Record<string, any>,
     ): C {
         return this.registry.upsertComponent(this, clazz, data);
     }
