@@ -79,7 +79,7 @@ export class Registry {
         return this.idGenerator.generate();
     }
 
-    createEntity(components: ComponentInitialization[]): Entity {
+    createEntity(components?: ComponentInitialization[]): Entity {
         const id = this.generateId();
         const entity = new Entity(id, this);
         this.registerEntity(entity);
