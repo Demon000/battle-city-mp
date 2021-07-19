@@ -1,3 +1,4 @@
+import { nonenumerable } from '@/utils/enumerable';
 import { Entity } from './Entity';
 import { Registry } from './Registry';
 
@@ -8,11 +9,24 @@ export type ComponentInitialization =
     string;
 
 export class Component<C extends Component<C>> {
+    @nonenumerable
+    readonly registry: Registry;
+
+    @nonenumerable
+    readonly entity: Entity;
+
+    @nonenumerable
+    readonly clazz: ComponentClassType<C>;
+
     constructor(
-        readonly registry: Registry,
-        readonly entity: Entity,
-        readonly clazz: ComponentClassType<C>,
-    ) {}
+        registry: Registry,
+        entity: Entity,
+        clazz: ComponentClassType<C>,
+    ) {
+        this.registry = registry;
+        this.entity = entity;
+        this.clazz = clazz;
+    }
 
     static readonly TAG?: string;
 
@@ -21,7 +35,7 @@ export class Component<C extends Component<C>> {
     }
 
     getData(): Partial<this> {
-        return {};
+        return {...this};
     }
 
     setData(encoding: Partial<this>): void {
