@@ -108,17 +108,18 @@ export class Registry {
     >(
         entity: Entity,
         clazzOrTag: ComponentClassType<C> | string,
-        data?: Partial<C>,
+        data?: any,
         upsert = false,
     ): C {
         let clazz;
         if (typeof clazzOrTag === 'string') {
             clazz = this.componentRegistry.getComponentClassByTag(clazzOrTag);
-            if (data !== undefined) {
-                this.componentRegistry.validateComponentData(clazz, data);
-            }
         } else {
             clazz = clazzOrTag;
+        }
+
+        if (data !== undefined) {
+            this.componentRegistry.validateComponentData(clazz, data);
         }
 
         let component = entity.findComponent(clazz);
@@ -157,20 +158,20 @@ export class Registry {
     >(
         entity: Entity,
         clazzOrTag: ComponentClassType<C> | string,
-        data?: Partial<C>,
+        data?: any,
     ): C {
         return this._addUpsertComponent(entity, clazzOrTag, data, false);
     }
 
     addComponents(entity: Entity, components: ComponentInitialization[]): void {
-        for (const clazzDataOrClazz of components) {
+        for (const componentInitialization of components) {
             let clazz;
             let data;
 
-            if (Array.isArray(clazzDataOrClazz)) {
-                [clazz, data] = clazzDataOrClazz;
+            if (Array.isArray(componentInitialization)) {
+                [clazz, data] = componentInitialization;
             } else {
-                clazz = clazzDataOrClazz;
+                clazz = componentInitialization;
             }
 
             this.addComponent(entity, clazz, data);
@@ -182,7 +183,7 @@ export class Registry {
     >(
         entity: Entity,
         clazzOrTag: ComponentClassType<C> | string,
-        data?: Partial<C>,
+        data?: any,
     ): C {
         return this._addUpsertComponent(entity, clazzOrTag, data, true);
     }
