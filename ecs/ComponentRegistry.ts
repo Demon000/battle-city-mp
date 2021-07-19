@@ -26,9 +26,9 @@ export interface ProcessResults {
 export class ComponentRegistry {
     private process(tag?: string, clazz?: ComponentClassType<any>, data?: any): ProcessResults {
         assert(tag !== undefined || clazz !== undefined);
-        
+
         if (tag === undefined && clazz !== undefined) {
-            tag = clazz.TAG;
+            tag = clazz.tag;
         }
 
         switch(tag) {
