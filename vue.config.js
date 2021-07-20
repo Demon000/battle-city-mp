@@ -17,5 +17,13 @@ module.exports = {
     },
     chainWebpack: config => {
         config.optimization.delete('splitChunks');
+        config.module
+            .rule('ts')
+            .use('ts-loader')
+            .tap(options => {
+                options.transpileOnly = false;
+                options.compiler = 'ttypescript';
+                return options;
+            });
     },
 };
