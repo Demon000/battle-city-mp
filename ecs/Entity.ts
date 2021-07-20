@@ -59,7 +59,7 @@ export class Entity {
         this.registry.addComponents(this, components);
     }
 
-    getTagDataComponents(): [string, Partial<Component<any>>][] {
+    getComponentsData(): [string, Partial<Component<any>>][] {
         const tagsComponentsEncoding: [string, Partial<Component<any>>][] = [];
         for (const [clazz, component] of this.tagComponentMap) {
             tagsComponentsEncoding.push([clazz.tag, component.getData()]);

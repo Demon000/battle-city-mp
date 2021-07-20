@@ -75,6 +75,7 @@ export class GameObject extends Entity {
             direction: this.direction,
             movementSpeed: this.movementSpeed,
             movementDirection: this.movementDirection,
+            components: this.getComponentsData(),
         };
     }
 
