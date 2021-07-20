@@ -34,10 +34,10 @@ export interface RegistryComponentEvents {
 }
 
 export type DataHandlingFn = <C extends Component<C>>(
-        entity: Entity,
-        clazzOrTag: ComponentClassType<C> | string,
-        data?: Record<string, any>,
-    ) => C;
+    entity: Entity,
+    clazzOrTag: ComponentClassType<C> | string,
+    data?: Record<string, any>,
+) => C;
 
 export class Registry {
     private tagsComponentsMap = new Map<string, Set<Component<any>>>();
