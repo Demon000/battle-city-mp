@@ -46,6 +46,15 @@ export class Entity {
         return this.registry.addComponent(this, clazzOrTag, data);
     }
 
+    updateComponent<
+        C extends Component<C>,
+    >(
+        clazzOrTag: ComponentClassType<C> | string,
+        data?: Record<string, any>,
+    ): C {
+        return this.registry.updateComponent(this, clazzOrTag, data);
+    }
+
     upsertComponent<
         C extends Component<C>,
     >(
