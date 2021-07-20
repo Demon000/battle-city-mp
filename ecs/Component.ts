@@ -38,7 +38,7 @@ export class Component<C extends Component<C>> {
         return {...this};
     }
 
-    setData(encoding: Partial<this>): void {
+    setData(encoding: Record<string, any>): void {
         Object.assign(this, encoding);
     }
 

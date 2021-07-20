@@ -105,14 +105,9 @@ export class Registry {
         return tagComponents;
     }
 
-    _addUpsertComponent<
+    private getClazz<
         C extends Component<C>,
-    >(
-        entity: Entity,
-        clazzOrTag: ComponentClassType<C> | string,
-        data?: Record<string, any>,
-        upsert = false,
-    ): C {
+    >(clazzOrTag: ComponentClassType<C> | string): ComponentClassType<C> {
         let clazz;
         if (typeof clazzOrTag === 'string') {
             clazz = this.componentRegistry.getComponentClassByTag(clazzOrTag);
@@ -120,43 +115,7 @@ export class Registry {
             clazz = clazzOrTag;
         }
 
-        if (data !== undefined) {
-            this.componentRegistry.validateComponentData(clazz, data);
-        }
-
-        let component = entity.findComponent(clazz);
-        const componentExisted = component !== undefined;
-        if (component !== undefined && !upsert) {
-            assert(false);
-        }
-
-        if (component === undefined) {
-            component = new clazz(this, entity, clazz);
-        }
-
-        if (data !== undefined) {
-            component.setData(data);
-        }
-
-        const componentEmitter = this.componentEmitter(clazz);
-
-        if (componentExisted) {
-            if (componentEmitter !== undefined) {
-                componentEmitter.emit(RegistryEvent.COMPONENT_UPDATED, component);
-            }
-            return component;
-        }
-
-        entity.addLocalComponent(component);
-
-        const tagComponents = this.getOrCreateComponentTypeSet(clazz);
-        tagComponents.add(component);
-
-        if (componentEmitter !== undefined) {
-            componentEmitter.emit(RegistryEvent.COMPONENT_ADDED, component);
-        }
-
-        return component;
+        return clazz;
     }
 
     addComponent<
@@ -166,7 +125,48 @@ export class Registry {
         clazzOrTag: ComponentClassType<C> | string,
         data?: Record<string, any>,
     ): C {
-        return this._addUpsertComponent(entity, clazzOrTag, data, false);
+        const clazz = this.getClazz(clazzOrTag);
+        const component = new clazz(this, entity, clazz);
+
+        if (data !== undefined) {
+            this.componentRegistry.validateComponentData(clazz, data);
+            component.setData(data);
+        }
+
+        entity.addLocalComponent(component);
+
+        const tagComponents = this.getOrCreateComponentTypeSet(clazz);
+        tagComponents.add(component);
+
+        const componentEmitter = this.componentEmitter(clazz);
+        if (componentEmitter !== undefined) {
+            componentEmitter.emit(RegistryEvent.COMPONENT_ADDED, component);
+        }
+
+        return component;
+    }
+
+    updateComponent<
+        C extends Component<C>,
+    >(
+        entity: Entity,
+        clazzOrTag: ComponentClassType<C> | string,
+        data?: Record<string, any>,
+    ): C {
+        const clazz = this.getClazz(clazzOrTag);
+        const component = entity.getComponent(clazz);
+
+        if (data !== undefined) {
+            this.componentRegistry.validateComponentData(clazz, data);
+            component.setData(data);
+        }
+
+        const componentEmitter = this.componentEmitter(clazz);
+        if (componentEmitter !== undefined) {
+            componentEmitter.emit(RegistryEvent.COMPONENT_UPDATED, component);
+        }
+
+        return component;
     }
 
     addComponents(entity: Entity, components: ComponentInitialization[]): void {
@@ -191,7 +191,13 @@ export class Registry {
         clazzOrTag: ComponentClassType<C> | string,
         data?: Record<string, any>,
     ): C {
-        return this._addUpsertComponent(entity, clazzOrTag, data, true);
+        const clazz = this.getClazz(clazzOrTag);
+        const component = entity.findComponent(clazz);
+        if (component === undefined) {
+            return this.addComponent(entity, clazz, data);
+        } else {
+            return this.updateComponent(entity, clazz, data);
+        }
     }
 
     removeEntityComponent<C extends Component<C>>(
