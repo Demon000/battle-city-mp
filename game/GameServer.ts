@@ -34,7 +34,7 @@ import { PlayerService, PlayerServiceEvent } from '../player/PlayerService';
 import { BroadcastBatchGameEvent, CommonBatchGameEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
 import { GameEventBatcher, GameEventBatcherEvent } from './GameEventBatcher';
 import { GameModeService } from '@/game-mode/GameModeService';
-import { Registry } from '@/ecs/Registry';
+import { Registry, RegistryEvent } from '@/ecs/Registry';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { EntityBlueprint } from '@/ecs/EntityBlueprint';
@@ -120,6 +120,48 @@ export class GameServer {
 
         const ticksPerSecond = this.config.get<number>('game-server', 'ticksPerSecond');
         this.ticker = new Ticker(ticksPerSecond);
+
+        /**
+         * Registry event handlers
+         */
+        this.registry.emitter.on(RegistryEvent.COMPONENT_ADDED,
+            (component, data) => {
+                if (!component.clazz.networked) {
+                    return;
+                }
+
+                this.gameEventBatcher.addBroadcastEvent([
+                    GameEvent.ENTITY_COMPONENT_ADDED,
+                    component.entity.id,
+                    component.clazz.tag,
+                    data,
+                ]);
+            });
+        this.registry.emitter.on(RegistryEvent.COMPONENT_UPDATED,
+            (component, data) => {
+                if (!component.clazz.networked) {
+                    return;
+                }
+
+                this.gameEventBatcher.addBroadcastEvent([
+                    GameEvent.ENTITY_COMPONENT_UPDATED,
+                    component.entity.id,
+                    component.clazz.tag,
+                    data,
+                ]);
+            });
+        this.registry.emitter.on(RegistryEvent.COMPONENT_BEFORE_REMOVE,
+            (component) => {
+                if (!component.clazz.networked) {
+                    return;
+                }
+
+                this.gameEventBatcher.addBroadcastEvent([
+                    GameEvent.ENTITY_COMPONENT_REMOVED,
+                    component.entity.id,
+                    component.clazz.tag,
+                ]);
+            });
 
         /**
          * PlayerService event handlers

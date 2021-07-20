@@ -62,6 +62,15 @@ export class GameClientSocket {
             case GameEvent.OBJECT_UNREGISTERED:
                 this.gameClient.onObjectUnregistered(batch[1]);
                 break;
+            case GameEvent.ENTITY_COMPONENT_ADDED:
+                this.gameClient.onEntityComponentAdded(batch[1], batch[2], batch[3]);
+                break;
+            case GameEvent.ENTITY_COMPONENT_UPDATED:
+                this.gameClient.onEntityComponentUpdated(batch[1], batch[2], batch[3]);
+                break;
+            case GameEvent.ENTITY_COMPONENT_REMOVED:
+                this.gameClient.onEntityComponentRemoved(batch[1], batch[2]);
+                break;
             case GameEvent.ROUND_TIME_UPDATED:
                 this.gameClient.onRoundTimeUpdated(batch[1]);
                 break;

@@ -242,6 +242,21 @@ export class GameClient {
         this.collisionService.unregisterObjectCollisions(objectId);
     }
 
+    onEntityComponentAdded(entityId: number, tag: string, data: any): void {
+        const entity = this.registry.getEntityById(entityId);
+        entity.addComponent(tag, data);
+    }
+
+    onEntityComponentUpdated(entityId: number, tag: string, data: any): void {
+        const entity = this.registry.getEntityById(entityId);
+        entity.updateComponent(tag, data);
+    }
+
+    onEntityComponentRemoved(entityId: number, tag: string): void {
+        const entity = this.registry.getEntityById(entityId);
+        entity.removeComponent(tag);
+    }
+
     onPlayerAdded(playerOptions: PlayerOptions): void {
         const player = new Player(playerOptions);
         this.playerService.addPlayer(player);

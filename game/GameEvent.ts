@@ -40,6 +40,9 @@ export type BroadcastBatchGameEvent = CommonBatchGameEvent |
 [name: GameEvent.OBJECT_REGISTERED, objectOptions: GameObjectOptions] |
 [name: GameEvent.OBJECT_CHANGED, objectId: number, options: PartialGameObjectOptions] |
 [name: GameEvent.OBJECT_UNREGISTERED, objectId: number] |
+[name: GameEvent.ENTITY_COMPONENT_ADDED, entityId: number, tag: string, data: any] |
+[name: GameEvent.ENTITY_COMPONENT_UPDATED, entityId: number, tag: string, data: any] |
+[name: GameEvent.ENTITY_COMPONENT_REMOVED, entityId: number, tag: string] |
 [name: GameEvent.ROUND_TIME_UPDATED, roundTime: number];
 
 export type BatchGameEvent = UnicastBatchGameEvent | BroadcastBatchGameEvent;
