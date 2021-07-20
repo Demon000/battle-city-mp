@@ -7,6 +7,10 @@ export enum GameEvent {
     OBJECT_REGISTERED = 'object-registered',
     OBJECT_UNREGISTERED = 'object-unregisterd',
 
+    ENTITY_COMPONENT_ADDED = 'entity-component-added',
+    ENTITY_COMPONENT_UPDATED = 'entity-component-updated',
+    ENTITY_COMPONENT_REMOVED = 'entity-component-removed',
+
     PLAYER_ADDED = 'player-added',
     PLAYER_REMOVED = 'player-removed',
     PLAYER_CHANGED = 'player-changed',

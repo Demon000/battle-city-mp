@@ -8,17 +8,27 @@ import { RegistryIdGenerator } from './RegistryIdGenerator';
 import { RegistryViewIterator } from './RegistryViewIterator';
 
 export enum RegistryEvent {
-    ENTITY_ADDED = 'entity-added',
-    ENTITY_REMOVED = 'entity-removed',
+    ENTITY_REGISTERED = 'entity-registered',
+    ENTITY_BEFORE_DESTROY = 'entity-before-destroy',
 
     COMPONENT_ADDED = 'component-added',
     COMPONENT_UPDATED = 'component-updated',
+    COMPONENT_BEFORE_REMOVE = 'component-before-remove',
     COMPONENT_REMOVED = 'component-removed',
 }
 
 export interface RegistryEvents {
-    [RegistryEvent.ENTITY_ADDED]: (entity: Entity) => void;
-    [RegistryEvent.ENTITY_REMOVED]: (entity: Entity) => void;
+    [RegistryEvent.ENTITY_REGISTERED]: (entity: Entity) => void;
+    [RegistryEvent.ENTITY_BEFORE_DESTROY]: (entity: Entity) => void;
+    [RegistryEvent.COMPONENT_ADDED]: <C extends Component<C>>(
+        component: C,
+    ) => void;
+    [RegistryEvent.COMPONENT_UPDATED]: <C extends Component<C>>(
+        component: C,
+    ) => void;
+    [RegistryEvent.COMPONENT_BEFORE_REMOVE]: <C extends Component<C>>(
+        component: C,
+    ) => void;
 }
 
 export interface RegistryComponentEvents {
@@ -28,7 +38,7 @@ export interface RegistryComponentEvents {
     [RegistryEvent.COMPONENT_UPDATED]: <C extends Component<C>>(
         component: C,
     ) => void;
-    [RegistryEvent.COMPONENT_REMOVED]: <C extends Component<C>>(
+    [RegistryEvent.COMPONENT_BEFORE_REMOVE]: <C extends Component<C>>(
         component: C,
     ) => void;
 }
@@ -79,6 +89,8 @@ export class Registry {
     registerEntity(entity: Entity): void {
         assert(!this.idsEntityMap.has(entity.id));
         this.idsEntityMap.set(entity.id, entity);
+
+        this.emitter.emit(RegistryEvent.ENTITY_REGISTERED, entity);
     }
 
     generateId(): EntityId {
@@ -99,8 +111,14 @@ export class Registry {
 
     destroyEntity(entity: Entity): void {
         entity.removeComponents();
+        const entityIdExists = this.idsEntityMap.has(entity.id);
+        assert(entityIdExists);
+
+        this.emitter.emit(RegistryEvent.ENTITY_BEFORE_DESTROY, entity);
+
         const entityIdExisted = this.idsEntityMap.delete(entity.id);
         assert(entityIdExisted);
+
     }
 
     private getOrCreateComponentTypeSet<C extends Component<C>>(
@@ -127,7 +145,6 @@ export class Registry {
 
         return clazz;
     }
-
 
     runForComponentInitialization(
         entity: Entity,
@@ -172,6 +189,7 @@ export class Registry {
         if (componentEmitter !== undefined) {
             componentEmitter.emit(RegistryEvent.COMPONENT_ADDED, component);
         }
+        this.emitter.emit(RegistryEvent.COMPONENT_ADDED, component);
 
         return component;
     }
@@ -199,6 +217,8 @@ export class Registry {
         if (componentEmitter !== undefined) {
             componentEmitter.emit(RegistryEvent.COMPONENT_UPDATED, component);
         }
+        this.emitter.emit(RegistryEvent.COMPONENT_UPDATED, component);
+
 
         return component;
     }
@@ -236,13 +256,17 @@ export class Registry {
         const tagComponents = this.tagsComponentsMap.get(clazz.tag);
         assert(tagComponents !== undefined);
 
-        const tagsHadComponent = tagComponents.delete(component);
-        assert(tagsHadComponent !== undefined);
+        const tagsHasComponent = tagComponents.has(component);
+        assert(tagsHasComponent);
 
         const componentEmitter = this.componentEmitter(clazz);
         if (componentEmitter !== undefined) {
-            componentEmitter.emit(RegistryEvent.COMPONENT_REMOVED, component);
+            componentEmitter.emit(RegistryEvent.COMPONENT_BEFORE_REMOVE, component);
         }
+        this.emitter.emit(RegistryEvent.COMPONENT_BEFORE_REMOVE, component);
+
+        const tagsHadComponent = tagComponents.delete(component);
+        assert(tagsHadComponent);
 
         return component;
     }
