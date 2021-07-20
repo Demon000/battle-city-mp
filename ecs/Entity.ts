@@ -76,8 +76,12 @@ export class Entity {
         return tagsComponentsEncoding;
     }
 
-    removeComponent<C extends Component<C>>(clazz: ComponentClassType<C>): C {
-        const component = this.getComponent(clazz);
+    removeComponent<
+        C extends Component<C>,
+    >(
+        clazzOrTag: ComponentClassType<C> | string,
+    ): C {
+        const component = this.getComponent(clazzOrTag);
         return this.registry.removeComponent(component);
     }
 
@@ -87,12 +91,27 @@ export class Entity {
         }
     }
 
-    findComponent<C extends Component<C>>(clazz: ComponentClassType<C>): C | undefined {
+    findComponent<
+        C extends Component<C>,
+    >(
+        clazzOrTag: ComponentClassType<C> | string,
+    ): C | undefined {
+        let clazz;
+        if (typeof clazzOrTag === 'string') {
+            clazz = this.registry.getClazz(clazzOrTag);
+        } else {
+            clazz = clazzOrTag;
+        }
+
         return this.tagComponentMap.get(clazz) as C;
     }
 
-    getComponent<C extends Component<C>>(clazz: ComponentClassType<C>): C {
-        const component = this.findComponent(clazz);
+    getComponent<
+        C extends Component<C>,
+    >(
+        clazzOrTag: ComponentClassType<C> | string,
+    ): C {
+        const component = this.findComponent(clazzOrTag);
         assert(component !== undefined);
         return component;
     }

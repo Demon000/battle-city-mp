@@ -133,7 +133,7 @@ export class Registry {
         return tagComponents;
     }
 
-    private getClazz<
+    getClazz<
         C extends Component<C>,
     >(clazzOrTag: ComponentClassType<C> | string): ComponentClassType<C> {
         let clazz;
