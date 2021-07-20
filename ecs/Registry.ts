@@ -14,7 +14,6 @@ export enum RegistryEvent {
     COMPONENT_ADDED = 'component-added',
     COMPONENT_UPDATED = 'component-updated',
     COMPONENT_BEFORE_REMOVE = 'component-before-remove',
-    COMPONENT_REMOVED = 'component-removed',
 }
 
 export interface RegistryEvents {
