@@ -33,6 +33,12 @@ export interface RegistryComponentEvents {
     ) => void;
 }
 
+export type DataHandlingFn = <C extends Component<C>>(
+        entity: Entity,
+        clazzOrTag: ComponentClassType<C> | string,
+        data?: Record<string, any>,
+    ) => C;
+
 export class Registry {
     private tagsComponentsMap = new Map<string, Set<Component<any>>>();
     private componentsEmitterMap = new Map<string, EventEmitter<RegistryComponentEvents>>();
@@ -43,7 +49,11 @@ export class Registry {
     constructor(
         private idGenerator: RegistryIdGenerator,
         private componentRegistry: ComponentRegistry,
-    ) {}
+    ) {
+        this.addComponent = this.addComponent.bind(this);
+        this.updateComponent = this.updateComponent.bind(this);
+        this.upsertComponent = this.upsertComponent.bind(this);
+    }
 
     componentEmitter<C extends Component<C>>(
         clazz: ComponentClassType<C>,
@@ -118,6 +128,26 @@ export class Registry {
         return clazz;
     }
 
+
+    runForComponentInitialization(
+        entity: Entity,
+        components: ComponentInitialization[],
+        fn: DataHandlingFn,
+    ): void {
+        for (const componentInitialization of components) {
+            let clazz;
+            let data;
+
+            if (Array.isArray(componentInitialization)) {
+                [clazz, data] = componentInitialization;
+            } else {
+                clazz = componentInitialization;
+            }
+
+            fn(entity, clazz, data);
+        }
+    }
+
     addComponent<
         C extends Component<C>,
     >(
@@ -146,6 +176,10 @@ export class Registry {
         return component;
     }
 
+    addComponents(entity: Entity, components: ComponentInitialization[]): void {
+        this.runForComponentInitialization(entity, components, this.addComponent);
+    }
+
     updateComponent<
         C extends Component<C>,
     >(
@@ -169,19 +203,8 @@ export class Registry {
         return component;
     }
 
-    addComponents(entity: Entity, components: ComponentInitialization[]): void {
-        for (const componentInitialization of components) {
-            let clazz;
-            let data;
-
-            if (Array.isArray(componentInitialization)) {
-                [clazz, data] = componentInitialization;
-            } else {
-                clazz = componentInitialization;
-            }
-
-            this.addComponent(entity, clazz, data);
-        }
+    updateComponents(entity: Entity, components: ComponentInitialization[]): void {
+        this.runForComponentInitialization(entity, components, this.updateComponent);
     }
 
     upsertComponent<
@@ -198,6 +221,10 @@ export class Registry {
         } else {
             return this.updateComponent(entity, clazz, data);
         }
+    }
+
+    upsertComponents(entity: Entity, components: ComponentInitialization[]): void {
+        this.runForComponentInitialization(entity, components, this.updateComponent);
     }
 
     removeEntityComponent<C extends Component<C>>(
