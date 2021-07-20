@@ -48,6 +48,10 @@ export class GameObjectFactory {
             object.addComponents(components);
         }
 
+        if (options.components !== undefined) {
+            object.addComponents(options.components);
+        }
+
         return object;
     }
 }
