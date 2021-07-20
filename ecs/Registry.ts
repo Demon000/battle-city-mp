@@ -21,9 +21,11 @@ export interface RegistryEvents {
     [RegistryEvent.ENTITY_BEFORE_DESTROY]: (entity: Entity) => void;
     [RegistryEvent.COMPONENT_ADDED]: <C extends Component<C>>(
         component: C,
+        data: any,
     ) => void;
     [RegistryEvent.COMPONENT_UPDATED]: <C extends Component<C>>(
         component: C,
+        data: any,
     ) => void;
     [RegistryEvent.COMPONENT_BEFORE_REMOVE]: <C extends Component<C>>(
         component: C,
@@ -33,9 +35,11 @@ export interface RegistryEvents {
 export interface RegistryComponentEvents {
     [RegistryEvent.COMPONENT_ADDED]: <C extends Component<C>>(
         component: C,
+        data: any,
     ) => void;
     [RegistryEvent.COMPONENT_UPDATED]: <C extends Component<C>>(
         component: C,
+        data: any,
     ) => void;
     [RegistryEvent.COMPONENT_BEFORE_REMOVE]: <C extends Component<C>>(
         component: C,
@@ -186,9 +190,9 @@ export class Registry {
 
         const componentEmitter = this.componentEmitter(clazz);
         if (componentEmitter !== undefined) {
-            componentEmitter.emit(RegistryEvent.COMPONENT_ADDED, component);
+            componentEmitter.emit(RegistryEvent.COMPONENT_ADDED, component, data);
         }
-        this.emitter.emit(RegistryEvent.COMPONENT_ADDED, component);
+        this.emitter.emit(RegistryEvent.COMPONENT_ADDED, component, data);
 
         return component;
     }
@@ -214,9 +218,9 @@ export class Registry {
 
         const componentEmitter = this.componentEmitter(clazz);
         if (componentEmitter !== undefined) {
-            componentEmitter.emit(RegistryEvent.COMPONENT_UPDATED, component);
+            componentEmitter.emit(RegistryEvent.COMPONENT_UPDATED, component, data);
         }
-        this.emitter.emit(RegistryEvent.COMPONENT_UPDATED, component);
+        this.emitter.emit(RegistryEvent.COMPONENT_UPDATED, component, data);
 
 
         return component;
