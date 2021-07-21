@@ -9,10 +9,10 @@ export enum QueryObjectOperationType {
 export type QueryObjectOptions<T> = {
     operation: QueryObjectOperationType,
     data: QueryObjectOptions<T>[],
-} | (() => Set<T>);
+} | (() => Iterable<T>);
 
 export class QueryObject {
-    static eval<T>(options: QueryObjectOptions<T>): Set<T> {
+    static eval<T>(options: QueryObjectOptions<T>): Iterable<T> {
         if (typeof options === 'function') {
             return options();
         }

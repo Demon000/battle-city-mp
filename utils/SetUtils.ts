@@ -1,9 +1,9 @@
 export class SetUtils {
-    static union<T>(...sets: Set<T>[]): Set<T> {
+    static union<T>(...iterables: Iterable<T>[]): Iterable<T> {
         const result = new Set<T>();
 
-        for (const set of sets) {
-            for (const value of set) {
+        for (const iterable of iterables) {
+            for (const value of iterable) {
                 result.add(value);
             }
         }
@@ -11,19 +11,19 @@ export class SetUtils {
         return result;
     }
 
-    static intersection<T>(...sets: Set<T>[]): Set<T> {
+    static intersection<T>(...iterables: Iterable<T>[]): Iterable<T> {
         const map = new Map<T, number>();
         const result = new Set<T>();
 
-        for (const set of sets) {
-            for (const value of set) {
+        for (const iterable of iterables) {
+            for (const value of iterable) {
                 let noEntries = map.get(value) ?? 0;
                 map.set(value, noEntries + 1);
             }
         }
 
         for (const entry of map.entries()) {
-            if (entry[1] === sets.length) {
+            if (entry[1] === iterables.length) {
                 result.add(entry[0]);
             }
         }
