@@ -5,7 +5,7 @@ import { Component, ComponentClassType, ComponentInitialization } from './Compon
 import { Entity } from './Entity';
 import { EntityId } from './EntityId';
 import { RegistryIdGenerator } from './RegistryIdGenerator';
-import { RegistryViewIterator } from './RegistryViewIterator';
+import { LazyIterable } from '@/utils/LazyIterable';
 
 export enum RegistryEvent {
     ENTITY_REGISTERED = 'entity-registered',
@@ -308,25 +308,21 @@ export class Registry {
         return entity;
     }
 
-    getEntities(): IterableIterator<Entity> {
+    getEntities(): Iterable<Entity> {
         return this.idsEntityMap.values();
     }
 
     getComponents<C extends Component<C>>(
         clazz: ComponentClassType<C>,
-    ): IterableIterator<C> {
-        return this.getOrCreateComponentTypeSet(clazz).keys() as IterableIterator<C>;
+    ): Iterable<C> {
+        return this.getOrCreateComponentTypeSet(clazz).keys() as Iterable<C>;
     }
 
-    getView<C extends Component<C>>(
+    getEntitiesWithComponent<C extends Component<C>>(
         clazz: ComponentClassType<C>,
-        ...clazzes: ComponentClassType[]
     ): Iterable<Entity> {
-        return {
-            [Symbol.iterator]: () => new RegistryViewIterator(
-                this.getComponents(clazz),
-                clazzes,
-            ),
-        };
+        const components = this.getComponents(clazz);
+        return LazyIterable.from(components)
+            .map(component => component.entity);
     }
 }
