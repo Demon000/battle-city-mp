@@ -21,17 +21,20 @@ export class Entity {
         this.tagComponentMap.set(component.clazz, component);
     }
 
-    getLocalComponents(): IterableIterator<Component<any>> {
-        return this.tagComponentMap.values();
-    }
-
     removeLocalComponent<C extends Component<C>>(
         clazz: ComponentClassType<C>,
-    ): C {
+        optional = false,
+    ): C | undefined {
         const component = this.tagComponentMap.get(clazz);
+        if (optional && component === undefined) {
+            return undefined;
+        }
         assert(component !== undefined);
 
         const hadComponent = this.tagComponentMap.delete(clazz);
+        if (optional && !hadComponent) {
+            return undefined;
+        }
         assert(hadComponent);
 
         return component as C;
@@ -80,9 +83,10 @@ export class Entity {
         C extends Component<C>,
     >(
         clazzOrTag: ComponentClassType<C> | string,
-    ): C {
+        optional = false,
+    ): C | undefined {
         const component = this.getComponent(clazzOrTag);
-        return this.registry.removeComponent(component);
+        return this.registry.removeComponent(component, optional);
     }
 
     removeComponents(): void {

@@ -253,20 +253,37 @@ export class Registry {
     removeEntityComponent<C extends Component<C>>(
         entity: Entity,
         clazz: ComponentClassType<C>,
-    ): C {
-        const component = entity.removeLocalComponent(clazz);
-
-        const tagComponents = this.tagsComponentsMap.get(clazz.tag);
-        assert(tagComponents !== undefined);
-
-        const tagsHasComponent = tagComponents.has(component);
-        assert(tagsHasComponent);
+        optional = false,
+    ): C | undefined {
+        let component = entity.findComponent(clazz);
+        if (optional && component === undefined) {
+            return undefined;
+        }
+        assert(component !== undefined);
 
         const componentEmitter = this.componentEmitter(clazz);
         if (componentEmitter !== undefined) {
             componentEmitter.emit(RegistryEvent.COMPONENT_BEFORE_REMOVE, component);
         }
         this.emitter.emit(RegistryEvent.COMPONENT_BEFORE_REMOVE, component);
+
+        component = entity.removeLocalComponent(clazz);
+        if (optional && component === undefined) {
+            return undefined;
+        }
+        assert(component !== undefined);
+
+        const tagComponents = this.tagsComponentsMap.get(clazz.tag);
+        if (optional && tagComponents === undefined) {
+            return undefined;
+        }
+        assert(tagComponents !== undefined);
+
+        const tagsHasComponent = tagComponents.has(component);
+        if (optional && !tagsHasComponent) {
+            return undefined;
+        }
+        assert(tagsHasComponent);
 
         const tagsHadComponent = tagComponents.delete(component);
         assert(tagsHadComponent);
@@ -276,8 +293,9 @@ export class Registry {
 
     removeComponent<C extends Component<C>>(
         component: C,
-    ): C {
-        return this.removeEntityComponent(component.entity, component.clazz) as C;
+        optional = false,
+    ): C | undefined {
+        return this.removeEntityComponent(component.entity, component.clazz, optional);
     }
 
     findEntityById(id: EntityId): Entity | undefined {
