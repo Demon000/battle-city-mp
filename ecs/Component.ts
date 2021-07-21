@@ -44,7 +44,7 @@ export class Component<C extends Component<C>> {
         Object.assign(this, encoding);
     }
 
-    remove(): C {
+    remove(): C | undefined {
         return this.entity.removeComponent(this.clazz);
     }
 }
