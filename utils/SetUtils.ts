@@ -17,7 +17,7 @@ export class SetUtils {
 
         for (const iterable of iterables) {
             for (const value of iterable) {
-                let noEntries = map.get(value) ?? 0;
+                const noEntries = map.get(value) ?? 0;
                 map.set(value, noEntries + 1);
             }
         }

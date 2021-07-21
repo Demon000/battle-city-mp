@@ -9,13 +9,16 @@ export enum QueryObjectOperationType {
 export type QueryObjectOptions<T> = {
     operation: QueryObjectOperationType,
     data: QueryObjectOptions<T>[],
-} | (() => Iterable<T>);
+} | (() => Iterable<T>) | Iterable<T>;
 
 export class QueryObject {
     static eval<T>(options: QueryObjectOptions<T>): Iterable<T> {
         if (typeof options === 'function') {
             return options();
+        } else if (!('operation' in options)) {
+            return options;
         }
+
         const sets = [];
         for (const option of options.data) {
             sets.push(this.eval(option));
