@@ -205,11 +205,6 @@ export class GameObjectService {
         this.emitter.emit(GameObjectServiceEvent.OBJECT_REQUESTED_POSITION, object.id, position);
     }
 
-    private isPastAutomaticDestroy(component: AutomaticDestroyComponent): boolean {
-        const object = component.entity as GameObject;
-        return Date.now() - object.spawnTime > component.timeMs;
-    }
-
     private processObjectsDestroyed(): void {
         for (const component of this.registry.getComponents(DestroyedComponent)) {
             this.unregisterObject(component.entity.id);
@@ -218,7 +213,8 @@ export class GameObjectService {
 
     private processObjectsAutomaticDestroy(): void {
         for (const component of this.registry.getComponents(AutomaticDestroyComponent)) {
-            if (this.isPastAutomaticDestroy(component)) {
+            const object = component.entity as GameObject;
+            if (Date.now() - object.spawnTime > component.timeMs) {
                 component.entity.addComponent(DestroyedComponent);
             }
         }
