@@ -67,11 +67,11 @@ export class Entity {
         return this.registry.upsertComponent(this, clazz, data);
     }
 
-    addComponents(components: ComponentInitialization[]): void {
-        this.registry.addComponents(this, components);
+    addComponents(components: ComponentInitialization[], emit = true): void {
+        this.registry.addComponents(this, components, emit);
     }
 
-    getComponentsData(): [string, Partial<Component<any>>][] {
+    getComponentsData(): ComponentInitialization[] {
         const tagsComponentsEncoding: [string, Partial<Component<any>>][] = [];
         for (const [clazz, component] of this.tagComponentMap) {
             tagsComponentsEncoding.push([clazz.tag, component.getData()]);
