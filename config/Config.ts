@@ -76,4 +76,8 @@ export class Config {
         const data = this.getData(name);
         return this.findDataMember(data, path);
     }
+
+    clear(): void {
+        this.nameToData = {};
+    }
 }

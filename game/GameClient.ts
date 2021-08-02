@@ -297,6 +297,7 @@ export class GameClient {
     }
 
     onServerStatus(serverStatus: GameServerStatus): void {
+        this.config.clear();
         const configsData = serverStatus.configsData;
         this.config.setMultiple(configsData);
 
