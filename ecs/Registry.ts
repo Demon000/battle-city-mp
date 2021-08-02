@@ -14,6 +14,7 @@ export enum RegistryEvent {
     COMPONENT_ADDED = 'component-added',
     COMPONENT_UPDATED = 'component-updated',
     COMPONENT_BEFORE_REMOVE = 'component-before-remove',
+    COMPONENT_REMOVED = 'component-removed',
 }
 
 export interface RegistryEvents {
@@ -30,6 +31,9 @@ export interface RegistryEvents {
     [RegistryEvent.COMPONENT_BEFORE_REMOVE]: <C extends Component<C>>(
         component: C,
     ) => void;
+    [RegistryEvent.COMPONENT_REMOVED]: <C extends Component<C>>(
+        component: C,
+    ) => void;
 }
 
 export interface RegistryComponentEvents {
@@ -42,6 +46,9 @@ export interface RegistryComponentEvents {
         data: any,
     ) => void;
     [RegistryEvent.COMPONENT_BEFORE_REMOVE]: <C extends Component<C>>(
+        component: C,
+    ) => void;
+    [RegistryEvent.COMPONENT_REMOVED]: <C extends Component<C>>(
         component: C,
     ) => void;
 }
@@ -287,6 +294,11 @@ export class Registry {
 
         const tagsHadComponent = tagComponents.delete(component);
         assert(tagsHadComponent);
+
+        if (componentEmitter !== undefined) {
+            componentEmitter.emit(RegistryEvent.COMPONENT_REMOVED, component);
+        }
+        this.emitter.emit(RegistryEvent.COMPONENT_REMOVED, component);
 
         return component;
     }
