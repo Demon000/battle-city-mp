@@ -28,7 +28,7 @@ import { PartialTankOptions, TankProperties } from '@/tank/Tank';
 import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
-import { Registry } from '@/ecs/Registry';
+import { Registry, RegistryEvent } from '@/ecs/Registry';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 
 export enum GameClientEvent {
@@ -133,6 +133,21 @@ export class GameClient {
         this.timeService = new TimeService(this.config);
         this.emitter = new EventEmitter<GameClientEvents>();
         this.ticker = new Ticker();
+
+        this.registry.emitter.on(RegistryEvent.COMPONENT_ADDED, component => {
+            this.gameGraphicsService.processObjectsGraphicsDependencies(component.entity.id,
+                component.clazz.tag);
+        });
+
+        this.registry.emitter.on(RegistryEvent.COMPONENT_UPDATED, component => {
+            this.gameGraphicsService.processObjectsGraphicsDependencies(component.entity.id,
+                component.clazz.tag);
+        });
+
+        this.registry.emitter.on(RegistryEvent.COMPONENT_REMOVED, component => {
+            this.gameGraphicsService.processObjectsGraphicsDependencies(component.entity.id,
+                component.clazz.tag);
+        });
 
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED,
             (objectId: number, box: BoundingBox) => {
@@ -245,19 +260,16 @@ export class GameClient {
     onEntityComponentAdded(entityId: number, tag: string, data: any): void {
         const entity = this.registry.getEntityById(entityId);
         entity.addComponent(tag, data);
-        this.gameGraphicsService.processObjectsGraphicsDependencies(entityId, tag);
     }
 
     onEntityComponentUpdated(entityId: number, tag: string, data: any): void {
         const entity = this.registry.getEntityById(entityId);
         entity.updateComponent(tag, data);
-        this.gameGraphicsService.processObjectsGraphicsDependencies(entityId, tag);
     }
 
     onEntityComponentRemoved(entityId: number, tag: string): void {
         const entity = this.registry.getEntityById(entityId);
         entity.removeComponent(tag);
-        this.gameGraphicsService.processObjectsGraphicsDependencies(entityId, tag);
     }
 
     onPlayerAdded(playerOptions: PlayerOptions): void {
