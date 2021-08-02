@@ -97,7 +97,8 @@ export class Registry {
     }
 
     registerEntity(entity: Entity): void {
-        assert(!this.idsEntityMap.has(entity.id));
+        const entityIdExists = this.idsEntityMap.has(entity.id);
+        assert(!entityIdExists);
         this.idsEntityMap.set(entity.id, entity);
 
         this.emitter.emit(RegistryEvent.ENTITY_REGISTERED, entity);
