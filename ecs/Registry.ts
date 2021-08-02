@@ -315,7 +315,7 @@ export class Registry {
     }
 
     getEntityById(id: EntityId): Entity {
-        const entity = this.getEntityById(id);
+        const entity = this.findEntityById(id);
         assert(entity !== undefined);
         return entity;
     }
