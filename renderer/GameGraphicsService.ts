@@ -174,6 +174,6 @@ export class GameGraphicsService {
             return;
         }
 
-        entity.addComponent(DirtyGraphicsComponent);
+        entity.upsertComponent(DirtyGraphicsComponent);
     }
 }
