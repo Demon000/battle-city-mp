@@ -1,5 +1,6 @@
 import { DirtyGraphicsComponent } from '@/components/DirtyGraphicsComponent';
 import { GraphicDependenciesComponent } from '@/components/GraphicDependenciesComponent';
+import { EntityId } from '@/ecs/EntityId';
 import { Registry } from '@/ecs/Registry';
 import { GameObject } from '@/object/GameObject';
 import { RenderPass } from '@/object/RenderPass';
@@ -163,7 +164,7 @@ export class GameGraphicsService {
         }
     }
 
-    processObjectsGraphicsDependencies(entityId: number, tag: string): void {
+    processObjectsGraphicsDependencies(entityId: EntityId, tag: string): void {
         const entity = this.registry.getEntityById(entityId);
         const component = entity.findComponent(GraphicDependenciesComponent);
         if (component === undefined) {

@@ -331,6 +331,7 @@ export class GameClient {
     }
 
     onTick(): void {
+        this.gameObjectService.processObjectsIsMoving();
         this.gameGraphicsService.processObjectsDirtyGraphics();
 
         const ownPlayer = this.playerService.getOwnPlayer();

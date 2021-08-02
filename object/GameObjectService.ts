@@ -1,5 +1,6 @@
 import { AutomaticDestroyComponent } from '@/components/AutomaticDestroyComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
+import { IsMovingComponent } from '@/components/IsMovingComponent';
 import { Registry } from '@/ecs/Registry';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { PlayerSpawn } from '@/player-spawn/PlayerSpawn';
@@ -216,6 +217,17 @@ export class GameObjectService {
             const object = component.entity as GameObject;
             if (Date.now() - object.spawnTime > component.timeMs) {
                 component.entity.addComponent(DestroyedComponent);
+            }
+        }
+    }
+
+    processObjectsIsMoving(): void {
+        for (const component of this.registry.getComponents(IsMovingComponent)) {
+            const object = component.entity as GameObject;
+            if (component.value !== object.movementSpeed > 0) {
+                component.update({
+                    value: object.movementSpeed > 0,
+                });
             }
         }
     }

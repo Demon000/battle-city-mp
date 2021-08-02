@@ -13,4 +13,14 @@
             },
         },
     },
+    'tank': {
+        components: {
+            IsMovingComponent: {},
+            GraphicDependenciesComponent: {
+                components: [
+                    'IsMovingComponent',
+                ],
+            },
+        },
+    },
 }

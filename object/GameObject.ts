@@ -30,7 +30,6 @@ export class GameObject extends Entity {
     protected _boundingBox: BoundingBox;
     protected _direction: Direction;
     protected _movementSpeed: number;
-    protected _isMoving: boolean;
     graphicsDirty: boolean;
 
     id: number;
@@ -60,7 +59,6 @@ export class GameObject extends Entity {
         this._boundingBox = this.getPositionedBoundingBox(this._position);
         this._direction = options.direction ?? Direction.UP;
         this._movementSpeed = options.movementSpeed ?? 0;
-        this._isMoving = this._movementSpeed > 0;
         this.movementDirection = options.movementDirection ?? null;
         this.spawnTime = Date.now();
         this.collisionsDisabled = options.collisionsDisabled ?? false;
@@ -137,19 +135,6 @@ export class GameObject extends Entity {
 
     set movementSpeed(value: number) {
         this._movementSpeed = value;
-
-        const isMoving = value > 0;
-        if (this.isMoving !== isMoving) {
-            this.isMoving = isMoving;
-        }
-    }
-
-    get isMoving(): boolean {
-        return this._isMoving;
-    }
-
-    set isMoving(value: boolean) {
-        this._isMoving = value;
     }
 
     get centerPosition(): Point {

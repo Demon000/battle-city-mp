@@ -8,6 +8,7 @@ import { assert } from '@/utils/assert';
 import { assertType } from 'typescript-is';
 import { DestroyedComponent, DestroyedComponentData } from '@/components/DestroyedComponent';
 import { GraphicDependenciesComponent, GraphicDependenciesComponentData } from '@/components/GraphicDependenciesComponent';
+import { IsMovingComponent, IsMovingComponentData } from '@/components/IsMovingComponent';
 
 export interface ProcessResults {
     clazz: ComponentClassType<any>;
@@ -50,6 +51,10 @@ export class ComponentRegistry {
             case GraphicDependenciesComponent.tag:
                 clazz = GraphicDependenciesComponent;
                 if (data !== undefined) assertType<Partial<GraphicDependenciesComponentData>>(data);
+                break;
+            case IsMovingComponent.tag:
+                clazz = IsMovingComponent;
+                if (data !== undefined) assertType<Partial<IsMovingComponentData>>(data);
                 break;
             default:
                 throw new Error(`Invalid tag: ${tag}`);

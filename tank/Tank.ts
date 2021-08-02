@@ -217,16 +217,6 @@ export class Tank extends GameObject {
         this.markGraphicsDirty();
     }
 
-    get isMoving(): boolean {
-        return super.isMoving;
-    }
-
-    set isMoving(value: boolean) {
-        super.isMoving = value;
-        this.markGraphicsDirty();
-        this.updateAudioMeta();
-    }
-
     get direction(): Direction {
         return super.direction;
     }
@@ -234,11 +224,5 @@ export class Tank extends GameObject {
     set direction(value: Direction) {
         super.direction = value;
         this.markGraphicsDirty();
-    }
-
-    protected updateAudioMeta(): void {
-        this._audioMeta = {
-            isMoving: this.isMoving,
-        };
     }
 }

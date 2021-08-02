@@ -1,5 +1,6 @@
 import { Bullet } from '@/bullet/Bullet';
 import { BulletPower } from '@/bullet/BulletPower';
+import { IsMovingComponent } from '@/components/IsMovingComponent';
 import { AnimatedImageDrawable } from '@/drawable/AnimatedImageDrawable';
 import { IDrawable, DrawableProcessingFunction, DrawableTestFunction } from '@/drawable/IDrawable';
 import { IImageDrawable } from '@/drawable/IImageDrawable';
@@ -225,8 +226,10 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                     directionTest(direction),
                     (object: GameObject): boolean => {
                         const tank = object as Tank;
+                        const isMovingComponent =
+                            tank.getComponent(IsMovingComponent);
 
-                        if (tank.isMoving !== isMoving) {
+                        if (isMovingComponent.value !== isMoving) {
                             return false;
                         }
 
