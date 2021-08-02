@@ -124,4 +124,8 @@ export class Entity {
         const component = this.findComponent(clazz);
         return component !== undefined;
     }
+
+    destroy(): void {
+        this.registry.destroyEntity(this);
+    }
 }
