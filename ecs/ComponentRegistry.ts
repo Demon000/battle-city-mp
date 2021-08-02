@@ -9,17 +9,6 @@ import { assertType } from 'typescript-is';
 import { DestroyedComponent, DestroyedComponentData } from '@/components/DestroyedComponent';
 import { GraphicDependenciesComponent, GraphicDependenciesComponentData } from '@/components/GraphicDependenciesComponent';
 
-/* eslint-disable @typescript-eslint/indent */
-export type DataOfComponent<T> =
-    T extends BoundingBoxComponent ? BoundingBoxComponentData :
-    T extends CollisionComponent ? CollisionComponentData :
-    T extends PositionComponent ? PositionComponentData :
-    T extends SizeComponent ? SizeComponentData :
-    T extends AutomaticDestroyComponent ? AutomaticDestroyComponentData :
-    T extends DestroyedComponent ? DestroyedComponentData :
-    T extends GraphicDependenciesComponent ? GraphicDependenciesComponentData :
-    never;
-
 export interface ProcessResults {
     clazz: ComponentClassType<any>;
     tag: string;
@@ -36,31 +25,31 @@ export class ComponentRegistry {
         switch(tag) {
             case BoundingBoxComponent.tag:
                 clazz = BoundingBoxComponent;
-                if (data !== undefined) assertType<Partial<DataOfComponent<BoundingBoxComponent>>>(data);
+                if (data !== undefined) assertType<Partial<BoundingBoxComponentData>>(data);
                 break;
             case CollisionComponent.tag:
                 clazz = CollisionComponent;
-                if (data !== undefined) assertType<Partial<DataOfComponent<CollisionComponent>>>(data);
+                if (data !== undefined) assertType<Partial<CollisionComponentData>>(data);
                 break;
             case PositionComponent.tag:
                 clazz = PositionComponent;
-                if (data !== undefined) assertType<Partial<DataOfComponent<PositionComponent>>>(data);
+                if (data !== undefined) assertType<Partial<PositionComponentData>>(data);
                 break;
             case SizeComponent.tag:
                 clazz = SizeComponent;
-                if (data !== undefined) assertType<Partial<DataOfComponent<SizeComponent>>>(data);
+                if (data !== undefined) assertType<Partial<SizeComponentData>>(data);
                 break;
             case AutomaticDestroyComponent.tag:
                 clazz = AutomaticDestroyComponent;
-                if (data !== undefined) assertType<Partial<DataOfComponent<AutomaticDestroyComponent>>>(data);
+                if (data !== undefined) assertType<Partial<AutomaticDestroyComponentData>>(data);
                 break;
             case DestroyedComponent.tag:
                 clazz = DestroyedComponent;
-                if (data !== undefined) assertType<Partial<DataOfComponent<DestroyedComponent>>>(data);
+                if (data !== undefined) assertType<Partial<DestroyedComponentData>>(data);
                 break;
             case GraphicDependenciesComponent.tag:
                 clazz = GraphicDependenciesComponent;
-                if (data !== undefined) assertType<Partial<DataOfComponent<GraphicDependenciesComponent>>>(data);
+                if (data !== undefined) assertType<Partial<GraphicDependenciesComponentData>>(data);
                 break;
             default:
                 throw new Error(`Invalid tag: ${tag}`);
