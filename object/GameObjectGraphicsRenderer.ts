@@ -65,12 +65,12 @@ export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
             .filter(this.filterOutMissingDrawable, this) as IDrawable[];
     }
 
-    update(scale: number): void {
+    update(scale: number, force = false): void {
         if (this.drawables === undefined) {
             return;
         }
 
-        if (!this.object.graphicsDirty && this.scale === scale) {
+        if (!this.object.graphicsDirty && !force && this.scale === scale) {
             return;
         }
 
@@ -80,7 +80,9 @@ export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
             this.drawables = this.processDrawables(this.drawables);
         }
 
-        this.object.graphicsDirty = false;
+        if (!force) {
+            this.object.graphicsDirty = false;
+        }
     }
 
     isRenderable(): boolean {

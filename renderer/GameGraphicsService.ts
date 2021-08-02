@@ -1,3 +1,6 @@
+import { DirtyGraphicsComponent } from '@/components/DirtyGraphicsComponent';
+import { GraphicDependenciesComponent } from '@/components/GraphicDependenciesComponent';
+import { Registry } from '@/ecs/Registry';
 import { GameObject } from '@/object/GameObject';
 import { RenderPass } from '@/object/RenderPass';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
@@ -18,6 +21,7 @@ export class GameGraphicsService {
     private targetGameSize = 0;
 
     constructor(
+        private registry: Registry,
         private canvases: HTMLCanvasElement[],
     ) {
         this.initializeContexts();
@@ -148,5 +152,28 @@ export class GameGraphicsService {
             x: Math.floor(position.x / this.scale),
             y: Math.floor(position.y / this.scale),
         };
+    }
+
+    processObjectsDirtyGraphics(): void {
+        for (const component of this.registry.getComponents(DirtyGraphicsComponent)) {
+            const object = component.entity as GameObject;
+            const renderer = this.getObjectRenderer(object);
+            renderer.update(this.scale, true);
+            component.remove();
+        }
+    }
+
+    processObjectsGraphicsDependencies(entityId: number, tag: string): void {
+        const entity = this.registry.getEntityById(entityId);
+        const component = entity.findComponent(GraphicDependenciesComponent);
+        if (component === undefined) {
+            return;
+        }
+
+        if (!component.components.includes(tag)) {
+            return;
+        }
+
+        entity.addComponent(DirtyGraphicsComponent);
     }
 }

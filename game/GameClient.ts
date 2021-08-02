@@ -126,7 +126,7 @@ export class GameClient {
         this.teamRepository = new MapRepository<string, Team>();
         this.teamService = new TeamService(this.teamRepository);
         this.gameCamera = new GameCamera();
-        this.gameGraphicsService = new GameGraphicsService(canvases);
+        this.gameGraphicsService = new GameGraphicsService(this.registry, canvases);
         this.audioRendererFactory = new GameObjectAudioRendererFactory();
         this.gameAudioService = new GameAudioService(this.audioRendererFactory);
         this.gameMapEditorService = new GameMapEditorService(this.gameObjectFactory);
@@ -245,16 +245,19 @@ export class GameClient {
     onEntityComponentAdded(entityId: number, tag: string, data: any): void {
         const entity = this.registry.getEntityById(entityId);
         entity.addComponent(tag, data);
+        this.gameGraphicsService.processObjectsGraphicsDependencies(entityId, tag);
     }
 
     onEntityComponentUpdated(entityId: number, tag: string, data: any): void {
         const entity = this.registry.getEntityById(entityId);
         entity.updateComponent(tag, data);
+        this.gameGraphicsService.processObjectsGraphicsDependencies(entityId, tag);
     }
 
     onEntityComponentRemoved(entityId: number, tag: string): void {
         const entity = this.registry.getEntityById(entityId);
         entity.removeComponent(tag);
+        this.gameGraphicsService.processObjectsGraphicsDependencies(entityId, tag);
     }
 
     onPlayerAdded(playerOptions: PlayerOptions): void {
@@ -315,6 +318,8 @@ export class GameClient {
     }
 
     onTick(): void {
+        this.gameGraphicsService.processObjectsDirtyGraphics();
+
         const ownPlayer = this.playerService.getOwnPlayer();
         if (ownPlayer === undefined) {
             return;
