@@ -44,6 +44,10 @@ export class Component<C extends Component<C>> {
         Object.assign(this, encoding);
     }
 
+    update(data?: Record<string, any>): C {
+        return this.entity.updateComponent(this.clazz, data);
+    }
+
     remove(): C | undefined {
         return this.entity.removeComponent(this.clazz);
     }
