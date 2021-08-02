@@ -291,6 +291,7 @@ export class GameServer {
 
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REGISTERED,
             (object: GameObject) => {
+                this.registry.registerEntity(object);
                 this.collisionService.registerObjectCollisions(object.id);
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_REGISTERED, object.toOptions()]);
 

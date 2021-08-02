@@ -43,15 +43,13 @@ export class GameObjectFactory {
             object = new GameObject(options, properties, this.registry);
         }
 
-        this.registry.registerEntity(object);
-
         const components = this.entityBlueprint?.getComponents(options.type);
         if (components !== undefined) {
-            object.addComponents(components);
+            object.addComponents(components, false);
         }
 
         if (options.components !== undefined) {
-            object.addComponents(options.components);
+            object.addComponents(options.components, false);
         }
 
         return object;

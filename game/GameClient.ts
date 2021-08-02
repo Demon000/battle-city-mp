@@ -151,6 +151,7 @@ export class GameClient {
 
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REGISTERED,
             (object: GameObject) => {
+                this.registry.registerEntity(object);
                 this.collisionService.registerObjectCollisions(object.id);
             });
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED,
