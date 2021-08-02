@@ -255,6 +255,9 @@ export class GameClient {
     onObjectUnregistered(objectId: number): void {
         this.gameObjectService.unregisterObject(objectId);
         this.collisionService.unregisterObjectCollisions(objectId);
+
+        const object = this.registry.getEntityById(objectId);
+        object.destroy();
     }
 
     onEntityComponentAdded(entityId: number, tag: string, data: any): void {
