@@ -8,5 +8,4 @@ export class GraphicDependenciesComponent
     extends Component<GraphicDependenciesComponent>
     implements GraphicDependenciesComponentData {
     components = new Array<string>();
-    networked = false;
 }
