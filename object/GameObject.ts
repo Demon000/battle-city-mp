@@ -125,10 +125,6 @@ export class GameObject extends Entity {
         return this.properties.savable;
     }
 
-    get directionAxisSnapping(): number | undefined {
-        return this.properties.directionAxisSnapping;
-    }
-
     get movementSpeed(): number {
         return this._movementSpeed;
     }

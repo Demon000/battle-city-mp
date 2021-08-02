@@ -16,6 +16,9 @@
     'tank': {
         components: {
             IsMovingComponent: {},
+            DirectionAxisSnappingComponent: {
+                value: 4,
+            },
             GraphicDependenciesComponent: {
                 components: [
                     'IsMovingComponent',

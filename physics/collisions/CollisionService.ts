@@ -1,4 +1,5 @@
 import { DestroyedComponent } from '@/components/DestroyedComponent';
+import { DirectionAxisSnappingComponent } from '@/components/DirectionAxisSnappingComponent';
 import { GameObject } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 import { MapRepository } from '@/utils/MapRepository';
@@ -291,23 +292,30 @@ export class CollisionService {
 
         this.emitter.emit(CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED, objectId, direction);
 
-        if (gameObject.directionAxisSnapping !== undefined &&
-                !DirectionUtils.isSameAxis(oldDirection, direction)) {
-            let x = gameObject.position.x;
-            let y = gameObject.position.y;
-            if (DirectionUtils.isHorizontalAxis(direction)) {
-                y = this.calculateSnappedCoordinates(gameObject.position.y,
-                    gameObject.directionAxisSnapping);
-            } else {
-                x = this.calculateSnappedCoordinates(gameObject.position.x,
-                    gameObject.directionAxisSnapping);
-            }
-
-            this.validateObjectMovement(objectId, {
-                x: x,
-                y: y,
-            }, oldDirection, false);
+        if (DirectionUtils.isSameAxis(oldDirection, direction)) {
+            return;
         }
+
+
+        const directionAxisSnappingComponent =
+            gameObject.findComponent(DirectionAxisSnappingComponent);
+        if (directionAxisSnappingComponent === undefined) {
+            return;
+        }
+
+        const value = directionAxisSnappingComponent.value;
+        let x = gameObject.position.x;
+        let y = gameObject.position.y;
+        if (DirectionUtils.isHorizontalAxis(direction)) {
+            y = this.calculateSnappedCoordinates(gameObject.position.y, value);
+        } else {
+            x = this.calculateSnappedCoordinates(gameObject.position.x, value);
+        }
+
+        this.validateObjectMovement(objectId, {
+            x,
+            y,
+        }, oldDirection, false);
     }
 
     clear(): void {
