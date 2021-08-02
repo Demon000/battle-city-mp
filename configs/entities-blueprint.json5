@@ -4,13 +4,13 @@
             AutomaticDestroyComponent: {
                 timeMs: 240,
             },
-        }
+        },
     },
     'smoke': {
         components: {
             AutomaticDestroyComponent: {
                 timeMs: 1000,
             },
-        }
+        },
     },
 }
