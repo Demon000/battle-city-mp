@@ -149,6 +149,10 @@ export class GameClient {
                 component.clazz.tag);
         });
 
+        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REGISTERED,
+            (object: GameObject) => {
+                this.collisionService.registerObjectCollisions(object.id);
+            });
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED,
             (objectId: number, box: BoundingBox) => {
                 this.collisionService.updateObjectCollisions(objectId, box);
@@ -158,6 +162,8 @@ export class GameClient {
             (objectId: number) => {
                 const object = this.gameObjectService.getObject(objectId);
                 this.gameAudioService.stopAudioPlayback(object);
+                this.collisionService.unregisterObjectCollisions(objectId);
+                this.registry.destroyEntity(object);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_ADDED, () => {
@@ -249,15 +255,10 @@ export class GameClient {
     onObjectRegistered(objectOptions: GameObjectOptions): void {
         const object = this.gameObjectFactory.buildFromOptions(objectOptions);
         this.gameObjectService.registerObject(object);
-        this.collisionService.registerObjectCollisions(object.id);
     }
 
     onObjectUnregistered(objectId: number): void {
         this.gameObjectService.unregisterObject(objectId);
-        this.collisionService.unregisterObjectCollisions(objectId);
-
-        const object = this.registry.getEntityById(objectId);
-        object.destroy();
     }
 
     onEntityComponentAdded(entityId: number, tag: string, data: any): void {
@@ -316,15 +317,10 @@ export class GameClient {
             this.teamService.addTeams(teams);
         }
 
-        this.gameObjectService.clear();
         const objects =
             LazyIterable.from(serverStatus.objectsOptions)
                 .map(o => this.gameObjectFactory.buildFromOptions(o));
         this.gameObjectService.registerObjects(objects);
-
-        this.collisionService.clear();
-        const objectIds = objects.map(o => o.id);
-        this.collisionService.registerObjectsCollisions(objectIds);
 
         const visibleGameSize = this.config.get<number>('game-client', 'visibleGameSize');
         this.gameGraphicsService.setTargetGameSize(visibleGameSize);
