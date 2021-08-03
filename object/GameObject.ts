@@ -36,7 +36,6 @@ export class GameObject extends Entity {
     properties;
     type: GameObjectType;
     movementDirection: Direction | null;
-    spawnTime: number;
 
     collisionsDisabled: boolean;
 
@@ -60,7 +59,6 @@ export class GameObject extends Entity {
         this._direction = options.direction ?? Direction.UP;
         this._movementSpeed = options.movementSpeed ?? 0;
         this.movementDirection = options.movementDirection ?? null;
-        this.spawnTime = Date.now();
         this.collisionsDisabled = options.collisionsDisabled ?? false;
         this.graphicsDirty = true;
     }
@@ -89,7 +87,6 @@ export class GameObject extends Entity {
         if (options.direction !== undefined) this.direction = options.direction;
         if (options.movementSpeed !== undefined) this.movementSpeed = options.movementSpeed;
         if (options.movementDirection !== undefined) this.movementDirection = options.movementDirection;
-        if (options.spawnTime !== undefined) this.spawnTime = options.spawnTime;
         if (options.collisionsDisabled !== undefined) this.collisionsDisabled = options.collisionsDisabled;
     }
 

@@ -1,3 +1,4 @@
+import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
 import { Config } from '@/config/Config';
 import { GameObject } from '@/object/GameObject';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
@@ -86,8 +87,9 @@ export class FlagService {
         }
 
         const pickupIgnoreTime = this.config.get<number>('flag', 'pickupIgnoreTime');
+        const spawnTime = flag.getComponent(SpawnTimeComponent).value;
         if (flag.droppedTankId === tank.id
-            && flag.spawnTime + pickupIgnoreTime >= Date.now()) {
+            && spawnTime + pickupIgnoreTime >= Date.now()) {
             interaction = undefined;
         }
 

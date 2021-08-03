@@ -10,6 +10,7 @@ import { DestroyedComponent, DestroyedComponentData } from '@/components/Destroy
 import { GraphicDependenciesComponent, GraphicDependenciesComponentData } from '@/components/GraphicDependenciesComponent';
 import { IsMovingComponent, IsMovingComponentData } from '@/components/IsMovingComponent';
 import { DirectionAxisSnappingComponent, DirectionAxisSnappingComponentData } from '@/components/DirectionAxisSnappingComponent';
+import { SpawnTimeComponent, SpawnTimeComponentData } from '@/components/SpawnTimeComponent';
 
 export interface ProcessResults {
     clazz: ComponentClassType<any>;
@@ -60,6 +61,10 @@ export class ComponentRegistry {
             case DirectionAxisSnappingComponent.tag:
                 clazz = DirectionAxisSnappingComponent;
                 if (data !== undefined) assertType<Partial<DirectionAxisSnappingComponentData>>(data);
+                break;
+            case SpawnTimeComponent.tag:
+                clazz = SpawnTimeComponent;
+                if (data !== undefined) assertType<Partial<SpawnTimeComponentData>>(data);
                 break;
             default:
                 throw new Error(`Invalid tag: ${tag}`);

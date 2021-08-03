@@ -1,6 +1,7 @@
 import { AutomaticDestroyComponent } from '@/components/AutomaticDestroyComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { IsMovingComponent } from '@/components/IsMovingComponent';
+import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
 import { Registry } from '@/ecs/Registry';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { PlayerSpawn } from '@/player-spawn/PlayerSpawn';
@@ -214,9 +215,13 @@ export class GameObjectService {
 
     private processObjectsAutomaticDestroy(): void {
         for (const component of this.registry.getComponents(AutomaticDestroyComponent)) {
-            const object = component.entity as GameObject;
-            if (Date.now() - object.spawnTime > component.timeMs) {
-                component.entity.addComponent(DestroyedComponent);
+            const entity = component.entity;
+            const automaticDestroyTimeMs =
+                entity.getComponent(AutomaticDestroyComponent).timeMs;
+            const spawnTime =
+                entity.getComponent(SpawnTimeComponent).value;
+            if (Date.now() - spawnTime > automaticDestroyTimeMs) {
+                entity.addComponent(DestroyedComponent);
             }
         }
     }

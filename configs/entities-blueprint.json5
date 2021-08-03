@@ -5,12 +5,28 @@
                 timeMs: 240,
             },
         },
+        clientComponents: {
+            SpawnTimeComponent: {},
+        },
     },
     'smoke': {
         serverComponents: {
             AutomaticDestroyComponent: {
                 timeMs: 1000,
             },
+        },
+        clientComponents: {
+            SpawnTimeComponent: {},
+        },
+    },
+    'water': {
+        clientComponents: {
+            SpawnTimeComponent: {},
+        },
+    },
+    'flag': {
+        serverComponents: {
+            SpawnTimeComponent: {},
         },
     },
     'tank': {
@@ -26,6 +42,7 @@
                     'IsMovingComponent',
                 ],
             },
+            SpawnTimeComponent: {},
         },
     },
 }

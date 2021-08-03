@@ -1,3 +1,4 @@
+import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
 import { AnimatedImageDrawable } from '@/drawable/AnimatedImageDrawable';
 import { DrawableType } from '@/drawable/DrawableType';
 import { IDrawable } from '@/drawable/IDrawable';
@@ -101,7 +102,8 @@ export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
         }
 
         if (drawable.type === DrawableType.ANIMATED_IMAGE) {
-            drawable = (drawable as AnimatedImageDrawable).getCurrentDrawable(this.object.spawnTime);
+            const spawnTime = this.object.getComponent(SpawnTimeComponent).value;
+            drawable = (drawable as AnimatedImageDrawable).getCurrentDrawable(spawnTime);
         }
 
         if (drawable === undefined) {
