@@ -224,11 +224,14 @@ export class GameObjectService {
     processObjectsIsMoving(): void {
         for (const component of this.registry.getComponents(IsMovingComponent)) {
             const object = component.entity as GameObject;
-            if (component.value !== object.movementSpeed > 0) {
-                component.update({
-                    value: object.movementSpeed > 0,
-                });
+            const isMoving = object.movementSpeed > 0;
+            if (component.value === isMoving) {
+                continue;
             }
+
+            component.update({
+                value: isMoving,
+            });
         }
     }
 
