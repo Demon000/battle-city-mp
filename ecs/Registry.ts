@@ -18,7 +18,7 @@ export enum RegistryEvent {
 }
 
 export interface RegistryOperationOptions {
-    emit?: boolean;
+    silent?: boolean;
     ignore?: boolean;
     optional?: boolean;
 }
@@ -209,7 +209,7 @@ export class Registry {
             component.ignore = true;
         }
 
-        if (options?.emit) {
+        if (!options?.silent) {
             const componentEmitter = this.componentEmitter(clazz);
             if (componentEmitter !== undefined) {
                 componentEmitter.emit(RegistryEvent.COMPONENT_ADDED, component, data);
@@ -249,7 +249,7 @@ export class Registry {
             component.ignore = false;
         }
 
-        if (options?.emit) {
+        if (!options?.silent) {
             const componentEmitter = this.componentEmitter(clazz);
             if (componentEmitter !== undefined) {
                 componentEmitter.emit(RegistryEvent.COMPONENT_UPDATED, component, data);
@@ -306,7 +306,7 @@ export class Registry {
         }
         assert(component !== undefined);
 
-        if (options?.emit) {
+        if (!options?.silent) {
             const componentEmitter = this.componentEmitter(clazz);
             if (componentEmitter !== undefined) {
                 componentEmitter.emit(RegistryEvent.COMPONENT_BEFORE_REMOVE, component);
@@ -335,7 +335,7 @@ export class Registry {
         const tagsHadComponent = tagComponents.delete(component);
         assert(tagsHadComponent);
 
-        if (options?.emit) {
+        if (!options?.silent) {
             const componentEmitter = this.componentEmitter(clazz);
             if (componentEmitter !== undefined) {
                 componentEmitter.emit(RegistryEvent.COMPONENT_REMOVED, component);
