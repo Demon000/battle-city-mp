@@ -205,6 +205,10 @@ export class Registry {
         const tagComponents = this.getOrCreateComponentTypeSet(clazz);
         tagComponents.add(component);
 
+        if (options?.ignore) {
+            component.ignore = true;
+        }
+
         if (options?.emit) {
             const componentEmitter = this.componentEmitter(clazz);
             if (componentEmitter !== undefined) {
@@ -239,6 +243,10 @@ export class Registry {
         if (data !== undefined) {
             this.componentRegistry.validateComponentData(clazz, data);
             component.setData(data);
+        }
+
+        if (component.ignore) {
+            component.ignore = false;
         }
 
         if (options?.emit) {

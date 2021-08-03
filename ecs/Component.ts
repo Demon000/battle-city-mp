@@ -18,6 +18,9 @@ export class Component<C extends Component<C>> {
     @nonenumerable
     readonly clazz: ComponentClassType<C>;
 
+    @nonenumerable
+    ignore = false;
+
     constructor(
         registry: Registry,
         entity: Entity,
