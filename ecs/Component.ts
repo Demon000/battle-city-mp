@@ -31,8 +31,6 @@ export class Component<C extends Component<C>> {
         this.clazz = clazz;
     }
 
-    static networked?: boolean;
-
     static readonly TAG?: string;
 
     static get tag(): string {
@@ -59,7 +57,6 @@ export class Component<C extends Component<C>> {
 export type ComponentClassType<C = any> = {
     readonly TAG?: string;
     readonly tag: string;
-    readonly networked?: boolean;
 
     new (
         registry: Registry,

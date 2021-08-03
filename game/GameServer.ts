@@ -126,7 +126,7 @@ export class GameServer {
          */
         this.registry.emitter.on(RegistryEvent.COMPONENT_ADDED,
             (component, data) => {
-                if (!component.clazz.networked) {
+                if (component.ignore) {
                     return;
                 }
 
@@ -139,7 +139,7 @@ export class GameServer {
             });
         this.registry.emitter.on(RegistryEvent.COMPONENT_UPDATED,
             (component, data) => {
-                if (!component.clazz.networked) {
+                if (component.ignore) {
                     return;
                 }
 
@@ -152,7 +152,7 @@ export class GameServer {
             });
         this.registry.emitter.on(RegistryEvent.COMPONENT_BEFORE_REMOVE,
             (component) => {
-                if (!component.clazz.networked) {
+                if (component.ignore) {
                     return;
                 }
 
