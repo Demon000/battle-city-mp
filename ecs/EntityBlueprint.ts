@@ -1,7 +1,6 @@
 import { ComponentRegistry } from './ComponentRegistry';
 import { Config } from '@/config/Config';
 import { ComponentClassType } from './Component';
-import { assert } from '@/utils/assert';
 
 export interface BlueprintData {
     components?: Record<string, any>,
@@ -59,6 +58,6 @@ export class EntityBlueprint {
             return this.getComponentsFromData(blueprintData.serverComponents);
         }
 
-        assert(false);
+        return undefined;
     }
 }
