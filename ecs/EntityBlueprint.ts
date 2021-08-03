@@ -3,7 +3,7 @@ import { Config } from '@/config/Config';
 import { ComponentClassType } from './Component';
 
 export interface BlueprintData {
-    components: Record<string, any>,
+    components?: Record<string, any>,
     clientComponents?: Record<string, any>,
     serverComponents?: Record<string, any>,
     extends?: string[],
@@ -35,7 +35,11 @@ export class EntityBlueprint {
             return undefined;
         }
 
-        const components = this.getComponentsFromData(blueprintData.components);
+        const components = [];
+        if (blueprintData.components !== undefined) {
+            components.push(...this.getComponentsFromData(blueprintData.components));
+        }
+
         if (this.env === BlueprintEnv.CLIENT
             && blueprintData.clientComponents !== undefined) {
             components.push(...this.getComponentsFromData(blueprintData.clientComponents));
