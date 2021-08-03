@@ -1,24 +1,26 @@
 {
     'explosion': {
-        components: {
+        serverComponents: {
             AutomaticDestroyComponent: {
                 timeMs: 240,
             },
         },
     },
     'smoke': {
-        components: {
+        serverComponents: {
             AutomaticDestroyComponent: {
                 timeMs: 1000,
             },
         },
     },
     'tank': {
-        components: {
-            IsMovingComponent: {},
+        serverComponents: {
             DirectionAxisSnappingComponent: {
                 value: 4,
             },
+        },
+        clientComponents: {
+            IsMovingComponent: {},
             GraphicDependenciesComponent: {
                 components: [
                     'IsMovingComponent',
