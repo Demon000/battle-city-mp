@@ -45,11 +45,16 @@ export class GameObjectFactory {
 
         const components = this.entityBlueprint?.getComponents(options.type);
         if (components !== undefined) {
-            object.addComponents(components, false);
+            object.addComponents(components, {
+                emit: false,
+                ignore: true,
+            });
         }
 
         if (options.components !== undefined) {
-            object.addComponents(options.components, false);
+            object.addComponents(options.components, {
+                emit: false,
+            });
         }
 
         return object;
