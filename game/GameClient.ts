@@ -30,6 +30,7 @@ import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { Registry, RegistryEvent } from '@/ecs/Registry';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
+import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -89,6 +90,7 @@ export class GameClient {
     private registryIdGenerator;
     private componentRegistry;
     private registry;
+    private entityBlueprint;
 
     private gameObjectFactory;
     private playerRepository;
@@ -115,7 +117,9 @@ export class GameClient {
         this.registryIdGenerator = new RegistryNumberIdGenerator();
         this.componentRegistry = new ComponentRegistry();
         this.registry = new Registry(this.registryIdGenerator, this.componentRegistry);
-        this.gameObjectFactory = new GameObjectFactory(this.registry, this.config);
+        this.entityBlueprint = new EntityBlueprint(this.config, this.componentRegistry, BlueprintEnv.CLIENT);
+        this.gameObjectFactory = new GameObjectFactory(this.registry, this.config, this.entityBlueprint);
+
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
         this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);

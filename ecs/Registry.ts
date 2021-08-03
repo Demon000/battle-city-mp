@@ -17,6 +17,12 @@ export enum RegistryEvent {
     COMPONENT_REMOVED = 'component-removed',
 }
 
+export interface RegistryOperationOptions {
+    emit?: boolean;
+    ignore?: boolean;
+    optional?: boolean;
+}
+
 export interface RegistryEvents {
     [RegistryEvent.ENTITY_REGISTERED]: (entity: Entity) => void;
     [RegistryEvent.ENTITY_BEFORE_DESTROY]: (entity: Entity) => void;
@@ -57,7 +63,7 @@ export type DataHandlingFn = <C extends Component<C>>(
     entity: Entity,
     clazzOrTag: ComponentClassType<C> | string,
     data?: Record<string, any>,
-    emit?: boolean,
+    options?: RegistryOperationOptions,
 ) => C;
 
 export class Registry {
@@ -162,7 +168,7 @@ export class Registry {
         entity: Entity,
         components: ComponentInitialization[],
         fn: DataHandlingFn,
-        emit = true,
+        options?: RegistryOperationOptions,
     ): void {
         for (const componentInitialization of components) {
             let clazz;
@@ -174,7 +180,7 @@ export class Registry {
                 clazz = componentInitialization;
             }
 
-            fn(entity, clazz, data, emit);
+            fn(entity, clazz, data, options);
         }
     }
 
@@ -184,7 +190,7 @@ export class Registry {
         entity: Entity,
         clazzOrTag: ComponentClassType<C> | string,
         data?: Record<string, any>,
-        emit = true,
+        options?: RegistryOperationOptions,
     ): C {
         const clazz = this.getClazz(clazzOrTag);
         const component = new clazz(this, entity, clazz);
@@ -199,7 +205,7 @@ export class Registry {
         const tagComponents = this.getOrCreateComponentTypeSet(clazz);
         tagComponents.add(component);
 
-        if (emit) {
+        if (options?.emit) {
             const componentEmitter = this.componentEmitter(clazz);
             if (componentEmitter !== undefined) {
                 componentEmitter.emit(RegistryEvent.COMPONENT_ADDED, component, data);
@@ -210,8 +216,13 @@ export class Registry {
         return component;
     }
 
-    addComponents(entity: Entity, components: ComponentInitialization[], emit = true): void {
-        this.runForComponentInitialization(entity, components, this.addComponent, emit);
+    addComponents(
+        entity: Entity,
+        components: ComponentInitialization[],
+        options?: RegistryOperationOptions,
+    ): void {
+        this.runForComponentInitialization(entity, components,
+            this.addComponent, options);
     }
 
     updateComponent<
@@ -220,7 +231,7 @@ export class Registry {
         entity: Entity,
         clazzOrTag: ComponentClassType<C> | string,
         data?: Record<string, any>,
-        emit = true,
+        options?: RegistryOperationOptions,
     ): C {
         const clazz = this.getClazz(clazzOrTag);
         const component = entity.getComponent(clazz);
@@ -230,7 +241,7 @@ export class Registry {
             component.setData(data);
         }
 
-        if (emit) {
+        if (options?.emit) {
             const componentEmitter = this.componentEmitter(clazz);
             if (componentEmitter !== undefined) {
                 componentEmitter.emit(RegistryEvent.COMPONENT_UPDATED, component, data);
@@ -241,8 +252,13 @@ export class Registry {
         return component;
     }
 
-    updateComponents(entity: Entity, components: ComponentInitialization[], emit = true): void {
-        this.runForComponentInitialization(entity, components, this.updateComponent, emit);
+    updateComponents(
+        entity: Entity,
+        components: ComponentInitialization[],
+        options?: RegistryOperationOptions,
+    ): void {
+        this.runForComponentInitialization(entity, components,
+            this.updateComponent, options);
     }
 
     upsertComponent<
@@ -251,33 +267,38 @@ export class Registry {
         entity: Entity,
         clazzOrTag: ComponentClassType<C> | string,
         data?: Record<string, any>,
+        options?: RegistryOperationOptions,
     ): C {
         const clazz = this.getClazz(clazzOrTag);
         const component = entity.findComponent(clazz);
         if (component === undefined) {
-            return this.addComponent(entity, clazz, data);
+            return this.addComponent(entity, clazz, options);
         } else {
-            return this.updateComponent(entity, clazz, data);
+            return this.updateComponent(entity, clazz, options);
         }
     }
 
-    upsertComponents(entity: Entity, components: ComponentInitialization[], emit = true): void {
-        this.runForComponentInitialization(entity, components, this.updateComponent, emit);
+    upsertComponents(
+        entity: Entity,
+        components: ComponentInitialization[],
+        options?: RegistryOperationOptions,
+    ): void {
+        this.runForComponentInitialization(entity, components,
+            this.updateComponent, options);
     }
 
     removeEntityComponent<C extends Component<C>>(
         entity: Entity,
         clazz: ComponentClassType<C>,
-        optional = false,
-        emit = true,
+        options?: RegistryOperationOptions,
     ): C | undefined {
         let component = entity.findComponent(clazz);
-        if (optional && component === undefined) {
+        if (options?.optional && component === undefined) {
             return undefined;
         }
         assert(component !== undefined);
 
-        if (emit) {
+        if (options?.emit) {
             const componentEmitter = this.componentEmitter(clazz);
             if (componentEmitter !== undefined) {
                 componentEmitter.emit(RegistryEvent.COMPONENT_BEFORE_REMOVE, component);
@@ -286,19 +307,19 @@ export class Registry {
         }
 
         component = entity.removeLocalComponent(clazz);
-        if (optional && component === undefined) {
+        if (options?.optional && component === undefined) {
             return undefined;
         }
         assert(component !== undefined);
 
         const tagComponents = this.tagsComponentsMap.get(clazz.tag);
-        if (optional && tagComponents === undefined) {
+        if (options?.optional && tagComponents === undefined) {
             return undefined;
         }
         assert(tagComponents !== undefined);
 
         const tagsHasComponent = tagComponents.has(component);
-        if (optional && !tagsHasComponent) {
+        if (options?.optional && !tagsHasComponent) {
             return undefined;
         }
         assert(tagsHasComponent);
@@ -306,7 +327,7 @@ export class Registry {
         const tagsHadComponent = tagComponents.delete(component);
         assert(tagsHadComponent);
 
-        if (emit) {
+        if (options?.emit) {
             const componentEmitter = this.componentEmitter(clazz);
             if (componentEmitter !== undefined) {
                 componentEmitter.emit(RegistryEvent.COMPONENT_REMOVED, component);
@@ -319,9 +340,9 @@ export class Registry {
 
     removeComponent<C extends Component<C>>(
         component: C,
-        optional = false,
+        options?: RegistryOperationOptions,
     ): C | undefined {
-        return this.removeEntityComponent(component.entity, component.clazz, optional);
+        return this.removeEntityComponent(component.entity, component.clazz, options);
     }
 
     findEntityById(id: EntityId): Entity | undefined {

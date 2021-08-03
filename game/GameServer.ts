@@ -37,7 +37,7 @@ import { GameModeService } from '@/game-mode/GameModeService';
 import { Registry, RegistryEvent } from '@/ecs/Registry';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
-import { EntityBlueprint } from '@/ecs/EntityBlueprint';
+import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { Flag, FlagType, PartialFlagOptions } from '@/flag/Flag';
 import { FlagService, FlagServiceEvent, FlagTankInteraction } from '@/flag/FlagService';
 import { PlayerPointsEvent } from '@/player/PlayerPoints';
@@ -92,10 +92,10 @@ export class GameServer {
         this.registryIdGenerator = new RegistryNumberIdGenerator();
         this.componentRegistry = new ComponentRegistry();
         this.registry = new Registry(this.registryIdGenerator, this.componentRegistry);
-        this.entityBlueprint = new EntityBlueprint(this.config, this.componentRegistry);
+        this.entityBlueprint = new EntityBlueprint(this.config, this.componentRegistry, BlueprintEnv.SERVER);
+        this.gameObjectFactory = new GameObjectFactory(this.registry, this.config, this.entityBlueprint);
 
         this.gameModeService = new GameModeService(this.config);
-        this.gameObjectFactory = new GameObjectFactory(this.registry, this.config, this.entityBlueprint);
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.movingGameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
@@ -635,6 +635,7 @@ export class GameServer {
         const configsData = this.config.getDataMultiple([
             'bounding-box',
             'game-object-properties',
+            'entities-blueprint',
             'game-client',
             'time',
         ]);

@@ -1,7 +1,7 @@
 import { assert } from '@/utils/assert';
 import { Component, ComponentClassType, ComponentInitialization } from './Component';
 import { EntityId } from './EntityId';
-import { Registry } from './Registry';
+import { Registry, RegistryOperationOptions } from './Registry';
 
 export class Entity {
     private tagComponentMap = new Map<ComponentClassType, Component<any>>();
@@ -45,8 +45,9 @@ export class Entity {
     >(
         clazzOrTag: ComponentClassType<C> | string,
         data?: Record<string, any>,
+        options?: RegistryOperationOptions,
     ): C {
-        return this.registry.addComponent(this, clazzOrTag, data);
+        return this.registry.addComponent(this, clazzOrTag, data, options);
     }
 
     updateComponent<
@@ -54,8 +55,9 @@ export class Entity {
     >(
         clazzOrTag: ComponentClassType<C> | string,
         data?: Record<string, any>,
+        options?: RegistryOperationOptions,
     ): C {
-        return this.registry.updateComponent(this, clazzOrTag, data);
+        return this.registry.updateComponent(this, clazzOrTag, data, options);
     }
 
     upsertComponent<
@@ -63,12 +65,16 @@ export class Entity {
     >(
         clazz: ComponentClassType<C> | string,
         data?: Record<string, any>,
+        options?: RegistryOperationOptions,
     ): C {
-        return this.registry.upsertComponent(this, clazz, data);
+        return this.registry.upsertComponent(this, clazz, data, options);
     }
 
-    addComponents(components: ComponentInitialization[], emit = true): void {
-        this.registry.addComponents(this, components, emit);
+    addComponents(
+        components: ComponentInitialization[],
+        options?: RegistryOperationOptions,
+    ): void {
+        this.registry.addComponents(this, components, options);
     }
 
     getComponentsData(): ComponentInitialization[] {
@@ -83,10 +89,10 @@ export class Entity {
         C extends Component<C>,
     >(
         clazzOrTag: ComponentClassType<C> | string,
-        optional = false,
+        options?: RegistryOperationOptions,
     ): C | undefined {
         const component = this.getComponent(clazzOrTag);
-        return this.registry.removeComponent(component, optional);
+        return this.registry.removeComponent(component, options);
     }
 
     removeComponents(): void {
