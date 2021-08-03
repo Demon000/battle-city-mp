@@ -8,6 +8,10 @@ export type ComponentInitialization =
     [string, any] |
     string;
 
+export enum ComponentFlags {
+    SERVER_ONLY = 1 << 0,
+}
+
 export class Component<C extends Component<C>> {
     @nonenumerable
     readonly registry: Registry;
@@ -19,7 +23,7 @@ export class Component<C extends Component<C>> {
     readonly clazz: ComponentClassType<C>;
 
     @nonenumerable
-    ignore = false;
+    flags = 0;
 
     constructor(
         registry: Registry,

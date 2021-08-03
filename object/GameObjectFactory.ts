@@ -1,7 +1,7 @@
 import { Bullet, BulletOptions } from '@/bullet/Bullet';
 import { Config } from '@/config/Config';
 import { Registry } from '@/ecs/Registry';
-import { EntityBlueprint } from '@/ecs/EntityBlueprint';
+import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { Explosion, ExplosionOptions } from '@/explosion/Explosion';
 import { Flag, FlagOptions } from '@/flag/Flag';
 import { PlayerSpawn, PlayerSpawnOptions } from '@/player-spawn/PlayerSpawn';
@@ -9,12 +9,13 @@ import { Tank, TankOptions, TankProperties } from '../tank/Tank';
 import { GameObject, GameObjectOptions } from './GameObject';
 import { GameObjectProperties } from './GameObjectProperties';
 import { GameObjectType } from './GameObjectType';
+import { ComponentFlags } from '@/ecs/Component';
 
 export class GameObjectFactory {
     constructor(
         private registry: Registry,
         private config: Config,
-        private entityBlueprint?: EntityBlueprint,
+        private entityBlueprint: EntityBlueprint,
     ) {}
 
     buildFromOptions(options: GameObjectOptions): GameObject {
@@ -43,11 +44,27 @@ export class GameObjectFactory {
             object = new GameObject(options, properties, this.registry);
         }
 
-        const components = this.entityBlueprint?.getComponents(options.type);
+        let components;
+
+        components = this.entityBlueprint.getCommonComponents(options.type);
         if (components !== undefined) {
             object.addComponents(components, {
                 silent: true,
-                ignore: true,
+            });
+        }
+
+        components = this.entityBlueprint.getEnvComponents(options.type);
+        if (components !== undefined) {
+            let flags = 0;
+
+            const env = this.entityBlueprint.getEnv();
+            if (env === BlueprintEnv.SERVER) {
+                flags |= ComponentFlags.SERVER_ONLY;
+            }
+
+            object.addComponents(components, {
+                silent: true,
+                flags,
             });
         }
 

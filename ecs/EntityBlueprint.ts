@@ -1,6 +1,7 @@
 import { ComponentRegistry } from './ComponentRegistry';
 import { Config } from '@/config/Config';
 import { ComponentClassType } from './Component';
+import { assert } from '@/utils/assert';
 
 export interface BlueprintData {
     components?: Record<string, any>,
@@ -29,27 +30,35 @@ export class EntityBlueprint {
         );
     }
 
-    getComponents(type: string): [ComponentClassType<any>, any][] | undefined {
+    getCommonComponents(type: string): [ComponentClassType<any>, any][] | undefined {
         const blueprintData = this.config.find<BlueprintData>('entities-blueprint', type);
         if (blueprintData === undefined) {
             return undefined;
         }
 
-        const components = [];
         if (blueprintData.components !== undefined) {
-            components.push(...this.getComponentsFromData(blueprintData.components));
+            return this.getComponentsFromData(blueprintData.components);
+        }
+    }
+
+    getEnv(): BlueprintEnv {
+        return this.env;
+    }
+
+    getEnvComponents(type: string): [ComponentClassType<any>, any][] | undefined {
+        const blueprintData = this.config.find<BlueprintData>('entities-blueprint', type);
+        if (blueprintData === undefined) {
+            return undefined;
         }
 
         if (this.env === BlueprintEnv.CLIENT
             && blueprintData.clientComponents !== undefined) {
-            components.push(...this.getComponentsFromData(blueprintData.clientComponents));
-        }
-
-        if (this.env === BlueprintEnv.SERVER
+            return this.getComponentsFromData(blueprintData.clientComponents);
+        } else if (this.env === BlueprintEnv.SERVER
             && blueprintData.serverComponents !== undefined) {
-            components.push(...this.getComponentsFromData(blueprintData.serverComponents));
+            return this.getComponentsFromData(blueprintData.serverComponents);
         }
 
-        return components;
+        assert(false);
     }
 }

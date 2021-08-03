@@ -45,6 +45,7 @@ import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { GameMap } from '@/maps/GameMap';
 import { assert } from '@/utils/assert';
+import { ComponentFlags } from '@/ecs/Component';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -126,7 +127,7 @@ export class GameServer {
          */
         this.registry.emitter.on(RegistryEvent.COMPONENT_ADDED,
             (component, data) => {
-                if (component.ignore) {
+                if (component.flags & ComponentFlags.SERVER_ONLY) {
                     return;
                 }
 
@@ -139,7 +140,7 @@ export class GameServer {
             });
         this.registry.emitter.on(RegistryEvent.COMPONENT_UPDATED,
             (component, data) => {
-                if (component.ignore) {
+                if (component.flags & ComponentFlags.SERVER_ONLY) {
                     return;
                 }
 
@@ -152,7 +153,7 @@ export class GameServer {
             });
         this.registry.emitter.on(RegistryEvent.COMPONENT_BEFORE_REMOVE,
             (component) => {
-                if (component.ignore) {
+                if (component.flags & ComponentFlags.SERVER_ONLY) {
                     return;
                 }
 

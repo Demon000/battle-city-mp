@@ -1,7 +1,7 @@
 import { ComponentRegistry } from './ComponentRegistry';
 import { assert } from '@/utils/assert';
 import EventEmitter from 'eventemitter3';
-import { Component, ComponentClassType, ComponentInitialization } from './Component';
+import { Component, ComponentClassType, ComponentFlags, ComponentInitialization } from './Component';
 import { Entity } from './Entity';
 import { EntityId } from './EntityId';
 import { RegistryIdGenerator } from './RegistryIdGenerator';
@@ -18,8 +18,8 @@ export enum RegistryEvent {
 }
 
 export interface RegistryOperationOptions {
+    flags?: number;
     silent?: boolean;
-    ignore?: boolean;
     optional?: boolean;
 }
 
@@ -205,8 +205,8 @@ export class Registry {
         const tagComponents = this.getOrCreateComponentTypeSet(clazz);
         tagComponents.add(component);
 
-        if (options?.ignore) {
-            component.ignore = true;
+        if (options?.flags) {
+            component.flags = options.flags;
         }
 
         if (!options?.silent) {
@@ -243,10 +243,6 @@ export class Registry {
         if (data !== undefined) {
             this.componentRegistry.validateComponentData(clazz, data);
             component.setData(data);
-        }
-
-        if (component.ignore) {
-            component.ignore = false;
         }
 
         if (!options?.silent) {
