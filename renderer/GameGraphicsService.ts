@@ -160,7 +160,6 @@ export class GameGraphicsService {
             const object = component.entity as GameObject;
             const renderer = this.getObjectRenderer(object);
             renderer.update(this.scale, true);
-            component.remove();
         }
     }
 

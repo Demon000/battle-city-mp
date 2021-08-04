@@ -1,3 +1,4 @@
+import { DirtyGraphicsComponent } from '@/components/DirtyGraphicsComponent';
 import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
 import { AnimatedImageDrawable } from '@/drawable/AnimatedImageDrawable';
 import { DrawableType } from '@/drawable/DrawableType';
@@ -81,7 +82,9 @@ export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
             this.drawables = this.processDrawables(this.drawables);
         }
 
-        if (!force) {
+        if (force) {
+            this.object.removeComponent(DirtyGraphicsComponent);
+        } else {
             this.object.graphicsDirty = false;
         }
     }
