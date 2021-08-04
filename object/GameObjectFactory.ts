@@ -1,7 +1,7 @@
 import { Bullet, BulletOptions } from '@/bullet/Bullet';
 import { Config } from '@/config/Config';
 import { Registry } from '@/ecs/Registry';
-import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
+import { EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { Explosion, ExplosionOptions } from '@/explosion/Explosion';
 import { Flag, FlagOptions } from '@/flag/Flag';
 import { PlayerSpawn, PlayerSpawnOptions } from '@/player-spawn/PlayerSpawn';
@@ -9,7 +9,7 @@ import { Tank, TankOptions, TankProperties } from '../tank/Tank';
 import { GameObject, GameObjectOptions } from './GameObject';
 import { GameObjectProperties } from './GameObjectProperties';
 import { GameObjectType } from './GameObjectType';
-import { ComponentFlags, ComponentInitialization } from '@/ecs/Component';
+import { ComponentInitialization } from '@/ecs/Component';
 
 export class GameObjectFactory {
     constructor(
@@ -47,29 +47,7 @@ export class GameObjectFactory {
             object = new GameObject(options, properties, this.registry);
         }
 
-        let blueprintComponents;
-
-        blueprintComponents = this.entityBlueprint.getCommonComponents(options.type);
-        if (blueprintComponents !== undefined) {
-            object.addComponents(blueprintComponents, {
-                silent: true,
-            });
-        }
-
-        blueprintComponents = this.entityBlueprint.getEnvComponents(options.type);
-        if (blueprintComponents !== undefined) {
-            let flags = 0;
-
-            const env = this.entityBlueprint.getEnv();
-            if (env === BlueprintEnv.SERVER) {
-                flags |= ComponentFlags.SERVER_ONLY;
-            }
-
-            object.addComponents(blueprintComponents, {
-                silent: true,
-                flags,
-            });
-        }
+        this.entityBlueprint.addComponents(options.type, object);
 
         if (components !== undefined) {
             object.addComponents(components, {

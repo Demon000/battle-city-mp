@@ -1,6 +1,6 @@
-import { ComponentRegistry } from './ComponentRegistry';
 import { Config } from '@/config/Config';
-import { ComponentClassType } from './Component';
+import { ComponentFlags } from './Component';
+import { Entity } from './Entity';
 
 export interface BlueprintData {
     components?: Record<string, any>,
@@ -17,47 +17,68 @@ export enum BlueprintEnv {
 export class EntityBlueprint {
     constructor(
         private config: Config,
-        private componentRegistry: ComponentRegistry,
         private env: BlueprintEnv,
     ) {}
 
-    private getComponentsFromData(
-        data: Record<string, any>,
-    ): [ComponentClassType<any>, any][] {
-        return Object.entries(data).map(
-            ([tag, data]) => [this.componentRegistry.getComponentClassByTag(tag), data],
-        );
+    private addComponentsFromData(
+        rawData: Record<string, any>,
+        entity: Entity,
+        flags?: number,
+    ): void {
+        for (const [tag, data] of  Object.entries(rawData)) {
+            entity.addComponent(tag, data, {
+                flags,
+            });
+        }
     }
 
-    getCommonComponents(type: string): [ComponentClassType<any>, any][] | undefined {
+    private addCommonComponents(
+        type: string,
+        entity: Entity,
+    ): void {
         const blueprintData = this.config.find<BlueprintData>('entities-blueprint', type);
         if (blueprintData === undefined) {
-            return undefined;
+            return;
+        }
+
+        if (blueprintData.extends !== undefined) {
+            for (const extendedType of  blueprintData.extends) {
+                this.addCommonComponents(extendedType, entity);
+            }
         }
 
         if (blueprintData.components !== undefined) {
-            return this.getComponentsFromData(blueprintData.components);
+            this.addComponentsFromData(blueprintData.components, entity);
         }
     }
 
-    getEnv(): BlueprintEnv {
-        return this.env;
-    }
-
-    getEnvComponents(type: string): [ComponentClassType<any>, any][] | undefined {
+    private addEnvComponents(
+        type: string,
+        entity: Entity,
+    ): void {
         const blueprintData = this.config.find<BlueprintData>('entities-blueprint', type);
         if (blueprintData === undefined) {
-            return undefined;
+            return;
+        }
+
+        if (blueprintData.extends !== undefined) {
+            for (const extendedType of  blueprintData.extends) {
+                this.addEnvComponents(extendedType, entity);
+            }
         }
 
         if (this.env === BlueprintEnv.CLIENT
             && blueprintData.clientComponents !== undefined) {
-            return this.getComponentsFromData(blueprintData.clientComponents);
+            this.addComponentsFromData(blueprintData.clientComponents, entity);
         } else if (this.env === BlueprintEnv.SERVER
             && blueprintData.serverComponents !== undefined) {
-            return this.getComponentsFromData(blueprintData.serverComponents);
+            this.addComponentsFromData(blueprintData.serverComponents, entity,
+                ComponentFlags.SERVER_ONLY);
         }
+    }
 
-        return undefined;
+    addComponents(type: string, entity: Entity): void {
+        this.addCommonComponents(type, entity);
+        this.addEnvComponents(type, entity);
     }
 }

@@ -113,7 +113,7 @@ export class GameClient {
         this.registryIdGenerator = new RegistryNumberIdGenerator();
         this.componentRegistry = new ComponentRegistry();
         this.registry = new Registry(this.registryIdGenerator, this.componentRegistry);
-        this.entityBlueprint = new EntityBlueprint(this.config, this.componentRegistry, BlueprintEnv.CLIENT);
+        this.entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.CLIENT);
         this.gameObjectFactory = new GameObjectFactory(this.registry, this.config, this.entityBlueprint);
 
         this.gameObjectRepository = new MapRepository<number, GameObject>();

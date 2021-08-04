@@ -93,7 +93,7 @@ export class GameServer {
         this.registryIdGenerator = new RegistryNumberIdGenerator();
         this.componentRegistry = new ComponentRegistry();
         this.registry = new Registry(this.registryIdGenerator, this.componentRegistry);
-        this.entityBlueprint = new EntityBlueprint(this.config, this.componentRegistry, BlueprintEnv.SERVER);
+        this.entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.SERVER);
         this.gameObjectFactory = new GameObjectFactory(this.registry, this.config, this.entityBlueprint);
 
         this.gameModeService = new GameModeService(this.config);
