@@ -54,7 +54,7 @@ export class GameClientSocket {
                 this.gameClient.onTeamPlayerRemoved(batch[1], batch[2]);
                 break;
             case GameEvent.OBJECT_REGISTERED:
-                this.gameClient.onObjectRegistered(batch[1]);
+                this.gameClient.onObjectRegistered(batch[1], batch[2]);
                 break;
             case GameEvent.OBJECT_CHANGED:
                 this.gameClient.onObjectChanged(batch[1], batch[2]);

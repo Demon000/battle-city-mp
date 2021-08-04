@@ -1,3 +1,4 @@
+import { ComponentInitialization } from '@/ecs/Component';
 import { GameObjectOptions, PartialGameObjectOptions } from '@/object/GameObject';
 import { PartialPlayerOptions, PlayerOptions } from '@/player/Player';
 import { GameServerStatus } from './GameServerStatus';
@@ -27,6 +28,11 @@ export type CommonBatchGameEvent =
     [name: GameEvent.SERVER_STATUS, serverStatus: GameServerStatus];
 
 
+export type GameEntityComponentEvent =
+    GameEvent.ENTITY_COMPONENT_ADDED |
+    GameEvent.ENTITY_COMPONENT_UPDATED |
+    GameEvent.ENTITY_COMPONENT_REMOVED;
+
 export type UnicastBatchGameEvent = CommonBatchGameEvent;
 
 export type BroadcastBatchGameEvent = CommonBatchGameEvent |
@@ -37,11 +43,11 @@ export type BroadcastBatchGameEvent = CommonBatchGameEvent |
 [name: GameEvent.TEAM_PLAYER_ADDED, teamId: string, playerId: string] |
 [name: GameEvent.TEAM_PLAYER_REMOVED, teamId: string, playerId: string] |
 
-[name: GameEvent.OBJECT_REGISTERED, objectOptions: GameObjectOptions] |
+[name: GameEvent.OBJECT_REGISTERED, objectOptions: GameObjectOptions, objectComponents: ComponentInitialization[]] |
 [name: GameEvent.OBJECT_CHANGED, objectId: number, options: PartialGameObjectOptions] |
 [name: GameEvent.OBJECT_UNREGISTERED, objectId: number] |
-[name: GameEvent.ENTITY_COMPONENT_ADDED, entityId: number, tag: string, data: any] |
-[name: GameEvent.ENTITY_COMPONENT_UPDATED, entityId: number, tag: string, data: any] |
+[name: GameEvent.ENTITY_COMPONENT_ADDED, entityId: number, tag: string, data?: any] |
+[name: GameEvent.ENTITY_COMPONENT_UPDATED, entityId: number, tag: string, data?: any] |
 [name: GameEvent.ENTITY_COMPONENT_REMOVED, entityId: number, tag: string] |
 [name: GameEvent.ROUND_TIME_UPDATED, roundTime: number];
 

@@ -28,9 +28,10 @@ import { PartialTankOptions, TankProperties } from '@/tank/Tank';
 import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
-import { Registry, RegistryEvent } from '@/ecs/Registry';
+import { Registry, RegistryComponentEvent } from '@/ecs/Registry';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
+import { ComponentInitialization } from '@/ecs/Component';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -138,17 +139,17 @@ export class GameClient {
         this.emitter = new EventEmitter<GameClientEvents>();
         this.ticker = new Ticker();
 
-        this.registry.emitter.on(RegistryEvent.COMPONENT_ADDED, component => {
+        this.registry.emitter.on(RegistryComponentEvent.COMPONENT_ADDED, component => {
             this.gameGraphicsService.processObjectsGraphicsDependencies(component.entity.id,
                 component.clazz.tag);
         });
 
-        this.registry.emitter.on(RegistryEvent.COMPONENT_UPDATED, component => {
+        this.registry.emitter.on(RegistryComponentEvent.COMPONENT_UPDATED, component => {
             this.gameGraphicsService.processObjectsGraphicsDependencies(component.entity.id,
                 component.clazz.tag);
         });
 
-        this.registry.emitter.on(RegistryEvent.COMPONENT_REMOVED, component => {
+        this.registry.emitter.on(RegistryComponentEvent.COMPONENT_REMOVED, component => {
             this.gameGraphicsService.processObjectsGraphicsDependencies(component.entity.id,
                 component.clazz.tag);
         });
@@ -257,8 +258,8 @@ export class GameClient {
         }
     }
 
-    onObjectRegistered(objectOptions: GameObjectOptions): void {
-        const object = this.gameObjectFactory.buildFromOptions(objectOptions);
+    onObjectRegistered(objectOptions: GameObjectOptions, objectComponents: ComponentInitialization[]): void {
+        const object = this.gameObjectFactory.buildFromOptions(objectOptions, objectComponents);
         this.gameObjectService.registerObject(object);
     }
 
@@ -324,7 +325,7 @@ export class GameClient {
 
         const objects =
             LazyIterable.from(serverStatus.objectsOptions)
-                .map(o => this.gameObjectFactory.buildFromOptions(o));
+                .map(([o, c]) => this.gameObjectFactory.buildFromOptions(o, c));
         this.gameObjectService.registerObjects(objects);
 
         const visibleGameSize = this.config.get<number>('game-client', 'visibleGameSize');

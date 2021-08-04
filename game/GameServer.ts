@@ -31,10 +31,10 @@ import { CollisionEvent } from '../physics/collisions/ICollisionRule';
 import { Point } from '../physics/point/Point';
 import { Player, PartialPlayerOptions, PlayerSpawnStatus } from '../player/Player';
 import { PlayerService, PlayerServiceEvent } from '../player/PlayerService';
-import { BroadcastBatchGameEvent, CommonBatchGameEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
+import { BroadcastBatchGameEvent, CommonBatchGameEvent, GameEntityComponentEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
 import { GameEventBatcher, GameEventBatcherEvent } from './GameEventBatcher';
 import { GameModeService } from '@/game-mode/GameModeService';
-import { Registry, RegistryEvent } from '@/ecs/Registry';
+import { Registry, RegistryComponentEvent } from '@/ecs/Registry';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
@@ -45,7 +45,7 @@ import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { GameMap } from '@/maps/GameMap';
 import { assert } from '@/utils/assert';
-import { ComponentFlags } from '@/ecs/Component';
+import { Component, ComponentFlags, ComponentInitialization } from '@/ecs/Component';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -125,43 +125,28 @@ export class GameServer {
         /**
          * Registry event handlers
          */
-        this.registry.emitter.on(RegistryEvent.COMPONENT_ADDED,
+        this.registry.emitter.on(RegistryComponentEvent.COMPONENT_ADDED,
             (component, data) => {
-                if (component.flags & ComponentFlags.SERVER_ONLY) {
-                    return;
-                }
-
-                this.gameEventBatcher.addBroadcastEvent([
+                this.onRegistryComponentEvent(
                     GameEvent.ENTITY_COMPONENT_ADDED,
-                    component.entity.id,
-                    component.clazz.tag,
+                    component,
                     data,
-                ]);
+                );
             });
-        this.registry.emitter.on(RegistryEvent.COMPONENT_UPDATED,
+        this.registry.emitter.on(RegistryComponentEvent.COMPONENT_UPDATED,
             (component, data) => {
-                if (component.flags & ComponentFlags.SERVER_ONLY) {
-                    return;
-                }
-
-                this.gameEventBatcher.addBroadcastEvent([
+                this.onRegistryComponentEvent(
                     GameEvent.ENTITY_COMPONENT_UPDATED,
-                    component.entity.id,
-                    component.clazz.tag,
+                    component,
                     data,
-                ]);
+                );
             });
-        this.registry.emitter.on(RegistryEvent.COMPONENT_BEFORE_REMOVE,
+        this.registry.emitter.on(RegistryComponentEvent.COMPONENT_BEFORE_REMOVE,
             (component) => {
-                if (component.flags & ComponentFlags.SERVER_ONLY) {
-                    return;
-                }
-
-                this.gameEventBatcher.addBroadcastEvent([
+                this.onRegistryComponentEvent(
                     GameEvent.ENTITY_COMPONENT_REMOVED,
-                    component.entity.id,
-                    component.clazz.tag,
-                ]);
+                    component,
+                );
             });
 
         /**
@@ -294,7 +279,13 @@ export class GameServer {
             (object: GameObject) => {
                 this.registry.registerEntity(object);
                 this.collisionService.registerObjectCollisions(object.id);
-                this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_REGISTERED, object.toOptions()]);
+                this.gameEventBatcher.addBroadcastEvent([
+                    GameEvent.OBJECT_REGISTERED,
+                    object.toOptions(),
+                    object.getComponentsData({
+                        withoutFlags: ComponentFlags.SERVER_ONLY,
+                    }),
+                ]);
 
                 switch (object.type) {
                     case GameObjectType.TANK: {
@@ -570,6 +561,31 @@ export class GameServer {
         this.reload();
     }
 
+    onRegistryComponentEvent<
+        C extends Component<C>,
+    >(event: GameEntityComponentEvent, component: C, data?: any): void {
+        if (component.flags & ComponentFlags.SERVER_ONLY) {
+            return;
+        }
+
+        if (data === undefined
+            || event === GameEvent.ENTITY_COMPONENT_REMOVED) {
+            this.gameEventBatcher.addBroadcastEvent([
+                event,
+                component.entity.id,
+                component.clazz.tag,
+            ]);
+        } else {
+            this.gameEventBatcher.addBroadcastEvent([
+                event,
+                component.entity.id,
+                component.clazz.tag,
+                data,
+            ]);
+        }
+
+    }
+
     handleFlagInteraction(
         tank: Tank,
         flag: Flag | undefined,
@@ -615,8 +631,15 @@ export class GameServer {
         const objects = this.gameObjectService.getObjects();
         const objectsOptions =
             LazyIterable.from(objects)
-                .map(object => object.toOptions())
-                .toArray();
+                .map(object => {
+                    return [
+                        object.toOptions(),
+                        object.getComponentsData({
+                            withoutFlags: ComponentFlags.SERVER_ONLY,
+                        }),
+                    ];
+                })
+                .toArray() as Iterable<[GameObjectOptions, ComponentInitialization[]]>;
 
         const players = this.playerService.getPlayers();
         const playersOptions =

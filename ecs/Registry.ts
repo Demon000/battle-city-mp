@@ -10,7 +10,9 @@ import { LazyIterable } from '@/utils/LazyIterable';
 export enum RegistryEvent {
     ENTITY_REGISTERED = 'entity-registered',
     ENTITY_BEFORE_DESTROY = 'entity-before-destroy',
+}
 
+export enum RegistryComponentEvent {
     COMPONENT_ADDED = 'component-added',
     COMPONENT_UPDATED = 'component-updated',
     COMPONENT_BEFORE_REMOVE = 'component-before-remove',
@@ -26,35 +28,21 @@ export interface RegistryOperationOptions {
 export interface RegistryEvents {
     [RegistryEvent.ENTITY_REGISTERED]: (entity: Entity) => void;
     [RegistryEvent.ENTITY_BEFORE_DESTROY]: (entity: Entity) => void;
-    [RegistryEvent.COMPONENT_ADDED]: <C extends Component<C>>(
-        component: C,
-        data: any,
-    ) => void;
-    [RegistryEvent.COMPONENT_UPDATED]: <C extends Component<C>>(
-        component: C,
-        data: any,
-    ) => void;
-    [RegistryEvent.COMPONENT_BEFORE_REMOVE]: <C extends Component<C>>(
-        component: C,
-    ) => void;
-    [RegistryEvent.COMPONENT_REMOVED]: <C extends Component<C>>(
-        component: C,
-    ) => void;
 }
 
 export interface RegistryComponentEvents {
-    [RegistryEvent.COMPONENT_ADDED]: <C extends Component<C>>(
+    [RegistryComponentEvent.COMPONENT_ADDED]: <C extends Component<C>>(
         component: C,
-        data: any,
+        data?: any,
     ) => void;
-    [RegistryEvent.COMPONENT_UPDATED]: <C extends Component<C>>(
+    [RegistryComponentEvent.COMPONENT_UPDATED]: <C extends Component<C>>(
         component: C,
-        data: any,
+        data?: any,
     ) => void;
-    [RegistryEvent.COMPONENT_BEFORE_REMOVE]: <C extends Component<C>>(
+    [RegistryComponentEvent.COMPONENT_BEFORE_REMOVE]: <C extends Component<C>>(
         component: C,
     ) => void;
-    [RegistryEvent.COMPONENT_REMOVED]: <C extends Component<C>>(
+    [RegistryComponentEvent.COMPONENT_REMOVED]: <C extends Component<C>>(
         component: C,
     ) => void;
 }
@@ -71,7 +59,7 @@ export class Registry {
     private componentsEmitterMap = new Map<string, EventEmitter<RegistryComponentEvents>>();
 
     private idsEntityMap = new Map<EntityId, Entity>();
-    emitter = new EventEmitter<RegistryEvents>();
+    emitter = new EventEmitter<RegistryEvents & RegistryComponentEvents>();
 
     constructor(
         private idGenerator: RegistryIdGenerator,
@@ -164,6 +152,17 @@ export class Registry {
         return clazz;
     }
 
+    private emit<
+        C extends Component<C>,
+    >(event: RegistryComponentEvent, component: C, data?: any): void {
+        const componentEmitter = this.componentEmitter(component.clazz);
+        if (componentEmitter !== undefined) {
+            componentEmitter.emit(event, component, data);
+        }
+
+        this.emitter.emit(event, component, data);
+    }
+
     runForComponentInitialization(
         entity: Entity,
         components: ComponentInitialization[],
@@ -211,11 +210,7 @@ export class Registry {
         }
 
         if (!options?.silent) {
-            const componentEmitter = this.componentEmitter(clazz);
-            if (componentEmitter !== undefined) {
-                componentEmitter.emit(RegistryEvent.COMPONENT_ADDED, component, data);
-            }
-            this.emitter.emit(RegistryEvent.COMPONENT_ADDED, component, data);
+            this.emit(RegistryComponentEvent.COMPONENT_ADDED, component, data);
         }
 
         return component;
@@ -247,11 +242,7 @@ export class Registry {
         }
 
         if (!options?.silent) {
-            const componentEmitter = this.componentEmitter(clazz);
-            if (componentEmitter !== undefined) {
-                componentEmitter.emit(RegistryEvent.COMPONENT_UPDATED, component, data);
-            }
-            this.emitter.emit(RegistryEvent.COMPONENT_UPDATED, component, data);
+            this.emit(RegistryComponentEvent.COMPONENT_UPDATED, component, data);
         }
 
         return component;
@@ -304,11 +295,7 @@ export class Registry {
         assert(component !== undefined);
 
         if (!options?.silent) {
-            const componentEmitter = this.componentEmitter(clazz);
-            if (componentEmitter !== undefined) {
-                componentEmitter.emit(RegistryEvent.COMPONENT_BEFORE_REMOVE, component);
-            }
-            this.emitter.emit(RegistryEvent.COMPONENT_BEFORE_REMOVE, component);
+            this.emit(RegistryComponentEvent.COMPONENT_BEFORE_REMOVE, component);
         }
 
         component = entity.removeLocalComponent(clazz);
@@ -333,11 +320,7 @@ export class Registry {
         assert(tagsHadComponent);
 
         if (!options?.silent) {
-            const componentEmitter = this.componentEmitter(clazz);
-            if (componentEmitter !== undefined) {
-                componentEmitter.emit(RegistryEvent.COMPONENT_REMOVED, component);
-            }
-            this.emitter.emit(RegistryEvent.COMPONENT_REMOVED, component);
+            this.emit(RegistryComponentEvent.COMPONENT_REMOVED, component);
         }
 
         return component;

@@ -6,7 +6,6 @@ import { GameObjectType } from './GameObjectType';
 import { AudioEffect, GameObjectProperties, ResourceMeta } from './GameObjectProperties';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
-import { ComponentInitialization } from '@/ecs/Component';
 
 export interface GameObjectOptions {
     id?: number;
@@ -17,7 +16,6 @@ export interface GameObjectOptions {
     movementDirection?: Direction | null;
     spawnTime?: number;
     collisionsDisabled?: boolean;
-    components?: ComponentInitialization[],
 }
 
 export type PartialGameObjectOptions = Partial<GameObjectOptions>;
@@ -71,7 +69,6 @@ export class GameObject extends Entity {
             direction: this.direction,
             movementSpeed: this.movementSpeed,
             movementDirection: this.movementDirection,
-            components: this.getComponentsData(),
         };
     }
 

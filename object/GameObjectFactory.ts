@@ -9,7 +9,7 @@ import { Tank, TankOptions, TankProperties } from '../tank/Tank';
 import { GameObject, GameObjectOptions } from './GameObject';
 import { GameObjectProperties } from './GameObjectProperties';
 import { GameObjectType } from './GameObjectType';
-import { ComponentFlags } from '@/ecs/Component';
+import { ComponentFlags, ComponentInitialization } from '@/ecs/Component';
 
 export class GameObjectFactory {
     constructor(
@@ -18,7 +18,10 @@ export class GameObjectFactory {
         private entityBlueprint: EntityBlueprint,
     ) {}
 
-    buildFromOptions(options: GameObjectOptions): GameObject {
+    buildFromOptions(
+        options: GameObjectOptions,
+        components?: ComponentInitialization[],
+    ): GameObject {
         if (options.type === undefined) {
             throw new Error('Cannot create object from options without a type');
         }
@@ -44,17 +47,17 @@ export class GameObjectFactory {
             object = new GameObject(options, properties, this.registry);
         }
 
-        let components;
+        let blueprintComponents;
 
-        components = this.entityBlueprint.getCommonComponents(options.type);
-        if (components !== undefined) {
-            object.addComponents(components, {
+        blueprintComponents = this.entityBlueprint.getCommonComponents(options.type);
+        if (blueprintComponents !== undefined) {
+            object.addComponents(blueprintComponents, {
                 silent: true,
             });
         }
 
-        components = this.entityBlueprint.getEnvComponents(options.type);
-        if (components !== undefined) {
+        blueprintComponents = this.entityBlueprint.getEnvComponents(options.type);
+        if (blueprintComponents !== undefined) {
             let flags = 0;
 
             const env = this.entityBlueprint.getEnv();
@@ -62,14 +65,14 @@ export class GameObjectFactory {
                 flags |= ComponentFlags.SERVER_ONLY;
             }
 
-            object.addComponents(components, {
+            object.addComponents(blueprintComponents, {
                 silent: true,
                 flags,
             });
         }
 
-        if (options.components !== undefined) {
-            object.addComponents(options.components, {
+        if (components !== undefined) {
+            object.addComponents(components, {
                 silent: true,
             });
         }

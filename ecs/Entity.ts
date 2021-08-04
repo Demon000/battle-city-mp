@@ -3,6 +3,11 @@ import { Component, ComponentClassType, ComponentInitialization } from './Compon
 import { EntityId } from './EntityId';
 import { Registry, RegistryOperationOptions } from './Registry';
 
+export interface EntityComponentsOptions {
+    withFlags?: number;
+    withoutFlags?: number;
+}
+
 export class Entity {
     private tagComponentMap = new Map<ComponentClassType, Component<any>>();
 
@@ -78,9 +83,22 @@ export class Entity {
         this.registry.addComponents(this, components, options);
     }
 
-    getComponentsData(): ComponentInitialization[] {
+    getComponentsData(options?: EntityComponentsOptions): ComponentInitialization[] {
         const tagsComponentsEncoding: [string, Partial<Component<any>>][] = [];
         for (const [clazz, component] of this.tagComponentMap) {
+            if (options !== undefined) {
+                if (options.withFlags !== undefined
+                    && (component.flags & options.withFlags)
+                        !== options.withFlags) {
+                    continue;
+                }
+
+                if (options.withoutFlags !== undefined
+                    && (component.flags & options.withoutFlags)
+                        !== 0) {
+                    continue;
+                }
+            }
             tagsComponentsEncoding.push([clazz.tag, component.getData()]);
         }
         return tagsComponentsEncoding;
