@@ -1,7 +1,7 @@
 import { ComponentRegistry } from './ComponentRegistry';
 import { assert } from '@/utils/assert';
 import EventEmitter from 'eventemitter3';
-import { Component, ComponentClassType, ComponentFlags, ComponentInitialization } from './Component';
+import { Component, ComponentClassType, ComponentInitialization } from './Component';
 import { Entity } from './Entity';
 import { EntityId } from './EntityId';
 import { RegistryIdGenerator } from './RegistryIdGenerator';
