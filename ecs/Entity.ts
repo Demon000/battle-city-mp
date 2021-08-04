@@ -83,6 +83,20 @@ export class Entity {
         this.registry.addComponents(this, components, options);
     }
 
+    updateComponents(
+        components: ComponentInitialization[],
+        options?: RegistryOperationOptions,
+    ): void {
+        this.registry.updateComponents(this, components, options);
+    }
+
+    upsertComponents(
+        components: ComponentInitialization[],
+        options?: RegistryOperationOptions,
+    ): void {
+        this.registry.upsertComponents(this, components, options);
+    }
+
     getComponentsData(options?: EntityComponentsOptions): ComponentInitialization[] {
         const tagsComponentsEncoding: [string, Partial<Component<any>>][] = [];
         for (const [clazz, component] of this.tagComponentMap) {
