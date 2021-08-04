@@ -196,7 +196,6 @@ import { Player, PlayerSpawnStatus } from '@/player/Player';
 import { PlayerStats } from '@/player/PlayerStats';
 import { TankTier } from '@/tank/TankTier';
 import { Team } from '@/team/Team';
-import { RatioUtils } from '@/utils/RatioUtils';
 import screenfull from 'screenfull';
 import { io, Socket } from 'socket.io-client';
 import { markRaw } from 'vue';
