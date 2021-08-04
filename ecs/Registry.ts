@@ -205,7 +205,8 @@ export class Registry {
         const tagComponents = this.getOrCreateComponentTypeSet(clazz);
         tagComponents.add(component);
 
-        if (options?.flags) {
+        if (options !== undefined && options.flags !== undefined
+            && options.flags) {
             component.flags = options.flags;
         }
 
