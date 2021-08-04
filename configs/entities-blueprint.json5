@@ -1,22 +1,24 @@
 {
     'explosion': {
+        clientComponents: {
+            SpawnTimeComponent: {},
+        },
         serverComponents: {
+            SpawnTimeComponent: {},
             AutomaticDestroyComponent: {
                 timeMs: 240,
             },
         },
+    },
+    'smoke': {
         clientComponents: {
             SpawnTimeComponent: {},
         },
-    },
-    'smoke': {
         serverComponents: {
+            SpawnTimeComponent: {},
             AutomaticDestroyComponent: {
                 timeMs: 1000,
             },
-        },
-        clientComponents: {
-            SpawnTimeComponent: {},
         },
     },
     'water': {
