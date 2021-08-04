@@ -61,21 +61,10 @@ export class GameMap {
         return type as GameObjectType;
     }
 
-    // write(path = this.name): void {
-    //     const fileData = JSON.stringify(this.options, null, 4);
-    //     fs.writeFileSync(path, fileData);
-    // }
-
-    // setObjectsFromOptions(objectsOptions: Iterable<GameObjectOptions>): void {
-    //     this.options.objectsFromOptions = Array.from(objectsOptions);
-    // }
-
-    // setObjectsFromBlocks(objectsFromBlocks: string[]): void {
-    //     this.options.objectsFromBlocks = objectsFromBlocks;
-    // }
-
     getShortTypeObjectProperties(shortType: GameShortObjectType): GameObjectProperties {
-        const gameObjectsProperties = this.config.getData<Record<GameObjectType, GameObjectProperties>>('game-object-properties');
+        const gameObjectsProperties = this.config
+            .getData<Record<GameObjectType, GameObjectProperties>>
+            ('game-object-properties');
 
         for (const gameObjectProperties of Object.values(gameObjectsProperties)) {
             if (gameObjectProperties.shortType === shortType) {
@@ -87,62 +76,16 @@ export class GameMap {
     }
 
     getTypeObjectProperties(type: GameObjectType): GameObjectProperties {
-        const gameObjectsProperties = this.config.getData<Record<GameObjectType, GameObjectProperties>>('game-object-properties');
+        const gameObjectsProperties = this.config
+            .getData<Record<GameObjectType, GameObjectProperties>>
+            ('game-object-properties');
+
         const gameObjectProperties = gameObjectsProperties[type];
         if (gameObjectsProperties === undefined) {
             throw new Error(`Cannot get properties of invalid object type: ${type}`);
         }
 
         return gameObjectProperties;
-    }
-
-    getObjectssOptionsFromBlocks(): GameObjectOptions[] {
-        const objectsOptions = new Array<GameObjectOptions>();
-        const splitBlocks = new Array<Array<string>>();
-
-        if (this.options.resolution === undefined
-            || this.options.objectsFromBlocks === undefined) {
-            return objectsOptions;
-        }
-
-        for (const row of this.options.objectsFromBlocks) {
-            splitBlocks.push(row.split(''));
-        }
-
-        const resolution = this.options.resolution;
-        const mapHeight = splitBlocks.length * resolution;
-        for (let bigY = 0; bigY < mapHeight; bigY += resolution) {
-            const mapRow = bigY / resolution;
-            const mapWidth = splitBlocks[mapRow].length * resolution;
-            for (let bigX = 0; bigX < mapWidth; bigX += resolution) {
-                const mapColumn = bigX / resolution;
-
-                const shortTypeString = splitBlocks[mapRow][mapColumn];
-                if (shortTypeString === ' ') {
-                    continue;
-                }
-
-                if (!isGameShortObjectType(shortTypeString)) {
-                    throw new Error(`Invalid short object type: ${shortTypeString}`);
-                }
-
-                const shortType = shortTypeString as GameShortObjectType;
-                const properties = this.getShortTypeObjectProperties(shortType);
-                for (let smallY = bigY; smallY < bigY + resolution; smallY += properties.height) {
-                    for (let smallX = bigX; smallX < bigX + resolution; smallX += properties.width) {
-                        objectsOptions.push({
-                            type: properties.type,
-                            position: {
-                                y: smallY,
-                                x: smallX,
-                            },
-                        });
-                    }
-                }
-            }
-        }
-
-        return objectsOptions;
     }
 
     getObjectsOptionsFromOptions(): GameObjectOptions[] {
@@ -189,8 +132,16 @@ export class GameMap {
                     const type = this.getColorGameObjectType([r, g, b]);
                     const properties = this.getTypeObjectProperties(type);
 
-                    for (let smallY = bigY; smallY < bigY + resolution; smallY += properties.height) {
-                        for (let smallX = bigX; smallX < bigX + resolution; smallX += properties.width) {
+                    for (
+                        let smallY = bigY;
+                        smallY < bigY + resolution;
+                        smallY += properties.height
+                    ) {
+                        for (
+                            let smallX = bigX;
+                            smallX < bigX + resolution;
+                            smallX += properties.width
+                        ) {
                             objectsOptions.push({
                                 type,
                                 position: {
@@ -209,9 +160,6 @@ export class GameMap {
 
     getObjectsOptions(): GameObjectOptions[] {
         let objectsOptions: GameObjectOptions[] = [];
-
-        const objectsOptionsFromBlocks = this.getObjectssOptionsFromBlocks();
-        objectsOptions = objectsOptions.concat(objectsOptionsFromBlocks);
 
         const objectsOptionsFromOptions = this.getObjectsOptionsFromOptions();
         objectsOptions = objectsOptions.concat(objectsOptionsFromOptions);
