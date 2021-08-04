@@ -52,7 +52,7 @@ export class GameObjectFactory {
         });
 
         if (components !== undefined) {
-            object.addComponents(components, {
+            object.upsertComponents(components, {
                 silent: true,
             });
         }

@@ -27,7 +27,7 @@ export class EntityBlueprint {
         options?: RegistryOperationOptions,
     ): void {
         for (const [tag, data] of  Object.entries(rawData)) {
-            entity.addComponent(tag, data, options);
+            entity.upsertComponent(tag, data, options);
         }
     }
 
