@@ -1,17 +1,3 @@
-export enum GameShortObjectType {
-    BRICK_WALL = 'B',
-    BUSH = '$',
-    STEEL_WALL = 'S',
-    PLAYER_SPAWN = 'O',
-    LEVEL_BORDER = '#',
-    ICE = 'I',
-    WATER = 'W',
-    SAND = 'A',
-    GRASS = 'G',
-    DIRT = 'D',
-    FLAG = 'F',
-}
-
 export enum GameObjectType {
     NONE = 'none',
     BRICK_WALL = 'brick-wall',
@@ -29,10 +15,6 @@ export enum GameObjectType {
     GRASS = 'grass',
     DIRT = 'dirt',
     FLAG = 'flag',
-}
-
-export function isGameShortObjectType(shortType: string): boolean {
-    return Object.values(GameShortObjectType).includes(shortType as any);
 }
 
 export function isGameObjectType(type: string): boolean {

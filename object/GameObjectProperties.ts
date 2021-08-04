@@ -1,4 +1,4 @@
-import { GameObjectType, GameShortObjectType } from './GameObjectType';
+import { GameObjectType } from './GameObjectType';
 
 export type ResourceMeta = Record<string, any>;
 
@@ -17,7 +17,6 @@ export interface AudioEffect {
 
 export interface GameObjectProperties {
     type: GameObjectType;
-    shortType?: GameShortObjectType;
 
     width: number;
     height: number;

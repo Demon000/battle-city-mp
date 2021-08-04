@@ -1,66 +1,55 @@
 {
     'steel-wall': {
-        shortType: 'S',
         width: 8,
         height: 8,
         savable: true,
     },
     'bush': {
-        shortType: 'B',
         width: 8,
         height: 8,
         savable: true,
     },
     'player-spawn': {
-        shortType: 'O',
         width: 16,
         height: 16,
         savable: true,
     },
     'level-border': {
-        shortType: '#',
         width: 16,
         height: 16,
         savable: true,
     },
     'ice': {
-        shortType: 'I',
         width: 8,
         height: 8,
         savable: true,
     },
     'sand': {
-        shortType: 'A',
         width: 8,
         height: 8,
         savable: true,
     },
     'grass': {
-        shortType: 'G',
         width: 8,
         height: 8,
         savable: true,
     },
     'dirt': {
-        shortType: 'D',
         width: 8,
         height: 8,
         savable: true,
     },
     'water': {
-        shortType: 'W',
         width: 8,
         height: 8,
         savable: true,
     },
     'brick-wall': {
-        shortType: 'B',
         width: 4,
         height: 4,
         savable: true,
     },
     'flag': {
-        shortType: 'F',
         width: 16,
         height: 16,
         savable: true,

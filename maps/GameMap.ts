@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { GameObjectOptions } from '@/object/GameObject';
 import { GameObjectProperties } from '@/object/GameObjectProperties';
-import { GameObjectType, GameShortObjectType, isGameObjectType, isGameShortObjectType } from '@/object/GameObjectType';
+import { GameObjectType, isGameObjectType } from '@/object/GameObjectType';
 import { Team, TeamOptions } from '@/team/Team';
 import { Config } from '@/config/Config';
 import { Color } from '@/drawable/Color';
@@ -15,7 +15,6 @@ export interface GameMapOptions {
     objectsFromOptionsFile?: string;
     colorsObjectTypesMap?: Record<string, Color>;
     objectTypesColorsMap?: Map<number, string>;
-    objectsFromBlocks?: string[];
     teamsOptions?: TeamOptions[];
 }
 
@@ -59,20 +58,6 @@ export class GameMap {
         }
 
         return type as GameObjectType;
-    }
-
-    getShortTypeObjectProperties(shortType: GameShortObjectType): GameObjectProperties {
-        const gameObjectsProperties = this.config
-            .getData<Record<GameObjectType, GameObjectProperties>>
-            ('game-object-properties');
-
-        for (const gameObjectProperties of Object.values(gameObjectsProperties)) {
-            if (gameObjectProperties.shortType === shortType) {
-                return gameObjectProperties;
-            }
-        }
-
-        throw new Error(`Cannot get properties of invalid short object type: ${shortType}`);
     }
 
     getTypeObjectProperties(type: GameObjectType): GameObjectProperties {
