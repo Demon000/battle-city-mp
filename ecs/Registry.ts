@@ -277,9 +277,9 @@ export class Registry {
         const clazz = this.getClazz(clazzOrTag);
         const component = entity.findComponent(clazz);
         if (component === undefined) {
-            return this.addComponent(entity, clazz, options);
+            return this.addComponent(entity, clazz, data, options);
         } else {
-            return this.updateComponent(entity, clazz, options);
+            return this.updateComponent(entity, clazz, data, options);
         }
     }
 
