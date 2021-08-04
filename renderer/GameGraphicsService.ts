@@ -18,7 +18,6 @@ export class GameGraphicsService {
     private contexts!: Context2D[];
     private canvasX = 0;
     private canvasY = 0;
-    private showInvisible = false;
     private targetGameSize = 0;
 
     constructor(
@@ -67,10 +66,6 @@ export class GameGraphicsService {
         this.gameHeight -= this.gameHeight % 2;
     }
 
-    setShowInvisible(showInvisible: boolean): void {
-        this.showInvisible = showInvisible;
-    }
-
     getObjectRenderer(object: GameObject): GameObjectGraphicsRenderer {
         if (object.graphicsRenderer === undefined) {
             object.graphicsRenderer = new GameObjectGraphicsRenderer(object);
@@ -89,8 +84,7 @@ export class GameGraphicsService {
         const objectRelativeY = Math.floor(object.position.y) - this.canvasY;
         const objectDrawX = objectRelativeX * this.scale;
         const objectDrawY = objectRelativeY * this.scale;
-        renderer.render(this.contexts,
-            objectDrawX, objectDrawY, this.showInvisible);
+        renderer.render(this.contexts, objectDrawX, objectDrawY);
     }
 
     renderObjectsOver(objects: Iterable<GameObject>): void {

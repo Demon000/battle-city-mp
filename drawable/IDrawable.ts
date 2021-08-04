@@ -8,7 +8,6 @@ export type DrawableProcessingFunction = (this: IDrawable, object: GameObject) =
 export interface DrawableProperties {
     tests?: DrawableTestFunction[];
     processor?: DrawableProcessingFunction;
-    isInvisible?: boolean;
     renderPass?: number;
     offsetX?: number;
     offsetY?: number;

@@ -49,12 +49,6 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             renderPass: RenderPass.WALL,
         }),
     ],
-    [GameObjectType.PLAYER_SPAWN]: [
-        new ImageDrawable('player_spawn.png', {
-            renderPass: RenderPass.WALL,
-            isInvisible: true,
-        }),
-    ],
     [GameObjectType.ICE]: [
         new ImageDrawable('ice.png', {
             renderPass: RenderPass.GROUND,

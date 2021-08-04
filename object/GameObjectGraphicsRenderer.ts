@@ -98,7 +98,6 @@ export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
         layersContext: Context2D[],
         drawX: number,
         drawY: number,
-        showInvisible: boolean,
     ): void {
         if (drawable === undefined) {
             return;
@@ -113,28 +112,19 @@ export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
             return;
         }
 
-        if (drawable.properties.isInvisible && !showInvisible) {
-            return;
-        }
-
         const renderPass = drawable.getRenderPass();
         const context = layersContext[renderPass];
 
         drawable.draw(context, drawX, drawY);
     }
 
-    render(
-        layersContext: Context2D[],
-        drawX: number,
-        drawY: number,
-        showInvisible: boolean,
-    ): void {
+    render(layersContext: Context2D[], drawX: number, drawY: number): void {
         if (this.drawables === undefined || this.drawables === null) {
             return;
         }
 
         for (const drawable of this.drawables) {
-            this.renderDrawable(drawable, layersContext, drawX, drawY, showInvisible);
+            this.renderDrawable(drawable, layersContext, drawX, drawY);
         }
     }
 }
