@@ -14,7 +14,6 @@ export interface GameObjectOptions {
     direction?: Direction;
     movementSpeed?: number;
     movementDirection?: Direction | null;
-    spawnTime?: number;
 }
 
 export type PartialGameObjectOptions = Partial<GameObjectOptions>;
