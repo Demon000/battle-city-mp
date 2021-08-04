@@ -35,11 +35,11 @@ export class Bullet extends GameObject {
     }
 
     toOptions(): BulletOptions {
-        const gameObjectOptions = super.toOptions();
-        return Object.assign(gameObjectOptions, {
+        return {
+            ...super.toOptions(),
             tankId: this.tankId,
             power: this.power,
-        });
+        };
     }
 
     setOptions(options: PartialBulletOptions): void {

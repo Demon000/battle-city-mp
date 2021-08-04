@@ -41,12 +41,12 @@ export class Flag extends GameObject {
     }
 
     toOptions(): FlagOptions {
-        const gameObjectOptions = super.toOptions();
-        return Object.assign(gameObjectOptions, {
+        return {
+            ...super.toOptions(),
             teamId: this.teamId,
             color: this.color,
             flagType: this._flagType,
-        });
+        };
     }
 
     setOptions(options: PartialFlagOptions): void {

@@ -25,11 +25,11 @@ export class Explosion extends GameObject {
     }
 
     toOptions(): ExplosionOptions {
-        const gameObjectOption = super.toOptions();
-        return Object.assign(gameObjectOption, {
+        return {
+            ...super.toOptions(),
             explosionType: this.explosionType,
             destroyedObjectType: this.destroyedObjectType,
-        });
+        };
     }
 
     setOptions(options: PartialExplosionOptions): void {

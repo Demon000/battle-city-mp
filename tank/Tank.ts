@@ -95,8 +95,8 @@ export class Tank extends GameObject {
     }
 
     toOptions(): TankOptions {
-        const gameObjectOptions = super.toOptions();
-        return Object.assign(gameObjectOptions, {
+        return {
+            ...super.toOptions(),
             tier: this.tier,
             playerId: this.playerId,
             playerName: this.playerName,
@@ -106,7 +106,7 @@ export class Tank extends GameObject {
             color: this.color,
             health: this.health,
             flagColor: this.flagColor,
-        });
+        };
     }
 
     setOptions(options: PartialTankOptions): void {
