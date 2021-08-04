@@ -6,6 +6,7 @@ import { GameObjectType } from './GameObjectType';
 import { AudioEffect, GameObjectProperties, ResourceMeta } from './GameObjectProperties';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
+import { assert } from '@/utils/assert';
 
 export interface GameObjectOptions {
     id?: number;
@@ -19,8 +20,6 @@ export interface GameObjectOptions {
 export type PartialGameObjectOptions = Partial<GameObjectOptions>;
 
 export class GameObject extends Entity {
-    static globalId = 0;
-
     protected _audioMeta: ResourceMeta | undefined | null;
     protected _position: Point;
     protected _boundingBox: BoundingBox;
@@ -36,15 +35,11 @@ export class GameObject extends Entity {
     audioRenderer?: any;
 
     constructor(options: GameObjectOptions, properties: GameObjectProperties, registry: Registry) {
-        const id = options.id ?? GameObject.globalId++;
+        assert(options.type !== undefined, 'Cannot construct object without a type');
+        assert(options.id !== undefined, 'Cannot construct object without an id');
 
-        if (options.type === undefined) {
-            throw new Error('Cannot construct object without a type');
-        }
+        super(options.id, registry);
 
-        super(id, registry);
-
-        this.id = id;
         this.properties = properties;
         this.type = options.type;
         this._position = options.position ?? {x: 0, y: 0};
