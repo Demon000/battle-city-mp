@@ -1,6 +1,5 @@
 import { Action } from '@/actions/Action';
 import { Color } from '@/drawable/Color';
-import { Point } from '@/physics/point/Point';
 import { TankTier } from '@/tank/TankTier';
 import { Socket } from 'socket.io-client';
 import { GameClient } from './GameClient';
