@@ -1,6 +1,7 @@
 import { Bullet } from '@/bullet/Bullet';
 import { BulletPower } from '@/bullet/BulletPower';
 import { IsMovingComponent } from '@/components/IsMovingComponent';
+import { IsUnderBushComponent } from '@/components/IsUnderBushComponent';
 import { AnimatedImageDrawable } from '@/drawable/AnimatedImageDrawable';
 import { IDrawable, DrawableProcessingFunction, DrawableTestFunction } from '@/drawable/IDrawable';
 import { IImageDrawable } from '@/drawable/IImageDrawable';
@@ -220,16 +221,16 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             const generateTankDrawableTests = (
                 tier: TankTier,
                 direction: Direction,
-                isMoving: boolean,
+                targetIsMoving: boolean,
             ) => {
                 return [
                     directionTest(direction),
                     (object: GameObject): boolean => {
                         const tank = object as Tank;
-                        const isMovingComponent =
-                            tank.getComponent(IsMovingComponent);
+                        const isMoving =
+                            tank.getComponent(IsMovingComponent).value;
 
-                        if (isMovingComponent.value !== isMoving) {
+                        if (isMoving !== targetIsMoving) {
                             return false;
                         }
 
@@ -316,8 +317,10 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             tests: [
                 (object: GameObject): boolean => {
                     const tank = object as Tank;
+                    const isUnderBush
+                        = tank.getComponent(IsUnderBushComponent).value;
 
-                    if (tank.isUnderBush) {
+                    if (isUnderBush) {
                         return false;
                     }
 

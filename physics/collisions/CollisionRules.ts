@@ -22,7 +22,6 @@ export const rules: ICollisionRule[] = [
         staticTypes: [
             GameObjectType.ICE,
             GameObjectType.SAND,
-            GameObjectType.BUSH,
         ],
         result: [
             {

@@ -1,5 +1,7 @@
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { DirectionAxisSnappingComponent } from '@/components/DirectionAxisSnappingComponent';
+import { IsUnderBushComponent } from '@/components/IsUnderBushComponent';
+import { Registry } from '@/ecs/Registry';
 import { GameObject } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 import { MapRepository } from '@/utils/MapRepository';
@@ -26,15 +28,14 @@ interface CollisionServiceEvents extends CollisionEvents {
 }
 
 export class CollisionService {
-    private gameObjectRepository;
-    private boundingBoxRepository;
     private rulesMap?: Map<GameObjectType, Map<GameObjectType, ICollisionRule>>;
 
     emitter = new EventEmitter<CollisionServiceEvents>();
 
     constructor(
-        gameObjectRepository: MapRepository<number, GameObject>,
-        boundingBoxRepository: BoundingBoxRepository<number>,
+        private gameObjectRepository: MapRepository<number, GameObject>,
+        private boundingBoxRepository: BoundingBoxRepository<number>,
+        private registry: Registry,
         rules?: ICollisionRule[],
     ) {
         this.gameObjectRepository = gameObjectRepository;
@@ -310,6 +311,33 @@ export class CollisionService {
             x,
             y,
         }, oldDirection, false);
+    }
+
+    private isOverlappingWithType(object: GameObject, type: GameObjectType): boolean {
+        const overlappingObjectIds = this.getOverlappingObjects(object.boundingBox);
+        const overlappingObjects = this.gameObjectRepository.getMultiple(overlappingObjectIds);
+
+        for (const overlappingObject of overlappingObjects) {
+            if (overlappingObject.type === type) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    processObjectsIsUnderBush(): void {
+        for (const component of this.registry.getComponents(IsUnderBushComponent)) {
+            const object = component.entity as GameObject;
+            const isUnderBush = this.isOverlappingWithType(object, GameObjectType.BUSH);
+            if (component.value === isUnderBush) {
+                continue;
+            }
+
+            component.update({
+                value: isUnderBush,
+            });
+        }
     }
 
     clear(): void {

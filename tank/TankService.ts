@@ -186,14 +186,6 @@ export class TankService {
 
         tank.isOnIce = tracker.isCollidingWithType(GameObjectType.ICE);
         tank.isOnSand = tracker.isCollidingWithType(GameObjectType.SAND);
-        const isUnderBush = tracker.isCollidingWithType(GameObjectType.BUSH);
-        if (isUnderBush !== tank.isUnderBush) {
-            tank.isUnderBush = isUnderBush;
-
-            this.emitter.emit(TankServiceEvent.TANK_UPDATED, tankId, {
-                isUnderBush: tank.isUnderBush,
-            });
-        }
     }
 
     processTanksStatus(): void {

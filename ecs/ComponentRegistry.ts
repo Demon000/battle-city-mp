@@ -11,6 +11,7 @@ import { GraphicDependenciesComponent, GraphicDependenciesComponentData } from '
 import { IsMovingComponent, IsMovingComponentData } from '@/components/IsMovingComponent';
 import { DirectionAxisSnappingComponent, DirectionAxisSnappingComponentData } from '@/components/DirectionAxisSnappingComponent';
 import { SpawnTimeComponent, SpawnTimeComponentData } from '@/components/SpawnTimeComponent';
+import { IsUnderBushComponent, IsUnderBushComponentData } from '@/components/IsUnderBushComponent';
 
 export interface ProcessResults {
     clazz: ComponentClassType<any>;
@@ -65,6 +66,10 @@ export class ComponentRegistry {
             case SpawnTimeComponent.tag:
                 clazz = SpawnTimeComponent;
                 if (data !== undefined) assertType<Partial<SpawnTimeComponentData>>(data);
+                break;
+            case IsUnderBushComponent.tag:
+                clazz = IsUnderBushComponent;
+                if (data !== undefined) assertType<Partial<IsUnderBushComponentData>>(data);
                 break;
             default:
                 throw new Error(`Invalid tag: ${tag}`);

@@ -36,7 +36,6 @@ export interface TankOptions extends GameObjectOptions {
     isShooting?: boolean;
     isOnIce?: boolean;
     isOnSand?: boolean;
-    isUnderBush?: boolean;
     lastBulletShotTime?: number;
     lastSmokeTime?: number;
     bulletIds?: number[];
@@ -51,7 +50,6 @@ export interface TankOptions extends GameObjectOptions {
 export type PartialTankOptions = Partial<TankOptions>;
 
 export class Tank extends GameObject {
-    protected _isUnderBush: boolean;
     protected _flagColor: Color | null;
 
     tier: TankTier;
@@ -82,7 +80,6 @@ export class Tank extends GameObject {
         this.isShooting = options.isShooting ?? false;
         this.isOnIce = options.isOnIce ?? false;
         this.isOnSand = options.isOnSand ?? false;
-        this._isUnderBush = options.isUnderBush ?? false;
         this.lastBulletShotTime = options.lastBulletShotTime ?? 0;
         this.lastSmokeTime = options.lastSmokeTime ?? 0;
         this.bulletIds = options.bulletIds ?? new Array<number>();
@@ -115,7 +112,6 @@ export class Tank extends GameObject {
         if (options.tier !== undefined) this.tier = options.tier;
         if (options.playerId !== undefined) this.playerId = options.playerId;
         if (options.playerName !== undefined) this.playerName = options.playerName;
-        if (options.isUnderBush !== undefined) this.isUnderBush = options.isUnderBush;
         if (options.lastBulletShotTime !== undefined) this.lastBulletShotTime = options.lastBulletShotTime;
         if (options.lastSmokeTime !== undefined) this.lastSmokeTime = options.lastSmokeTime;
         if (options.bulletIds !== undefined) this.bulletIds = options.bulletIds;
@@ -197,15 +193,6 @@ export class Tank extends GameObject {
 
     get bulletCooldown(): number {
         return this.tierProperties.bulletCooldown;
-    }
-
-    get isUnderBush(): boolean {
-        return this._isUnderBush;
-    }
-
-    set isUnderBush(value: boolean) {
-        this._isUnderBush = value;
-        this.markGraphicsDirty();
     }
 
     get flagColor(): Color | null {

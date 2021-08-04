@@ -118,7 +118,8 @@ export class GameClient {
 
         this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
-        this.collisionService = new CollisionService(this.gameObjectRepository, this.boundingBoxRepository);
+        this.collisionService = new CollisionService(this.gameObjectRepository,
+            this.boundingBoxRepository, this.registry);
         this.gameObjectService = new GameObjectService(this.gameObjectRepository, this.registry);
         this.tankService = new TankService(this.gameObjectRepository, this.gameObjectFactory);
         this.playerRepository = new MapRepository<string, Player>();
@@ -331,6 +332,7 @@ export class GameClient {
 
     onTick(): void {
         this.gameObjectService.processObjectsIsMoving();
+        this.collisionService.processObjectsIsUnderBush();
         this.gameGraphicsService.processObjectsDirtyGraphics();
 
         const ownPlayer = this.playerService.getOwnPlayer();

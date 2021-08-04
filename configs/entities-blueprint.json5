@@ -39,9 +39,11 @@
         },
         clientComponents: {
             IsMovingComponent: {},
+            IsUnderBushComponent: {},
             GraphicDependenciesComponent: {
                 components: [
                     'IsMovingComponent',
+                    'IsUnderBushComponent',
                 ],
             },
             SpawnTimeComponent: {},

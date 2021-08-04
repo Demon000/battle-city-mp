@@ -102,7 +102,7 @@ export class GameServer {
         this.boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
         this.collisionRules = rules;
         this.collisionService = new CollisionService(this.gameObjectRepository,
-            this.boundingBoxRepository, this.collisionRules);
+            this.boundingBoxRepository, this.registry, this.collisionRules);
         this.gameObjectService = new GameObjectService(
             this.gameObjectRepository,
             this.registry,
