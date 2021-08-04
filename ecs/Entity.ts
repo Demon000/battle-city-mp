@@ -16,7 +16,8 @@ export class Entity {
         component: C,
     ): void {
         const existingComponent = this.findComponent(component.clazz);
-        assert(existingComponent === undefined);
+        assert(existingComponent === undefined,
+            'Component already exists on entity', component, this);
 
         this.tagComponentMap.set(component.clazz, component);
     }
