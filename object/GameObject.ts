@@ -29,7 +29,6 @@ export class GameObject extends Entity {
     protected _movementSpeed: number;
     graphicsDirty: boolean;
 
-    id: number;
     properties;
     type: GameObjectType;
     movementDirection: Direction | null;
