@@ -10,9 +10,7 @@ import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxReposi
 import { CollisionService } from '../physics/collisions/CollisionService';
 import { Player, PartialPlayerOptions, PlayerOptions, PlayerSpawnStatus } from '../player/Player';
 import { PlayerService, PlayerServiceEvent } from '../player/PlayerService';
-import { GameMapEditorService } from '@/maps/GameMapEditorService';
 import { GameObjectType } from '@/object/GameObjectType';
-import { Point } from '@/physics/point/Point';
 import { GameServerStatus } from './GameServerStatus';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
 import EventEmitter from 'eventemitter3';
@@ -36,7 +34,6 @@ import { ComponentInitialization } from '@/ecs/Component';
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
     TEAMS_CHANGED = 'teams-changed',
-    MAP_EDITOR_ENABLED_CHANGED = 'map-editor-enabled-changed',
     ROUND_TIME_UPDATED = 'round-time-updated',
     ROUND_TIME_RESTART = 'round-time-restart',
     SCOREBOARD_WATCH_TIME = 'scoreboard-watch-time',
@@ -62,7 +59,6 @@ export enum GameClientEvent {
 export interface GameClientEvents {
     [GameClientEvent.PLAYERS_CHANGED]: () => void;
     [GameClientEvent.TEAMS_CHANGED]: () => void;
-    [GameClientEvent.MAP_EDITOR_ENABLED_CHANGED]: (enabled: boolean) => void;
     [GameClientEvent.ROUND_TIME_UPDATED]: (roundTimeSeconds: number) => void;
     [GameClientEvent.ROUND_TIME_RESTART]: () => void;
     [GameClientEvent.SCOREBOARD_WATCH_TIME]: (value: boolean) => void;
@@ -107,7 +103,6 @@ export class GameClient {
     private gameGraphicsService;
     private audioRendererFactory;
     private gameAudioService;
-    private gameMapEditorService;
     private timeService;
     emitter;
     ticker;
@@ -134,7 +129,6 @@ export class GameClient {
         this.gameGraphicsService = new GameGraphicsService(this.registry, canvases);
         this.audioRendererFactory = new GameObjectAudioRendererFactory();
         this.gameAudioService = new GameAudioService(this.audioRendererFactory);
-        this.gameMapEditorService = new GameMapEditorService(this.gameObjectFactory);
         this.timeService = new TimeService(this.config);
         this.emitter = new EventEmitter<GameClientEvents>();
         this.ticker = new Ticker();
@@ -367,19 +361,6 @@ export class GameClient {
         this.gameGraphicsService.renderObjectsOver(viewableObjects);
         this.gameAudioService.playObjectsAudioEffect(viewableObjects, position, box);
 
-        if (this.gameMapEditorService.getEnabled()) {
-            const gridSize = this.gameMapEditorService.getGridSize();
-            if (gridSize !== 0) {
-                this.gameGraphicsService.renderGrid(gridSize);
-            }
-
-            this.gameMapEditorService.setViewPosition(box.tl);
-            const ghostObjects = this.gameMapEditorService.getGhostObjects();
-            if (ghostObjects.length !== 0) {
-                this.gameGraphicsService.renderObjectsOver(ghostObjects);
-            }
-        }
-
         this.emitter.emit(GameClientEvent.TICK);
     }
 
@@ -423,48 +404,6 @@ export class GameClient {
 
     getOwnPlayer(): Player | undefined {
         return this.playerService.getOwnPlayer();
-    }
-
-    setMapEditorEnabled(enabled: boolean): void {
-        this.gameMapEditorService.setEnabled(enabled);
-        this.gameGraphicsService.setShowInvisible(enabled);
-        this.emitter.emit(GameClientEvent.MAP_EDITOR_ENABLED_CHANGED, enabled);
-    }
-
-    toggleMapEditorEnabled(): boolean {
-        const enabled = !this.gameMapEditorService.getEnabled();
-        this.setMapEditorEnabled(enabled);
-        return enabled;
-    }
-
-    setMapEditorGridSize(gridSize: number): void {
-        this.gameMapEditorService.setGridSize(gridSize);
-    }
-
-    setMapEditorSelectedObjectType(type: GameObjectType): void {
-        this.gameMapEditorService.setSelectedObjectType(type);
-    }
-
-    setMapEditorHoverPosition(position: Point): void {
-        const worldPosition = this.gameGraphicsService.getWorldPosition(position);
-        this.gameMapEditorService.setHoverPosition(worldPosition);
-    }
-
-    getMapEditorObjectsOptions(): GameObjectOptions[] {
-        const objects = this.gameMapEditorService.getGhostObjects();
-        const objectsOptions = objects
-            .map(o => o.toSaveOptions()) as GameObjectOptions[];
-        return objectsOptions;
-    }
-
-    getMapEditorDestroyBox(position: Point): BoundingBox | undefined {
-        const worldPosition = this.gameGraphicsService.getWorldPosition(position);
-        const destroyBox = this.gameMapEditorService.getDestroyBox(worldPosition);
-        if (destroyBox === undefined) {
-            return undefined;
-        }
-
-        return destroyBox;
     }
 
     onRoundTimeUpdated(roundSeconds: number): void {

@@ -89,52 +89,6 @@
                 </div>
 
                 <div
-                    id="building-controls"
-                    class="controls"
-                    v-if="isBuilding"
-                >
-                    <label>Grid size</label>
-                    <br>
-                    <select
-                        @change="onGridSizeChanged"
-                        v-model="gridSize"
-                    >
-                        <option
-                            v-for="size in GameMapGridSizes"
-                            :key="size"
-                            :value="size"
-                        >
-                            {{ size }}
-                        </option>
-                    </select>
-
-                    <br>
-
-                    <label>Block type</label>
-                    <br>
-                    <select
-                        @change="onSelectedObjectTypeChanged"
-                        v-model="selectedObjectType"
-                    >
-                        <option
-                            v-for="type in Object.keys(GameShortObjectType)"
-                            :key="type"
-                            :value="GameObjectType[type]"
-                        >
-                            {{ type }}
-                        </option>
-                    </select>
-
-                    <br>
-
-                    <button
-                        @click="onSaveButtonClick"
-                    >
-                        Save
-                    </button>
-                </div>
-
-                <div
                     id="stats-container"
                     v-if="isShowingScoreboard"
                 >
@@ -237,8 +191,6 @@ import { Color } from '@/drawable/Color';
 import { GameClient, GameClientEvent } from '@/game/GameClient';
 import { GameClientSocket } from '@/game/GameClientSocket';
 import { GameSocketEvents } from '@/game/GameSocketEvent';
-import { GameMapGridSizes } from '@/maps/GameMapGridSizes';
-import { GameObjectType, GameShortObjectType } from '@/object/GameObjectType';
 import { RenderPass } from '@/object/RenderPass';
 import { Player, PlayerSpawnStatus } from '@/player/Player';
 import { PlayerStats } from '@/player/PlayerStats';
@@ -272,15 +224,9 @@ export default class App extends Vue {
     isFullscreen = false;
     CLIENT_SPRITES_RELATIVE_URL = CLIENT_SPRITES_RELATIVE_URL;
     ColorUtils = ColorUtils;
-    GameMapGridSizes = GameMapGridSizes;
-    GameShortObjectType = GameShortObjectType;
-    GameObjectType = GameObjectType;
     TankTier = TankTier;
     RenderPass = RenderPass;
-    isBuilding = false;
     isUserShowingScoreboard = false;
-    gridSize = 0;
-    selectedObjectType = GameObjectType.NONE;
     ownPlayer: Player | null = null;
     playersStats: PlayerStats[] | null = null;
     canvases: HTMLCanvasElement[] = [];
@@ -332,10 +278,6 @@ export default class App extends Vue {
         gameClient.emitter.on(GameClientEvent.TEAMS_CHANGED,
             () => {
                 this.updateTeams();
-            });
-        gameClient.emitter.on(GameClientEvent.MAP_EDITOR_ENABLED_CHANGED,
-            (enabled: boolean) => {
-                this.isBuilding = enabled;
             });
         gameClient.emitter.on(GameClientEvent.SCOREBOARD_WATCH_TIME,
             (value: boolean) => {
@@ -411,11 +353,6 @@ export default class App extends Vue {
         canvasContainerElement.addEventListener('blur', this.onCanvasBlurEvent);
         canvasContainerElement.addEventListener('keydown', this.onKeyboardEvent);
         canvasContainerElement.addEventListener('keyup', this.onKeyboardEvent);
-        canvasContainerElement.addEventListener('click', this.onMouseClickEvent);
-        canvasContainerElement.addEventListener('contextmenu', this.onMouseRightClickEvent);
-        canvasContainerElement.addEventListener('mousemove', this.onMouseMoveEvent, {
-            passive: true,
-        });
 
         const shootButton = this.$refs.shootButton as HTMLElement;
         shootButton.addEventListener('touchstart', this.onShootButtonTouchEvent);
@@ -539,14 +476,6 @@ export default class App extends Vue {
         let repeated = event.repeat;
         let handled = false;
 
-        if (!repeated && lowerKey === 'b') {
-            if (event.type === 'keyup') {
-                this.gameClientSocket?.toggleMapEditor();
-            }
-
-            handled = true;
-        }
-
         if (lowerKey === 'tab') {
             if (!repeated) {
                 if (event.type === 'keydown') {
@@ -651,42 +580,6 @@ export default class App extends Vue {
         if (screenfull.isEnabled) {
             screenfull.toggle();
         }
-    }
-
-    onGridSizeChanged(): void {
-        this.gameClient?.setMapEditorGridSize(this.gridSize);
-    }
-
-    onSelectedObjectTypeChanged(): void {
-        this.gameClient?.setMapEditorSelectedObjectType(this.selectedObjectType);
-    }
-
-    onMouseMoveEvent(event: MouseEvent): void {
-        this.gameClient?.setMapEditorHoverPosition({
-            x: RatioUtils.scaleForDevicePixelRatio(event.offsetX),
-            y: RatioUtils.scaleForDevicePixelRatio(event.offsetY),
-        });
-    }
-
-    onMouseClickEvent(): void {
-        if (this.isBuilding) {
-            this.gameClientSocket?.mapEditorCreateObjects();
-        }
-    }
-
-    onMouseRightClickEvent(event: MouseEvent): void {
-        if (this.isBuilding) {
-            this.gameClientSocket?.mapEditorDestroyObjects({
-                x: RatioUtils.scaleForDevicePixelRatio(event.offsetX),
-                y: RatioUtils.scaleForDevicePixelRatio(event.offsetY),
-            });
-        }
-
-        event.preventDefault();
-    }
-
-    onSaveButtonClick(): void {
-        this.gameClientSocket?.saveMap();
     }
 }
 </script>

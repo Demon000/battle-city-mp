@@ -15,7 +15,6 @@ export interface GameObjectOptions {
     movementSpeed?: number;
     movementDirection?: Direction | null;
     spawnTime?: number;
-    collisionsDisabled?: boolean;
 }
 
 export type PartialGameObjectOptions = Partial<GameObjectOptions>;
@@ -34,8 +33,6 @@ export class GameObject extends Entity {
     properties;
     type: GameObjectType;
     movementDirection: Direction | null;
-
-    collisionsDisabled: boolean;
 
     graphicsRenderer?: any;
     audioRenderer?: any;
@@ -57,7 +54,6 @@ export class GameObject extends Entity {
         this._direction = options.direction ?? Direction.UP;
         this._movementSpeed = options.movementSpeed ?? 0;
         this.movementDirection = options.movementDirection ?? null;
-        this.collisionsDisabled = options.collisionsDisabled ?? false;
         this.graphicsDirty = true;
     }
 
@@ -72,19 +68,11 @@ export class GameObject extends Entity {
         };
     }
 
-    toSaveOptions(): GameObjectOptions {
-        return {
-            type: this.type,
-            position: this.position,
-        };
-    }
-
     setOptions(options: PartialGameObjectOptions): void {
         if (options.position !== undefined) this.position = options.position;
         if (options.direction !== undefined) this.direction = options.direction;
         if (options.movementSpeed !== undefined) this.movementSpeed = options.movementSpeed;
         if (options.movementDirection !== undefined) this.movementDirection = options.movementDirection;
-        if (options.collisionsDisabled !== undefined) this.collisionsDisabled = options.collisionsDisabled;
     }
 
     get position(): Point {
@@ -113,10 +101,6 @@ export class GameObject extends Entity {
 
     set direction(value: Direction) {
         this._direction = value;
-    }
-
-    get savable(): boolean | undefined {
-        return this.properties.savable;
     }
 
     get movementSpeed(): number {

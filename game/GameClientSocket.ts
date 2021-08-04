@@ -106,27 +106,4 @@ export class GameClientSocket {
     setPlayerName(name: string): void {
         this.socket.emit(GameSocketEvent.PLAYER_SET_NAME, name);
     }
-
-    toggleMapEditor(): void {
-        const enabled = this.gameClient.toggleMapEditorEnabled();
-        this.socket.emit(GameSocketEvent.PLAYER_MAP_EDITOR_ENABLE, enabled);
-    }
-
-    mapEditorCreateObjects(): void {
-        const objectsOptions = this.gameClient.getMapEditorObjectsOptions();
-        this.socket.emit(GameSocketEvent.PLAYER_MAP_EDITOR_CREATE_OBJECTS, objectsOptions);
-    }
-
-    mapEditorDestroyObjects(position: Point): void {
-        const destroyBox = this.gameClient.getMapEditorDestroyBox(position);
-        if (destroyBox === undefined) {
-            return;
-        }
-
-        this.socket.emit(GameSocketEvent.PLAYER_MAP_EDITOR_DESTROY_OBJECTS, destroyBox);
-    }
-
-    saveMap(): void {
-        this.socket.emit(GameSocketEvent.PLAYER_MAP_EDITOR_SAVE);
-    }
 }

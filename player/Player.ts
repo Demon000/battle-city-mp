@@ -42,7 +42,6 @@ export class Player {
     kills: number;
     deaths: number;
     points: number;
-    mapEditorEnabled = false;
     respawnTimeout;
 
     constructor(options: PlayerOptions) {

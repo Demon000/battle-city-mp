@@ -59,7 +59,6 @@ export class TankService {
             playerName: player.displayName,
             teamId: player.teamId,
             tier: player.requestedTankTier,
-            collisionsDisabled: player.mapEditorEnabled,
         } as TankOptions) as Tank;
     }
 

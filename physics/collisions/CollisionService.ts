@@ -268,12 +268,6 @@ export class CollisionService {
 
     validateObjectMovement(objectId: number, position: Point, direction?: Direction, trySnapping=true): void {
         const movingObject = this.gameObjectRepository.get(objectId);
-        if (movingObject.collisionsDisabled) {
-            this.emitter.emit(CollisionServiceEvent.OBJECT_POSITION_ALLOWED,
-                movingObject.id, position);
-            return;
-        }
-
         this._validateObjectMovement(movingObject, position, direction, trySnapping);
     }
 

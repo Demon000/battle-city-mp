@@ -701,40 +701,6 @@ export class GameServer {
         this.playerService.setPlayerName(playerId, name);
     }
 
-    onMapEditorEnable(playerId: string, enabled: boolean): void {
-        const player = this.playerService.getPlayer(playerId);
-        if (player.tankId === null) {
-            return;
-        }
-
-        player.mapEditorEnabled = enabled;
-        const tank = this.tankService.getTank(player.tankId);
-        if (tank === undefined) {
-            return;
-        }
-
-        tank.collisionsDisabled = enabled;
-    }
-
-    onMapEditorCreateObjects(objectsOptions: GameObjectOptions[]): void {
-        const objects = objectsOptions.map(o => this.gameObjectFactory.buildFromOptions(o));
-        this.gameObjectService.registerObjects(objects);
-    }
-
-    onMapEditorDestroyObjects(destroyBox: BoundingBox): void {
-        const objectsIds = this.collisionService.getOverlappingObjects(destroyBox);
-        const objects = this.gameObjectService.getMultipleObjects(objectsIds);
-        LazyIterable.from(objects)
-            .filter(o => o.type !== GameObjectType.TANK)
-            .forEach(o => this.gameObjectService.unregisterObject(o.id));
-    }
-
-    onMapEditorSave(): void {
-        // const objects = this.gameObjectService.getObjects();
-        // this.gameMapService.setMapObjects(objects);
-        // this.gameMapService.saveToFile();
-    }
-
     onPlayerRequestSpawnStatus(playerId: string, spawnStatus: PlayerSpawnStatus): void {
         this.playerService.setPlayerRequestedSpawnStatus(playerId, spawnStatus);
     }

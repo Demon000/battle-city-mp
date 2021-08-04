@@ -25,13 +25,6 @@ export class PlayerSpawn extends GameObject {
         };
     }
 
-    toSaveOptions(): PlayerSpawnOptions {
-        return {
-            ...super.toSaveOptions(),
-            teamId: this.teamId,
-        };
-    }
-
     setOptions(options: PlayerSpawnOptions): void {
         super.setOptions(options);
 

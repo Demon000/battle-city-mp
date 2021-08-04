@@ -72,23 +72,5 @@ export class GameServerSocket {
         socket.on(GameSocketEvent.PLAYER_SET_NAME, name => {
             this.gameServer.onPlayerSetName(socket.id, name);
         });
-
-        socket.on(GameSocketEvent.PLAYER_MAP_EDITOR_ENABLE, enabled => {
-            this.gameServer.onMapEditorEnable(socket.id, enabled);
-        });
-
-        socket.on(GameSocketEvent.PLAYER_MAP_EDITOR_CREATE_OBJECTS,
-            (objectsOptions: GameObjectOptions[]) => {
-                this.gameServer.onMapEditorCreateObjects(objectsOptions);
-            });
-
-        socket.on(GameSocketEvent.PLAYER_MAP_EDITOR_DESTROY_OBJECTS,
-            (destroyBox: BoundingBox) => {
-                this.gameServer.onMapEditorDestroyObjects(destroyBox);
-            });
-
-        socket.on(GameSocketEvent.PLAYER_MAP_EDITOR_SAVE, () => {
-            this.gameServer.onMapEditorSave();
-        });
     }
 }
