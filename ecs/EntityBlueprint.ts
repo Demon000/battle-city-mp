@@ -1,6 +1,7 @@
 import { Config } from '@/config/Config';
 import { ComponentFlags } from './Component';
 import { Entity } from './Entity';
+import { RegistryOperationOptions } from './Registry';
 
 export interface BlueprintData {
     components?: Record<string, any>,
@@ -23,18 +24,17 @@ export class EntityBlueprint {
     private addComponentsFromData(
         rawData: Record<string, any>,
         entity: Entity,
-        flags?: number,
+        options?: RegistryOperationOptions,
     ): void {
         for (const [tag, data] of  Object.entries(rawData)) {
-            entity.addComponent(tag, data, {
-                flags,
-            });
+            entity.addComponent(tag, data, options);
         }
     }
 
     private addCommonComponents(
         type: string,
         entity: Entity,
+        options?: RegistryOperationOptions,
     ): void {
         const blueprintData = this.config.find<BlueprintData>('entities-blueprint', type);
         if (blueprintData === undefined) {
@@ -43,18 +43,19 @@ export class EntityBlueprint {
 
         if (blueprintData.extends !== undefined) {
             for (const extendedType of  blueprintData.extends) {
-                this.addCommonComponents(extendedType, entity);
+                this.addCommonComponents(extendedType, entity, options);
             }
         }
 
         if (blueprintData.components !== undefined) {
-            this.addComponentsFromData(blueprintData.components, entity);
+            this.addComponentsFromData(blueprintData.components, entity, options);
         }
     }
 
     private addEnvComponents(
         type: string,
         entity: Entity,
+        options?: RegistryOperationOptions,
     ): void {
         const blueprintData = this.config.find<BlueprintData>('entities-blueprint', type);
         if (blueprintData === undefined) {
@@ -69,16 +70,23 @@ export class EntityBlueprint {
 
         if (this.env === BlueprintEnv.CLIENT
             && blueprintData.clientComponents !== undefined) {
-            this.addComponentsFromData(blueprintData.clientComponents, entity);
+            this.addComponentsFromData(blueprintData.clientComponents, entity,
+                options);
         } else if (this.env === BlueprintEnv.SERVER
             && blueprintData.serverComponents !== undefined) {
-            this.addComponentsFromData(blueprintData.serverComponents, entity,
-                ComponentFlags.SERVER_ONLY);
+            this.addComponentsFromData(blueprintData.serverComponents, entity, {
+                ...options,
+                flags: ComponentFlags.SERVER_ONLY,
+            });
         }
     }
 
-    addComponents(type: string, entity: Entity): void {
-        this.addCommonComponents(type, entity);
-        this.addEnvComponents(type, entity);
+    addComponents(
+        type: string,
+        entity: Entity,
+        options?: RegistryOperationOptions,
+    ): void {
+        this.addCommonComponents(type, entity, options);
+        this.addEnvComponents(type, entity, options);
     }
 }

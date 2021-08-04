@@ -47,7 +47,9 @@ export class GameObjectFactory {
             object = new GameObject(options, properties, this.registry);
         }
 
-        this.entityBlueprint.addComponents(options.type, object);
+        this.entityBlueprint.addComponents(options.type, object, {
+            silent: true,
+        });
 
         if (components !== undefined) {
             object.addComponents(components, {
