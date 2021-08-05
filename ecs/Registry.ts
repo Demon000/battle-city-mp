@@ -271,7 +271,7 @@ export class Registry {
         options?: RegistryOperationOptions,
     ): void {
         this.runForComponentsInitialization(entity, components,
-            this.updateComponent, options);
+            this.upsertComponent, options);
     }
 
     removeEntityComponent<C extends Component<C>>(
