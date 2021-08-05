@@ -145,12 +145,12 @@ export class GameMap {
                                     {
                                         type,
                                     },
-                                    [
-                                        [PositionComponent, {
+                                    {
+                                        PositionComponent: {
                                             y: smallY,
                                             x: smallX,
-                                        }],
-                                    ],
+                                        }
+                                    },
                                 ],
                             );
                         }
