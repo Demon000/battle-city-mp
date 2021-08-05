@@ -7,6 +7,8 @@ import { Config } from '@/config/Config';
 import { Color } from '@/drawable/Color';
 import { PNG } from 'pngjs';
 import JSON5 from 'json5';
+import { PositionComponent } from '@/physics/point/PositionComponent';
+import { Point } from '@/physics/point/Point';
 
 export interface GameMapOptions {
     name: string;
@@ -80,7 +82,18 @@ export class GameMap {
 
         const filePath = this.getMapFilePath(this.options.objectsFromOptionsFile);
         const fileData = fs.readFileSync(filePath, 'utf8');
-        const data = JSON5.parse(fileData);
+        const data = JSON5.parse(fileData).map(
+            (options: GameObjectComponentsOptions | GameObjectOptions  & {
+                position: Point,
+            }) => {
+                if (!Array.isArray(options)) {
+                    options = [options, {
+                        PositionComponent: options.position,
+                    }];
+                }
+                return options;
+            }
+        );
         return data;
     }
 
