@@ -32,7 +32,7 @@ export class EntityBlueprint {
         }
 
         if (blueprintData.extends !== undefined) {
-            for (const extendedType of  blueprintData.extends) {
+            for (const extendedType of blueprintData.extends) {
                 this.addCommonComponents(extendedType, entity, options);
             }
         }
@@ -53,7 +53,7 @@ export class EntityBlueprint {
         }
 
         if (blueprintData.extends !== undefined) {
-            for (const extendedType of  blueprintData.extends) {
+            for (const extendedType of blueprintData.extends) {
                 this.addEnvComponents(extendedType, entity);
             }
         }
