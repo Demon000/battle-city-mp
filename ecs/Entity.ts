@@ -155,7 +155,8 @@ export class Entity {
         clazzOrTag: ClazzOrTag<C>,
     ): C {
         const component = this.findComponent(clazzOrTag);
-        assert(component !== undefined);
+        assert(component !== undefined,
+            'Component does not exist on entity', component, this);
         return component;
     }
 
