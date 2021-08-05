@@ -276,7 +276,10 @@ export class PlayerService {
     }
 
     addPlayerKill(playerId: string): void {
-        const player = this.repository.get(playerId);
+        const player = this.repository.find(playerId);
+        if (player === undefined) {
+            return;
+        }
 
         this.addPlayerPoints(playerId, PlayerPointsEvent.KILL);
         this.setPlayerKills(player, player.kills + 1);
