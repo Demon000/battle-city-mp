@@ -2,11 +2,8 @@ import { nonenumerable } from '@/utils/enumerable';
 import { Entity } from './Entity';
 import { Registry } from './Registry';
 
-export type ComponentInitialization =
-    [ComponentClassType<any>, any] |
-    ComponentClassType<any> |
-    [string, any] |
-    string;
+export type ClazzOrTag<C = any> = ComponentClassType<C> | string;
+export type ComponentsInitialization = Record<string, any>;
 
 export enum ComponentFlags {
     SERVER_ONLY = 1 << 0,
@@ -45,11 +42,11 @@ export class Component<C extends Component<C>> {
         return {...this};
     }
 
-    setData(encoding: Record<string, any>): void {
+    setData(encoding: any): void {
         Object.assign(this, encoding);
     }
 
-    update(data?: Record<string, any>): C {
+    update(data?: any): C {
         return this.entity.updateComponent(this.clazz, data);
     }
 

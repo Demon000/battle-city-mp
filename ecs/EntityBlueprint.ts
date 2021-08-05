@@ -21,16 +21,6 @@ export class EntityBlueprint {
         private env: BlueprintEnv,
     ) {}
 
-    private addComponentsFromData(
-        rawData: Record<string, any>,
-        entity: Entity,
-        options?: RegistryOperationOptions,
-    ): void {
-        for (const [tag, data] of  Object.entries(rawData)) {
-            entity.upsertComponent(tag, data, options);
-        }
-    }
-
     private addCommonComponents(
         type: string,
         entity: Entity,
@@ -48,7 +38,7 @@ export class EntityBlueprint {
         }
 
         if (blueprintData.components !== undefined) {
-            this.addComponentsFromData(blueprintData.components, entity, options);
+            entity.upsertComponents(blueprintData.components, options);
         }
     }
 
@@ -70,11 +60,10 @@ export class EntityBlueprint {
 
         if (this.env === BlueprintEnv.CLIENT
             && blueprintData.clientComponents !== undefined) {
-            this.addComponentsFromData(blueprintData.clientComponents, entity,
-                options);
+            entity.upsertComponents(blueprintData.clientComponents, options);
         } else if (this.env === BlueprintEnv.SERVER
             && blueprintData.serverComponents !== undefined) {
-            this.addComponentsFromData(blueprintData.serverComponents, entity, {
+            entity.upsertComponents(blueprintData.serverComponents, {
                 ...options,
                 flags: ComponentFlags.SERVER_ONLY,
             });

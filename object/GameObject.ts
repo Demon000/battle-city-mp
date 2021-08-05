@@ -7,22 +7,24 @@ import { AudioEffect, GameObjectProperties, ResourceMeta } from './GameObjectPro
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 import { assert } from '@/utils/assert';
+import { PositionComponent } from '@/physics/point/PositionComponent';
+import { ComponentsInitialization } from '@/ecs/Component';
 
 export interface GameObjectOptions {
     id?: number;
     type?: GameObjectType;
-    position?: Point;
     direction?: Direction;
     movementSpeed?: number;
     movementDirection?: Direction | null;
 }
 
+export type GameObjectComponentsOptions = [GameObjectOptions, ComponentsInitialization];
+
 export type PartialGameObjectOptions = Partial<GameObjectOptions>;
 
 export class GameObject extends Entity {
     protected _audioMeta: ResourceMeta | undefined | null;
-    protected _position: Point;
-    protected _boundingBox: BoundingBox;
+    protected _boundingBox: BoundingBox | undefined;
     protected _direction: Direction;
     protected _movementSpeed: number;
     graphicsDirty: boolean;
@@ -42,8 +44,6 @@ export class GameObject extends Entity {
 
         this.properties = properties;
         this.type = options.type;
-        this._position = options.position ?? {x: 0, y: 0};
-        this._boundingBox = this.getPositionedBoundingBox(this._position);
         this._direction = options.direction ?? Direction.UP;
         this._movementSpeed = options.movementSpeed ?? 0;
         this.movementDirection = options.movementDirection ?? null;
@@ -54,7 +54,6 @@ export class GameObject extends Entity {
         return {
             id: this.id,
             type: this.type,
-            position: this.position,
             direction: this.direction,
             movementSpeed: this.movementSpeed,
             movementDirection: this.movementDirection,
@@ -62,22 +61,9 @@ export class GameObject extends Entity {
     }
 
     setOptions(options: PartialGameObjectOptions): void {
-        if (options.position !== undefined) this.position = options.position;
         if (options.direction !== undefined) this.direction = options.direction;
         if (options.movementSpeed !== undefined) this.movementSpeed = options.movementSpeed;
         if (options.movementDirection !== undefined) this.movementDirection = options.movementDirection;
-    }
-
-    get position(): Point {
-        return this._position;
-    }
-
-    set position(value: Point) {
-        this._position = value;
-        this._boundingBox.tl.x = value.x;
-        this._boundingBox.tl.y = value.y;
-        this._boundingBox.br.x = value.x + this.width;
-        this._boundingBox.br.y = value.y + this.height;
     }
 
     get width(): number {
@@ -102,13 +88,6 @@ export class GameObject extends Entity {
 
     set movementSpeed(value: number) {
         this._movementSpeed = value;
-    }
-
-    get centerPosition(): Point {
-        return {
-            x: this.position.x + this.width / 2,
-            y: this.position.y + this.height / 2,
-        };
     }
 
     get maxMovementSpeed(): number {
@@ -140,7 +119,17 @@ export class GameObject extends Entity {
     }
 
     get boundingBox(): BoundingBox {
-        return this._boundingBox;
+        const position = this.getComponent(PositionComponent);
+        return {
+            tl: {
+                x: position.x,
+                y: position.y,
+            },
+            br: {
+                x: position.x + this.width,
+                y: position.y + this.height,
+            },
+        };
     }
 
     get audioEffects(): AudioEffect[] | undefined {

@@ -1,5 +1,5 @@
 import { assert } from '@/utils/assert';
-import { Component, ComponentClassType, ComponentInitialization } from './Component';
+import { ClazzOrTag, Component, ComponentClassType, ComponentsInitialization } from './Component';
 import { EntityId } from './EntityId';
 import { Registry, RegistryOperationOptions } from './Registry';
 
@@ -49,8 +49,8 @@ export class Entity {
     addComponent<
         C extends Component<C>,
     >(
-        clazzOrTag: ComponentClassType<C> | string,
-        data?: Record<string, any>,
+        clazzOrTag: ClazzOrTag,
+        data?: any,
         options?: RegistryOperationOptions,
     ): C {
         return this.registry.addComponent(this, clazzOrTag, data, options);
@@ -59,8 +59,8 @@ export class Entity {
     updateComponent<
         C extends Component<C>,
     >(
-        clazzOrTag: ComponentClassType<C> | string,
-        data?: Record<string, any>,
+        clazzOrTag: ClazzOrTag,
+        data?: any,
         options?: RegistryOperationOptions,
     ): C {
         return this.registry.updateComponent(this, clazzOrTag, data, options);
@@ -69,36 +69,36 @@ export class Entity {
     upsertComponent<
         C extends Component<C>,
     >(
-        clazz: ComponentClassType<C> | string,
-        data?: Record<string, any>,
+        clazzOrTag: ClazzOrTag,
+        data?: any,
         options?: RegistryOperationOptions,
     ): C {
-        return this.registry.upsertComponent(this, clazz, data, options);
+        return this.registry.upsertComponent(this, clazzOrTag, data, options);
     }
 
     addComponents(
-        components: ComponentInitialization[],
+        components: ComponentsInitialization,
         options?: RegistryOperationOptions,
     ): void {
         this.registry.addComponents(this, components, options);
     }
 
     updateComponents(
-        components: ComponentInitialization[],
+        components: ComponentsInitialization,
         options?: RegistryOperationOptions,
     ): void {
         this.registry.updateComponents(this, components, options);
     }
 
     upsertComponents(
-        components: ComponentInitialization[],
+        components: ComponentsInitialization,
         options?: RegistryOperationOptions,
     ): void {
         this.registry.upsertComponents(this, components, options);
     }
 
-    getComponentsData(options?: EntityComponentsOptions): ComponentInitialization[] {
-        const tagsComponentsEncoding: [string, Partial<Component<any>>][] = [];
+    getComponentsData(options?: EntityComponentsOptions): ComponentsInitialization {
+        const componentsInitialization: ComponentsInitialization = {};
         for (const [clazz, component] of this.tagComponentMap) {
             if (options !== undefined) {
                 if (options.withFlags !== undefined
@@ -113,15 +113,15 @@ export class Entity {
                     continue;
                 }
             }
-            tagsComponentsEncoding.push([clazz.tag, component.getData()]);
+            componentsInitialization[clazz.tag] = component.getData();
         }
-        return tagsComponentsEncoding;
+        return componentsInitialization;
     }
 
     removeComponent<
         C extends Component<C>,
     >(
-        clazzOrTag: ComponentClassType<C> | string,
+        clazzOrTag: ClazzOrTag<C>,
         options?: RegistryOperationOptions,
     ): C | undefined {
         const component = this.getComponent(clazzOrTag);
@@ -137,7 +137,7 @@ export class Entity {
     findComponent<
         C extends Component<C>,
     >(
-        clazzOrTag: ComponentClassType<C> | string,
+        clazzOrTag: ClazzOrTag<C>,
     ): C | undefined {
         let clazz;
         if (typeof clazzOrTag === 'string') {
@@ -152,7 +152,7 @@ export class Entity {
     getComponent<
         C extends Component<C>,
     >(
-        clazzOrTag: ComponentClassType<C> | string,
+        clazzOrTag: ClazzOrTag<C>,
     ): C {
         const component = this.findComponent(clazzOrTag);
         assert(component !== undefined);

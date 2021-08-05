@@ -9,7 +9,7 @@ import { Tank, TankOptions, TankProperties } from '../tank/Tank';
 import { GameObject, GameObjectOptions } from './GameObject';
 import { GameObjectProperties } from './GameObjectProperties';
 import { GameObjectType } from './GameObjectType';
-import { ComponentInitialization } from '@/ecs/Component';
+import { ComponentsInitialization } from '@/ecs/Component';
 
 export class GameObjectFactory {
     constructor(
@@ -20,7 +20,7 @@ export class GameObjectFactory {
 
     buildFromOptions(
         options: GameObjectOptions,
-        components?: ComponentInitialization[],
+        components?: ComponentsInitialization,
     ): GameObject {
         if (options.type === undefined) {
             throw new Error('Cannot create object from options without a type');

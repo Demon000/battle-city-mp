@@ -1,4 +1,4 @@
-import { ComponentInitialization } from '@/ecs/Component';
+import { ComponentsInitialization } from '@/ecs/Component';
 import { GameObjectOptions, PartialGameObjectOptions } from '@/object/GameObject';
 import { PartialPlayerOptions, PlayerOptions } from '@/player/Player';
 import { GameServerStatus } from './GameServerStatus';
@@ -43,7 +43,7 @@ export type BroadcastBatchGameEvent = CommonBatchGameEvent |
 [name: GameEvent.TEAM_PLAYER_ADDED, teamId: string, playerId: string] |
 [name: GameEvent.TEAM_PLAYER_REMOVED, teamId: string, playerId: string] |
 
-[name: GameEvent.OBJECT_REGISTERED, objectOptions: GameObjectOptions, objectComponents: ComponentInitialization[]] |
+[name: GameEvent.OBJECT_REGISTERED, objectOptions: GameObjectOptions, objectComponents: ComponentsInitialization] |
 [name: GameEvent.OBJECT_CHANGED, objectId: number, options: PartialGameObjectOptions] |
 [name: GameEvent.OBJECT_UNREGISTERED, objectId: number] |
 [name: GameEvent.ENTITY_COMPONENT_ADDED, entityId: number, tag: string, data?: any] |

@@ -89,7 +89,12 @@ export class ComponentRegistry {
         this.process(tag, undefined, data);
     }
 
-    validateComponentData<C extends Component<C>>(clazz: ComponentClassType<C>, data: Record<string, any>): void {
+    validateComponentData<
+        C extends Component<C>,
+    >(
+        clazz: ComponentClassType<C>,
+        data: any,
+    ): void {
         this.process(undefined, clazz, data);
     }
 }

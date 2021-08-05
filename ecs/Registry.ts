@@ -1,7 +1,7 @@
 import { ComponentRegistry } from './ComponentRegistry';
 import { assert } from '@/utils/assert';
 import EventEmitter from 'eventemitter3';
-import { Component, ComponentClassType, ComponentInitialization } from './Component';
+import { ClazzOrTag, Component, ComponentClassType, ComponentsInitialization } from './Component';
 import { Entity } from './Entity';
 import { EntityId } from './EntityId';
 import { RegistryIdGenerator } from './RegistryIdGenerator';
@@ -49,8 +49,8 @@ export interface RegistryComponentEvents {
 
 export type DataHandlingFn = <C extends Component<C>>(
     entity: Entity,
-    clazzOrTag: ComponentClassType<C> | string,
-    data?: Record<string, any>,
+    clazzOrTag: ClazzOrTag<C>,
+    data?: any,
     options?: RegistryOperationOptions,
 ) => C;
 
@@ -103,7 +103,7 @@ export class Registry {
         return this.idGenerator.generate();
     }
 
-    createEntity(components?: ComponentInitialization[]): Entity {
+    createEntity(components?: ComponentsInitialization): Entity {
         const id = this.generateId();
         const entity = new Entity(id, this);
         this.registerEntity(entity);
@@ -141,7 +141,7 @@ export class Registry {
 
     getClazz<
         C extends Component<C>,
-    >(clazzOrTag: ComponentClassType<C> | string): ComponentClassType<C> {
+    >(clazzOrTag: ClazzOrTag<C>): ComponentClassType<C> {
         let clazz;
         if (typeof clazzOrTag === 'string') {
             clazz = this.componentRegistry.getComponentClassByTag(clazzOrTag);
@@ -163,23 +163,14 @@ export class Registry {
         this.emitter.emit(event, component, data);
     }
 
-    runForComponentInitialization(
+    runForComponentsInitialization(
         entity: Entity,
-        components: ComponentInitialization[],
+        components: ComponentsInitialization,
         fn: DataHandlingFn,
         options?: RegistryOperationOptions,
     ): void {
-        for (const componentInitialization of components) {
-            let clazz;
-            let data;
-
-            if (Array.isArray(componentInitialization)) {
-                [clazz, data] = componentInitialization;
-            } else {
-                clazz = componentInitialization;
-            }
-
-            fn(entity, clazz, data, options);
+        for (const [clazzOrTag, data] of Object.entries(components)) {
+            fn(entity, clazzOrTag, data, options);
         }
     }
 
@@ -187,8 +178,8 @@ export class Registry {
         C extends Component<C>,
     >(
         entity: Entity,
-        clazzOrTag: ComponentClassType<C> | string,
-        data?: Record<string, any>,
+        clazzOrTag: ClazzOrTag<C>,
+        data?: any,
         options?: RegistryOperationOptions,
     ): C {
         const clazz = this.getClazz(clazzOrTag);
@@ -218,10 +209,10 @@ export class Registry {
 
     addComponents(
         entity: Entity,
-        components: ComponentInitialization[],
+        components: ComponentsInitialization,
         options?: RegistryOperationOptions,
     ): void {
-        this.runForComponentInitialization(entity, components,
+        this.runForComponentsInitialization(entity, components,
             this.addComponent, options);
     }
 
@@ -229,8 +220,8 @@ export class Registry {
         C extends Component<C>,
     >(
         entity: Entity,
-        clazzOrTag: ComponentClassType<C> | string,
-        data?: Record<string, any>,
+        clazzOrTag: ClazzOrTag<C>,
+        data?: any,
         options?: RegistryOperationOptions,
     ): C {
         const clazz = this.getClazz(clazzOrTag);
@@ -250,10 +241,10 @@ export class Registry {
 
     updateComponents(
         entity: Entity,
-        components: ComponentInitialization[],
+        components: ComponentsInitialization,
         options?: RegistryOperationOptions,
     ): void {
-        this.runForComponentInitialization(entity, components,
+        this.runForComponentsInitialization(entity, components,
             this.updateComponent, options);
     }
 
@@ -261,8 +252,8 @@ export class Registry {
         C extends Component<C>,
     >(
         entity: Entity,
-        clazzOrTag: ComponentClassType<C> | string,
-        data?: Record<string, any>,
+        clazzOrTag: ClazzOrTag<C>,
+        data?: any,
         options?: RegistryOperationOptions,
     ): C {
         const clazz = this.getClazz(clazzOrTag);
@@ -276,10 +267,10 @@ export class Registry {
 
     upsertComponents(
         entity: Entity,
-        components: ComponentInitialization[],
+        components: ComponentsInitialization,
         options?: RegistryOperationOptions,
     ): void {
-        this.runForComponentInitialization(entity, components,
+        this.runForComponentsInitialization(entity, components,
             this.updateComponent, options);
     }
 

@@ -45,7 +45,7 @@ import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { GameMap } from '@/maps/GameMap';
 import { assert } from '@/utils/assert';
-import { Component, ComponentFlags, ComponentInitialization } from '@/ecs/Component';
+import { Component, ComponentFlags, ComponentsInitialization } from '@/ecs/Component';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -639,7 +639,7 @@ export class GameServer {
                         }),
                     ];
                 })
-                .toArray() as Iterable<[GameObjectOptions, ComponentInitialization[]]>;
+                .toArray() as Iterable<[GameObjectOptions, ComponentsInitialization]>;
 
         const players = this.playerService.getPlayers();
         const playersOptions =

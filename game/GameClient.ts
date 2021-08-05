@@ -29,7 +29,7 @@ import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { Registry, RegistryComponentEvent } from '@/ecs/Registry';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
-import { ComponentInitialization } from '@/ecs/Component';
+import { ComponentsInitialization } from '@/ecs/Component';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -253,7 +253,7 @@ export class GameClient {
         }
     }
 
-    onObjectRegistered(objectOptions: GameObjectOptions, objectComponents: ComponentInitialization[]): void {
+    onObjectRegistered(objectOptions: GameObjectOptions, objectComponents: ComponentsInitialization): void {
         const object = this.gameObjectFactory.buildFromOptions(objectOptions, objectComponents);
         this.gameObjectService.registerObject(object);
     }

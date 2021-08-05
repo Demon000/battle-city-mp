@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { GameObjectOptions } from '@/object/GameObject';
+import { GameObjectComponentsOptions, GameObjectOptions } from '@/object/GameObject';
 import { GameObjectProperties } from '@/object/GameObjectProperties';
 import { GameObjectType, isGameObjectType } from '@/object/GameObjectType';
 import { Team, TeamOptions } from '@/team/Team';
@@ -73,7 +73,7 @@ export class GameMap {
         return gameObjectProperties;
     }
 
-    getObjectsOptionsFromOptions(): GameObjectOptions[] {
+    getObjectsOptionsFromOptions(): GameObjectComponentsOptions[] {
         if (this.options.objectsFromOptionsFile === undefined) {
             return [];
         }
@@ -88,12 +88,12 @@ export class GameMap {
         return `./configs/maps/${this.name}/${fileName}`;
     }
 
-    getObjectsOptionsFromLayers(): GameObjectOptions[] {
-        const objectsOptions: GameObjectOptions[] = [];
+    getObjectsOptionsFromLayers(): GameObjectComponentsOptions[] {
+        const objectsOptionsComponents: GameObjectComponentsOptions[] = [];
 
         if (this.options.layerFiles === undefined
             || this.options.colorsObjectTypesMap === undefined) {
-            return objectsOptions;
+            return objectsOptionsComponents;
         }
 
         const resolution = this.options.resolution;
@@ -127,32 +127,38 @@ export class GameMap {
                             smallX < bigX + resolution;
                             smallX += properties.width
                         ) {
-                            objectsOptions.push({
-                                type,
-                                position: {
-                                    y: smallY,
-                                    x: smallX,
-                                },
-                            });
+                            objectsOptionsComponents.push(
+                                [
+                                    {
+                                        type,
+                                    },
+                                    [
+                                        [PositionComponent, {
+                                            y: smallY,
+                                            x: smallX,
+                                        }],
+                                    ],
+                                ],
+                            );
                         }
                     }
                 }
             }
         }
 
-        return objectsOptions;
+        return objectsOptionsComponents;
     }
 
-    getObjectsOptions(): GameObjectOptions[] {
-        let objectsOptions: GameObjectOptions[] = [];
+    getObjectsOptions(): GameObjectComponentsOptions[] {
+        let options: GameObjectComponentsOptions[] = [];
 
         const objectsOptionsFromOptions = this.getObjectsOptionsFromOptions();
-        objectsOptions = objectsOptions.concat(objectsOptionsFromOptions);
+        options = options.concat(objectsOptionsFromOptions);
 
         const objectsOptionsFromLayers = this.getObjectsOptionsFromLayers();
-        objectsOptions = objectsOptions.concat(objectsOptionsFromLayers);
+        options = options.concat(objectsOptionsFromLayers);
 
-        return objectsOptions;
+        return options;
     }
 
     getTeamsOptions(): Team[] {
