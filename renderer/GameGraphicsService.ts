@@ -166,7 +166,7 @@ export class GameGraphicsService {
             return;
         }
 
-        if (!component.components.includes(tag)) {
+        if (!(tag in component.components)) {
             return;
         }
 

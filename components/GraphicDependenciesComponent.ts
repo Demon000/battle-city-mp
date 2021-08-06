@@ -1,11 +1,11 @@
 import { Component } from '@/ecs/Component';
 
 export interface GraphicDependenciesComponentData {
-    components: string[],
+    components: Record<string, any>,
 }
 
 export class GraphicDependenciesComponent
     extends Component<GraphicDependenciesComponent>
     implements GraphicDependenciesComponentData {
-    components = new Array<string>();
+    components = {};
 }

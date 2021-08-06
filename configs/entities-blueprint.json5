@@ -226,10 +226,10 @@
             IsMovingComponent: {},
             IsUnderBushComponent: {},
             GraphicDependenciesComponent: {
-                components: [
-                    'IsMovingComponent',
-                    'IsUnderBushComponent',
-                ],
+                components: {
+                    'IsMovingComponent': true,
+                    'IsUnderBushComponent': true,
+                },
             },
             SpawnTimeComponent: {},
         },
