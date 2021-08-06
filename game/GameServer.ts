@@ -283,7 +283,7 @@ export class GameServer {
                     GameEvent.OBJECT_REGISTERED,
                     object.toOptions(),
                     object.getComponentsData({
-                        withoutFlags: ComponentFlags.SERVER_ONLY,
+                        withoutFlags: ComponentFlags.LOCAL_ONLY,
                     }),
                 ]);
 
@@ -564,7 +564,7 @@ export class GameServer {
     onRegistryComponentEvent<
         C extends Component<C>,
     >(event: GameEntityComponentEvent, component: C, data?: any): void {
-        if (component.flags & ComponentFlags.SERVER_ONLY) {
+        if (component.flags & ComponentFlags.LOCAL_ONLY) {
             return;
         }
 
@@ -635,7 +635,7 @@ export class GameServer {
                     return [
                         object.toOptions(),
                         object.getComponentsData({
-                            withoutFlags: ComponentFlags.SERVER_ONLY,
+                            withoutFlags: ComponentFlags.LOCAL_ONLY,
                         }),
                     ];
                 })

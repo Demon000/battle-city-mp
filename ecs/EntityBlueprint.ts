@@ -58,14 +58,17 @@ export class EntityBlueprint {
             }
         }
 
-        if (this.env === BlueprintEnv.CLIENT
-            && blueprintData.clientComponents !== undefined) {
-            entity.upsertComponents(blueprintData.clientComponents, options);
-        } else if (this.env === BlueprintEnv.SERVER
-            && blueprintData.serverComponents !== undefined) {
-            entity.upsertComponents(blueprintData.serverComponents, {
+        let components;
+        if (this.env === BlueprintEnv.CLIENT) {
+            components = blueprintData.clientComponents;
+        } else if (this.env === BlueprintEnv.SERVER) {
+            components = blueprintData.serverComponents;
+        }
+
+        if (components !== undefined) {
+            entity.upsertComponents(components, {
                 ...options,
-                flags: ComponentFlags.SERVER_ONLY,
+                flags: ComponentFlags.LOCAL_ONLY,
             });
         }
     }

@@ -6,7 +6,7 @@ export type ClazzOrTag<C = any> = ComponentClassType<C> | string;
 export type ComponentsInitialization = Record<string, any>;
 
 export enum ComponentFlags {
-    SERVER_ONLY = 1 << 0,
+    LOCAL_ONLY = 1 << 0,
 }
 
 export class Component<C extends Component<C>> {
