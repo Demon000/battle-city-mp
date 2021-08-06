@@ -7,6 +7,7 @@ import { RenderPass } from '@/object/RenderPass';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { Point } from '@/physics/point/Point';
+import { PositionComponent } from '@/physics/point/PositionComponent';
 import { CanvasUtils, Context2D } from '@/utils/CanvasUtils';
 import { RatioUtils } from '@/utils/RatioUtils';
 import { GameObjectGraphicsRenderer } from '../object/GameObjectGraphicsRenderer';
@@ -80,8 +81,9 @@ export class GameGraphicsService {
         }
 
         const renderer = this.getObjectRenderer(object);
-        const objectRelativeX = Math.floor(object.position.x) - this.canvasX;
-        const objectRelativeY = Math.floor(object.position.y) - this.canvasY;
+        const position = object.getComponent(PositionComponent);
+        const objectRelativeX = Math.floor(position.x) - this.canvasX;
+        const objectRelativeY = Math.floor(position.y) - this.canvasY;
         const objectDrawX = objectRelativeX * this.scale;
         const objectDrawY = objectRelativeY * this.scale;
         renderer.render(this.contexts, objectDrawX, objectDrawY);

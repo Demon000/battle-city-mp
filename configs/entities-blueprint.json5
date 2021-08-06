@@ -1,37 +1,217 @@
 {
-    'explosion': {
-        clientComponents: {
-            SpawnTimeComponent: {},
+    'positioned-entity': {
+        components: {
+            PositionComponent: {},
+        },
+    },
+    'bounding-boxed-entity': {
+        localComponents: {
+            BoundingBoxComponent: {},
+            DirtyBoundingBoxComponent: {},
+        },
+    },
+    'brick-wall': {
+        extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
+        ],
+        localComponents: {
+            SizeComponent: {
+                width: 4,
+                height: 4,
+            },
         },
         serverComponents: {
+            CenterPositionComponent: {},
+        },
+    },
+    'steel-wall': {
+        extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
+        ],
+        localComponents: {
+            SizeComponent: {
+                width: 8,
+                height: 8,
+            },
+        },
+        serverComponents: {
+            CenterPositionComponent: {},
+        },
+    },
+    'bush': {
+        extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
+        ],
+        localComponents: {
+            SizeComponent: {
+                width: 8,
+                height: 8,
+            },
+        },
+    },
+    'ice': {
+        extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
+        ],
+        localComponents: {
+            SizeComponent: {
+                width: 8,
+                height: 8,
+            },
+        },
+    },
+    'sand': {
+        extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
+        ],
+        localComponents: {
+            SizeComponent: {
+                width: 8,
+                height: 8,
+            },
+        },
+    },
+    'grass': {
+        extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
+        ],
+        localComponents: {
+            SizeComponent: {
+                width: 8,
+                height: 8,
+            },
+        },
+    },
+    'dirt': {
+        extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
+        ],
+        localComponents: {
+            SizeComponent: {
+                width: 8,
+                height: 8,
+            },
+        },
+    },
+    'player-spawn': {
+        extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
+        ],
+        localComponents: {
+            SizeComponent: {
+                width: 16,
+                height: 16,
+            },
+        },
+    },
+    'level-border': {
+        extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
+        ],
+        localComponents: {
+            SizeComponent: {
+                width: 16,
+                height: 16,
+            },
+        },
+    },
+    'bullet': {
+        extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
+        ],
+        localComponents: {
+            CenterPositionComponent: {},
+            SizeComponent: {
+                width: 2,
+                height: 2,
+            },
+        },
+    },
+    'explosion': {
+        extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
+        ],
+        localComponents: {
+            SizeComponent: {},
             SpawnTimeComponent: {},
+        },
+        clientComponents: {
+            CenterPositionComponent: {},
+        },
+        serverComponents: {
             AutomaticDestroyComponent: {
                 timeMs: 240,
             },
         },
     },
     'smoke': {
-        clientComponents: {
+        extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
+        ],
+        localComponents: {
+            SizeComponent: {},
             SpawnTimeComponent: {},
         },
         serverComponents: {
-            SpawnTimeComponent: {},
             AutomaticDestroyComponent: {
                 timeMs: 1000,
             },
         },
     },
     'water': {
+        extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
+        ],
+        localComponents: {
+            SizeComponent: {
+                width: 8,
+                height: 8,
+            },
+        },
         clientComponents: {
             SpawnTimeComponent: {},
         },
     },
     'flag': {
+        extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
+        ],
+        localComponents: {
+            SizeComponent: {
+                width: 16,
+                height: 16,
+            },
+        },
         serverComponents: {
             SpawnTimeComponent: {},
         },
     },
     'tank': {
+        extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
+        ],
+        localComponents: {
+            SizeComponent: {
+                width: 16,
+                height: 16,
+            },
+            CenterPositionComponent: {},
+        },
         serverComponents: {
             DirectionAxisSnappingComponent: {
                 value: 4,

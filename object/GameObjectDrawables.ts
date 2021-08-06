@@ -11,7 +11,9 @@ import { Explosion } from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { Flag, FlagType } from '@/flag/Flag';
 import { Direction } from '@/physics/Direction';
+import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
 import { Point } from '@/physics/point/Point';
+import { PositionComponent } from '@/physics/point/PositionComponent';
 import { Tank } from '@/tank/Tank';
 import { TankTier } from '@/tank/TankTier';
 import { GameObject } from './GameObject';
@@ -20,7 +22,7 @@ import { RenderPass } from './RenderPass';
 
 const positionTest = (mod: number, divide: number, points: Point[]): DrawableTestFunction => {
     return (object: GameObject): boolean => {
-        const position = object.position;
+        const position = object.getComponent(PositionComponent);
         const x = Math.floor(Math.abs(position.x % mod / divide));
         const y = Math.floor(Math.abs(position.y % mod / divide));
         return points.some(p => p.x === x && p.y === y);
@@ -330,8 +332,8 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                     return drawable;
                 }
 
-                const position = object.position;
-                const centerPosition = object.centerPosition;
+                const position = object.getComponent(PositionComponent);
+                const centerPosition = object.getComponent(CenterPositionComponent);
                 const direction = object.direction;
                 const offsetX = centerPosition.x - position.x;
                 let offsetY = 0;

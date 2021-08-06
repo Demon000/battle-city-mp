@@ -15,6 +15,10 @@ export class BoundingBoxRepository<V> {
         return this.tree.getOverlappingNodeValues(box);
     }
 
+    hasNode(value: V): boolean {
+        return this.map.has(value);
+    }
+
     private getNode(value: V): BoundingBoxNode<V> {
         const node = this.map.get(value);
         if (!node) {

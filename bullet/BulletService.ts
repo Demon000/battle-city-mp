@@ -2,9 +2,12 @@ import { GameObject } from '@/object/GameObject';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
+import { BoundingBoxComponent } from '@/physics/bounding-box/BoundingBoxComponent';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { DirectionUtils } from '@/physics/collisions/DirectionUtils';
 import { Direction } from '@/physics/Direction';
+import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
+import { PositionComponent } from '@/physics/point/PositionComponent';
 import { Tank } from '@/tank/Tank';
 import { MapRepository } from '@/utils/MapRepository';
 import { Bullet, BulletOptions } from './Bullet';
@@ -28,52 +31,56 @@ export class BulletService {
     getBulletBrickWallDestroyBox(bulletId: number, brickWallId: number): BoundingBox {
         const bullet = this.getBullet(bulletId);
         const brickWall = this.repository.get(brickWallId);
-        const box = BoundingBoxUtils.clone(brickWall.boundingBox);
+        const boundingBox = BoundingBoxUtils.clone(
+            brickWall.getComponent(BoundingBoxComponent),
+        );
 
-        const bulletCenter = bullet.centerPosition;
-        const brickWallCenterPosition = brickWall.centerPosition;
+        const bulletCenterPosition =
+            bullet.getComponent(CenterPositionComponent);
+        const brickWallCenterPosition =
+            brickWall.getComponent(CenterPositionComponent);
 
         const brickWallWidth = brickWall.width;
         const brickWallHeight = brickWall.height;
         if (DirectionUtils.isHorizontalAxis(bullet.direction)) {
-            if (bulletCenter.y > brickWallCenterPosition.y) {
-                box.tl.y -= brickWallHeight;
-                box.br.y += brickWallHeight * 2;
+            if (bulletCenterPosition.y > brickWallCenterPosition.y) {
+                boundingBox.tl.y -= brickWallHeight;
+                boundingBox.br.y += brickWallHeight * 2;
             } else {
-                box.tl.y -= brickWallHeight * 2;
-                box.br.y += brickWallHeight;
+                boundingBox.tl.y -= brickWallHeight * 2;
+                boundingBox.br.y += brickWallHeight;
             }
 
             if (bullet.power === BulletPower.HEAVY) {
                 if (bullet.direction === Direction.RIGHT) {
-                    box.br.x += brickWallWidth;
+                    boundingBox.br.x += brickWallWidth;
                 } else {
-                    box.tl.x -= brickWallWidth;
+                    boundingBox.tl.x -= brickWallWidth;
                 }
             }
         } else {
-            if (bulletCenter.x > brickWallCenterPosition.x) {
-                box.tl.x -= brickWallWidth;
-                box.br.x += brickWallWidth * 2;
+            if (bulletCenterPosition.x > brickWallCenterPosition.x) {
+                boundingBox.tl.x -= brickWallWidth;
+                boundingBox.br.x += brickWallWidth * 2;
             } else {
-                box.tl.x -= brickWallWidth * 2;
-                box.br.x += brickWallWidth;
+                boundingBox.tl.x -= brickWallWidth * 2;
+                boundingBox.br.x += brickWallWidth;
             }
 
             if (bullet.power === BulletPower.HEAVY) {
                 if (bullet.direction === Direction.DOWN) {
-                    box.br.y += brickWallHeight;
+                    boundingBox.br.y += brickWallHeight;
                 } else {
-                    box.tl.y -= brickWallHeight;
+                    boundingBox.tl.y -= brickWallHeight;
                 }
             }
         }
 
-        return box;
+        return boundingBox;
     }
 
     createBulletForTank(tank: Tank): Bullet {
-        const objectCenterPosition = tank.centerPosition;
+        const centerPosition = tank.getComponent(CenterPositionComponent);
         const bullet = this.gameObjectFactory.buildFromOptions({
             type: GameObjectType.BULLET,
             direction: tank.direction,
@@ -84,13 +91,12 @@ export class BulletService {
             power: tank.bulletPower,
         } as BulletOptions);
 
-        const bulletY = objectCenterPosition.y - bullet.height / 2;
-        const bulletX = objectCenterPosition.x - bullet.width / 2;
-
-        bullet.position = {
-            y: bulletY,
-            x: bulletX,
-        };
+        bullet.updateComponent(PositionComponent, {
+            x: centerPosition.x - bullet.width / 2,
+            y: centerPosition.y - bullet.height / 2,
+        }, {
+            silent: true,
+        });
 
         return bullet as Bullet;
     }

@@ -4,6 +4,7 @@ import { GameObjectAudioRenderer } from '@/object/GameObjectAudioRenderer';
 import { GameObjectAudioRendererFactory } from '@/object/GameObjectAudioRendererFactory';
 import { AudioEffectLoadingState, AudioEffect } from '@/object/GameObjectProperties';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
+import { BoundingBoxComponent } from '@/physics/bounding-box/BoundingBoxComponent';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { Point } from '@/physics/point/Point';
 import { CartesianUtils } from '@/utils/CartesianUtils';
@@ -91,7 +92,8 @@ export class GameAudioService {
         CartesianUtils.setCartesianPositions(this.context.listener, point);
 
         for (const object of this.objectsPlayingAudioEffects) {
-            if (BoundingBoxUtils.overlaps(box, object.boundingBox)) {
+            const boundingBox = object.getComponent(BoundingBoxComponent);
+            if (BoundingBoxUtils.overlaps(box, boundingBox)) {
                 continue;
             }
 

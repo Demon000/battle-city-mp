@@ -1,4 +1,3 @@
-import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { GameAudioService } from '@/renderer/GameAudioService';
 import { GameCamera } from '@/renderer/GameCamera';
 import { GameGraphicsService } from '@/renderer/GameGraphicsService';
@@ -30,6 +29,9 @@ import { Registry, RegistryComponentEvent } from '@/ecs/Registry';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { ComponentsInitialization } from '@/ecs/Component';
+import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
+import { PositionComponent } from '@/physics/point/PositionComponent';
+import { SizeComponent } from '@/physics/size/SizeComponent';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -148,17 +150,25 @@ export class GameClient {
             this.gameGraphicsService.processObjectsGraphicsDependencies(component.entity.id,
                 component.clazz.tag);
         });
+        this.registry.componentEmitter(PositionComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_UPDATED,
+                (component) => {
+                    const entity = component.entity;
+                    this.collisionService.markBoundingBoxNeedsUpdate(entity);
+                    this.gameObjectService.markObjectsDirtyCenterPosition(entity);
+                });
+        this.registry.componentEmitter(SizeComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_UPDATED,
+                (component) => {
+                    const entity = component.entity;
+                    this.collisionService.markBoundingBoxNeedsUpdate(entity);
+                    this.gameObjectService.markObjectsDirtyCenterPosition(entity);
+                });
 
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REGISTERED,
             (object: GameObject) => {
                 this.registry.registerEntity(object);
-                this.collisionService.registerObjectCollisions(object.id);
             });
-        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED,
-            (objectId: number, box: BoundingBox) => {
-                this.collisionService.updateObjectCollisions(objectId, box);
-            });
-
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BEFORE_UNREGISTER,
             (objectId: number) => {
                 const object = this.gameObjectService.getObject(objectId);
@@ -332,6 +342,8 @@ export class GameClient {
 
     onTick(): void {
         this.gameObjectService.processObjectsIsMoving();
+        this.gameObjectService.processObjectsCenterPosition();
+        this.collisionService.processObjectsDirtyBoundingBox();
         this.collisionService.processObjectsIsUnderBush();
         this.gameGraphicsService.processObjectsDirtyGraphics();
 
@@ -343,7 +355,8 @@ export class GameClient {
         if (ownPlayer.tankId !== null) {
             const tank = this.gameObjectService.findObject(ownPlayer.tankId);
             if (tank !== undefined) {
-                this.gameCamera.setPosition(tank.centerPosition);
+                const centerPosition = tank.getComponent(CenterPositionComponent);
+                this.gameCamera.setPosition(centerPosition);
             }
         }
 

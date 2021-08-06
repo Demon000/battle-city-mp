@@ -3,6 +3,7 @@ import { Config } from '@/config/Config';
 import { GameObject } from '@/object/GameObject';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
+import { PositionComponent } from '@/physics/point/PositionComponent';
 import { Tank } from '@/tank/Tank';
 import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
@@ -38,15 +39,17 @@ export class FlagService {
             return undefined;
         }
 
+        const position = tank.getComponent(PositionComponent);
         return this.gameObjectFactory.buildFromOptions({
             type: GameObjectType.FLAG,
-            position: tank.position,
             teamId: tank.flagTeamId,
             color: tank.flagColor,
             flagType: FlagType.POLE_ONLY,
             sourceId: tank.flagSourceId,
             droppedTankId: tank.id,
-        } as FlagOptions) as Flag;
+        } as FlagOptions, {
+            PositionComponent: position,
+        }) as Flag;
     }
 
     getFlag(flagId: number): Flag {

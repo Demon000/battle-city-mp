@@ -11,6 +11,9 @@ import { IsMovingComponent, IsMovingComponentData } from '@/components/IsMovingC
 import { DirectionAxisSnappingComponent, DirectionAxisSnappingComponentData } from '@/components/DirectionAxisSnappingComponent';
 import { SpawnTimeComponent, SpawnTimeComponentData } from '@/components/SpawnTimeComponent';
 import { IsUnderBushComponent, IsUnderBushComponentData } from '@/components/IsUnderBushComponent';
+import { CenterPositionComponent, CenterPositionComponentData } from '@/physics/point/CenterPositionComponent';
+import { DirtyBoundingBoxComponent, DirtyBoundingBoxComponentData } from '@/physics/bounding-box/DirtyBoundingBox';
+import { RequestedPositionComponent, RequestedPositionComponentData } from '@/physics/point/RequestedPositionComponent';
 
 export interface ProcessResults {
     clazz: ComponentClassType<any>;
@@ -65,6 +68,18 @@ export class ComponentRegistry {
             case IsUnderBushComponent.tag:
                 clazz = IsUnderBushComponent;
                 if (data !== undefined) assertType<Partial<IsUnderBushComponentData>>(data);
+                break;
+            case CenterPositionComponent.tag:
+                clazz = CenterPositionComponent;
+                if (data !== undefined) assertType<Partial<CenterPositionComponentData>>(data);
+                break;
+            case DirtyBoundingBoxComponent.tag:
+                clazz = DirtyBoundingBoxComponent;
+                if (data !== undefined) assertType<Partial<DirtyBoundingBoxComponentData>>(data);
+                break;
+            case RequestedPositionComponent.tag:
+                clazz = RequestedPositionComponent;
+                if (data !== undefined) assertType<Partial<RequestedPositionComponentData>>(data);
                 break;
             default:
                 throw new Error(`Invalid tag: ${tag}`);

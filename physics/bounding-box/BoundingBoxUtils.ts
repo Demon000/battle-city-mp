@@ -1,5 +1,6 @@
 import { BoundingBox } from './BoundingBox';
 import { PointUtils } from '../point/PointUtils';
+import { Point } from '../point/Point';
 
 export class BoundingBoxUtils {
     static create(tlx: number, tly: number, brx: number, bry: number): BoundingBox {
@@ -11,6 +12,25 @@ export class BoundingBoxUtils {
             br: {
                 x: brx,
                 y: bry,
+            },
+        };
+    }
+
+    static reposition(
+        box: BoundingBox,
+        originalPosition: Point,
+        newPosition: Point,
+    ): BoundingBox {
+        const offsetX = - originalPosition.x + newPosition.x;
+        const offsetY = - originalPosition.y + newPosition.y;
+        return {
+            tl: {
+                x: box.tl.x + offsetX,
+                y: box.tl.y + offsetY,
+            },
+            br: {
+                x: box.br.x + offsetX,
+                y: box.br.y + offsetY,
             },
         };
     }

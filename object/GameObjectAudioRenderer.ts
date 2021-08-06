@@ -1,3 +1,4 @@
+import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
 import { CartesianUtils } from '@/utils/CartesianUtils';
 import { GameObject } from './GameObject';
 import { AudioEffect, ResourceMeta } from './GameObjectProperties';
@@ -50,7 +51,8 @@ export class GameObjectAudioRenderer {
             throw new Error('Inconsistent audio effect panner');
         }
 
-        CartesianUtils.setCartesianPositions(this.panner, this.object.centerPosition);
+        const centerPosition = this.object.getComponent(CenterPositionComponent);
+        CartesianUtils.setCartesianPositions(this.panner, centerPosition);
     }
 
     private createPanner(): PannerNode {

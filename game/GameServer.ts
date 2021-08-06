@@ -7,7 +7,6 @@ import { ExplosionType } from '@/explosion/ExplosionType';
 import { SameTeamBulletHitMode } from '@/game-mode/IGameModeProperties';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
-import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { CollisionTracker } from '@/physics/collisions/CollisionTracker';
 import { Direction } from '@/physics/Direction';
 import { Tank, PartialTankOptions } from '@/tank/Tank';
@@ -46,6 +45,9 @@ import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { GameMap } from '@/maps/GameMap';
 import { assert } from '@/utils/assert';
 import { Component, ComponentFlags, ComponentsInitialization } from '@/ecs/Component';
+import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
+import { PositionComponent } from '@/physics/point/PositionComponent';
+import { SizeComponent } from '@/physics/size/SizeComponent';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -148,6 +150,20 @@ export class GameServer {
                     component,
                 );
             });
+        this.registry.componentEmitter(PositionComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_UPDATED,
+                (component) => {
+                    const entity = component.entity;
+                    this.collisionService.markBoundingBoxNeedsUpdate(entity);
+                    this.gameObjectService.markObjectsDirtyCenterPosition(entity);
+                });
+        this.registry.componentEmitter(SizeComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_UPDATED,
+                (component) => {
+                    const entity = component.entity;
+                    this.collisionService.markBoundingBoxNeedsUpdate(entity);
+                    this.gameObjectService.markObjectsDirtyCenterPosition(entity);
+                });
 
         /**
          * PlayerService event handlers
@@ -265,20 +281,10 @@ export class GameServer {
                 this.collisionService.validateObjectDirection(objectId, direction);
             });
 
-        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REQUESTED_POSITION,
-            (objectId: number, position: Point) => {
-                this.collisionService.validateObjectMovement(objectId, position);
-            });
-
-        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED,
-            (objectId: number, box: BoundingBox) => {
-                this.collisionService.updateObjectCollisions(objectId, box);
-            });
-
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REGISTERED,
             (object: GameObject) => {
                 this.registry.registerEntity(object);
-                this.collisionService.registerObjectCollisions(object.id);
+
                 this.gameEventBatcher.addBroadcastEvent([
                     GameEvent.OBJECT_REGISTERED,
                     object.toOptions(),
@@ -350,9 +356,11 @@ export class GameServer {
         this.tankService.emitter.on(TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN,
             (tankId: number) => {
                 const tank = this.tankService.getTank(tankId);
+                const position = tank.getComponent(CenterPositionComponent);
                 const smoke = this.gameObjectFactory.buildFromOptions({
                     type: GameObjectType.SMOKE,
-                    position: tank.centerPosition,
+                }, {
+                    PositionComponent: position,
                 });
                 this.gameObjectService.registerObject(smoke);
             });
@@ -370,24 +378,21 @@ export class GameServer {
         /**
          * CollisionService event handlers
          */
-        const spawnExplosion = (position: Point, type: ExplosionType, destroyedObjectType?: GameObjectType) => {
+        const spawnExplosion = (source: GameObject, type: ExplosionType, destroyedObjectType?: GameObjectType) => {
+            const position = source.getComponent(CenterPositionComponent);
             const explosion = this.gameObjectFactory.buildFromOptions({
                 type: GameObjectType.EXPLOSION,
                 explosionType: type,
-                position: position,
                 destroyedObjectType,
-            } as ExplosionOptions);
+            } as ExplosionOptions, {
+                PositionComponent: position,
+            });
             this.gameObjectService.registerObject(explosion);
         };
 
         this.collisionService.emitter.on(CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED,
             (objectId: number, direction: Direction) => {
                 this.gameObjectService.setObjectDirection(objectId, direction);
-            });
-
-        this.collisionService.emitter.on(CollisionServiceEvent.OBJECT_POSITION_ALLOWED,
-            (objectId: number, position: Point) => {
-                this.gameObjectService.setObjectPosition(objectId, position);
             });
 
         this.collisionService.emitter.on(CollisionServiceEvent.OBJECT_TRACKED_COLLISIONS,
@@ -404,7 +409,7 @@ export class GameServer {
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_LEVEL_BORDER,
             (bulletId: number, _staticObjectId: number, _position: Point) => {
                 const bullet = this.gameObjectService.getObject(bulletId);
-                spawnExplosion(bullet.centerPosition, ExplosionType.SMALL, GameObjectType.NONE);
+                spawnExplosion(bullet, ExplosionType.SMALL, GameObjectType.NONE);
                 this.gameObjectService.setObjectDestroyed(bulletId);
             });
 
@@ -413,10 +418,10 @@ export class GameServer {
                 const bullet = this.bulletService.getBullet(bulletId);
                 this.gameObjectService.setObjectDestroyed(bulletId);
                 if (bullet.power === BulletPower.HEAVY) {
-                    spawnExplosion(bullet.centerPosition, ExplosionType.SMALL);
+                    spawnExplosion(bullet, ExplosionType.SMALL);
                     this.gameObjectService.setObjectDestroyed(steelWallId);
                 } else {
-                    spawnExplosion(bullet.centerPosition, ExplosionType.SMALL, GameObjectType.NONE);
+                    spawnExplosion(bullet, ExplosionType.SMALL, GameObjectType.NONE);
                 }
             });
 
@@ -426,7 +431,7 @@ export class GameServer {
                 const objectsIds = this.collisionService.getOverlappingObjects(destroyBox);
                 const objects = this.gameObjectService.getMultipleObjects(objectsIds);
                 const bullet = this.gameObjectService.getObject(bulletId);
-                spawnExplosion(bullet.centerPosition, ExplosionType.SMALL);
+                spawnExplosion(bullet, ExplosionType.SMALL);
                 this.gameObjectService.setObjectDestroyed(bulletId);
 
                 LazyIterable.from(objects)
@@ -475,18 +480,18 @@ export class GameServer {
                 }
 
                 if (tank.health <= 0) {
-                    spawnExplosion(tank.centerPosition, ExplosionType.BIG, GameObjectType.TANK);
+                    spawnExplosion(tank, ExplosionType.BIG, GameObjectType.TANK);
                     this.playerService.setPlayerRequestedSpawnStatus(tank.playerId, PlayerSpawnStatus.DESPAWN);
                     this.playerService.addPlayerDeath(tank.playerId);
                     if (bullet.playerId !== undefined) {
                         this.playerService.addPlayerKill(bullet.playerId);
                     }
                 } else {
-                    spawnExplosion(bullet.centerPosition, ExplosionType.SMALL, GameObjectType.NONE);
+                    spawnExplosion(bullet, ExplosionType.SMALL, GameObjectType.NONE);
                 }
 
                 if (destroyBullet || bullet.damage <= 0) {
-                    spawnExplosion(bullet.centerPosition, ExplosionType.SMALL);
+                    spawnExplosion(bullet, ExplosionType.SMALL);
                     this.gameObjectService.setObjectDestroyed(bulletId);
                 }
             });
@@ -499,7 +504,7 @@ export class GameServer {
                     return;
                 }
 
-                spawnExplosion(movingBullet.centerPosition, ExplosionType.SMALL);
+                spawnExplosion(movingBullet, ExplosionType.SMALL);
                 this.gameObjectService.setObjectDestroyed(movingBulletId);
                 this.gameObjectService.setObjectDestroyed(staticBulletId);
             });
@@ -548,7 +553,10 @@ export class GameServer {
             (deltaSeconds: number) => {
                 this.playerService.processPlayersStatus(deltaSeconds);
                 this.tankService.processTanksStatus();
+                this.gameObjectService.processObjectsCenterPosition();
                 this.gameObjectService.processObjectsStatus(deltaSeconds);
+                this.collisionService.processObjectsRequestedPosition();
+                this.collisionService.processObjectsDirtyBoundingBox();
                 this.timeService.decreaseRoundTime(deltaSeconds);
                 if (this.timeService.isRoundEnded()) {
                     this.reload();
@@ -767,8 +775,8 @@ export class GameServer {
     loadMap(gameMap: GameMap): void {
         const objectsOptions = gameMap.getObjectsOptions();
         const objects = objectsOptions
-            .filter(o => this.gameModeService.isIgnoredObjectType(o.type))
-            .map(o => this.gameObjectFactory.buildFromOptions(o));
+            .filter(o => this.gameModeService.isIgnoredObjectType(o[0].type))
+            .map(o => this.gameObjectFactory.buildFromOptions(o[0], o[1]));
         this.gameObjectService.registerObjects(objects);
 
         const teamsOptions = gameMap.getTeamsOptions();

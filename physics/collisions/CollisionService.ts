@@ -1,29 +1,35 @@
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { DirectionAxisSnappingComponent } from '@/components/DirectionAxisSnappingComponent';
 import { IsUnderBushComponent } from '@/components/IsUnderBushComponent';
+import { ComponentFlags } from '@/ecs/Component';
+import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 import { GameObject } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import { BoundingBox } from '../bounding-box/BoundingBox';
+import { BoundingBoxComponent } from '../bounding-box/BoundingBoxComponent';
 import { BoundingBoxRepository } from '../bounding-box/BoundingBoxRepository';
 import { BoundingBoxUtils } from '../bounding-box/BoundingBoxUtils';
+import { DirtyBoundingBoxComponent } from '../bounding-box/DirtyBoundingBox';
 import { Direction } from '../Direction';
 import { Point } from '../point/Point';
+import { PointUtils } from '../point/PointUtils';
+import { PositionComponent } from '../point/PositionComponent';
+import { RequestedPositionComponent } from '../point/RequestedPositionComponent';
+import { SizeComponent } from '../size/SizeComponent';
 import { CollisionTracker } from './CollisionTracker';
 import { DirectionUtils } from './DirectionUtils';
 import { ICollisionRule, CollisionEvent, CollisionEvents, CollisionResultEvent } from './ICollisionRule';
 
 export enum CollisionServiceEvent {
     OBJECT_TRACKED_COLLISIONS = 'object-tracked-collisions',
-    OBJECT_POSITION_ALLOWED = 'object-position-allowed',
     OBJECT_DIRECTION_ALLOWED = 'object-direction-allowed',
 }
 
 interface CollisionServiceEvents extends CollisionEvents {
     [CollisionServiceEvent.OBJECT_TRACKED_COLLISIONS]: (movingObjectId: number, tracker: CollisionTracker) => void;
-    [CollisionServiceEvent.OBJECT_POSITION_ALLOWED]: (movingObjectId: number, position: Point) => void;
     [CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED]: (movingObjectId: number, direction: Direction) => void;
 }
 
@@ -73,19 +79,14 @@ export class CollisionService {
         return movingMap.get(staticType);
     }
 
-    registerObjectCollisions(objectId: number): void {
-        const object = this.gameObjectRepository.get(objectId);
-        this.boundingBoxRepository.addBoxValue(objectId, object.boundingBox);
+    registerObjectCollisions(entity: Entity): void {
+        const boundingBox = entity.getComponent(BoundingBoxComponent);
+        this.boundingBoxRepository.addBoxValue(entity.id, boundingBox);
     }
 
-    registerObjectsCollisions(objectIds: Iterable<number>): void {
-        for (const objectId of objectIds) {
-            this.registerObjectCollisions(objectId);
-        }
-    }
-
-    updateObjectCollisions(objectId: number, box: BoundingBox): void {
-        this.boundingBoxRepository.updateBoxValue(objectId, box);
+    updateObjectCollisions(entity: Entity): void {
+        const box = entity.getComponent(BoundingBoxComponent);
+        this.boundingBoxRepository.updateBoxValue(entity.id, box);
     }
 
     unregisterObjectCollisions(objectId: number): void {
@@ -164,17 +165,29 @@ export class CollisionService {
         return false;
     }
 
-    private _validateObjectMovement(movingObject: GameObject, position: Point, direction?: Direction, trySnapping=true): void {
+    private _validateObjectMovement(
+        movingObject: GameObject,
+        position: Point,
+        direction?: Direction,
+        trySnapping = true,
+    ): void {
         if (this.rulesMap === undefined) {
             throw new Error('Cannot validate object movement when rules map is not set');
         }
 
         const movingDirection = direction ?? movingObject.direction;
-        const originalBoundingBox = movingObject.boundingBox;
-        const movedBoundingBox = movingObject.getPositionedBoundingBox(position);
-        const mergedBoundingBox = BoundingBoxUtils.combine(originalBoundingBox, movedBoundingBox);
-        const overlappingObjectIds = this.getOverlappingObjects(mergedBoundingBox);
-        const overlappingObjects = this.gameObjectRepository.getMultiple(overlappingObjectIds);
+        const originalBoundingBox = movingObject
+            .getComponent(BoundingBoxComponent);
+        const originalPosition = movingObject
+            .getComponent(PositionComponent);
+        const movedBoundingBox = BoundingBoxUtils
+            .reposition(originalBoundingBox, originalPosition, position);
+        const mergedBoundingBox = BoundingBoxUtils
+            .combine(originalBoundingBox, movedBoundingBox);
+        const overlappingObjectIds = this
+            .getOverlappingObjects(mergedBoundingBox);
+        const overlappingObjects = this.gameObjectRepository
+            .getMultiple(overlappingObjectIds);
 
         let movementPreventingObject;
         const collidingObjectNotifications = new Array<[CollisionEvent, GameObject]>();
@@ -195,14 +208,19 @@ export class CollisionService {
 
             for (const result of rule.result) {
                 if (result.type === CollisionResultEvent.PREVENT_MOVEMENT) {
-                    const overlappingBoundingBox = overlappingObject.boundingBox;
-                    const isAlreadyInside = BoundingBoxUtils.overlaps(originalBoundingBox,
-                        overlappingBoundingBox);
+                    const overlappingBoundingBox = overlappingObject
+                        .getComponent(BoundingBoxComponent);
+                    const isAlreadyInside = BoundingBoxUtils
+                        .overlaps(originalBoundingBox, overlappingBoundingBox);
 
                     let isCloser = true;
                     if (movementPreventingObject !== undefined) {
-                        isCloser = this.isPositionCloserToDirection(overlappingObject.position,
-                            movementPreventingObject.position, movingDirection);
+                        const overlappingPosition =
+                            overlappingObject.getComponent(PositionComponent);
+                        const movementPreventingPosition =
+                            movementPreventingObject.getComponent(PositionComponent);
+                        isCloser = this.isPositionCloserToDirection(overlappingPosition,
+                            movementPreventingPosition, movingDirection);
                     }
 
                     if (!isAlreadyInside && isCloser) {
@@ -225,7 +243,8 @@ export class CollisionService {
          * movement preventing object.
          */
         if (movementPreventingObject !== undefined) {
-            const preventingBoundingBox = movementPreventingObject.boundingBox;
+            const preventingBoundingBox = movementPreventingObject
+                .getComponent(BoundingBoxComponent);
             this.snapObjectToBoundingBoxEdge(movingObject, position,
                 preventingBoundingBox, movingDirection);
         }
@@ -241,13 +260,15 @@ export class CollisionService {
         }
 
         if (isValidPosition) {
-            this.emitter.emit(CollisionServiceEvent.OBJECT_POSITION_ALLOWED,
-                movingObject.id, position);
+            movingObject.updateComponent(PositionComponent, position);
         }
 
-        const preventedBoundingBox = movingObject.getPositionedBoundingBox(position);
+        const preventedBoundingBox = BoundingBoxUtils
+            .reposition(originalBoundingBox, originalPosition, position);
+
         for (const [name, overlappingObject] of collidingObjectNotifications) {
-            const overlappingBoundingBox = overlappingObject.boundingBox;
+            const overlappingBoundingBox = overlappingObject
+                .getComponent(BoundingBoxComponent);
             if (this.isObjectOverlapping(isValidPosition, preventedBoundingBox, movedBoundingBox,
                 overlappingBoundingBox)) {
                 this.emitter.emit(name, movingObject.id, overlappingObject.id, position);
@@ -256,7 +277,8 @@ export class CollisionService {
 
         const collisionTracker = new CollisionTracker();
         for (const overlappingObject of collidingObjectTrackings) {
-            const overlappingBoundingBox = overlappingObject.boundingBox;
+            const overlappingBoundingBox = overlappingObject
+                .getComponent(BoundingBoxComponent);
             if (this.isObjectOverlapping(isValidPosition, preventedBoundingBox, movedBoundingBox,
                 overlappingBoundingBox)) {
                 collisionTracker.markTypeObject(overlappingObject.type, overlappingObject.id);
@@ -267,9 +289,23 @@ export class CollisionService {
             movingObject.id, collisionTracker);
     }
 
-    validateObjectMovement(objectId: number, position: Point, direction?: Direction, trySnapping=true): void {
+    validateObjectMovement(
+        objectId: number,
+        position: Point,
+        direction?: Direction,
+        trySnapping = true,
+    ): void {
         const movingObject = this.gameObjectRepository.get(objectId);
         this._validateObjectMovement(movingObject, position, direction, trySnapping);
+    }
+
+    processObjectsRequestedPosition(): void {
+        for (const component of this.registry.getComponents(RequestedPositionComponent)) {
+            component.remove();
+
+            const object = component.entity as GameObject;
+            this._validateObjectMovement(object, component, undefined, true);
+        }
     }
 
     private calculateSnappedCoordinates(value: number, snapping: number): number {
@@ -282,8 +318,8 @@ export class CollisionService {
     }
 
     validateObjectDirection(objectId: number, direction: Direction): void {
-        const gameObject = this.gameObjectRepository.get(objectId);
-        const oldDirection = gameObject.direction;
+        const object = this.gameObjectRepository.get(objectId);
+        const oldDirection = object.direction;
 
         this.emitter.emit(CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED, objectId, direction);
 
@@ -293,28 +329,26 @@ export class CollisionService {
 
 
         const directionAxisSnappingComponent =
-            gameObject.findComponent(DirectionAxisSnappingComponent);
+            object.findComponent(DirectionAxisSnappingComponent);
         if (directionAxisSnappingComponent === undefined) {
             return;
         }
 
         const value = directionAxisSnappingComponent.value;
-        let x = gameObject.position.x;
-        let y = gameObject.position.y;
+        const position = object.getComponent(PositionComponent);
+        const newPosition = PointUtils.clone(position);
         if (DirectionUtils.isHorizontalAxis(direction)) {
-            y = this.calculateSnappedCoordinates(gameObject.position.y, value);
+            newPosition.y = this.calculateSnappedCoordinates(position.y, value);
         } else {
-            x = this.calculateSnappedCoordinates(gameObject.position.x, value);
+            newPosition.x = this.calculateSnappedCoordinates(position.x, value);
         }
 
-        this.validateObjectMovement(objectId, {
-            x,
-            y,
-        }, oldDirection, false);
+        this.validateObjectMovement(objectId, newPosition, oldDirection, false);
     }
 
-    private isOverlappingWithType(object: GameObject, type: GameObjectType): boolean {
-        const overlappingObjectIds = this.getOverlappingObjects(object.boundingBox);
+    private isOverlappingWithType(entity: Entity, type: GameObjectType): boolean {
+        const boundingBox = entity.getComponent(BoundingBoxComponent);
+        const overlappingObjectIds = this.getOverlappingObjects(boundingBox);
         const overlappingObjects = this.gameObjectRepository.getMultiple(overlappingObjectIds);
 
         for (const overlappingObject of overlappingObjects) {
@@ -337,6 +371,53 @@ export class CollisionService {
             component.update({
                 value: isUnderBush,
             });
+        }
+    }
+
+    markBoundingBoxNeedsUpdate(entity: Entity): void {
+        if (!entity.hasComponent(BoundingBoxComponent)) {
+            return;
+        }
+
+        entity.upsertComponent(DirtyBoundingBoxComponent, undefined, {
+            flags: ComponentFlags.LOCAL_ONLY,
+        });
+    }
+
+    processObjectsDirtyBoundingBox(): void {
+        for (const component of this.registry.getComponents(DirtyBoundingBoxComponent)) {
+            component.remove();
+
+            const entity = component.entity;
+            const size = entity.getComponent(SizeComponent);
+            const position = entity.getComponent(PositionComponent);
+            const boundingBox = entity.getComponent(BoundingBoxComponent);
+            const brx = position.x + size.width;
+            const bry = position.y + size.height;
+
+            if (boundingBox.tl.x === position.x
+                && boundingBox.tl.y === position.y
+                && boundingBox.br.x === brx
+                && boundingBox.br.y === bry) {
+                return;
+            }
+
+            boundingBox.update({
+                tl: {
+                    x: position.x,
+                    y: position.y,
+                },
+                br: {
+                    x: brx,
+                    y: bry,
+                },
+            });
+
+            if (this.boundingBoxRepository.hasNode(entity.id)) {
+                this.boundingBoxRepository.updateBoxValue(entity.id, boundingBox);
+            } else {
+                this.boundingBoxRepository.addBoxValue(entity.id, boundingBox);
+            }
         }
     }
 

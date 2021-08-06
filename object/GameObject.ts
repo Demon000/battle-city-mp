@@ -1,13 +1,9 @@
-import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
-import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
-import { Point } from '@/physics/point/Point';
 import { Direction } from '../physics/Direction';
 import { GameObjectType } from './GameObjectType';
 import { AudioEffect, GameObjectProperties, ResourceMeta } from './GameObjectProperties';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 import { assert } from '@/utils/assert';
-import { PositionComponent } from '@/physics/point/PositionComponent';
 import { ComponentsInitialization } from '@/ecs/Component';
 
 export interface GameObjectOptions {
@@ -24,7 +20,6 @@ export type PartialGameObjectOptions = Partial<GameObjectOptions>;
 
 export class GameObject extends Entity {
     protected _audioMeta: ResourceMeta | undefined | null;
-    protected _boundingBox: BoundingBox | undefined;
     protected _direction: Direction;
     protected _movementSpeed: number;
     graphicsDirty: boolean;
@@ -118,26 +113,7 @@ export class GameObject extends Entity {
         return this._audioMeta;
     }
 
-    get boundingBox(): BoundingBox {
-        const position = this.getComponent(PositionComponent);
-        return {
-            tl: {
-                x: position.x,
-                y: position.y,
-            },
-            br: {
-                x: position.x + this.width,
-                y: position.y + this.height,
-            },
-        };
-    }
-
     get audioEffects(): AudioEffect[] | undefined {
         return this.properties.audioEffects;
-    }
-
-    getPositionedBoundingBox(position: Point): BoundingBox {
-        return BoundingBoxUtils.create(position.x, position.y,
-            position.x + this.width, position.y + this.height);
     }
 }

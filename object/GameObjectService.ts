@@ -2,8 +2,14 @@ import { AutomaticDestroyComponent } from '@/components/AutomaticDestroyComponen
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { IsMovingComponent } from '@/components/IsMovingComponent';
 import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
+import { ComponentFlags } from '@/ecs/Component';
+import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
-import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
+import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
+import { DirtyCenterPositionComponent } from '@/physics/point/DirtyCenterPositionComponent';
+import { PositionComponent } from '@/physics/point/PositionComponent';
+import { RequestedPositionComponent } from '@/physics/point/RequestedPositionComponent';
+import { SizeComponent } from '@/physics/size/SizeComponent';
 import { PlayerSpawn } from '@/player-spawn/PlayerSpawn';
 import { MapRepository } from '@/utils/MapRepository';
 import { Random } from '@/utils/Random';
@@ -15,20 +21,16 @@ import { GameObject, PartialGameObjectOptions } from './GameObject';
 import { GameObjectType } from './GameObjectType';
 
 export enum GameObjectServiceEvent {
-    OBJECT_REQUESTED_POSITION = 'object-requested-position',
     OBJECT_REQUESTED_DIRECTION = 'object-requested-direction',
     OBJECT_CHANGED = 'object-changed',
-    OBJECT_BOUNDING_BOX_CHANGED = 'object-bounding-box-changed',
     OBJECT_REGISTERED = 'object-registered',
     OBJECT_BEFORE_UNREGISTER = 'object-before-unregister',
     OBJECT_UNREGISTERED = 'object-unregistered',
 }
 
 export interface GameObjectServiceEvents {
-    [GameObjectServiceEvent.OBJECT_REQUESTED_POSITION]: (objectId: number, position: Point) => void,
     [GameObjectServiceEvent.OBJECT_REQUESTED_DIRECTION]: (objectId: number, direction: Direction) => void,
     [GameObjectServiceEvent.OBJECT_CHANGED]: (objectId: number, options: PartialGameObjectOptions) => void,
-    [GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED]: (objectId: number, box: BoundingBox) => void,
     [GameObjectServiceEvent.OBJECT_REGISTERED]: (object: GameObject) => void,
     [GameObjectServiceEvent.OBJECT_BEFORE_UNREGISTER]: (objectId: number) => void,
     [GameObjectServiceEvent.OBJECT_UNREGISTERED]: (objectId: number) => void,
@@ -92,15 +94,6 @@ export class GameObjectService {
         }
     }
 
-    setObjectPosition(objectId: number, position: Point): void {
-        const object = this.repository.get(objectId);
-        object.position = position;
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
-            position,
-        } as PartialGameObjectOptions);
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, objectId, object.boundingBox);
-    }
-
     setObjectDirection(objectId: number, direction: Direction): void {
         const object = this.repository.get(objectId);
         object.direction = direction;
@@ -118,9 +111,6 @@ export class GameObjectService {
         const object = this.repository.get(objectId);
         object.setOptions(objectOptions);
         this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, objectOptions);
-        if (objectOptions.position !== undefined) {
-            this.emitter.emit(GameObjectServiceEvent.OBJECT_BOUNDING_BOX_CHANGED, object.id, object.boundingBox);
-        }
     }
 
     setObjectMovementDirection(objectId: number, direction: Direction | null): void {
@@ -161,7 +151,7 @@ export class GameObjectService {
             throw new Error('Failed to get random spawn object');
         }
 
-        return playerSpawnObject.position;
+        return playerSpawnObject.getComponent(PositionComponent);
     }
 
     private processObjectMovement(object: GameObject, delta: number): void {
@@ -193,7 +183,8 @@ export class GameObjectService {
             return;
         }
 
-        const position = PointUtils.clone(object.position);
+        const positionComponent = object.getComponent(PositionComponent);
+        const position = PointUtils.clone(positionComponent);
         if (object.direction === Direction.UP) {
             position.y -= distance;
         } else if (object.direction === Direction.RIGHT) {
@@ -204,7 +195,7 @@ export class GameObjectService {
             position.x -= distance;
         }
 
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_REQUESTED_POSITION, object.id, position);
+        object.upsertComponent(RequestedPositionComponent, position);
     }
 
     private processObjectsDestroyed(): void {
@@ -236,6 +227,36 @@ export class GameObjectService {
 
             component.update({
                 value: isMoving,
+            });
+        }
+    }
+
+    markObjectsDirtyCenterPosition(entity: Entity): void {
+        if (!entity.hasComponent(DirtyCenterPositionComponent)) {
+            return;
+        }
+
+        entity.upsertComponent(DirtyCenterPositionComponent, undefined, {
+            flags: ComponentFlags.LOCAL_ONLY,
+        });
+    }
+
+    processObjectsCenterPosition(): void {
+        for (const component of this.registry.getComponents(DirtyCenterPositionComponent)) {
+            const entity = component.entity;
+            const centerPosition = entity.getComponent(CenterPositionComponent);
+            const position = entity.getComponent(PositionComponent);
+            const size = entity.getComponent(SizeComponent);
+
+            const x = position.x + size.width / 2;
+            const y = position.y + size.height / 2;
+            if (x === centerPosition.x && y === centerPosition.y) {
+                continue;
+            }
+
+            centerPosition.update({
+                x,
+                y,
             });
         }
     }
