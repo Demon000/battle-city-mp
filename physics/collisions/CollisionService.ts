@@ -14,10 +14,12 @@ import { BoundingBoxRepository } from '../bounding-box/BoundingBoxRepository';
 import { BoundingBoxUtils } from '../bounding-box/BoundingBoxUtils';
 import { DirtyBoundingBoxComponent } from '../bounding-box/DirtyBoundingBox';
 import { Direction } from '../Direction';
+import { DirectionComponent } from '../DirectionComponent';
 import { Point } from '../point/Point';
 import { PointUtils } from '../point/PointUtils';
 import { PositionComponent } from '../point/PositionComponent';
 import { RequestedPositionComponent } from '../point/RequestedPositionComponent';
+import { RequestedDirectionComponent } from '../RequestedDirectionComponent';
 import { SizeComponent } from '../size/SizeComponent';
 import { CollisionTracker } from './CollisionTracker';
 import { DirectionUtils } from './DirectionUtils';
@@ -25,12 +27,10 @@ import { ICollisionRule, CollisionEvent, CollisionEvents, CollisionResultEvent }
 
 export enum CollisionServiceEvent {
     OBJECT_TRACKED_COLLISIONS = 'object-tracked-collisions',
-    OBJECT_DIRECTION_ALLOWED = 'object-direction-allowed',
 }
 
 interface CollisionServiceEvents extends CollisionEvents {
     [CollisionServiceEvent.OBJECT_TRACKED_COLLISIONS]: (movingObjectId: number, tracker: CollisionTracker) => void;
-    [CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED]: (movingObjectId: number, direction: Direction) => void;
 }
 
 export class CollisionService {
@@ -176,7 +176,9 @@ export class CollisionService {
             throw new Error('Cannot validate object movement when rules map is not set');
         }
 
-        const movingDirection = direction ?? movingObject.direction;
+        const movingObjectDirection =
+            movingObject.getComponent(DirectionComponent).value;
+        const movingDirection = direction ?? movingObjectDirection;
         const originalBoundingBox = movingObject
             .getComponent(BoundingBoxComponent);
         const originalPosition = movingObject
@@ -290,16 +292,6 @@ export class CollisionService {
             movingObject.id, collisionTracker);
     }
 
-    validateObjectMovement(
-        objectId: number,
-        position: Point,
-        direction?: Direction,
-        trySnapping = true,
-    ): void {
-        const movingObject = this.gameObjectRepository.get(objectId);
-        this._validateObjectMovement(movingObject, position, direction, trySnapping);
-    }
-
     processObjectsRequestedPosition(): void {
         for (const component of this.registry.getComponents(RequestedPositionComponent)) {
             component.remove();
@@ -320,14 +312,16 @@ export class CollisionService {
 
     validateObjectDirection(objectId: number, direction: Direction): void {
         const object = this.gameObjectRepository.get(objectId);
-        const oldDirection = object.direction;
+        const directionComponent = object.getComponent(DirectionComponent);
+        const oldDirection = directionComponent.value;
 
-        this.emitter.emit(CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED, objectId, direction);
+        directionComponent.update({
+            value: direction,
+        });
 
         if (DirectionUtils.isSameAxis(oldDirection, direction)) {
             return;
         }
-
 
         const directionAxisSnappingComponent =
             object.findComponent(DirectionAxisSnappingComponent);
@@ -344,7 +338,15 @@ export class CollisionService {
             newPosition.x = this.calculateSnappedCoordinates(position.x, value);
         }
 
-        this.validateObjectMovement(objectId, newPosition, oldDirection, false);
+        this._validateObjectMovement(object, newPosition, oldDirection, false);
+    }
+
+    processObjectsRequestedDirection(): void {
+        for (const component of this.registry.getComponents(RequestedDirectionComponent)) {
+            component.remove();
+
+            this.validateObjectDirection(component.entity.id, component.value);
+        }
     }
 
     private isOverlappingWithType(entity: Entity, type: GameObjectType): boolean {

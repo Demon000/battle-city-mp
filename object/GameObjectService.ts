@@ -5,10 +5,12 @@ import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
 import { ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
+import { DirectionComponent } from '@/physics/DirectionComponent';
 import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
 import { DirtyCenterPositionComponent } from '@/physics/point/DirtyCenterPositionComponent';
 import { PositionComponent } from '@/physics/point/PositionComponent';
 import { RequestedPositionComponent } from '@/physics/point/RequestedPositionComponent';
+import { RequestedDirectionComponent } from '@/physics/RequestedDirectionComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
 import { PlayerSpawn } from '@/player-spawn/PlayerSpawn';
 import { MapRepository } from '@/utils/MapRepository';
@@ -21,7 +23,6 @@ import { GameObject, PartialGameObjectOptions } from './GameObject';
 import { GameObjectType } from './GameObjectType';
 
 export enum GameObjectServiceEvent {
-    OBJECT_REQUESTED_DIRECTION = 'object-requested-direction',
     OBJECT_CHANGED = 'object-changed',
     OBJECT_REGISTERED = 'object-registered',
     OBJECT_BEFORE_UNREGISTER = 'object-before-unregister',
@@ -29,7 +30,6 @@ export enum GameObjectServiceEvent {
 }
 
 export interface GameObjectServiceEvents {
-    [GameObjectServiceEvent.OBJECT_REQUESTED_DIRECTION]: (objectId: number, direction: Direction) => void,
     [GameObjectServiceEvent.OBJECT_CHANGED]: (objectId: number, options: PartialGameObjectOptions) => void,
     [GameObjectServiceEvent.OBJECT_REGISTERED]: (object: GameObject) => void,
     [GameObjectServiceEvent.OBJECT_BEFORE_UNREGISTER]: (objectId: number) => void,
@@ -94,14 +94,6 @@ export class GameObjectService {
         }
     }
 
-    setObjectDirection(objectId: number, direction: Direction): void {
-        const object = this.repository.get(objectId);
-        object.direction = direction;
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
-            direction,
-        } as PartialGameObjectOptions);
-    }
-
     setObjectDestroyed(objectId: number): void {
         const object = this.repository.get(objectId);
         object.upsertComponent(DestroyedComponent);
@@ -127,9 +119,13 @@ export class GameObjectService {
     }
 
     processObjectDirection(object: GameObject): void {
-        if (object.movementDirection !== null
-            && object.direction !== object.movementDirection) {
-            this.emitter.emit(GameObjectServiceEvent.OBJECT_REQUESTED_DIRECTION, object.id, object.movementDirection);
+        const direction = object.getComponent(DirectionComponent).value;
+        if (object.movementDirection !== null && direction !== object.movementDirection) {
+            object.upsertComponent(RequestedDirectionComponent, {
+                value: object.movementDirection,
+            }, {
+                flags: ComponentFlags.LOCAL_ONLY,
+            });
         }
     }
 
@@ -185,26 +181,29 @@ export class GameObjectService {
 
         const positionComponent = object.getComponent(PositionComponent);
         const position = PointUtils.clone(positionComponent);
-        if (object.direction === Direction.UP) {
+        const direction = object.getComponent(DirectionComponent).value;
+        if (direction === Direction.UP) {
             position.y -= distance;
-        } else if (object.direction === Direction.RIGHT) {
+        } else if (direction === Direction.RIGHT) {
             position.x += distance;
-        } else if (object.direction === Direction.DOWN) {
+        } else if (direction === Direction.DOWN) {
             position.y += distance;
-        } else if (object.direction === Direction.LEFT) {
+        } else if (direction === Direction.LEFT) {
             position.x -= distance;
         }
 
-        object.upsertComponent(RequestedPositionComponent, position);
+        object.upsertComponent(RequestedPositionComponent, position, {
+            flags: ComponentFlags.LOCAL_ONLY,
+        });
     }
 
-    private processObjectsDestroyed(): void {
+    processObjectsDestroyed(): void {
         for (const component of this.registry.getComponents(DestroyedComponent)) {
             this.unregisterObject(component.entity.id);
         }
     }
 
-    private processObjectsAutomaticDestroy(): void {
+    processObjectsAutomaticDestroy(): void {
         for (const component of this.registry.getComponents(AutomaticDestroyComponent)) {
             const entity = component.entity;
             const automaticDestroyTimeMs =
@@ -241,7 +240,7 @@ export class GameObjectService {
         });
     }
 
-    processObjectsCenterPosition(): void {
+    processObjectsDirtyCenterPosition(): void {
         for (const component of this.registry.getComponents(DirtyCenterPositionComponent)) {
             const entity = component.entity;
             const centerPosition = entity.getComponent(CenterPositionComponent);
@@ -261,14 +260,19 @@ export class GameObjectService {
         }
     }
 
-    processObjectsStatus(delta: number): void {
-        this.processObjectsAutomaticDestroy();
-        this.processObjectsDestroyed();
-
+    processObjectsDirection(): void {
         const movingObjects = this.movingRespository?.getAll();
         if (movingObjects !== undefined) {
             for (const object of movingObjects) {
                 this.processObjectDirection(object);
+            }
+        }
+    }
+
+    processObjectsPosition(delta: number): void {
+        const movingObjects = this.movingRespository?.getAll();
+        if (movingObjects !== undefined) {
+            for (const object of movingObjects) {
                 this.processObjectMovement(object, delta);
             }
         }

@@ -15,6 +15,8 @@ import { CenterPositionComponent, CenterPositionComponentData } from '@/physics/
 import { DirtyBoundingBoxComponent, DirtyBoundingBoxComponentData } from '@/physics/bounding-box/DirtyBoundingBox';
 import { RequestedPositionComponent, RequestedPositionComponentData } from '@/physics/point/RequestedPositionComponent';
 import { DirtyCenterPositionComponent, DirtyCenterPositionComponentData } from '@/physics/point/DirtyCenterPositionComponent';
+import { DirectionComponent, DirectionComponentData } from '@/physics/DirectionComponent';
+import { RequestedDirectionComponent, RequestedDirectionComponentData } from '@/physics/RequestedDirectionComponent';
 
 export interface ProcessResults {
     clazz: ComponentClassType<any>;
@@ -85,6 +87,14 @@ export class ComponentRegistry {
             case DirtyCenterPositionComponent.tag:
                 clazz = DirtyCenterPositionComponent;
                 if (data !== undefined) assertType<Partial<DirtyCenterPositionComponentData>>(data);
+                break;
+            case DirectionComponent.tag:
+                clazz = DirectionComponent;
+                if (data !== undefined) assertType<Partial<DirectionComponentData>>(data);
+                break;
+            case RequestedDirectionComponent.tag:
+                clazz = RequestedDirectionComponent;
+                if (data !== undefined) assertType<Partial<RequestedDirectionComponentData>>(data);
                 break;
             default:
                 throw new Error(`Invalid tag: ${tag}`);

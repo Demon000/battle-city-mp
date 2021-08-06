@@ -278,11 +278,6 @@ export class GameServer {
         /**
          * GameObjectService event handlers
          */
-        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REQUESTED_DIRECTION,
-            (objectId: number, direction: Direction) => {
-                this.collisionService.validateObjectDirection(objectId, direction);
-            });
-
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REGISTERED,
             (object: GameObject) => {
                 this.registry.registerEntity(object);
@@ -391,11 +386,6 @@ export class GameServer {
             });
             this.gameObjectService.registerObject(explosion);
         };
-
-        this.collisionService.emitter.on(CollisionServiceEvent.OBJECT_DIRECTION_ALLOWED,
-            (objectId: number, direction: Direction) => {
-                this.gameObjectService.setObjectDirection(objectId, direction);
-            });
 
         this.collisionService.emitter.on(CollisionServiceEvent.OBJECT_TRACKED_COLLISIONS,
             (objectId: number, tracker: CollisionTracker) => {
@@ -555,9 +545,13 @@ export class GameServer {
             (deltaSeconds: number) => {
                 this.playerService.processPlayersStatus(deltaSeconds);
                 this.tankService.processTanksStatus();
-                this.gameObjectService.processObjectsCenterPosition();
-                this.gameObjectService.processObjectsStatus(deltaSeconds);
+                this.gameObjectService.processObjectsAutomaticDestroy();
+                this.gameObjectService.processObjectsDestroyed();
+                this.gameObjectService.processObjectsDirection();
+                this.collisionService.processObjectsRequestedDirection();
+                this.gameObjectService.processObjectsPosition(deltaSeconds);
                 this.collisionService.processObjectsRequestedPosition();
+                this.gameObjectService.processObjectsDirtyCenterPosition();
                 this.collisionService.processObjectsDirtyBoundingBox();
                 this.timeService.decreaseRoundTime(deltaSeconds);
                 if (this.timeService.isRoundEnded()) {

@@ -131,6 +131,9 @@
             'positioned-entity',
             'bounding-boxed-entity',
         ],
+        components: {
+            DirectionComponent: {},
+        },
         localComponents: {
             CenterPositionComponent: {},
             DirtyCenterPositionComponent: {},
@@ -209,6 +212,9 @@
             'positioned-entity',
             'bounding-boxed-entity',
         ],
+        components: {
+            DirectionComponent: {},
+        },
         localComponents: {
             SizeComponent: {
                 width: 16,
@@ -229,6 +235,7 @@
                 components: {
                     'IsMovingComponent': true,
                     'IsUnderBushComponent': true,
+                    'DirectionComponent': true,
                 },
             },
             SpawnTimeComponent: {},

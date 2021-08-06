@@ -2,7 +2,6 @@ import { BulletPower } from '@/bullet/BulletPower';
 import { Color } from '@/drawable/Color';
 import { Registry } from '@/ecs/Registry';
 import { GameObjectProperties } from '@/object/GameObjectProperties';
-import { Direction } from '@/physics/Direction';
 import { GameObject, GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
@@ -201,15 +200,6 @@ export class Tank extends GameObject {
 
     set flagColor(value: Color | null) {
         this._flagColor = value;
-        this.markGraphicsDirty();
-    }
-
-    get direction(): Direction {
-        return super.direction;
-    }
-
-    set direction(value: Direction) {
-        super.direction = value;
         this.markGraphicsDirty();
     }
 }

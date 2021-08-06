@@ -9,7 +9,6 @@ import { ComponentsInitialization } from '@/ecs/Component';
 export interface GameObjectOptions {
     id?: number;
     type?: GameObjectType;
-    direction?: Direction;
     movementSpeed?: number;
     movementDirection?: Direction | null;
 }
@@ -20,7 +19,6 @@ export type PartialGameObjectOptions = Partial<GameObjectOptions>;
 
 export class GameObject extends Entity {
     protected _audioMeta: ResourceMeta | undefined | null;
-    protected _direction: Direction;
     protected _movementSpeed: number;
     graphicsDirty: boolean;
 
@@ -39,7 +37,6 @@ export class GameObject extends Entity {
 
         this.properties = properties;
         this.type = options.type;
-        this._direction = options.direction ?? Direction.UP;
         this._movementSpeed = options.movementSpeed ?? 0;
         this.movementDirection = options.movementDirection ?? null;
         this.graphicsDirty = true;
@@ -49,24 +46,14 @@ export class GameObject extends Entity {
         return {
             id: this.id,
             type: this.type,
-            direction: this.direction,
             movementSpeed: this.movementSpeed,
             movementDirection: this.movementDirection,
         };
     }
 
     setOptions(options: PartialGameObjectOptions): void {
-        if (options.direction !== undefined) this.direction = options.direction;
         if (options.movementSpeed !== undefined) this.movementSpeed = options.movementSpeed;
         if (options.movementDirection !== undefined) this.movementDirection = options.movementDirection;
-    }
-
-    get direction(): Direction {
-        return this._direction;
-    }
-
-    set direction(value: Direction) {
-        this._direction = value;
     }
 
     get movementSpeed(): number {

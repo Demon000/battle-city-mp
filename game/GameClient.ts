@@ -343,7 +343,7 @@ export class GameClient {
 
     onTick(): void {
         this.gameObjectService.processObjectsIsMoving();
-        this.gameObjectService.processObjectsCenterPosition();
+        this.gameObjectService.processObjectsDirtyCenterPosition();
         this.collisionService.processObjectsDirtyBoundingBox();
         this.collisionService.processObjectsIsUnderBush();
         this.gameGraphicsService.processObjectsDirtyGraphics();

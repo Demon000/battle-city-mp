@@ -11,6 +11,7 @@ import { Explosion } from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { Flag, FlagType } from '@/flag/Flag';
 import { Direction } from '@/physics/Direction';
+import { DirectionComponent } from '@/physics/DirectionComponent';
 import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
 import { Point } from '@/physics/point/Point';
 import { PositionComponent } from '@/physics/point/PositionComponent';
@@ -32,7 +33,8 @@ const positionTest = (mod: number, divide: number, points: Point[]): DrawableTes
 
 const directionTest = (targetDirection: Direction): DrawableTestFunction => {
     return (object: GameObject): boolean => {
-        return object.direction === targetDirection;
+        const direction = object.getComponent(DirectionComponent).value;
+        return direction === targetDirection;
     };
 };
 
@@ -336,7 +338,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
                 const position = object.getComponent(PositionComponent);
                 const centerPosition = object.getComponent(CenterPositionComponent);
                 const size = object.getComponent(SizeComponent);
-                const direction = object.direction;
+                const direction = object.getComponent(DirectionComponent).value;
                 const offsetX = centerPosition.x - position.x;
                 let offsetY = 0;
                 let positionYReference: TextPositionReference | undefined = 'end';
