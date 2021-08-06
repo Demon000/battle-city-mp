@@ -1,6 +1,5 @@
 import { Component, ComponentClassType } from '@/ecs/Component';
 import { BoundingBoxComponent, BoundingBoxComponentData } from '@/physics/bounding-box/BoundingBoxComponent';
-import { CollisionComponent, CollisionComponentData } from '@/physics/collisions/CollisionComponent';
 import { PositionComponent, PositionComponentData } from '@/physics/point/PositionComponent';
 import { SizeComponent, SizeComponentData } from '@/physics/size/SizeComponent';
 import { AutomaticDestroyComponent, AutomaticDestroyComponentData } from '../components/AutomaticDestroyComponent';
@@ -30,10 +29,6 @@ export class ComponentRegistry {
             case BoundingBoxComponent.tag:
                 clazz = BoundingBoxComponent;
                 if (data !== undefined) assertType<Partial<BoundingBoxComponentData>>(data);
-                break;
-            case CollisionComponent.tag:
-                clazz = CollisionComponent;
-                if (data !== undefined) assertType<Partial<CollisionComponentData>>(data);
                 break;
             case PositionComponent.tag:
                 clazz = PositionComponent;
