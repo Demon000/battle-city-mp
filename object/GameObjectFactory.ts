@@ -30,7 +30,12 @@ export class GameObjectFactory {
             options.id = this.registry.generateId();
         }
 
-        const properties = this.config.get<GameObjectProperties>('game-object-properties', options.type);
+        let properties = this.config.find<GameObjectProperties>('game-object-properties', options.type);
+        if (properties === undefined) {
+            properties = {
+                type: options.type,
+            };
+        }
         let object;
 
         if (options.type === GameObjectType.TANK) {

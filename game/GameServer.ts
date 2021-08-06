@@ -96,6 +96,8 @@ export class GameServer {
         this.componentRegistry = new ComponentRegistry();
         this.registry = new Registry(this.registryIdGenerator, this.componentRegistry);
         this.entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.SERVER);
+        this.entityBlueprint.reloadBlueprintData();
+
         this.gameObjectFactory = new GameObjectFactory(this.registry, this.config, this.entityBlueprint);
 
         this.gameModeService = new GameModeService(this.config);
@@ -113,7 +115,7 @@ export class GameServer {
         this.tankService = new TankService(this.gameObjectRepository, this.gameObjectFactory);
         this.flagService = new FlagService(this.gameObjectRepository, this.gameObjectFactory, this.config);
         this.bulletService = new BulletService(this.gameObjectRepository, this.gameObjectFactory);
-        this.gameMapService = new GameMapService(this.config);
+        this.gameMapService = new GameMapService(this.config, this.entityBlueprint);
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.config, this.playerRepository);
         this.teamRepository = new MapRepository<string, Team>();

@@ -312,6 +312,7 @@ export class GameClient {
         this.config.clear();
         const configsData = serverStatus.configsData;
         this.config.setMultiple(configsData);
+        this.entityBlueprint.reloadBlueprintData();
 
         this.emitter.emit(GameClientEvent.CONFIG_CHANGED);
 

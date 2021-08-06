@@ -125,20 +125,21 @@ export class CollisionService {
     }
 
     private snapObjectToBoundingBoxEdge(
-        object: GameObject,
+        entity: Entity,
         position: Point,
         box: BoundingBox,
         direction: Direction,
     ): void {
+        const size = entity.getComponent(SizeComponent);
         switch (direction) {
             case Direction.UP:
                 position.y = box.br.y;
                 break;
             case Direction.RIGHT:
-                position.x = box.tl.x - object.width;
+                position.x = box.tl.x - size.width;
                 break;
             case Direction.DOWN:
-                position.y = box.tl.y - object.height;
+                position.y = box.tl.y - size.height;
                 break;
             case Direction.LEFT:
                 position.x = box.br.x;

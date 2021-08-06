@@ -14,6 +14,7 @@ import { Direction } from '@/physics/Direction';
 import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
 import { Point } from '@/physics/point/Point';
 import { PositionComponent } from '@/physics/point/PositionComponent';
+import { SizeComponent } from '@/physics/size/SizeComponent';
 import { Tank } from '@/tank/Tank';
 import { TankTier } from '@/tank/TankTier';
 import { GameObject } from './GameObject';
@@ -334,12 +335,13 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
 
                 const position = object.getComponent(PositionComponent);
                 const centerPosition = object.getComponent(CenterPositionComponent);
+                const size = object.getComponent(SizeComponent);
                 const direction = object.direction;
                 const offsetX = centerPosition.x - position.x;
                 let offsetY = 0;
                 let positionYReference: TextPositionReference | undefined = 'end';
                 if (direction === Direction.UP) {
-                    offsetY = object.height;
+                    offsetY = size.height;
                     positionYReference = undefined;
                 }
 

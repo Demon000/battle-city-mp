@@ -1,66 +1,5 @@
 {
-    'steel-wall': {
-        width: 8,
-        height: 8,
-        savable: true,
-    },
-    'bush': {
-        width: 8,
-        height: 8,
-        savable: true,
-    },
-    'player-spawn': {
-        width: 16,
-        height: 16,
-        savable: true,
-    },
-    'level-border': {
-        width: 16,
-        height: 16,
-        savable: true,
-    },
-    'ice': {
-        width: 8,
-        height: 8,
-        savable: true,
-    },
-    'sand': {
-        width: 8,
-        height: 8,
-        savable: true,
-    },
-    'grass': {
-        width: 8,
-        height: 8,
-        savable: true,
-    },
-    'dirt': {
-        width: 8,
-        height: 8,
-        savable: true,
-    },
-    'water': {
-        width: 8,
-        height: 8,
-        savable: true,
-    },
-    'brick-wall': {
-        width: 4,
-        height: 4,
-        savable: true,
-    },
-    'flag': {
-        width: 16,
-        height: 16,
-        savable: true,
-    },
-    'smoke': {
-        width: 0,
-        height: 0,
-    },
     'bullet': {
-        width: 2,
-        height: 2,
         audioEffects: [
             {
                 filename: 'shoot_bullet.wav',
@@ -68,8 +7,6 @@
         ],
     },
     'explosion': {
-        width: 0,
-        height: 0,
         audioEffects: [
             {
                 filename: 'destroy_tank.wav',
@@ -89,8 +26,6 @@
         ],
     },
     'tank': {
-        width: 16,
-        height: 16,
         tiers: {
             normal: {
                 maxSpeed: 114,

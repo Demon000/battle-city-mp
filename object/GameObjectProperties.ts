@@ -17,10 +17,5 @@ export interface AudioEffect {
 
 export interface GameObjectProperties {
     type: GameObjectType;
-
-    width: number;
-    height: number;
-    savable?: boolean;
-
     audioEffects?: AudioEffect[];
 }

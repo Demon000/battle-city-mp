@@ -1,14 +1,14 @@
 import fs from 'fs';
 import { GameObjectComponentsOptions, GameObjectOptions } from '@/object/GameObject';
-import { GameObjectProperties } from '@/object/GameObjectProperties';
 import { GameObjectType, isGameObjectType } from '@/object/GameObjectType';
 import { Team, TeamOptions } from '@/team/Team';
 import { Config } from '@/config/Config';
 import { Color } from '@/drawable/Color';
 import { PNG } from 'pngjs';
 import JSON5 from 'json5';
-import { PositionComponent } from '@/physics/point/PositionComponent';
 import { Point } from '@/physics/point/Point';
+import { EntityBlueprint } from '@/ecs/EntityBlueprint';
+import { SizeComponent } from '@/physics/size/SizeComponent';
 
 export interface GameMapOptions {
     name: string;
@@ -26,6 +26,7 @@ export class GameMap {
     constructor(
         private name: string,
         private config: Config,
+        private entityBlueprint: EntityBlueprint,
     ) {
         this.name = name;
         this.options = this.config.get('maps', name);
@@ -60,19 +61,6 @@ export class GameMap {
         }
 
         return type as GameObjectType;
-    }
-
-    getTypeObjectProperties(type: GameObjectType): GameObjectProperties {
-        const gameObjectsProperties = this.config
-            .getData<Record<GameObjectType, GameObjectProperties>>
-            ('game-object-properties');
-
-        const gameObjectProperties = gameObjectsProperties[type];
-        if (gameObjectsProperties === undefined) {
-            throw new Error(`Cannot get properties of invalid object type: ${type}`);
-        }
-
-        return gameObjectProperties;
     }
 
     getObjectsOptionsFromOptions(): GameObjectComponentsOptions[] {
@@ -128,17 +116,18 @@ export class GameMap {
                     const bigX = pngX * this.options.resolution;
                     const bigY = pngY * this.options.resolution;
                     const type = this.getColorGameObjectType([r, g, b]);
-                    const properties = this.getTypeObjectProperties(type);
+                    const size = this.entityBlueprint
+                        .getTypeComponentData(type, 'SizeComponent') as SizeComponent;
 
                     for (
                         let smallY = bigY;
                         smallY < bigY + resolution;
-                        smallY += properties.height
+                        smallY += size.height
                     ) {
                         for (
                             let smallX = bigX;
                             smallX < bigX + resolution;
-                            smallX += properties.width
+                            smallX += size.width
                         ) {
                             objectsOptionsComponents.push(
                                 [

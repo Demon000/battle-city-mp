@@ -1,4 +1,5 @@
 import { Config } from '@/config/Config';
+import { EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { GameMap } from './GameMap';
 
 export class GameMapService {
@@ -6,10 +7,11 @@ export class GameMapService {
 
     constructor(
         private config: Config,
+        private entityBlueprint: EntityBlueprint,
     ) {}
 
     loadByName(name: string): GameMap {
-        return this.map = new GameMap(name, this.config);
+        return this.map = new GameMap(name, this.config, this.entityBlueprint);
     }
 
     getLoadedMap(): GameMap | undefined {

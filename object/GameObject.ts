@@ -61,14 +61,6 @@ export class GameObject extends Entity {
         if (options.movementDirection !== undefined) this.movementDirection = options.movementDirection;
     }
 
-    get width(): number {
-        return this.properties.width;
-    }
-
-    get height(): number {
-        return this.properties.height;
-    }
-
     get direction(): Direction {
         return this._direction;
     }

@@ -8,6 +8,7 @@ import { DirectionUtils } from '@/physics/collisions/DirectionUtils';
 import { Direction } from '@/physics/Direction';
 import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
 import { PositionComponent } from '@/physics/point/PositionComponent';
+import { SizeComponent } from '@/physics/size/SizeComponent';
 import { Tank } from '@/tank/Tank';
 import { MapRepository } from '@/utils/MapRepository';
 import { Bullet, BulletOptions } from './Bullet';
@@ -40,8 +41,9 @@ export class BulletService {
         const brickWallCenterPosition =
             brickWall.getComponent(CenterPositionComponent);
 
-        const brickWallWidth = brickWall.width;
-        const brickWallHeight = brickWall.height;
+        const brickWallSize = brickWall.getComponent(SizeComponent);
+        const brickWallWidth = brickWallSize.width;
+        const brickWallHeight = brickWallSize.height;
         if (DirectionUtils.isHorizontalAxis(bullet.direction)) {
             if (bulletCenterPosition.y > brickWallCenterPosition.y) {
                 boundingBox.tl.y -= brickWallHeight;
@@ -91,9 +93,10 @@ export class BulletService {
             power: tank.bulletPower,
         } as BulletOptions);
 
+        const bulletSize = bullet.getComponent(SizeComponent);
         bullet.updateComponent(PositionComponent, {
-            x: centerPosition.x - bullet.width / 2,
-            y: centerPosition.y - bullet.height / 2,
+            x: centerPosition.x - bulletSize.width / 2,
+            y: centerPosition.y - bulletSize.height / 2,
         }, {
             silent: true,
         });

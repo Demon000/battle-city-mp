@@ -1,15 +1,29 @@
 import { Config } from '@/config/Config';
+import { assert } from '@/utils/assert';
 import { ComponentFlags } from './Component';
 import { Entity } from './Entity';
 import { RegistryOperationOptions } from './Registry';
 
-export interface BlueprintData {
+export interface BlueprintComponentsData {
     components?: Record<string, any>,
     localComponents?: Record<string, any>,
     clientComponents?: Record<string, any>,
     serverComponents?: Record<string, any>,
+}
+
+export interface BlueprintData extends BlueprintComponentsData {
     extends?: string[],
 }
+
+export type BlueprintComponentsKeys = keyof BlueprintComponentsData;
+export const blueprintComponentsKeys: BlueprintComponentsKeys[] = [
+    'components',
+    'localComponents',
+    'clientComponents',
+    'serverComponents',
+];
+
+export type BlueprintsData = Record<string, BlueprintData>;
 
 export enum BlueprintEnv {
     CLIENT,
@@ -17,26 +31,89 @@ export enum BlueprintEnv {
 }
 
 export class EntityBlueprint {
+    private blueprintsData?: BlueprintsData;
+
     constructor(
         private config: Config,
         private env: BlueprintEnv,
     ) {}
+
+    private addBlueprintData(
+        type: string,
+        target: BlueprintData,
+        firstLevel = false,
+    ) {
+        assert(this.blueprintsData !== undefined);
+
+        const blueprintData = this.blueprintsData[type];
+        assert(blueprintData !== undefined);
+
+        if (blueprintData.extends !== undefined) {
+            for (const extendedType of blueprintData.extends) {
+                this.addBlueprintData(extendedType, target);
+            }
+
+            delete blueprintData.extends;
+        }
+
+        if (firstLevel) {
+            return;
+        }
+
+        for (const key of blueprintComponentsKeys) {
+            if (!(key in target)) {
+                target[key] = {};
+            }
+
+            const blueprintComponentsData = blueprintData[key];
+            if (blueprintComponentsData === undefined) {
+                continue;
+            }
+
+            Object.assign(target[key], blueprintData[key]);
+        }
+    }
+
+    reloadBlueprintData(): void {
+        this.blueprintsData = this.config.getData<BlueprintsData>('entities-blueprint');
+
+        for (const [type, blueprintData] of Object.entries(this.blueprintsData)) {
+            this.addBlueprintData(type, blueprintData, true);
+        }
+    }
+
+    getTypeComponentData(type: string, tag: string): any {
+        assert(this.blueprintsData !== undefined);
+
+        const blueprintData = this.blueprintsData[type];
+        assert(blueprintData !== undefined);
+
+        for (const key of blueprintComponentsKeys) {
+            const componentsInitialization = blueprintData[key];
+            if (componentsInitialization === undefined) {
+                continue;
+            }
+
+            const componentData = componentsInitialization[tag];
+            if (componentData === undefined) {
+                continue;
+            }
+
+            return componentData;
+        }
+
+        assert(false);
+    }
 
     addComponents(
         type: string,
         entity: Entity,
         options?: RegistryOperationOptions,
     ): void {
-        const blueprintData = this.config.find<BlueprintData>('entities-blueprint', type);
-        if (blueprintData === undefined) {
-            return;
-        }
+        assert(this.blueprintsData !== undefined);
 
-        if (blueprintData.extends !== undefined) {
-            for (const extendedType of blueprintData.extends) {
-                this.addComponents(extendedType, entity, options);
-            }
-        }
+        const blueprintData = this.blueprintsData[type];
+        assert(blueprintData !== undefined);
 
         if (blueprintData.components !== undefined) {
             entity.upsertComponents(blueprintData.components, options);
