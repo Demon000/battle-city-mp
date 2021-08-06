@@ -32,7 +32,7 @@ export class BulletService {
     getBulletBrickWallDestroyBox(bulletId: number, brickWallId: number): BoundingBox {
         const bullet = this.getBullet(bulletId);
         const brickWall = this.repository.get(brickWallId);
-        const boundingBox = BoundingBoxUtils.clone(
+        const brickWallBoundingBox = BoundingBoxUtils.clone(
             brickWall.getComponent(BoundingBoxComponent),
         );
 
@@ -46,39 +46,39 @@ export class BulletService {
         const brickWallHeight = brickWallSize.height;
         if (DirectionUtils.isHorizontalAxis(bullet.direction)) {
             if (bulletCenterPosition.y > brickWallCenterPosition.y) {
-                boundingBox.tl.y -= brickWallHeight;
-                boundingBox.br.y += brickWallHeight * 2;
+                brickWallBoundingBox.tl.y -= brickWallHeight;
+                brickWallBoundingBox.br.y += brickWallHeight * 2;
             } else {
-                boundingBox.tl.y -= brickWallHeight * 2;
-                boundingBox.br.y += brickWallHeight;
+                brickWallBoundingBox.tl.y -= brickWallHeight * 2;
+                brickWallBoundingBox.br.y += brickWallHeight;
             }
 
             if (bullet.power === BulletPower.HEAVY) {
                 if (bullet.direction === Direction.RIGHT) {
-                    boundingBox.br.x += brickWallWidth;
+                    brickWallBoundingBox.br.x += brickWallWidth;
                 } else {
-                    boundingBox.tl.x -= brickWallWidth;
+                    brickWallBoundingBox.tl.x -= brickWallWidth;
                 }
             }
         } else {
             if (bulletCenterPosition.x > brickWallCenterPosition.x) {
-                boundingBox.tl.x -= brickWallWidth;
-                boundingBox.br.x += brickWallWidth * 2;
+                brickWallBoundingBox.tl.x -= brickWallWidth;
+                brickWallBoundingBox.br.x += brickWallWidth * 2;
             } else {
-                boundingBox.tl.x -= brickWallWidth * 2;
-                boundingBox.br.x += brickWallWidth;
+                brickWallBoundingBox.tl.x -= brickWallWidth * 2;
+                brickWallBoundingBox.br.x += brickWallWidth;
             }
 
             if (bullet.power === BulletPower.HEAVY) {
                 if (bullet.direction === Direction.DOWN) {
-                    boundingBox.br.y += brickWallHeight;
+                    brickWallBoundingBox.br.y += brickWallHeight;
                 } else {
-                    boundingBox.tl.y -= brickWallHeight;
+                    brickWallBoundingBox.tl.y -= brickWallHeight;
                 }
             }
         }
 
-        return boundingBox;
+        return brickWallBoundingBox;
     }
 
     createBulletForTank(tank: Tank): Bullet {
