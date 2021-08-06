@@ -43,7 +43,10 @@ export class EntityBlueprint {
         }
 
         if (blueprintData.localComponents !== undefined) {
-            entity.upsertComponents(blueprintData.localComponents, options);
+            entity.upsertComponents(blueprintData.localComponents, {
+                ...options,
+                flags: ComponentFlags.LOCAL_ONLY,
+            });
         }
 
         let components;
