@@ -54,7 +54,7 @@ export class EntityBlueprint {
 
         if (blueprintData.extends !== undefined) {
             for (const extendedType of blueprintData.extends) {
-                this.addEnvComponents(extendedType, entity);
+                this.addEnvComponents(extendedType, entity, options);
             }
         }
 
