@@ -1,3 +1,5 @@
+Error.stackTraceLimit = Infinity;
+
 import dotenv from 'dotenv';
 dotenv.config();
 
