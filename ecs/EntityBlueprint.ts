@@ -5,6 +5,7 @@ import { RegistryOperationOptions } from './Registry';
 
 export interface BlueprintData {
     components?: Record<string, any>,
+    localComponents?: Record<string, any>,
     clientComponents?: Record<string, any>,
     serverComponents?: Record<string, any>,
     extends?: string[],
@@ -21,7 +22,7 @@ export class EntityBlueprint {
         private env: BlueprintEnv,
     ) {}
 
-    private addCommonComponents(
+    addComponents(
         type: string,
         entity: Entity,
         options?: RegistryOperationOptions,
@@ -33,29 +34,16 @@ export class EntityBlueprint {
 
         if (blueprintData.extends !== undefined) {
             for (const extendedType of blueprintData.extends) {
-                this.addCommonComponents(extendedType, entity, options);
+                this.addComponents(extendedType, entity, options);
             }
         }
 
         if (blueprintData.components !== undefined) {
             entity.upsertComponents(blueprintData.components, options);
         }
-    }
 
-    private addEnvComponents(
-        type: string,
-        entity: Entity,
-        options?: RegistryOperationOptions,
-    ): void {
-        const blueprintData = this.config.find<BlueprintData>('entities-blueprint', type);
-        if (blueprintData === undefined) {
-            return;
-        }
-
-        if (blueprintData.extends !== undefined) {
-            for (const extendedType of blueprintData.extends) {
-                this.addEnvComponents(extendedType, entity, options);
-            }
+        if (blueprintData.localComponents !== undefined) {
+            entity.upsertComponents(blueprintData.localComponents, options);
         }
 
         let components;
@@ -71,14 +59,5 @@ export class EntityBlueprint {
                 flags: ComponentFlags.LOCAL_ONLY,
             });
         }
-    }
-
-    addComponents(
-        type: string,
-        entity: Entity,
-        options?: RegistryOperationOptions,
-    ): void {
-        this.addCommonComponents(type, entity, options);
-        this.addEnvComponents(type, entity, options);
     }
 }
