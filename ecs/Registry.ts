@@ -330,7 +330,7 @@ export class Registry {
 
     getEntityById(id: EntityId): Entity {
         const entity = this.findEntityById(id);
-        assert(entity !== undefined);
+        assert(entity !== undefined, `Entity with id ${id} is not registered`);
         return entity;
     }
 
