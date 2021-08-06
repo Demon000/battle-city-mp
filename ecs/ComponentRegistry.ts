@@ -14,6 +14,7 @@ import { IsUnderBushComponent, IsUnderBushComponentData } from '@/components/IsU
 import { CenterPositionComponent, CenterPositionComponentData } from '@/physics/point/CenterPositionComponent';
 import { DirtyBoundingBoxComponent, DirtyBoundingBoxComponentData } from '@/physics/bounding-box/DirtyBoundingBox';
 import { RequestedPositionComponent, RequestedPositionComponentData } from '@/physics/point/RequestedPositionComponent';
+import { DirtyCenterPositionComponent, DirtyCenterPositionComponentData } from '@/physics/point/DirtyCenterPositionComponent';
 
 export interface ProcessResults {
     clazz: ComponentClassType<any>;
@@ -80,6 +81,10 @@ export class ComponentRegistry {
             case RequestedPositionComponent.tag:
                 clazz = RequestedPositionComponent;
                 if (data !== undefined) assertType<Partial<RequestedPositionComponentData>>(data);
+                break;
+            case DirtyCenterPositionComponent.tag:
+                clazz = DirtyCenterPositionComponent;
+                if (data !== undefined) assertType<Partial<DirtyCenterPositionComponentData>>(data);
                 break;
             default:
                 throw new Error(`Invalid tag: ${tag}`);

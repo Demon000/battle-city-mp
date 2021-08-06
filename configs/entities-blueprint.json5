@@ -23,6 +23,7 @@
         },
         serverComponents: {
             CenterPositionComponent: {},
+            DirtyCenterPositionComponent: {},
         },
     },
     'steel-wall': {
@@ -38,6 +39,7 @@
         },
         serverComponents: {
             CenterPositionComponent: {},
+            DirtyCenterPositionComponent: {},
         },
     },
     'bush': {
@@ -131,6 +133,7 @@
         ],
         localComponents: {
             CenterPositionComponent: {},
+            DirtyCenterPositionComponent: {},
             SizeComponent: {
                 width: 2,
                 height: 2,
@@ -148,6 +151,7 @@
         },
         clientComponents: {
             CenterPositionComponent: {},
+            DirtyCenterPositionComponent: {},
         },
         serverComponents: {
             AutomaticDestroyComponent: {
@@ -211,6 +215,7 @@
                 height: 16,
             },
             CenterPositionComponent: {},
+            DirtyCenterPositionComponent: {},
         },
         serverComponents: {
             DirectionAxisSnappingComponent: {
