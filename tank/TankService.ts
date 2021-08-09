@@ -53,13 +53,16 @@ export class TankService {
     ): Tank {
         return this.gameObjectFactory.buildFromOptions({
             type: GameObjectType.TANK,
-            color,
-            playerId: player.id,
-            playerName: player.displayName,
-            teamId: player.teamId,
-            tier: player.requestedTankTier,
-        } as TankOptions, {
-            PositionComponent: position,
+            options: {
+                color,
+                playerId: player.id,
+                playerName: player.displayName,
+                teamId: player.teamId,
+                tier: player.requestedTankTier,
+            } as TankOptions,
+            components: {
+                PositionComponent: position,
+            },
         }) as Tank;
     }
 

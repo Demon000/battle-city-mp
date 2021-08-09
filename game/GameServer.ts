@@ -5,7 +5,7 @@ import { Color } from '@/drawable/Color';
 import { ExplosionOptions } from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { SameTeamBulletHitMode } from '@/game-mode/IGameModeProperties';
-import { GameObjectFactory } from '@/object/GameObjectFactory';
+import { GameObjectFactory, GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { CollisionTracker } from '@/physics/collisions/CollisionTracker';
 import { Direction } from '@/physics/Direction';
@@ -285,10 +285,14 @@ export class GameServer {
 
                 this.gameEventBatcher.addBroadcastEvent([
                     GameEvent.OBJECT_REGISTERED,
-                    object.toOptions(),
-                    object.getComponentsData({
-                        withoutFlags: ComponentFlags.LOCAL_ONLY,
-                    }),
+                    {
+                        type: object.type,
+                        subtypes: object.subtypes,
+                        options: object.toOptions(),
+                        components: object.getComponentsData({
+                            withoutFlags: ComponentFlags.LOCAL_ONLY,
+                        }),
+                    },
                 ]);
 
                 switch (object.type) {
@@ -356,8 +360,9 @@ export class GameServer {
                 const position = tank.getComponent(CenterPositionComponent);
                 const smoke = this.gameObjectFactory.buildFromOptions({
                     type: GameObjectType.SMOKE,
-                }, {
-                    PositionComponent: position,
+                    components: {
+                        PositionComponent: position,
+                    },
                 });
                 this.gameObjectService.registerObject(smoke);
             });
@@ -379,10 +384,13 @@ export class GameServer {
             const position = source.getComponent(CenterPositionComponent);
             const explosion = this.gameObjectFactory.buildFromOptions({
                 type: GameObjectType.EXPLOSION,
-                explosionType: type,
-                destroyedObjectType,
-            } as ExplosionOptions, {
-                PositionComponent: position,
+                options: {
+                    explosionType: type,
+                    destroyedObjectType,
+                } as ExplosionOptions,
+                components: {
+                    PositionComponent: position,
+                },
             });
             this.gameObjectService.registerObject(explosion);
         };
@@ -638,14 +646,16 @@ export class GameServer {
         const objectsOptions =
             LazyIterable.from(objects)
                 .map(object => {
-                    return [
-                        object.toOptions(),
-                        object.getComponentsData({
+                    return {
+                        type: object.type,
+                        subtypes: object.subtypes,
+                        options: object.toOptions(),
+                        components: object.getComponentsData({
                             withoutFlags: ComponentFlags.LOCAL_ONLY,
                         }),
-                    ];
+                    };
                 })
-                .toArray() as Iterable<[GameObjectOptions, ComponentsInitialization]>;
+                .toArray() as Iterable<GameObjectFactoryBuildOptions>;
 
         const players = this.playerService.getPlayers();
         const playersOptions =
@@ -773,8 +783,8 @@ export class GameServer {
     loadMap(gameMap: GameMap): void {
         const objectsOptions = gameMap.getObjectsOptions();
         const objects = objectsOptions
-            .filter(o => this.gameModeService.isIgnoredObjectType(o[0].type))
-            .map(o => this.gameObjectFactory.buildFromOptions(o[0], o[1]));
+            .filter(o => this.gameModeService.isIgnoredObjectType(o.type))
+            .map(o => this.gameObjectFactory.buildFromOptions(o));
         this.gameObjectService.registerObjects(objects);
 
         const teamsOptions = gameMap.getTeamsOptions();

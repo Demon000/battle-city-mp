@@ -11,7 +11,7 @@ import { Player, PartialPlayerOptions, PlayerOptions, PlayerSpawnStatus } from '
 import { PlayerService, PlayerServiceEvent } from '../player/PlayerService';
 import { GameObjectType } from '@/object/GameObjectType';
 import { GameServerStatus } from './GameServerStatus';
-import { GameObjectFactory } from '@/object/GameObjectFactory';
+import { GameObjectFactory, GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
 import EventEmitter from 'eventemitter3';
 import { Team } from '@/team/Team';
 import { TeamService, TeamServiceEvent } from '@/team/TeamService';
@@ -263,8 +263,8 @@ export class GameClient {
         }
     }
 
-    onObjectRegistered(objectOptions: GameObjectOptions, objectComponents: ComponentsInitialization): void {
-        const object = this.gameObjectFactory.buildFromOptions(objectOptions, objectComponents);
+    onObjectRegistered(buildOptions: GameObjectFactoryBuildOptions): void {
+        const object = this.gameObjectFactory.buildFromOptions(buildOptions);
         this.gameObjectService.registerObject(object);
     }
 
@@ -332,7 +332,7 @@ export class GameClient {
 
         const objects =
             LazyIterable.from(serverStatus.objectsOptions)
-                .map(([o, c]) => this.gameObjectFactory.buildFromOptions(o, c));
+                .map(o => this.gameObjectFactory.buildFromOptions(o));
         this.gameObjectService.registerObjects(objects);
 
         const visibleGameSize = this.config.get<number>('game-client', 'visibleGameSize');

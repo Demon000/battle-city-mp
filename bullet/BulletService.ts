@@ -89,14 +89,17 @@ export class BulletService {
         const direction = tank.getComponent(DirectionComponent);
         const bullet = this.gameObjectFactory.buildFromOptions({
             type: GameObjectType.BULLET,
-            movementDirection: direction.value,
-            movementSpeed: tank.bulletSpeed,
-            tankId: tank.id,
-            playerId: tank.playerId,
-            power: tank.bulletPower,
-        } as BulletOptions, {
-            DirectionComponent: direction,
-        });
+            options: {
+                movementDirection: direction.value,
+                movementSpeed: tank.bulletSpeed,
+                tankId: tank.id,
+                playerId: tank.playerId,
+                power: tank.bulletPower,
+            } as BulletOptions,
+            components: {
+                DirectionComponent: direction,
+            },
+        }) as Bullet;
 
         const bulletSize = bullet.getComponent(SizeComponent);
         bullet.updateComponent(PositionComponent, {
@@ -106,6 +109,6 @@ export class BulletService {
             silent: true,
         });
 
-        return bullet as Bullet;
+        return bullet;
     }
 }

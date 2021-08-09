@@ -1,14 +1,15 @@
 import fs from 'fs';
-import { GameObjectComponentsOptions, GameObjectOptions } from '@/object/GameObject';
-import { GameObjectType, isGameObjectType } from '@/object/GameObjectType';
+import { isGameObjectType } from '@/object/GameObjectType';
 import { Team, TeamOptions } from '@/team/Team';
 import { Config } from '@/config/Config';
 import { Color } from '@/drawable/Color';
 import { PNG } from 'pngjs';
 import JSON5 from 'json5';
-import { Point } from '@/physics/point/Point';
 import { EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { SizeComponent } from '@/physics/size/SizeComponent';
+import { GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
+import { Point } from '@/physics/point/Point';
+import { GameObjectOptions } from '@/object/GameObject';
 
 export interface GameMapOptions {
     name: string;
@@ -18,6 +19,10 @@ export interface GameMapOptions {
     colorsObjectTypesMap?: Record<string, Color>;
     objectTypesColorsMap?: Map<number, string>;
     teamsOptions?: TeamOptions[];
+}
+
+export interface LegacyGameObjectOptions extends GameObjectOptions {
+    position: Point;
 }
 
 export class GameMap {
@@ -63,7 +68,7 @@ export class GameMap {
         return type;
     }
 
-    getObjectsOptionsFromOptions(): GameObjectComponentsOptions[] {
+    getObjectsOptionsFromOptions(): GameObjectFactoryBuildOptions[] {
         if (this.options.objectsFromOptionsFile === undefined) {
             return [];
         }
@@ -71,15 +76,14 @@ export class GameMap {
         const filePath = this.getMapFilePath(this.options.objectsFromOptionsFile);
         const fileData = fs.readFileSync(filePath, 'utf8');
         const data = JSON5.parse(fileData).map(
-            (options: GameObjectComponentsOptions | GameObjectOptions  & {
-                position: Point,
-            }) => {
-                if (!Array.isArray(options)) {
-                    options = [options, {
+            (options: LegacyGameObjectOptions) => {
+                return {
+                    type: options.type,
+                    options: options,
+                    components: {
                         PositionComponent: options.position,
-                    }];
-                }
-                return options;
+                    },
+                };
             },
         );
         return data;
@@ -89,8 +93,8 @@ export class GameMap {
         return `./configs/maps/${this.name}/${fileName}`;
     }
 
-    getObjectsOptionsFromLayers(): GameObjectComponentsOptions[] {
-        const objectsOptionsComponents: GameObjectComponentsOptions[] = [];
+    getObjectsOptionsFromLayers(): GameObjectFactoryBuildOptions[] {
+        const objectsOptionsComponents: GameObjectFactoryBuildOptions[] = [];
 
         if (this.options.layerFiles === undefined
             || this.options.colorsObjectTypesMap === undefined) {
@@ -129,19 +133,15 @@ export class GameMap {
                             smallX < bigX + resolution;
                             smallX += size.width
                         ) {
-                            objectsOptionsComponents.push(
-                                [
-                                    {
-                                        type,
+                            objectsOptionsComponents.push({
+                                type,
+                                components: {
+                                    PositionComponent: {
+                                        y: smallY,
+                                        x: smallX,
                                     },
-                                    {
-                                        PositionComponent: {
-                                            y: smallY,
-                                            x: smallX,
-                                        },
-                                    },
-                                ],
-                            );
+                                }
+                            });
                         }
                     }
                 }
@@ -151,8 +151,8 @@ export class GameMap {
         return objectsOptionsComponents;
     }
 
-    getObjectsOptions(): GameObjectComponentsOptions[] {
-        let options: GameObjectComponentsOptions[] = [];
+    getObjectsOptions(): GameObjectFactoryBuildOptions[] {
+        let options: GameObjectFactoryBuildOptions[] = [];
 
         const objectsOptionsFromOptions = this.getObjectsOptionsFromOptions();
         options = options.concat(objectsOptionsFromOptions);

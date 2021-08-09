@@ -1,19 +1,16 @@
 import { Direction } from '../physics/Direction';
-import { GameObjectType } from './GameObjectType';
 import { AudioEffect, GameObjectProperties, ResourceMeta } from './GameObjectProperties';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 import { assert } from '@/utils/assert';
-import { ComponentsInitialization } from '@/ecs/Component';
 
 export interface GameObjectOptions {
     id?: number;
     type?: string;
+    subtypes?: string[];
     movementSpeed?: number;
     movementDirection?: Direction | null;
 }
-
-export type GameObjectComponentsOptions = [GameObjectOptions, ComponentsInitialization];
 
 export type PartialGameObjectOptions = Partial<GameObjectOptions>;
 
@@ -24,6 +21,7 @@ export class GameObject extends Entity {
 
     properties;
     type: string;
+    subtypes?: string[];
     movementDirection: Direction | null;
 
     graphicsRenderer?: any;
@@ -37,6 +35,7 @@ export class GameObject extends Entity {
 
         this.properties = properties;
         this.type = options.type;
+        this.subtypes = options.subtypes;
         this._movementSpeed = options.movementSpeed ?? 0;
         this.movementDirection = options.movementDirection ?? null;
         this.graphicsDirty = true;
@@ -45,7 +44,7 @@ export class GameObject extends Entity {
     toOptions(): GameObjectOptions {
         return {
             id: this.id,
-            type: this.type,
+            subtypes: this.subtypes,
             movementSpeed: this.movementSpeed,
             movementDirection: this.movementDirection,
         };

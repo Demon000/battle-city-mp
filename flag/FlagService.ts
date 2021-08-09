@@ -42,13 +42,16 @@ export class FlagService {
         const position = tank.getComponent(PositionComponent);
         return this.gameObjectFactory.buildFromOptions({
             type: GameObjectType.FLAG,
-            teamId: tank.flagTeamId,
-            color: tank.flagColor,
-            flagType: FlagType.POLE_ONLY,
-            sourceId: tank.flagSourceId,
-            droppedTankId: tank.id,
-        } as FlagOptions, {
-            PositionComponent: position,
+            options: {
+                teamId: tank.flagTeamId,
+                color: tank.flagColor,
+                flagType: FlagType.POLE_ONLY,
+                sourceId: tank.flagSourceId,
+                droppedTankId: tank.id,
+            } as FlagOptions,
+            components: {
+                PositionComponent: position,
+            },
         }) as Flag;
     }
 
