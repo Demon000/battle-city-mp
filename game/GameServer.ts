@@ -21,7 +21,7 @@ import EventEmitter from 'eventemitter3';
 import { Action, ActionType } from '../actions/Action';
 import { ButtonPressAction } from '../actions/ButtonPressAction';
 import { GameMapService } from '../maps/GameMapService';
-import { GameObject, GameObjectOptions, PartialGameObjectOptions } from '../object/GameObject';
+import { GameObject, PartialGameObjectOptions } from '../object/GameObject';
 import { GameObjectService, GameObjectServiceEvent } from '../object/GameObjectService';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
 import { rules } from '../physics/collisions/CollisionRules';
@@ -44,11 +44,10 @@ import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { GameMap } from '@/maps/GameMap';
 import { assert } from '@/utils/assert';
-import { Component, ComponentFlags, ComponentsInitialization } from '@/ecs/Component';
+import { Component, ComponentFlags } from '@/ecs/Component';
 import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
 import { PositionComponent } from '@/physics/point/PositionComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
-import { BoundingBoxComponent } from '@/physics/bounding-box/BoundingBoxComponent';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',

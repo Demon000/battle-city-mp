@@ -140,7 +140,7 @@ export class GameMap {
                                         y: smallY,
                                         x: smallX,
                                     },
-                                }
+                                },
                             });
                         }
                     }
