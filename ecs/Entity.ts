@@ -100,18 +100,16 @@ export class Entity {
     getComponentsData(options?: EntityComponentsOptions): ComponentsInitialization {
         const componentsInitialization: ComponentsInitialization = {};
         for (const [clazz, component] of this.tagComponentMap) {
-            if (options !== undefined) {
-                if (options.withFlags !== undefined
-                    && (component.flags & options.withFlags)
-                        !== options.withFlags) {
-                    continue;
-                }
+            if (options?.withFlags !== undefined
+                && (component.flags & options.withFlags)
+                    !== options.withFlags) {
+                continue;
+            }
 
-                if (options.withoutFlags !== undefined
-                    && (component.flags & options.withoutFlags)
-                        !== 0) {
-                    continue;
-                }
+            if (options?.withoutFlags !== undefined
+                && (component.flags & options.withoutFlags)
+                    !== 0) {
+                continue;
             }
             componentsInitialization[clazz.tag] = component.getData();
         }
