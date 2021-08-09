@@ -32,9 +32,18 @@ export class GameGraphicsService {
     private initializeContexts(): void {
         this.contexts = new Array<Context2D>();
 
-        for (const canvas of this.canvases) {
-            const context = CanvasUtils.getContext(canvas);
+        for (const [renderPass, canvas] of this.canvases.entries()) {
+            const options = {
+                alpha: true,
+            };
+
+            if (renderPass === 0) {
+                options.alpha = false;
+            }
+
+            const context = CanvasUtils.getContext(canvas, options);
             context.imageSmoothingEnabled = false;
+
             this.contexts.push(context);
         }
     }
@@ -100,8 +109,13 @@ export class GameGraphicsService {
     }
 
     initializeRender(point: Point): void {
-        for (const context of this.contexts) {
-            context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+        for (const [renderPass, context] of this.contexts.entries()) {
+            if (renderPass === 0) {
+                context.fillStyle = 'black';
+                context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+            } else {
+                context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+            }
         }
 
         this.canvasX = point.x - this.gameWidth / 2;
