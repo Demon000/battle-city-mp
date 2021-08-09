@@ -1,4 +1,3 @@
-import { GameObjectType } from '@/object/GameObjectType';
 import { Point } from '../point/Point';
 
 export enum CollisionResultEvent {
@@ -37,7 +36,7 @@ export type ICollisionResult = {
 };
 
 export interface ICollisionRule {
-    movingTypes: GameObjectType[];
-    staticTypes: GameObjectType[];
+    movingTypes: string[];
+    staticTypes: string[];
     result: ICollisionResult[];
 }

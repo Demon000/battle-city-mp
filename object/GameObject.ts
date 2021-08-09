@@ -8,7 +8,7 @@ import { ComponentsInitialization } from '@/ecs/Component';
 
 export interface GameObjectOptions {
     id?: number;
-    type?: GameObjectType;
+    type?: string;
     movementSpeed?: number;
     movementDirection?: Direction | null;
 }
@@ -23,7 +23,7 @@ export class GameObject extends Entity {
     graphicsDirty: boolean;
 
     properties;
-    type: GameObjectType;
+    type: string;
     movementDirection: Direction | null;
 
     graphicsRenderer?: any;

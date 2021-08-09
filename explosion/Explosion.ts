@@ -2,18 +2,17 @@ import { Registry } from '@/ecs/Registry';
 import { GameObject, GameObjectOptions } from '@/object/GameObject';
 import { GameObjectProperties } from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
-import { ExplosionType } from './ExplosionType';
 
 export interface ExplosionOptions extends GameObjectOptions {
-    explosionType: ExplosionType;
-    destroyedObjectType?: GameObjectType;
+    explosionType: string;
+    destroyedObjectType?: string;
 }
 
 export type PartialExplosionOptions = Partial<ExplosionOptions>;
 
 export class Explosion extends GameObject {
-    explosionType: ExplosionType;
-    destroyedObjectType?: GameObjectType;
+    explosionType: string;
+    destroyedObjectType?: string;
 
     constructor(options: ExplosionOptions, properties: GameObjectProperties, registry: Registry) {
         options.type = GameObjectType.EXPLOSION;

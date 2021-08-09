@@ -35,7 +35,7 @@ interface CollisionServiceEvents extends CollisionEvents {
 }
 
 export class CollisionService {
-    private rulesMap?: Map<GameObjectType, Map<GameObjectType, ICollisionRule>>;
+    private rulesMap?: Map<string, Map<string, ICollisionRule>>;
 
     emitter = new EventEmitter<CollisionServiceEvents>();
 
@@ -49,13 +49,13 @@ export class CollisionService {
         this.boundingBoxRepository = boundingBoxRepository;
 
         if (rules) {
-            this.rulesMap = new Map<GameObjectType, Map<GameObjectType, ICollisionRule>>();
+            this.rulesMap = new Map<string, Map<string, ICollisionRule>>();
 
             for (const rule of rules) {
                 for (const movingType of rule.movingTypes) {
                     let movingMap = this.rulesMap.get(movingType);
                     if (!movingMap) {
-                        movingMap = new Map<GameObjectType, ICollisionRule>();
+                        movingMap = new Map<string, ICollisionRule>();
                         this.rulesMap.set(movingType, movingMap);
                     }
             
@@ -67,7 +67,7 @@ export class CollisionService {
         }
     }
 
-    private getRule(movingType: GameObjectType, staticType: GameObjectType): ICollisionRule | undefined {
+    private getRule(movingType: string, staticType: string): ICollisionRule | undefined {
         if (!this.rulesMap) {
             throw new Error('getRule called but no rules supplied');
         }
@@ -336,7 +336,7 @@ export class CollisionService {
         }
     }
 
-    private isOverlappingWithType(entity: Entity, type: GameObjectType): boolean {
+    private isOverlappingWithType(entity: Entity, type: string): boolean {
         const boundingBox = entity.getComponent(BoundingBoxComponent);
         const overlappingObjectIds = this.getOverlappingObjects(boundingBox);
         const overlappingObjects = this.gameObjectRepository.getMultiple(overlappingObjectIds);

@@ -1,4 +1,3 @@
-import { BulletPower } from '@/bullet/BulletPower';
 import { Color } from '@/drawable/Color';
 import { Registry } from '@/ecs/Registry';
 import { GameObjectProperties } from '@/object/GameObjectProperties';
@@ -13,7 +12,7 @@ export interface TankTierProperties {
     bulletSpeed: number;
     maxBullets: number;
     bulletCooldown: number;
-    bulletPower: BulletPower;
+    bulletPower: string;
     sandMaxSpeedFactor: number;
     sandAccelerationFactor: number;
     sandDecelerationFactor: number;
@@ -182,7 +181,7 @@ export class Tank extends GameObject {
         return this.tierProperties.bulletSpeed + this.movementSpeed;
     }
 
-    get bulletPower(): BulletPower {
+    get bulletPower(): string {
         return this.tierProperties.bulletPower;
     }
 

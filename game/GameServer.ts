@@ -375,7 +375,7 @@ export class GameServer {
         /**
          * CollisionService event handlers
          */
-        const spawnExplosion = (source: GameObject, type: ExplosionType, destroyedObjectType?: GameObjectType) => {
+        const spawnExplosion = (source: GameObject, type: string, destroyedObjectType?: string) => {
             const position = source.getComponent(CenterPositionComponent);
             const explosion = this.gameObjectFactory.buildFromOptions({
                 type: GameObjectType.EXPLOSION,

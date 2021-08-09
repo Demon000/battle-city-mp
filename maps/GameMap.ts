@@ -49,7 +49,7 @@ export class GameMap {
         return color[0] << 16 | color[1] << 8 | color[2];
     }
 
-    getColorGameObjectType(color: Color): GameObjectType {
+    getColorGameObjectType(color: Color): string {
         if (this.options.objectTypesColorsMap  === undefined) {
             throw new Error('Cannot retrieve game object type of color when missing map');
         }
@@ -60,7 +60,7 @@ export class GameMap {
             throw new Error(`Cannot retrieve game object type for invalid color: ${color}`);
         }
 
-        return type as GameObjectType;
+        return type;
     }
 
     getObjectsOptionsFromOptions(): GameObjectComponentsOptions[] {

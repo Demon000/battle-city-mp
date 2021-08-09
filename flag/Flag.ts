@@ -13,7 +13,7 @@ export enum FlagType {
 export interface FlagOptions extends GameObjectOptions {
     teamId: string;
     color: Color;
-    flagType?: FlagType;
+    flagType?: string;
     sourceId?: number;
     droppedTankId?: number;
 }
@@ -21,7 +21,7 @@ export interface FlagOptions extends GameObjectOptions {
 export type PartialFlagOptions = Partial<FlagOptions>;
 
 export class Flag extends GameObject {
-    protected _flagType: FlagType;
+    protected _flagType: string;
 
     teamId: string;
     color: Color;
@@ -57,11 +57,11 @@ export class Flag extends GameObject {
         if (options.flagType !== undefined) this.flagType = options.flagType;
     }
 
-    get flagType(): FlagType {
+    get flagType(): string {
         return this._flagType;
     }
 
-    set flagType(type: FlagType) {
+    set flagType(type: string) {
         this._flagType = type;
         this.markGraphicsDirty();
     }

@@ -4,7 +4,7 @@ import { GameObjectProperties } from '@/object/GameObjectProperties';
 import { GameObjectType } from '@/object/GameObjectType';
 import { BulletPower } from './BulletPower';
 
-const bulletPowerToDamageMap = {
+const bulletPowerToDamageMap: Record<string, number> = {
     [BulletPower.LIGHT]: 1,
     [BulletPower.HEAVY]: 2,
 };
@@ -12,7 +12,7 @@ const bulletPowerToDamageMap = {
 export interface BulletOptions extends GameObjectOptions {
     tankId: number;
     playerId?: string;
-    power: BulletPower;
+    power: string;
 }
 
 export type PartialBulletOptions = Partial<BulletOptions>;
@@ -20,7 +20,7 @@ export type PartialBulletOptions = Partial<BulletOptions>;
 export class Bullet extends GameObject {
     tankId: number;
     playerId?: string;
-    power: BulletPower;
+    power: string;
     damage: number;
 
     constructor(options: BulletOptions, properties: GameObjectProperties, registry: Registry) {

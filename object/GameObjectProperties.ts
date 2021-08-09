@@ -1,5 +1,3 @@
-import { GameObjectType } from './GameObjectType';
-
 export type ResourceMeta = Record<string, any>;
 
 export enum AudioEffectLoadingState {
@@ -16,6 +14,6 @@ export interface AudioEffect {
 }
 
 export interface GameObjectProperties {
-    type: GameObjectType;
+    type: string;
     audioEffects?: AudioEffect[];
 }

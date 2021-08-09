@@ -38,7 +38,7 @@ const directionTest = (targetDirection: Direction): DrawableTestFunction => {
     };
 };
 
-const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
+const drawables: Partial<Record<string, IDrawable[]>> = {
     [GameObjectType.STEEL_WALL]: [
         new ImageDrawable('steel_wall.png', {
             renderPass: RenderPass.WALL,
@@ -458,7 +458,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             const drawables = [];
 
             const generateExplosionDrawableTests = (
-                type: ExplosionType,
+                type: string,
             ) => [
                 (object: GameObject): boolean => {
                     const explosion = object as Explosion;
@@ -472,7 +472,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
             ];
 
             const generateExplosionDrawableFrame = (
-                type: ExplosionType,
+                type: string,
                 frame: number,
             ) => new ImageDrawable(`explosion_${type}_${frame}.png`);
 
@@ -516,7 +516,7 @@ const drawables: Partial<Record<GameObjectType, IDrawable[]>> = {
 };
 
 export class GameObjectDrawables {
-    static getTypeDrawables(type: GameObjectType): IDrawable[] | undefined {
+    static getTypeDrawables(type: string): IDrawable[] | undefined {
         return drawables[type];
     }
 }
