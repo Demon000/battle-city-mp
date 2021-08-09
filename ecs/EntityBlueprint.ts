@@ -43,10 +43,12 @@ export class EntityBlueprint {
         target: BlueprintData,
         firstLevel = false,
     ) {
-        assert(this.blueprintsData !== undefined);
+        assert(this.blueprintsData !== undefined,
+            'Blueprints data is missing');
 
         const blueprintData = this.blueprintsData[type];
-        assert(blueprintData !== undefined);
+        assert(blueprintData !== undefined,
+            `Blueprint data for '${type}' does not exist`);
 
         if (blueprintData.extends !== undefined) {
             for (const extendedType of blueprintData.extends) {
@@ -83,10 +85,12 @@ export class EntityBlueprint {
     }
 
     getTypeComponentData(type: string, tag: string): any {
-        assert(this.blueprintsData !== undefined);
+        assert(this.blueprintsData !== undefined,
+            'Blueprints data is missing');
 
         const blueprintData = this.blueprintsData[type];
-        assert(blueprintData !== undefined);
+        assert(blueprintData !== undefined,
+            `Blueprint data for '${type}' does not exist`);
 
         for (const key of blueprintComponentsKeys) {
             const componentsInitialization = blueprintData[key];
@@ -102,7 +106,8 @@ export class EntityBlueprint {
             return componentData;
         }
 
-        assert(false);
+        assert(false,
+            `Blueprint data for '${type}' and component '${tag}' does not exist`);
     }
 
     addComponents(
@@ -110,10 +115,12 @@ export class EntityBlueprint {
         entity: Entity,
         options?: RegistryOperationOptions,
     ): void {
-        assert(this.blueprintsData !== undefined);
+        assert(this.blueprintsData !== undefined,
+            'Blueprints data is missing');
 
         const blueprintData = this.blueprintsData[type];
-        assert(blueprintData !== undefined);
+        assert(blueprintData !== undefined,
+            `Blueprint data for '${type}' does not exist`);
 
         if (blueprintData.components !== undefined) {
             entity.upsertComponents(blueprintData.components, options);
