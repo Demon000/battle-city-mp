@@ -14,7 +14,7 @@ export class MapRepository<K, V> {
     get(key: K): V {
         const value = this.map.get(key);
         if (value === undefined) {
-            throw new Error('Map does not contain the given key');
+            throw new Error(`Map does not contain the '${key}' key`);
         }
 
         return value;

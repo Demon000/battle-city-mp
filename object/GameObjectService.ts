@@ -94,9 +94,10 @@ export class GameObjectService {
         }
     }
 
-    setObjectDestroyed(objectId: number): void {
-        const object = this.repository.get(objectId);
-        object.upsertComponent(DestroyedComponent);
+    markDestroyed(entity: Entity): void {
+        entity.upsertComponent(DestroyedComponent, undefined, {
+            flags: ComponentFlags.LOCAL_ONLY,
+        });
     }
 
     updateObject(objectId: number, objectOptions: PartialGameObjectOptions): void {
@@ -211,7 +212,9 @@ export class GameObjectService {
             const spawnTime =
                 entity.getComponent(SpawnTimeComponent).value;
             if (Date.now() - spawnTime > automaticDestroyTimeMs) {
-                entity.addComponent(DestroyedComponent);
+                entity.upsertComponent(DestroyedComponent, undefined, {
+                    flags: ComponentFlags.LOCAL_ONLY,
+                });
             }
         }
     }
@@ -230,8 +233,8 @@ export class GameObjectService {
         }
     }
 
-    markObjectsDirtyCenterPosition(entity: Entity): void {
-        if (!entity.hasComponent(DirtyCenterPositionComponent)) {
+    markDirtyCenterPosition(entity: Entity): void {
+        if (!entity.hasComponent(CenterPositionComponent)) {
             return;
         }
 
@@ -242,6 +245,8 @@ export class GameObjectService {
 
     processObjectsDirtyCenterPosition(): void {
         for (const component of this.registry.getComponents(DirtyCenterPositionComponent)) {
+            component.remove();
+
             const entity = component.entity;
             const centerPosition = entity.getComponent(CenterPositionComponent);
             const position = entity.getComponent(PositionComponent);

@@ -32,6 +32,7 @@ import { ComponentsInitialization } from '@/ecs/Component';
 import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
 import { PositionComponent } from '@/physics/point/PositionComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
+import { EntityId } from '@/ecs/EntityId';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -154,15 +155,15 @@ export class GameClient {
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
                 (component) => {
                     const entity = component.entity;
-                    this.collisionService.markBoundingBoxNeedsUpdate(entity);
-                    this.gameObjectService.markObjectsDirtyCenterPosition(entity);
+                    this.collisionService.markDirtyBoundingBox(entity);
+                    this.gameObjectService.markDirtyCenterPosition(entity);
                 });
         this.registry.componentEmitter(SizeComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
                 (component) => {
                     const entity = component.entity;
-                    this.collisionService.markBoundingBoxNeedsUpdate(entity);
-                    this.gameObjectService.markObjectsDirtyCenterPosition(entity);
+                    this.collisionService.markDirtyBoundingBox(entity);
+                    this.gameObjectService.markDirtyCenterPosition(entity);
                 });
 
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REGISTERED,
@@ -173,7 +174,6 @@ export class GameClient {
             (objectId: number) => {
                 const object = this.gameObjectService.getObject(objectId);
                 this.gameAudioService.stopAudioPlayback(object);
-                this.collisionService.unregisterObjectCollisions(objectId);
                 this.registry.destroyEntity(object);
             });
 
@@ -268,8 +268,9 @@ export class GameClient {
         this.gameObjectService.registerObject(object);
     }
 
-    onObjectUnregistered(objectId: number): void {
-        this.gameObjectService.unregisterObject(objectId);
+    onObjectUnregistered(entityId: EntityId): void {
+        const entity = this.registry.getEntityById(entityId);
+        this.gameObjectService.markDestroyed(entity);
     }
 
     onEntityComponentAdded(entityId: number, tag: string, data: any): void {
@@ -342,6 +343,8 @@ export class GameClient {
     }
 
     onTick(): void {
+        this.collisionService.processObjectsDestroyedBoundingBox();
+        this.gameObjectService.processObjectsDestroyed();
         this.gameObjectService.processObjectsIsMoving();
         this.gameObjectService.processObjectsDirtyCenterPosition();
         this.collisionService.processObjectsDirtyBoundingBox();

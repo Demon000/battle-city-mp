@@ -7,6 +7,7 @@ import { Registry } from '@/ecs/Registry';
 import { GameObject } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 import { MapRepository } from '@/utils/MapRepository';
+import { QueryObject, QueryObjectOperationType } from '@/utils/QueryObject';
 import EventEmitter from 'eventemitter3';
 import { BoundingBox } from '../bounding-box/BoundingBox';
 import { BoundingBoxComponent } from '../bounding-box/BoundingBoxComponent';
@@ -77,20 +78,6 @@ export class CollisionService {
         }
 
         return movingMap.get(staticType);
-    }
-
-    registerObjectCollisions(entity: Entity): void {
-        const boundingBox = entity.getComponent(BoundingBoxComponent);
-        this.boundingBoxRepository.addBoxValue(entity.id, boundingBox);
-    }
-
-    updateObjectCollisions(entity: Entity): void {
-        const box = entity.getComponent(BoundingBoxComponent);
-        this.boundingBoxRepository.updateBoxValue(entity.id, box);
-    }
-
-    unregisterObjectCollisions(objectId: number): void {
-        this.boundingBoxRepository.removeValue(objectId);
     }
 
     getOverlappingObjects(box: BoundingBox): Iterable<number> {
@@ -377,7 +364,7 @@ export class CollisionService {
         }
     }
 
-    markBoundingBoxNeedsUpdate(entity: Entity): void {
+    markDirtyBoundingBox(entity: Entity): void {
         if (!entity.hasComponent(BoundingBoxComponent)) {
             return;
         }
@@ -420,6 +407,26 @@ export class CollisionService {
                 this.boundingBoxRepository.updateBoxValue(entity.id, boundingBox);
             } else {
                 this.boundingBoxRepository.addBoxValue(entity.id, boundingBox);
+            }
+        }
+    }
+
+    processObjectsDestroyedBoundingBox(): void {
+        const destroyedEntities =
+            this.registry.getEntitiesWithComponent(DestroyedComponent);
+        const boundingBoxEntities =
+            this.registry.getEntitiesWithComponent(BoundingBoxComponent);
+        const entities = QueryObject.eval({
+            operation: QueryObjectOperationType.AND,
+            data: [
+                destroyedEntities,
+                boundingBoxEntities,
+            ],
+        });
+
+        for (const entity of entities) {
+            if (this.boundingBoxRepository.hasNode(entity.id)) {
+                this.boundingBoxRepository.removeValue(entity.id);
             }
         }
     }
