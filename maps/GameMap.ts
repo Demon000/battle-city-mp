@@ -80,7 +80,7 @@ export class GameMap {
                     }];
                 }
                 return options;
-            }
+            },
         );
         return data;
     }
@@ -138,7 +138,7 @@ export class GameMap {
                                         PositionComponent: {
                                             y: smallY,
                                             x: smallX,
-                                        }
+                                        },
                                     },
                                 ],
                             );
