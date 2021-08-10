@@ -336,7 +336,7 @@ export class GameClient {
     onTick(): void {
         this.collisionService.processObjectsDestroyedBoundingBox();
         this.gameObjectService.processObjectsDestroyed();
-        this.gameObjectService.processObjectsIsMoving();
+        this.gameObjectService.processObjectsDirtyIsMoving();
         this.gameObjectService.processObjectsDirtyCenterPosition();
         this.collisionService.processObjectsDirtyBoundingBox();
         this.collisionService.processObjectsIsUnderBush();

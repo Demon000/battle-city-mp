@@ -1,13 +1,14 @@
 import { AutomaticDestroyComponent } from '@/components/AutomaticDestroyComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
+import { DirtyIsMovingComponent } from '@/components/DirtyIsMovingComponent';
 import { IsMovingComponent } from '@/components/IsMovingComponent';
+import { IsMovingTrackingComponent } from '@/components/IsMovingTrackingComponent';
 import { SpawnComponent } from '@/components/SpawnComponent';
 import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
 import { ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 import { DirectionComponent } from '@/physics/DirectionComponent';
-import { MoveableComponent } from '@/physics/MoveableComponent';
 import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
 import { DirtyCenterPositionComponent } from '@/physics/point/DirtyCenterPositionComponent';
 import { PositionComponent } from '@/physics/point/PositionComponent';
@@ -45,19 +46,37 @@ export class GameObjectService {
         });
     }
 
+    markDirtyIsMoving(entity: Entity): void {
+        if (!entity.hasComponent(IsMovingTrackingComponent)) {
+            return;
+        }
+
+        entity.upsertComponent(DirtyIsMovingComponent, undefined, {
+            flags: ComponentFlags.LOCAL_ONLY,
+        });
+    }
+
     updateObject(objectId: number, objectOptions: PartialGameObjectOptions): void {
         const object = this.registry.getEntityById(objectId) as GameObject;
         object.setOptions(objectOptions);
+
+        if (objectOptions.movementDirection !== undefined
+            || objectOptions.movementSpeed !== undefined) {
+            this.markDirtyIsMoving(object);
+        }
+
         this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, objectOptions);
     }
 
     setObjectMovementDirection(objectId: number, direction: Direction | null): void {
         const object = this.registry.getEntityById(objectId) as GameObject;
+        if (object.movementDirection === direction) {
+            return;
+        }
+
         object.movementDirection = direction;
 
-        if (object.movementDirection !== null) {
-            object.upsertComponent(MoveableComponent);
-        }
+        this.markDirtyIsMoving(object);
 
         this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
             movementDirection: direction,
@@ -108,11 +127,7 @@ export class GameObjectService {
         if (object.movementSpeed !== newMovementSpeed) {
             object.movementSpeed = newMovementSpeed;
 
-            if (newMovementSpeed === 0 && object.movementDirection === null) {
-                object.removeComponentIfExists(MoveableComponent);
-            } else {
-                object.upsertComponent(MoveableComponent);
-            }
+            this.markDirtyIsMoving(object);
 
             this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
                 movementSpeed: newMovementSpeed,
@@ -163,17 +178,22 @@ export class GameObjectService {
         }
     }
 
-    processObjectsIsMoving(): void {
-        for (const component of this.registry.getComponents(IsMovingComponent)) {
-            const object = component.entity as GameObject;
-            const isMoving = object.movementSpeed > 0;
-            if (component.value === isMoving) {
-                continue;
-            }
+    processObjectsDirtyIsMoving(): void {
+        for (const component of this.registry.getComponents(DirtyIsMovingComponent)) {
+            component.remove();
 
-            component.update({
-                value: isMoving,
-            });
+            const entity = component.entity;
+            const isMovingComponent = entity.findComponent(IsMovingComponent);
+            const object = entity as GameObject;
+            const isMoving = object.movementSpeed > 0
+                || object.movementDirection !== null;
+            if (isMoving && isMovingComponent === undefined) {
+                entity.addComponent(IsMovingComponent, undefined, {
+                    flags: ComponentFlags.LOCAL_ONLY,
+                });
+            } else if (!isMoving && isMovingComponent !== undefined) {
+                entity.removeComponent(IsMovingComponent);
+            }
         }
     }
 
@@ -210,14 +230,14 @@ export class GameObjectService {
     }
 
     processObjectsDirection(): void {
-        for (const entity of this.registry.getEntitiesWithComponent(MoveableComponent)) {
+        for (const entity of this.registry.getEntitiesWithComponent(IsMovingComponent)) {
             const object = entity as GameObject;
             this.processObjectDirection(object);
         }
     }
 
     processObjectsPosition(delta: number): void {
-        for (const entity of this.registry.getEntitiesWithComponent(MoveableComponent)) {
+        for (const entity of this.registry.getEntitiesWithComponent(IsMovingComponent)) {
             const object = entity as GameObject;
             this.processObjectMovement(object, delta);
         }

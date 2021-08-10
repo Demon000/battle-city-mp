@@ -144,9 +144,8 @@
                 width: 2,
                 height: 2,
             },
-        },
-        serverComponents: {
-            MoveableComponent: {},
+            IsMovingComponent: {},
+            IsMovingTrackingComponent: {},
         },
     },
     'explosion': {
@@ -228,16 +227,15 @@
             },
             CenterPositionComponent: {},
             DirtyCenterPositionComponent: {},
+            IsMovingTrackingComponent: {},
         },
         serverComponents: {
-            MoveableComponent: {},
             TankComponent: {},
             DirectionAxisSnappingComponent: {
                 value: 4,
             },
         },
         clientComponents: {
-            IsMovingComponent: {},
             IsUnderBushComponent: {},
             GraphicDependenciesComponent: {
                 components: {

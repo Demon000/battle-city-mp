@@ -19,7 +19,7 @@ import { DirectionComponent, DirectionComponentData } from '@/physics/DirectionC
 import { RequestedDirectionComponent, RequestedDirectionComponentData } from '@/physics/RequestedDirectionComponent';
 import { TankComponent, TankComponentData } from '@/tank/TankComponent';
 import { SpawnComponent, SpawnComponentData } from '@/components/SpawnComponent';
-import { MoveableComponent, MoveableComponentData } from '@/physics/MoveableComponent';
+import { IsMovingTrackingComponent, IsMovingTrackingComponentData } from '@/components/IsMovingTrackingComponent';
 
 export interface ProcessResults {
     clazz: ComponentClassType<any>;
@@ -107,9 +107,9 @@ export class ComponentRegistry {
                 clazz = SpawnComponent;
                 if (data !== undefined) assertType<Partial<SpawnComponentData>>(data);
                 break;
-            case MoveableComponent.tag:
-                clazz = MoveableComponent;
-                if (data !== undefined) assertType<Partial<MoveableComponentData>>(data);
+            case IsMovingTrackingComponent.tag:
+                clazz = IsMovingTrackingComponent;
+                if (data !== undefined) assertType<Partial<IsMovingTrackingComponentData>>(data);
                 break;
             default:
                 assert(false, `Invalid tag '${tag}'`);

@@ -226,8 +226,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                     directionTest(direction),
                     (object: GameObject): boolean => {
                         const tank = object as Tank;
-                        const isMoving =
-                            tank.getComponent(IsMovingComponent).value;
+                        const isMoving = tank.hasComponent(IsMovingComponent);
 
                         if (isMoving !== targetIsMoving) {
                             return false;

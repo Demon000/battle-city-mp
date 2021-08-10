@@ -553,6 +553,7 @@ export class GameServer {
                 this.collisionService.processObjectsRequestedDirection();
                 this.gameObjectService.processObjectsPosition(deltaSeconds);
                 this.collisionService.processObjectsRequestedPosition();
+                this.gameObjectService.processObjectsDirtyIsMoving();
                 this.gameObjectService.processObjectsDirtyCenterPosition();
                 this.collisionService.processObjectsDirtyBoundingBox();
                 this.timeService.decreaseRoundTime(deltaSeconds);

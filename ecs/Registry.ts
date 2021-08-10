@@ -113,6 +113,7 @@ export class Registry {
 
     destroyEntity(entity: Entity): void {
         entity.removeComponents();
+
         const entityIdExists = this.idsEntityMap.has(entity.id);
         assert(entityIdExists);
 
