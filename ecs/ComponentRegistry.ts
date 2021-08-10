@@ -17,6 +17,9 @@ import { RequestedPositionComponent, RequestedPositionComponentData } from '@/ph
 import { DirtyCenterPositionComponent, DirtyCenterPositionComponentData } from '@/physics/point/DirtyCenterPositionComponent';
 import { DirectionComponent, DirectionComponentData } from '@/physics/DirectionComponent';
 import { RequestedDirectionComponent, RequestedDirectionComponentData } from '@/physics/RequestedDirectionComponent';
+import { TankComponent, TankComponentData } from '@/tank/TankComponent';
+import { SpawnComponent, SpawnComponentData } from '@/components/SpawnComponent';
+import { MoveableComponent, MoveableComponentData } from '@/physics/MoveableComponent';
 
 export interface ProcessResults {
     clazz: ComponentClassType<any>;
@@ -95,6 +98,18 @@ export class ComponentRegistry {
             case RequestedDirectionComponent.tag:
                 clazz = RequestedDirectionComponent;
                 if (data !== undefined) assertType<Partial<RequestedDirectionComponentData>>(data);
+                break;
+            case TankComponent.tag:
+                clazz = TankComponent;
+                if (data !== undefined) assertType<Partial<TankComponentData>>(data);
+                break;
+            case SpawnComponent.tag:
+                clazz = SpawnComponent;
+                if (data !== undefined) assertType<Partial<SpawnComponentData>>(data);
+                break;
+            case MoveableComponent.tag:
+                clazz = MoveableComponent;
+                if (data !== undefined) assertType<Partial<MoveableComponentData>>(data);
                 break;
             default:
                 throw new Error(`Invalid tag: ${tag}`);

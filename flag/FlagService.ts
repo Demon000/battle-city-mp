@@ -1,11 +1,10 @@
 import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
 import { Config } from '@/config/Config';
-import { GameObject } from '@/object/GameObject';
+import { Registry } from '@/ecs/Registry';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { PositionComponent } from '@/physics/point/PositionComponent';
 import { Tank } from '@/tank/Tank';
-import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import { Flag, FlagOptions, FlagType, PartialFlagOptions } from './Flag';
 
@@ -29,8 +28,8 @@ export class FlagService {
     emitter = new EventEmitter<FlagServiceEvents>();
 
     constructor(
-        private repository: MapRepository<number, GameObject>,
         private gameObjectFactory: GameObjectFactory,
+        private registry: Registry,
         private config: Config,
     ) {}
 
@@ -55,17 +54,8 @@ export class FlagService {
         }) as Flag;
     }
 
-    getFlag(flagId: number): Flag {
-        const object = this.repository.get(flagId);
-        if (object.type !== GameObjectType.FLAG) {
-            throw new Error('Game object type is not flag');
-        }
-
-        return object as Flag;
-    }
-
     setFlagType(flagId: number, type: FlagType): void {
-        const flag = this.getFlag(flagId);
+        const flag = this.registry.getEntityById(flagId) as Flag;
         flag.flagType  = type;
 
         this.emitter.emit(FlagServiceEvent.FLAG_UPDATED, flagId, {

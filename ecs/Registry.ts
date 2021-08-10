@@ -10,6 +10,7 @@ import { LazyIterable } from '@/utils/LazyIterable';
 export enum RegistryEvent {
     ENTITY_REGISTERED = 'entity-registered',
     ENTITY_BEFORE_DESTROY = 'entity-before-destroy',
+    ENTITY_DESTROYED = 'entity-destroyed',
 }
 
 export enum RegistryComponentEvent {
@@ -28,6 +29,7 @@ export interface RegistryOperationOptions {
 export interface RegistryEvents {
     [RegistryEvent.ENTITY_REGISTERED]: (entity: Entity) => void;
     [RegistryEvent.ENTITY_BEFORE_DESTROY]: (entity: Entity) => void;
+    [RegistryEvent.ENTITY_DESTROYED]: (entity: Entity) => void;
 }
 
 export interface RegistryComponentEvents {
@@ -99,20 +101,14 @@ export class Registry {
         this.emitter.emit(RegistryEvent.ENTITY_REGISTERED, entity);
     }
 
-    generateId(): EntityId {
-        return this.idGenerator.generate();
+    registerEntities(entities: Iterable<Entity>): void {
+        for (const entity of entities) {
+            this.registerEntity(entity);
+        }
     }
 
-    createEntity(components?: ComponentsInitialization): Entity {
-        const id = this.generateId();
-        const entity = new Entity(id, this);
-        this.registerEntity(entity);
-
-        if (components !== undefined) {
-            this.addComponents(entity, components);
-        }
-
-        return entity;
+    generateId(): EntityId {
+        return this.idGenerator.generate();
     }
 
     destroyEntity(entity: Entity): void {
@@ -125,6 +121,14 @@ export class Registry {
         const entityIdExisted = this.idsEntityMap.delete(entity.id);
         assert(entityIdExisted);
 
+        this.emitter.emit(RegistryEvent.ENTITY_DESTROYED, entity);
+    }
+
+    destroyAllEntities(): void {
+        const entities = this.getEntities();
+        for (const entity of entities) {
+            this.destroyEntity(entity);
+        }
     }
 
     private getOrCreateComponentTypeSet<C extends Component<C>>(
@@ -274,7 +278,7 @@ export class Registry {
             this.upsertComponent, options);
     }
 
-    removeEntityComponent<C extends Component<C>>(
+    private removeEntityComponent<C extends Component<C>>(
         entity: Entity,
         clazz: ComponentClassType<C>,
         options?: RegistryOperationOptions,
@@ -324,6 +328,16 @@ export class Registry {
         return this.removeEntityComponent(component.entity, component.clazz, options);
     }
 
+    removeComponentIfExists<C extends Component<C>>(
+        component: C,
+        options?: RegistryOperationOptions,
+    ): C | undefined {
+        return this.removeEntityComponent(component.entity, component.clazz, {
+            ...options,
+            optional: true,
+        });
+    }
+
     findEntityById(id: EntityId): Entity | undefined {
         return this.idsEntityMap.get(id);
     }
@@ -332,6 +346,11 @@ export class Registry {
         const entity = this.findEntityById(id);
         assert(entity !== undefined, `Entity with id ${id} is not registered`);
         return entity;
+    }
+
+    getMultipleEntitiesById(ids: Iterable<EntityId>): Iterable<Entity> {
+        return LazyIterable.from(ids)
+            .map(id => this.getEntityById(id));
     }
 
     getEntities(): Iterable<Entity> {

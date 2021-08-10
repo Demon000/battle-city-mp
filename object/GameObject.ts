@@ -31,7 +31,7 @@ export class GameObject extends Entity {
         assert(options.type !== undefined, 'Cannot construct object without a type');
         assert(options.id !== undefined, 'Cannot construct object without an id');
 
-        super(options.id, registry);
+        super(registry, options.id, options.type, options.subtypes);
 
         this.properties = properties;
         this.type = options.type;

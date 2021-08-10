@@ -33,7 +33,7 @@ import { PlayerService, PlayerServiceEvent } from '../player/PlayerService';
 import { BroadcastBatchGameEvent, CommonBatchGameEvent, GameEntityComponentEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
 import { GameEventBatcher, GameEventBatcherEvent } from './GameEventBatcher';
 import { GameModeService } from '@/game-mode/GameModeService';
-import { Registry, RegistryComponentEvent } from '@/ecs/Registry';
+import { Registry, RegistryComponentEvent, RegistryEvent } from '@/ecs/Registry';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
@@ -48,6 +48,7 @@ import { Component, ComponentFlags } from '@/ecs/Component';
 import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
 import { PositionComponent } from '@/physics/point/PositionComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
+import { Entity } from '@/ecs/Entity';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -71,8 +72,6 @@ export class GameServer {
     private gameMapService;
     private playerRepository;
     private playerService;
-    private gameObjectRepository;
-    private movingGameObjectRepository;
     private gameObjectService;
     private tankService;
     private flagService;
@@ -101,20 +100,17 @@ export class GameServer {
         this.gameObjectFactory = new GameObjectFactory(this.registry, this.config, this.entityBlueprint);
 
         this.gameModeService = new GameModeService(this.config);
-        this.gameObjectRepository = new MapRepository<number, GameObject>();
-        this.movingGameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
         this.collisionRules = rules;
-        this.collisionService = new CollisionService(this.gameObjectRepository,
-            this.boundingBoxRepository, this.registry, this.collisionRules);
-        this.gameObjectService = new GameObjectService(
-            this.gameObjectRepository,
+        this.collisionService = new CollisionService(
+            this.boundingBoxRepository,
             this.registry,
-            this.movingGameObjectRepository,
+            this.collisionRules,
         );
-        this.tankService = new TankService(this.gameObjectRepository, this.gameObjectFactory);
-        this.flagService = new FlagService(this.gameObjectRepository, this.gameObjectFactory, this.config);
-        this.bulletService = new BulletService(this.gameObjectRepository, this.gameObjectFactory);
+        this.gameObjectService = new GameObjectService(this.registry);
+        this.tankService = new TankService(this.gameObjectFactory, this.registry);
+        this.flagService = new FlagService(this.gameObjectFactory, this.registry, this.config);
+        this.bulletService = new BulletService(this.gameObjectFactory, this.registry);
         this.gameMapService = new GameMapService(this.config, this.entityBlueprint);
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.config, this.playerRepository);
@@ -129,6 +125,62 @@ export class GameServer {
         /**
          * Registry event handlers
          */
+        this.registry.emitter.on(RegistryEvent.ENTITY_REGISTERED,
+            (entity: Entity) => {
+                const object = entity as GameObject;
+                this.gameEventBatcher.addBroadcastEvent([
+                    GameEvent.OBJECT_REGISTERED,
+                    {
+                        type: object.type,
+                        subtypes: object.subtypes,
+                        options: object.toOptions(),
+                        components: object.getComponentsData({
+                            withoutFlags: ComponentFlags.LOCAL_ONLY,
+                        }),
+                    },
+                ]);
+
+                switch (object.type) {
+                    case GameObjectType.TANK: {
+                        const tank = object as Tank;
+                        this.playerService.setPlayerTankId(tank.playerId, tank.id);
+                        break;
+                    }
+                    case GameObjectType.BULLET: {
+                        const bullet = object as Bullet;
+                        this.tankService.addTankBullet(bullet.tankId, bullet.id);
+                        break;
+                    }
+                }
+            });
+        this.registry.emitter.on(RegistryEvent.ENTITY_BEFORE_DESTROY,
+            (entity: Entity) => {
+                const object = entity as GameObject;
+
+                switch (object.type) {
+                    case GameObjectType.TANK: {
+                        const tank = object as Tank;
+                        this.handleFlagInteraction(tank, undefined, FlagTankInteraction.DROP);
+                        this.playerService.setPlayerTankId(tank.playerId, null);
+                        break;
+                    }
+                    case GameObjectType.BULLET: {
+                        const bullet = object as Bullet;
+                        const tank = this.registry.findEntityById(bullet.tankId);
+                        if (tank === undefined) {
+                            break;
+                        }
+
+                        this.tankService.removeTankBullet(bullet.tankId, entity.id);
+                        break;
+                    }
+                }
+            });
+        this.registry.emitter.on(RegistryEvent.ENTITY_DESTROYED,
+            (entity: Entity) => {
+                this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_UNREGISTERED, entity.id]);
+            });
+
         this.registry.emitter.on(RegistryComponentEvent.COMPONENT_ADDED,
             (component, data) => {
                 this.onRegistryComponentEvent(
@@ -245,9 +297,10 @@ export class GameServer {
 
                     const position = this.gameObjectService.getRandomSpawnPosition(player.teamId);
                     const tank = this.tankService.createTankForPlayer(player, position, tankColor);
-                    this.gameObjectService.registerObject(tank);
+                    this.registry.registerEntity(tank);
                 } else if (status === PlayerSpawnStatus.DESPAWN && player.tankId !== null) {
-                    this.gameObjectService.unregisterObject(player.tankId);
+                    const tank = this.registry.getEntityById(player.tankId);
+                    this.gameObjectService.markDestroyed(tank);
                 }
             });
 
@@ -258,7 +311,7 @@ export class GameServer {
                     return;
                 }
 
-                const tank = this.tankService.getTank(player.tankId);
+                const tank = this.registry.getEntityById(player.tankId) as Tank;
                 this.handleFlagInteraction(tank, undefined, FlagTankInteraction.DROP);
             });
 
@@ -278,69 +331,9 @@ export class GameServer {
         /**
          * GameObjectService event handlers
          */
-        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REGISTERED,
-            (object: GameObject) => {
-                this.registry.registerEntity(object);
-
-                this.gameEventBatcher.addBroadcastEvent([
-                    GameEvent.OBJECT_REGISTERED,
-                    {
-                        type: object.type,
-                        subtypes: object.subtypes,
-                        options: object.toOptions(),
-                        components: object.getComponentsData({
-                            withoutFlags: ComponentFlags.LOCAL_ONLY,
-                        }),
-                    },
-                ]);
-
-                switch (object.type) {
-                    case GameObjectType.TANK: {
-                        const tank = object as Tank;
-                        this.playerService.setPlayerTankId(tank.playerId, tank.id);
-                        break;
-                    }
-                    case GameObjectType.BULLET: {
-                        const bullet = object as Bullet;
-                        this.tankService.addTankBullet(bullet.tankId, bullet.id);
-                        break;
-                    }
-                }
-            });
-
-        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_UNREGISTERED,
-            (objectId: number) => {
-                this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_UNREGISTERED, objectId]);
-            });
-
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_CHANGED,
             (objectId: number, objectOptions: PartialGameObjectOptions) => {
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_CHANGED, objectId, objectOptions]);
-            });
-
-        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BEFORE_UNREGISTER,
-            (objectId: number) => {
-                const object = this.gameObjectService.getObject(objectId);
-                switch (object.type) {
-                    case GameObjectType.TANK: {
-                        const tank = object as Tank;
-                        this.handleFlagInteraction(tank, undefined, FlagTankInteraction.DROP);
-                        this.playerService.setPlayerTankId(tank.playerId, null);
-                        break;
-                    }
-                    case GameObjectType.BULLET: {
-                        const bullet = object as Bullet;
-                        const tank = this.tankService.findTank(bullet.tankId);
-                        if (tank === undefined) {
-                            break;
-                        }
-
-                        this.tankService.removeTankBullet(bullet.tankId, objectId);
-                        break;
-                    }
-                }
-
-                this.registry.destroyEntity(object);
             });
 
         /**
@@ -348,14 +341,14 @@ export class GameServer {
          */
         this.tankService.emitter.on(TankServiceEvent.TANK_REQUESTED_BULLET_SPAWN,
             (tankId: number) => {
-                const tank = this.tankService.getTank(tankId);
+                const tank = this.registry.getEntityById(tankId) as Tank;
                 const bullet = this.bulletService.createBulletForTank(tank);
-                this.gameObjectService.registerObject(bullet);
+                this.registry.registerEntity(bullet);
             });
 
         this.tankService.emitter.on(TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN,
             (tankId: number) => {
-                const tank = this.tankService.getTank(tankId);
+                const tank = this.registry.getEntityById(tankId) as Tank;
                 const position = tank.getComponent(CenterPositionComponent);
                 const smoke = this.gameObjectFactory.buildFromOptions({
                     type: GameObjectType.SMOKE,
@@ -363,7 +356,7 @@ export class GameServer {
                         PositionComponent: position,
                     },
                 });
-                this.gameObjectService.registerObject(smoke);
+                this.registry.registerEntity(smoke);
             });
 
         this.tankService.emitter.on(TankServiceEvent.TANK_UPDATED,
@@ -379,7 +372,7 @@ export class GameServer {
         /**
          * CollisionService event handlers
          */
-        const spawnExplosion = (source: GameObject, type: string, destroyedObjectType?: string) => {
+        const spawnExplosion = (source: Entity, type: string, destroyedObjectType?: string) => {
             const position = source.getComponent(CenterPositionComponent);
             const explosion = this.gameObjectFactory.buildFromOptions({
                 type: GameObjectType.EXPLOSION,
@@ -391,12 +384,12 @@ export class GameServer {
                     PositionComponent: position,
                 },
             });
-            this.gameObjectService.registerObject(explosion);
+            this.registry.registerEntity(explosion);
         };
 
         this.collisionService.emitter.on(CollisionServiceEvent.OBJECT_TRACKED_COLLISIONS,
             (objectId: number, tracker: CollisionTracker) => {
-                const object = this.gameObjectService.getObject(objectId);
+                const object = this.registry.getEntityById(objectId);
 
                 switch (object.type) {
                     case GameObjectType.TANK:
@@ -407,15 +400,15 @@ export class GameServer {
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_LEVEL_BORDER,
             (bulletId: number, _staticObjectId: number, _position: Point) => {
-                const bullet = this.gameObjectService.getObject(bulletId);
+                const bullet = this.registry.getEntityById(bulletId);
                 spawnExplosion(bullet, ExplosionType.SMALL, GameObjectType.NONE);
                 this.gameObjectService.markDestroyed(bullet);
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_STEEL_WALL,
             (bulletId: number, steelWallId: number, _position: Point) => {
-                const bullet = this.bulletService.getBullet(bulletId);
-                const steelWall = this.gameObjectService.getObject(steelWallId);
+                const bullet = this.registry.getEntityById(bulletId) as Bullet;
+                const steelWall = this.registry.getEntityById(steelWallId);
                 this.gameObjectService.markDestroyed(bullet);
                 if (bullet.power === BulletPower.HEAVY) {
                     spawnExplosion(bullet, ExplosionType.SMALL);
@@ -429,8 +422,8 @@ export class GameServer {
             (bulletId: number, brickWallId: number, _position: Point) => {
                 const destroyBox = this.bulletService.getBulletBrickWallDestroyBox(bulletId, brickWallId);
                 const objectsIds = this.collisionService.getOverlappingObjects(destroyBox);
-                const objects = this.gameObjectService.getMultipleObjects(objectsIds);
-                const bullet = this.gameObjectService.getObject(bulletId);
+                const objects = this.registry.getMultipleEntitiesById(objectsIds);
+                const bullet = this.registry.getEntityById(bulletId);
                 spawnExplosion(bullet, ExplosionType.SMALL);
                 this.gameObjectService.markDestroyed(bullet);
 
@@ -443,12 +436,12 @@ export class GameServer {
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_TANK,
             (bulletId: number, tankId: number, _position: Point) => {
-                const bullet = this.bulletService.getBullet(bulletId);
+                const bullet = this.registry.getEntityById(bulletId) as Bullet;
                 if (bullet.tankId === tankId) {
                     return;
                 }
 
-                const tank = this.tankService.getTank(tankId);
+                const tank = this.registry.getEntityById(tankId) as Tank;
                 const gameModeProperties = this.gameModeService.getGameModeProperties();
 
                 let ignoreBulletDamage = false;
@@ -498,8 +491,8 @@ export class GameServer {
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BULLET,
             (movingBulletId: number, staticBulletId: number, _position: Point) => {
-                const movingBullet = this.bulletService.getBullet(movingBulletId);
-                const staticBullet = this.bulletService.getBullet(staticBulletId);
+                const movingBullet = this.registry.getEntityById(movingBulletId) as Bullet;
+                const staticBullet = this.registry.getEntityById(staticBulletId) as Bullet;
                 if (movingBullet.tankId === staticBullet.tankId) {
                     return;
                 }
@@ -511,8 +504,8 @@ export class GameServer {
 
         this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_FLAG,
             (tankId: number, flagId: number) => {
-                const tank = this.tankService.getTank(tankId);
-                const flag = this.flagService.getFlag(flagId);
+                const tank = this.registry.getEntityById(tankId) as Tank;
+                const flag = this.registry.getEntityById(flagId) as Flag;
                 const interaction = this.flagService.getFlagTankInteractionType(flag, tank);
                 if (interaction !== undefined) {
                     this.handleFlagInteraction(tank, flag, interaction);
@@ -632,7 +625,7 @@ export class GameServer {
                 flag = this.flagService.createFlagForTank(tank);
                 if (flag !== undefined) {
                     this.tankService.clearTankFlag(tank.id);
-                    this.gameObjectService.registerObject(flag);
+                    this.registry.registerEntity(flag);
                 }
                 break;
             default:
@@ -641,7 +634,7 @@ export class GameServer {
     }
 
     sendRequestedServerStatus(playerId?: string): void {
-        const objects = this.gameObjectService.getObjects();
+        const objects = this.registry.getEntities() as Iterable<GameObject>;
         const objectsOptions =
             LazyIterable.from(objects)
                 .map(object => {
@@ -784,7 +777,7 @@ export class GameServer {
         const objects = objectsOptions
             .filter(o => this.gameModeService.isIgnoredObjectType(o.type))
             .map(o => this.gameObjectFactory.buildFromOptions(o));
-        this.gameObjectService.registerObjects(objects);
+        this.registry.registerEntities(objects);
 
         const teamsOptions = gameMap.getTeamsOptions();
         const gameModeProperties = this.gameModeService.getGameModeProperties();
@@ -799,7 +792,7 @@ export class GameServer {
     reload(): void {
         this.ticker.stop();
 
-        this.gameObjectService.unregisterAll();
+        this.registry.destroyAllEntities();
         this.playerService.resetFields();
 
         const gameMap = this.gameMapService.getLoadedMap();

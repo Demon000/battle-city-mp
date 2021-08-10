@@ -1,11 +1,13 @@
 import { AutomaticDestroyComponent } from '@/components/AutomaticDestroyComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { IsMovingComponent } from '@/components/IsMovingComponent';
+import { SpawnComponent } from '@/components/SpawnComponent';
 import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
 import { ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 import { DirectionComponent } from '@/physics/DirectionComponent';
+import { MoveableComponent } from '@/physics/MoveableComponent';
 import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
 import { DirtyCenterPositionComponent } from '@/physics/point/DirtyCenterPositionComponent';
 import { PositionComponent } from '@/physics/point/PositionComponent';
@@ -13,7 +15,6 @@ import { RequestedPositionComponent } from '@/physics/point/RequestedPositionCom
 import { RequestedDirectionComponent } from '@/physics/RequestedDirectionComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
 import { PlayerSpawn } from '@/player-spawn/PlayerSpawn';
-import { MapRepository } from '@/utils/MapRepository';
 import { Random } from '@/utils/Random';
 import EventEmitter from 'eventemitter3';
 import { Direction } from '../physics/Direction';
@@ -24,75 +25,18 @@ import { GameObjectType } from './GameObjectType';
 
 export enum GameObjectServiceEvent {
     OBJECT_CHANGED = 'object-changed',
-    OBJECT_REGISTERED = 'object-registered',
-    OBJECT_BEFORE_UNREGISTER = 'object-before-unregister',
-    OBJECT_UNREGISTERED = 'object-unregistered',
 }
 
 export interface GameObjectServiceEvents {
     [GameObjectServiceEvent.OBJECT_CHANGED]: (objectId: number, options: PartialGameObjectOptions) => void,
-    [GameObjectServiceEvent.OBJECT_REGISTERED]: (object: GameObject) => void,
-    [GameObjectServiceEvent.OBJECT_BEFORE_UNREGISTER]: (objectId: number) => void,
-    [GameObjectServiceEvent.OBJECT_UNREGISTERED]: (objectId: number) => void,
 }
 
 export class GameObjectService {
     emitter = new EventEmitter<GameObjectServiceEvents>();
 
     constructor(
-        private repository: MapRepository<number, GameObject>,
         private registry: Registry,
-        private movingRespository?: MapRepository<number, GameObject>,
     ) {}
-
-    findObject(objectId: number): GameObject | undefined {
-        return this.repository.find(objectId);
-    }
-
-    getObject(objectId: number): GameObject {
-        return this.repository.get(objectId);
-    }
-
-    getObjects(): Iterable<GameObject> {
-        return this.repository.getAll();
-    }
-
-    getMultipleObjects(objectIds: Iterable<number>): Iterable<GameObject> {
-        return this.repository.getMultiple(objectIds);
-    }
-
-    registerObject(object: GameObject): void {
-        this.repository.add(object.id, object);
-        if (object.movementDirection !== null || object.movementSpeed !== 0) {
-            this.movingRespository?.add(object.id, object);
-        }
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_REGISTERED, object);
-    }
-
-    registerObjects(objects: Iterable<GameObject>): void {
-        for (const object of objects) {
-            this.registerObject(object);
-        }
-    }
-
-    unregisterObject(objectId: number): void {
-        const object = this.findObject(objectId);
-        if (object === undefined) {
-            return;
-        }
-
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_BEFORE_UNREGISTER, objectId);
-        this.repository.remove(objectId);
-        this.movingRespository?.remove(object.id);
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_UNREGISTERED, objectId);
-    }
-
-    unregisterAll(): void {
-        const objects = this.repository.getAll();
-        for (const object of objects) {
-            this.unregisterObject(object.id);
-        }
-    }
 
     markDestroyed(entity: Entity): void {
         entity.upsertComponent(DestroyedComponent, undefined, {
@@ -101,17 +45,17 @@ export class GameObjectService {
     }
 
     updateObject(objectId: number, objectOptions: PartialGameObjectOptions): void {
-        const object = this.repository.get(objectId);
+        const object = this.registry.getEntityById(objectId) as GameObject;
         object.setOptions(objectOptions);
         this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, objectOptions);
     }
 
     setObjectMovementDirection(objectId: number, direction: Direction | null): void {
-        const object = this.repository.get(objectId);
+        const object = this.registry.getEntityById(objectId) as GameObject;
         object.movementDirection = direction;
 
         if (object.movementDirection !== null) {
-            this.movingRespository?.add(object.id, object);
+            object.upsertComponent(MoveableComponent);
         }
 
         this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
@@ -131,14 +75,14 @@ export class GameObjectService {
     }
 
     getRandomSpawnPosition(teamId: string | null): Point {
-        const objects = this.repository.getAll();
+        const objects = this.registry.getEntitiesWithComponent(SpawnComponent);
         const playerSpawnObjects = new Array<GameObject>();
 
         for (const object of objects) {
             if (object.type === GameObjectType.PLAYER_SPAWN) {
                 const playerSpawn = object as PlayerSpawn;
                 if (teamId === null || teamId === playerSpawn.teamId) {
-                    playerSpawnObjects.push(object);
+                    playerSpawnObjects.push(playerSpawn);
                 }
             }
         }
@@ -165,9 +109,9 @@ export class GameObjectService {
             object.movementSpeed = newMovementSpeed;
 
             if (newMovementSpeed === 0 && object.movementDirection === null) {
-                this.movingRespository?.remove(object.id);
+                object.removeComponentIfExists(MoveableComponent);
             } else {
-                this.movingRespository?.add(object.id, object);
+                object.upsertComponent(MoveableComponent);
             }
 
             this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
@@ -200,7 +144,7 @@ export class GameObjectService {
 
     processObjectsDestroyed(): void {
         for (const component of this.registry.getComponents(DestroyedComponent)) {
-            this.unregisterObject(component.entity.id);
+            this.registry.destroyEntity(component.entity);
         }
     }
 
@@ -266,24 +210,16 @@ export class GameObjectService {
     }
 
     processObjectsDirection(): void {
-        const movingObjects = this.movingRespository?.getAll();
-        if (movingObjects !== undefined) {
-            for (const object of movingObjects) {
-                this.processObjectDirection(object);
-            }
+        for (const entity of this.registry.getEntitiesWithComponent(MoveableComponent)) {
+            const object = entity as GameObject;
+            this.processObjectDirection(object);
         }
     }
 
     processObjectsPosition(delta: number): void {
-        const movingObjects = this.movingRespository?.getAll();
-        if (movingObjects !== undefined) {
-            for (const object of movingObjects) {
-                this.processObjectMovement(object, delta);
-            }
+        for (const entity of this.registry.getEntitiesWithComponent(MoveableComponent)) {
+            const object = entity as GameObject;
+            this.processObjectMovement(object, delta);
         }
-    }
-
-    clear(): void {
-        this.repository.clear();
     }
 }

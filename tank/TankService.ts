@@ -1,14 +1,13 @@
 import { Color } from '@/drawable/Color';
-import { GameObject } from '@/object/GameObject';
+import { Registry } from '@/ecs/Registry';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { CollisionTracker } from '@/physics/collisions/CollisionTracker';
 import { Point } from '@/physics/point/Point';
 import { Player } from '@/player/Player';
-import { LazyIterable } from '@/utils/LazyIterable';
-import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import { Tank, PartialTankOptions, TankOptions } from './Tank';
+import { TankComponent } from './TankComponent';
 
 export enum TankServiceEvent {
     TANK_REQUESTED_BULLET_SPAWN = 'tank-requested-bullet-spawn',
@@ -35,16 +34,9 @@ export class TankService {
     emitter = new EventEmitter<TankServiceEvents>();
 
     constructor(
-        private repository: MapRepository<number, GameObject>,
         private gameObjectFactory: GameObjectFactory,
+        private registry: Registry,
     ) {}
-
-    private getTanks(): Iterable<Tank> {
-        const objects = this.repository.getAll();
-
-        return LazyIterable.from(objects)
-            .filter(o => o.type === GameObjectType.TANK) as Iterable<Tank>;
-    }
 
     createTankForPlayer(
         player: Player,
@@ -66,47 +58,27 @@ export class TankService {
         }) as Tank;
     }
 
-    getTank(tankId: number): Tank {
-        const object = this.repository.get(tankId);
-        if (object.type !== GameObjectType.TANK) {
-            throw new Error('Game object type is not tank');
-        }
-
-        return object as Tank;
-    }
-
-    findTank(tankId: number): Tank | undefined {
-        const object = this.repository.find(tankId);
-        if (object === undefined) {
-            return undefined;
-        }
-
-        if (object.type !== GameObjectType.TANK) {
-            throw new Error('Game object type is not tank');
-        }
-
-        return object as Tank;
-    }
-
     setOwnPlayerTankId(tankId: number | null): void {
         this.ownPlayerTankId = tankId;
 
-        if (tankId !== null) {
-            const tank = this.getTank(tankId);
-
-            this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
-                tank.maxHealth);
-            this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
-                tank.health);
-            this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
-                tank.maxBullets);
-            this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
-                tank.bulletIds.length);
+        if (tankId === null) {
+            return;
         }
+
+        const tank = this.registry.getEntityById(tankId) as Tank;
+
+        this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
+            tank.maxHealth);
+        this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
+            tank.health);
+        this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
+            tank.maxBullets);
+        this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
+            tank.bulletIds.length);
     }
 
     addRemoveTankBullets(tankId: number, bulletId: number, add: boolean): void {
-        const tank = this.getTank(tankId);
+        const tank = this.registry.getEntityById(tankId) as Tank;
 
         if (add) {
             tank.bulletIds.push(bulletId);
@@ -186,28 +158,27 @@ export class TankService {
     }
 
     updateTankCollisions(tankId: number, tracker: CollisionTracker): void {
-        const tank = this.getTank(tankId);
+        const tank = this.registry.getEntityById(tankId) as Tank;
 
         tank.isOnIce = tracker.isCollidingWithType(GameObjectType.ICE);
         tank.isOnSand = tracker.isCollidingWithType(GameObjectType.SAND);
     }
 
     processTanksStatus(): void {
-        const tanks = this.getTanks();
-
-        for (const tank of tanks) {
+        for (const entity of this.registry.getEntitiesWithComponent(TankComponent)) {
+            const tank = entity as Tank;
             this.processTankShooting(tank);
             this.processTankSmoking(tank);
         }
     }
 
     setTankShooting(tankId: number, isShooting: boolean): void {
-        const tank = this.getTank(tankId);
+        const tank = this.registry.getEntityById(tankId) as Tank;
         tank.isShooting = isShooting;
     }
 
     setTankFlag(tankId: number, teamId: string | null, color: Color | null, sourceId: number | null): void {
-        const tank = this.getTank(tankId);
+        const tank = this.registry.getEntityById(tankId) as Tank;
         tank.flagTeamId = teamId;
         tank.flagColor = color;
         tank.flagSourceId = sourceId;
@@ -223,7 +194,7 @@ export class TankService {
     }
 
     decreaseTankHealth(tankId: number, value: number): void {
-        const tank = this.getTank(tankId);
+        const tank = this.registry.getEntityById(tankId) as Tank;
         tank.health -= value;
 
         this.emitter.emit(TankServiceEvent.TANK_UPDATED, tankId, {

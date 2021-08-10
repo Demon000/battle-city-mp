@@ -6,7 +6,6 @@ import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 import { GameObject } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
-import { MapRepository } from '@/utils/MapRepository';
 import { QueryObject, QueryObjectOperationType } from '@/utils/QueryObject';
 import EventEmitter from 'eventemitter3';
 import { BoundingBox } from '../bounding-box/BoundingBox';
@@ -40,14 +39,10 @@ export class CollisionService {
     emitter = new EventEmitter<CollisionServiceEvents>();
 
     constructor(
-        private gameObjectRepository: MapRepository<number, GameObject>,
         private boundingBoxRepository: BoundingBoxRepository<number>,
         private registry: Registry,
         rules?: ICollisionRule[],
     ) {
-        this.gameObjectRepository = gameObjectRepository;
-        this.boundingBoxRepository = boundingBoxRepository;
-
         if (rules) {
             this.rulesMap = new Map<string, Map<string, ICollisionRule>>();
 
@@ -154,7 +149,7 @@ export class CollisionService {
     }
 
     private _validateObjectMovement(
-        movingObject: GameObject,
+        movingObject: Entity,
         position: Point,
         direction?: Direction,
         trySnapping = true,
@@ -176,12 +171,12 @@ export class CollisionService {
             .combine(originalBoundingBox, movedBoundingBox);
         const overlappingObjectIds = this
             .getOverlappingObjects(mergedBoundingBox);
-        const overlappingObjects = this.gameObjectRepository
-            .getMultiple(overlappingObjectIds);
+        const overlappingObjects = this.registry
+            .getMultipleEntitiesById(overlappingObjectIds);
 
         let movementPreventingObject;
-        const collidingObjectNotifications = new Array<[CollisionEvent, GameObject]>();
-        const collidingObjectTrackings = new Array<GameObject>();
+        const collidingObjectNotifications = new Array<[CollisionEvent, Entity]>();
+        const collidingObjectTrackings = new Array<Entity>();
         for (const overlappingObject of overlappingObjects) {
             if (movingObject.id === overlappingObject.id) {
                 continue;
@@ -297,9 +292,8 @@ export class CollisionService {
         return snapped;
     }
 
-    validateObjectDirection(objectId: number, direction: Direction): void {
-        const object = this.gameObjectRepository.get(objectId);
-        const directionComponent = object.getComponent(DirectionComponent);
+    validateObjectDirection(entity: Entity, direction: Direction): void {
+        const directionComponent = entity.getComponent(DirectionComponent);
         const oldDirection = directionComponent.value;
 
         directionComponent.update({
@@ -311,13 +305,13 @@ export class CollisionService {
         }
 
         const directionAxisSnappingComponent =
-            object.findComponent(DirectionAxisSnappingComponent);
+            entity.findComponent(DirectionAxisSnappingComponent);
         if (directionAxisSnappingComponent === undefined) {
             return;
         }
 
         const value = directionAxisSnappingComponent.value;
-        const position = object.getComponent(PositionComponent);
+        const position = entity.getComponent(PositionComponent);
         const newPosition = PointUtils.clone(position);
         if (DirectionUtils.isHorizontalAxis(direction)) {
             newPosition.y = this.calculateSnappedCoordinates(position.y, value);
@@ -325,21 +319,22 @@ export class CollisionService {
             newPosition.x = this.calculateSnappedCoordinates(position.x, value);
         }
 
-        this._validateObjectMovement(object, newPosition, oldDirection, false);
+        this._validateObjectMovement(entity, newPosition, oldDirection, false);
     }
 
     processObjectsRequestedDirection(): void {
         for (const component of this.registry.getComponents(RequestedDirectionComponent)) {
             component.remove();
 
-            this.validateObjectDirection(component.entity.id, component.value);
+            this.validateObjectDirection(component.entity, component.value);
         }
     }
 
     private isOverlappingWithType(entity: Entity, type: string): boolean {
         const boundingBox = entity.getComponent(BoundingBoxComponent);
         const overlappingObjectIds = this.getOverlappingObjects(boundingBox);
-        const overlappingObjects = this.gameObjectRepository.getMultiple(overlappingObjectIds);
+        const overlappingObjects = this.registry
+            .getMultipleEntitiesById(overlappingObjectIds);
 
         for (const overlappingObject of overlappingObjects) {
             if (overlappingObject.type === type) {

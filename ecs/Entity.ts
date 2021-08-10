@@ -11,11 +11,12 @@ export interface EntityComponentsOptions {
 export class Entity {
     private tagComponentMap = new Map<ComponentClassType, Component<any>>();
 
-    id: EntityId;
-
-    constructor(id: EntityId, private registry: Registry) {
-        this.id = id;
-    }
+    constructor(
+        private registry: Registry,
+        public id: EntityId,
+        public type: string,
+        public subtypes?: string[],
+    ) {}
 
     addLocalComponent<C extends Component<C>>(
         component: C,
@@ -124,6 +125,16 @@ export class Entity {
     ): C | undefined {
         const component = this.getComponent(clazzOrTag);
         return this.registry.removeComponent(component, options);
+    }
+
+    removeComponentIfExists<
+        C extends Component<C>,
+    >(
+        clazzOrTag: ClazzOrTag<C>,
+        options?: RegistryOperationOptions,
+    ): C | undefined {
+        const component = this.getComponent(clazzOrTag);
+        return this.registry.removeComponentIfExists(component, options);
     }
 
     removeComponents(): void {

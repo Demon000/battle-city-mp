@@ -1,4 +1,4 @@
-import { GameObject } from '@/object/GameObject';
+import { Registry } from '@/ecs/Registry';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
@@ -11,28 +11,18 @@ import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent
 import { PositionComponent } from '@/physics/point/PositionComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
 import { Tank } from '@/tank/Tank';
-import { MapRepository } from '@/utils/MapRepository';
 import { Bullet, BulletOptions } from './Bullet';
 import { BulletPower } from './BulletPower';
 
 export class BulletService {
     constructor(
-        private repository: MapRepository<number, GameObject>,
         private gameObjectFactory: GameObjectFactory,
+        private registry: Registry,
     ) {}
 
-    getBullet(bulletId: number): Bullet {
-        const object = this.repository.get(bulletId);
-        if (object.type !== GameObjectType.BULLET) {
-            throw new Error('Game object type is not bullet');
-        }
-
-        return object as Bullet;
-    }
-
     getBulletBrickWallDestroyBox(bulletId: number, brickWallId: number): BoundingBox {
-        const bullet = this.getBullet(bulletId);
-        const brickWall = this.repository.get(brickWallId);
+        const bullet = this.registry.getEntityById(bulletId) as Bullet;
+        const brickWall = this.registry.getEntityById(brickWallId);
         const brickWallBoundingBox = BoundingBoxUtils.clone(
             brickWall.getComponent(BoundingBoxComponent),
         );

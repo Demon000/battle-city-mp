@@ -4,7 +4,7 @@ import { GameGraphicsService } from '@/renderer/GameGraphicsService';
 import { MapRepository } from '@/utils/MapRepository';
 import { Ticker, TickerEvent } from '@/utils/Ticker';
 import { GameObject, PartialGameObjectOptions } from '../object/GameObject';
-import { GameObjectService, GameObjectServiceEvent } from '../object/GameObjectService';
+import { GameObjectService } from '../object/GameObjectService';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
 import { CollisionService } from '../physics/collisions/CollisionService';
 import { Player, PartialPlayerOptions, PlayerOptions, PlayerSpawnStatus } from '../player/Player';
@@ -21,17 +21,18 @@ import { LazyIterable } from '@/utils/LazyIterable';
 import { GameObjectAudioRendererFactory } from '@/object/GameObjectAudioRendererFactory';
 import { TankTier } from '@/tank/TankTier';
 import { Color } from '@/drawable/Color';
-import { PartialTankOptions, TankProperties } from '@/tank/Tank';
+import { PartialTankOptions, Tank, TankProperties } from '@/tank/Tank';
 import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
-import { Registry, RegistryComponentEvent } from '@/ecs/Registry';
+import { Registry, RegistryComponentEvent, RegistryEvent } from '@/ecs/Registry';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
 import { PositionComponent } from '@/physics/point/PositionComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
 import { EntityId } from '@/ecs/EntityId';
+import { Entity } from '@/ecs/Entity';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -96,7 +97,6 @@ export class GameClient {
     private playerService;
     private teamRepository;
     private teamService;
-    private gameObjectRepository;
     private gameObjectService;
     private tankService;
     private boundingBoxRepository;
@@ -118,12 +118,10 @@ export class GameClient {
         this.entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.CLIENT);
         this.gameObjectFactory = new GameObjectFactory(this.registry, this.config, this.entityBlueprint);
 
-        this.gameObjectRepository = new MapRepository<number, GameObject>();
         this.boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
-        this.collisionService = new CollisionService(this.gameObjectRepository,
-            this.boundingBoxRepository, this.registry);
-        this.gameObjectService = new GameObjectService(this.gameObjectRepository, this.registry);
-        this.tankService = new TankService(this.gameObjectRepository, this.gameObjectFactory);
+        this.collisionService = new CollisionService(this.boundingBoxRepository, this.registry);
+        this.gameObjectService = new GameObjectService(this.registry);
+        this.tankService = new TankService(this.gameObjectFactory, this.registry);
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.config, this.playerRepository);
         this.teamRepository = new MapRepository<string, Team>();
@@ -164,16 +162,10 @@ export class GameClient {
                     this.collisionService.markDirtyBoundingBox(entity);
                     this.gameObjectService.markDirtyCenterPosition(entity);
                 });
-
-        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_REGISTERED,
-            (object: GameObject) => {
-                this.registry.registerEntity(object);
-            });
-        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_BEFORE_UNREGISTER,
-            (objectId: number) => {
-                const object = this.gameObjectService.getObject(objectId);
+        this.registry.emitter.on(RegistryEvent.ENTITY_BEFORE_DESTROY,
+            (entity: Entity) => {
+                const object = entity as GameObject;
                 this.gameAudioService.stopAudioPlayback(object);
-                this.registry.destroyEntity(object);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_ADDED, () => {
@@ -255,7 +247,7 @@ export class GameClient {
     onObjectChanged(objectId: number, objectOptions: PartialGameObjectOptions): void {
         this.gameObjectService.updateObject(objectId, objectOptions);
 
-        const object = this.gameObjectService.getObject(objectId);
+        const object = this.registry.getEntityById(objectId);
         switch (object.type) {
             case GameObjectType.TANK:
                 this.tankService.updateTank(objectId, objectOptions as PartialTankOptions);
@@ -264,7 +256,7 @@ export class GameClient {
 
     onObjectRegistered(buildOptions: GameObjectFactoryBuildOptions): void {
         const object = this.gameObjectFactory.buildFromOptions(buildOptions);
-        this.gameObjectService.registerObject(object);
+        this.registry.registerEntity(object);
     }
 
     onObjectUnregistered(entityId: EntityId): void {
@@ -332,7 +324,7 @@ export class GameClient {
         const objects =
             LazyIterable.from(serverStatus.objectsOptions)
                 .map(o => this.gameObjectFactory.buildFromOptions(o));
-        this.gameObjectService.registerObjects(objects);
+        this.registry.registerEntities(objects);
 
         const visibleGameSize = this.config.get<number>('game-client', 'visibleGameSize');
         this.gameGraphicsService.setTargetGameSize(visibleGameSize);
@@ -356,7 +348,7 @@ export class GameClient {
         }
 
         if (ownPlayer.tankId !== null) {
-            const tank = this.gameObjectService.findObject(ownPlayer.tankId);
+            const tank = this.registry.findEntityById(ownPlayer.tankId);
             if (tank !== undefined) {
                 const centerPosition = tank.getComponent(CenterPositionComponent);
                 this.gameCamera.setPosition(centerPosition);
@@ -373,8 +365,10 @@ export class GameClient {
             return;
         }
 
-        const viewableObjectIds = this.collisionService.getOverlappingObjects(box);
-        const viewableObjects = this.gameObjectService.getMultipleObjects(viewableObjectIds);
+        const viewableObjectIds = this.collisionService
+            .getOverlappingObjects(box);
+        const viewableObjects = this.registry
+            .getMultipleEntitiesById(viewableObjectIds) as Iterable<GameObject>;
         this.gameGraphicsService.initializeRender(position);
         this.gameGraphicsService.renderObjectsOver(viewableObjects);
         this.gameAudioService.playObjectsAudioEffect(viewableObjects, position, box);
@@ -395,7 +389,7 @@ export class GameClient {
             .map(player => {
                 let tank;
                 if (player.tankId !== null) {
-                    tank = this.tankService.getTank(player.tankId);
+                    tank = this.registry.getEntityById(player.tankId) as Tank;
                 }
 
                 let team;

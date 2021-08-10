@@ -113,6 +113,9 @@
                 height: 16,
             },
         },
+        serverComponents: {
+            SpawnComponent: {},
+        },
     },
     'level-border': {
         extends: [
@@ -141,6 +144,9 @@
                 width: 2,
                 height: 2,
             },
+        },
+        serverComponents: {
+            MoveableComponent: {},
         },
     },
     'explosion': {
@@ -224,6 +230,8 @@
             DirtyCenterPositionComponent: {},
         },
         serverComponents: {
+            MoveableComponent: {},
+            TankComponent: {},
             DirectionAxisSnappingComponent: {
                 value: 4,
             },
