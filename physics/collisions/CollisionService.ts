@@ -6,7 +6,6 @@ import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 import { GameObject } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
-import { QueryObject, QueryObjectOperationType } from '@/utils/QueryObject';
 import EventEmitter from 'eventemitter3';
 import { BoundingBox } from '../bounding-box/BoundingBox';
 import { BoundingBoxComponent } from '../bounding-box/BoundingBoxComponent';
@@ -407,22 +406,16 @@ export class CollisionService {
     }
 
     processObjectsDestroyedBoundingBox(): void {
-        const destroyedEntities =
-            this.registry.getEntitiesWithComponent(DestroyedComponent);
-        const boundingBoxEntities =
-            this.registry.getEntitiesWithComponent(BoundingBoxComponent);
-        const entities = QueryObject.eval({
-            operation: QueryObjectOperationType.AND,
-            data: [
-                destroyedEntities,
-                boundingBoxEntities,
-            ],
-        });
-
-        for (const entity of entities) {
-            if (this.boundingBoxRepository.hasNode(entity.id)) {
-                this.boundingBoxRepository.removeValue(entity.id);
+        for (const entity of this.registry.getEntitiesWithComponent(DestroyedComponent)) {
+            if (!entity.hasComponent(BoundingBoxComponent)) {
+                continue;
             }
+
+            if (!this.boundingBoxRepository.hasNode(entity.id)) {
+                continue;
+            }
+
+            this.boundingBoxRepository.removeValue(entity.id);
         }
     }
 
