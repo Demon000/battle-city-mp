@@ -119,7 +119,11 @@ export class PlayerService {
     }
 
     setPlayerTankId(playerId: string, tankId: number | null): void {
-        const player = this.repository.get(playerId);
+        const player = this.repository.find(playerId);
+        if (player === undefined) {
+            return;
+        }
+
         if (player.tankId === tankId) {
             return;
         }
