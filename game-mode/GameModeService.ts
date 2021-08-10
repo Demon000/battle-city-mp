@@ -1,5 +1,6 @@
 import { Config } from '@/config/Config';
 import { IGameModeProperties } from '@/game-mode/IGameModeProperties';
+import { assert } from '@/utils/assert';
 
 export class GameModeService {
     private gameMode?: string;
@@ -17,17 +18,15 @@ export class GameModeService {
     }
 
     getGameModeProperties(): IGameModeProperties {
-        if (this.gameMode === undefined) {
-            throw new Error('Cannot find properties for undefined game mode');
-        }
+        assert(this.gameMode !== undefined,
+            'Cannot find properties for undefined game mode');
 
-        return this.config.get<IGameModeProperties>('game-modes-properties', this.gameMode);
+            return this.config.get<IGameModeProperties>('game-modes-properties', this.gameMode);
     }
 
     isIgnoredObjectType(type: string | undefined): boolean {
-        if (type === undefined) {
-            throw new Error(`Cannot check if type '${type}' is ignored`);
-        }
+        assert(type !== undefined,
+            `Cannot check if undefined type is ignored`);
 
         const gameModeProperties = this.getGameModeProperties();
         if (gameModeProperties.ignoredObjectTypes === undefined) {

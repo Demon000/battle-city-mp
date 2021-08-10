@@ -6,6 +6,7 @@ import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 import { GameObject } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
+import { assert } from '@/utils/assert';
 import EventEmitter from 'eventemitter3';
 import { BoundingBox } from '../bounding-box/BoundingBox';
 import { BoundingBoxComponent } from '../bounding-box/BoundingBoxComponent';
@@ -62,9 +63,8 @@ export class CollisionService {
     }
 
     private getRule(movingType: string, staticType: string): ICollisionRule | undefined {
-        if (!this.rulesMap) {
-            throw new Error('getRule called but no rules supplied');
-        }
+        assert(this.rulesMap !== undefined,
+            'Cannot call getRule with no rules supplied');
 
         const movingMap = this.rulesMap.get(movingType);
         if (movingMap === undefined) {
@@ -153,9 +153,8 @@ export class CollisionService {
         direction?: Direction,
         trySnapping = true,
     ): void {
-        if (this.rulesMap === undefined) {
-            throw new Error('Cannot validate object movement when rules map is not set');
-        }
+        assert(this.rulesMap !== undefined,
+            'Cannot call validate object movement with no rules supplied');
 
         const movingObjectDirection =
             movingObject.getComponent(DirectionComponent).value;

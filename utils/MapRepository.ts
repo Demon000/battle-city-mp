@@ -1,3 +1,4 @@
+import { assert } from './assert';
 import { LazyIterable } from './LazyIterable';
 
 export class MapRepository<K, V> {
@@ -13,10 +14,7 @@ export class MapRepository<K, V> {
 
     get(key: K): V {
         const value = this.map.get(key);
-        if (value === undefined) {
-            throw new Error(`Map does not contain the '${key}' key`);
-        }
-
+        assert(value !== undefined, `Map does not contain the key '${key}'`);
         return value;
     }
 

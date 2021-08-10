@@ -112,7 +112,7 @@ export class ComponentRegistry {
                 if (data !== undefined) assertType<Partial<MoveableComponentData>>(data);
                 break;
             default:
-                throw new Error(`Invalid tag: ${tag}`);
+                assert(false, `Invalid tag '${tag}'`);
         }
 
         return {

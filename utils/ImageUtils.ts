@@ -1,4 +1,5 @@
 import { Color } from '../drawable/Color';
+import { assert } from './assert';
 import { CanvasUtils, Canvas } from './CanvasUtils';
 
 export type Source = HTMLImageElement | Canvas;
@@ -15,9 +16,7 @@ export interface ContentMeasurements {
 export class ImageUtils {
     static measureContents(canvas: Canvas): ContentMeasurements {
         const context = canvas.getContext('2d');
-        if (context === null) {
-            throw new Error('Failed to create offscreen canvas context');
-        }
+        assert(context !== null, 'Failed to create offscreen canvas context');
 
         let minX = undefined;
         let minY = undefined;
@@ -68,9 +67,7 @@ export class ImageUtils {
         const height = source.height * scaleY;
         const canvas = CanvasUtils.create(width, height);
         const context = canvas.getContext('2d');
-        if (context === null) {
-            throw new Error('Failed to create offscreen canvas context');
-        }
+        assert(context !== null, 'Failed to create offscreen canvas context');
 
         context.imageSmoothingEnabled = false;
         context.drawImage(source, 0, 0, width, height);
@@ -83,9 +80,7 @@ export class ImageUtils {
     ): Canvas {
         const canvas = CanvasUtils.create(source.width, source.height);
         const context = canvas.getContext('2d');
-        if (context === null) {
-            throw new Error('Failed to create offscreen canvas context');
-        }
+        assert(context !== null, 'Failed to create offscreen canvas context');
 
         context.drawImage(source, 0, 0);
         context.globalCompositeOperation = 'source-in';

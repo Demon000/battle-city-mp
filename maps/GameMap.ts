@@ -10,6 +10,7 @@ import { SizeComponent } from '@/physics/size/SizeComponent';
 import { GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
 import { Point } from '@/physics/point/Point';
 import { GameObjectOptions } from '@/object/GameObject';
+import { assert } from '@/utils/assert';
 
 export interface GameMapOptions {
     name: string;
@@ -55,15 +56,13 @@ export class GameMap {
     }
 
     getColorGameObjectType(color: Color): string {
-        if (this.options.objectTypesColorsMap  === undefined) {
-            throw new Error('Cannot retrieve game object type of color when missing map');
-        }
+        assert(this.options.objectTypesColorsMap  !== undefined,
+            'Cannot retrieve game object type of color when missing map');
 
         const colorIndex = this.getColorIndex(color);
         const type = this.options.objectTypesColorsMap.get(colorIndex);
-        if (type === undefined) {
-            throw new Error(`Cannot retrieve game object type for invalid color: ${color}`);
-        }
+        assert(type !== undefined,
+            `Cannot retrieve game object type for invalid color '${color}'`);
 
         return type;
     }

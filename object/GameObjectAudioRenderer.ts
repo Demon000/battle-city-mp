@@ -1,4 +1,5 @@
 import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
+import { assert } from '@/utils/assert';
 import { CartesianUtils } from '@/utils/CartesianUtils';
 import { GameObject } from './GameObject';
 import { AudioEffect, ResourceMeta } from './GameObjectProperties';
@@ -47,9 +48,8 @@ export class GameObjectAudioRenderer {
     }
 
     private updatePannerPosition(): void {
-        if (this.panner === undefined) {
-            throw new Error('Inconsistent audio effect panner');
-        }
+        assert(this.panner !== undefined,
+            'Inconsistent audio effect panner');
 
         const centerPosition = this.object.getComponent(CenterPositionComponent);
         CartesianUtils.setCartesianPositions(this.panner, centerPosition);
@@ -74,9 +74,8 @@ export class GameObjectAudioRenderer {
             return;
         }
 
-        if (this.panner === undefined) {
-            throw new Error('Audio effect panner is inconsistent');
-        }
+        assert(this.panner !== undefined,
+            'Inconsistent audio effect panner');
 
         this.bufferSource = new AudioBufferSourceNode(this.context, {
             buffer: this.audioEffect.buffer,
@@ -87,9 +86,8 @@ export class GameObjectAudioRenderer {
     }
 
     private destroyBufferSource(): boolean {
-        if (this.bufferSource === undefined) {
-            throw new Error('Audio effect panner is inconsistent');
-        }
+        assert(this.bufferSource !== undefined,
+            'Inconsistent audio effect buffer source');
 
         this.bufferSource.stop();
         this.bufferSource.disconnect();

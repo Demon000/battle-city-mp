@@ -5,6 +5,7 @@ import { DrawableProperties } from './IDrawable';
 import { ImageUtils, Source } from '../utils/ImageUtils';
 import { CLIENT_FONTS_RELATIVE_URL } from '@/config';
 import { CanvasUtils, Canvas } from '@/utils/CanvasUtils';
+import { assert } from '@/utils/assert';
 
 export interface FontFaceProperties {
     family: string;
@@ -89,9 +90,7 @@ export class TextDrawable extends BaseDrawable {
 
         const canvas = CanvasUtils.create(width, height);
         const context = canvas.getContext('2d');
-        if (context == null) {
-            throw new Error('Failed to create offscreen canvas context');
-        }
+        assert(context !== null, 'Failed to create offscreen canvas context');
 
         const fontFamily = properties.fontFamily ?? 'Arial';
         context.font = `${fontSize}px '${fontFamily}'`;
@@ -131,9 +130,8 @@ export class TextDrawable extends BaseDrawable {
 
         const canvas = CanvasUtils.create(width, height);
         const context = canvas.getContext('2d');
-        if (context == null) {
-            throw new Error('Failed to create offscreen canvas context');
-        }
+        assert(context !== null, 'Failed to create offscreen canvas context');
+
 
         if (properties.backgroundColor !== undefined) {
             context.fillStyle = this.getContextBackgroundFillStyle();

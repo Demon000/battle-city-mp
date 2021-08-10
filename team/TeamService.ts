@@ -1,3 +1,4 @@
+import { assert } from '@/utils/assert';
 import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import { Team } from './Team';
@@ -66,9 +67,7 @@ export class TeamService {
             }
         }
 
-        if (foundTeam === undefined) {
-            throw new Error('Failed to find team');
-        }
+        assert(foundTeam !== undefined, 'Failed to find team with least players');
 
         return foundTeam;
     }

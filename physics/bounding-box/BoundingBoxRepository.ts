@@ -2,6 +2,7 @@ import { BoundingBox } from './BoundingBox';
 import { BoundingBoxNode } from '../bounding-box-tree/BoundingBoxNode';
 import { BoundingBoxTree } from '../bounding-box-tree/BoundingBoxTree';
 import { Config } from '@/config/Config';
+import { assert } from '@/utils/assert';
 
 export class BoundingBoxRepository<V> {
     tree = new BoundingBoxTree<V>();
@@ -21,10 +22,7 @@ export class BoundingBoxRepository<V> {
 
     private getNode(value: V): BoundingBoxNode<V> {
         const node = this.map.get(value);
-        if (!node) {
-            throw new Error(`Node does not exist for value: ${value}`);
-        }
-
+        assert(node !== undefined, `Node does not exist for value '${value}'`);
         return node;
     }
 
@@ -34,9 +32,8 @@ export class BoundingBoxRepository<V> {
     }
 
     addBoxValue(value: V, box: BoundingBox): void {
-        if (this.map.has(value)) {
-            throw new Error(`Node already exists with value: ${value}`);
-        }
+        assert(!this.map.has(value),
+            `Node already exists with value '${value}'`);
 
         const node = new BoundingBoxNode<V>({
             fatGrowFactor: this.config.get('bounding-box', 'fatGrowFactor'),

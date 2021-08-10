@@ -1,6 +1,7 @@
 import { Action } from '@/actions/Action';
 import { Color } from '@/drawable/Color';
 import { TankTier } from '@/tank/TankTier';
+import { assert } from '@/utils/assert';
 import { Socket } from 'socket.io-client';
 import { GameClient } from './GameClient';
 import { BatchGameEvent, GameEvent } from './GameEvent';
@@ -74,7 +75,7 @@ export class GameClientSocket {
                 this.gameClient.onRoundTimeUpdated(batch[1]);
                 break;
             default:
-                throw new Error('Invalid event');
+                assert(false, `Invalid event '${batch[0]}'`);
         }
     }
 

@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import jp from 'jsonpath';
 import JSON5 from 'json5';
+import { assert } from '@/utils/assert';
 
 export class Config {
     private nameToData = {} as Record<string, any>;
@@ -33,7 +34,7 @@ export class Config {
     getData<T = any>(name: string): T {
         const data = this.nameToData[name];
         if (data === undefined) {
-            throw new Error(`Invalid configuration name '${name}'`);
+            assert(false, `Invalid configuration name '${name}'`);
         }
 
         return data;
@@ -60,9 +61,7 @@ export class Config {
 
     getDataMember<T>(data: Record<string, any>, member: string): T {
         const value = this.findDataMember<T>(data, member);
-        if (value === undefined) {
-            throw new Error(`Invalid value for member '${member}'`);
-        }
+        assert(value !== undefined, `Invalid value for member '${member}'`);
 
         return value;
     }

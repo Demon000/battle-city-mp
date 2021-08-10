@@ -796,9 +796,8 @@ export class GameServer {
         this.playerService.resetFields();
 
         const gameMap = this.gameMapService.getLoadedMap();
-        if (gameMap === undefined) {
-            throw new Error('Cannot reload game without a loaded map');
-        }
+        assert(gameMap !== undefined, 'Cannot reload game without a loaded map');
+
         this.loadMap(gameMap);
 
         this.ticker.start();

@@ -1,4 +1,5 @@
 import { Point } from '@/physics/point/Point';
+import { assert } from '@/utils/assert';
 import { BaseImageDrawable } from './BaseImageDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
@@ -21,9 +22,9 @@ export class AnimatedImageDrawable extends BaseImageDrawable {
     ) {
         super();
 
-        if (drawables.length !== durations.length) {
-            throw new Error('Timings do not match animated drawables');
-        }
+        assert(drawables.length === durations.length,
+            'Timings do not match animated drawables, ' +
+            `${drawables.length} != ${durations.length}`);
 
         this.drawables = drawables;
         this.durations = durations;
@@ -74,19 +75,19 @@ export class AnimatedImageDrawable extends BaseImageDrawable {
     }
 
     getRenderPass(): number {
-        throw new Error('Cannot get render pass of animated image drawable');
+        assert(false, 'Cannot get render pass of animated image drawable');
     }
 
     draw(_context: CanvasRenderingContext2D, _drawX: number, _drawY: number): void {
-        throw new Error('Cannot draw animated image drawable');
+        assert(false, 'Cannot draw animated image drawable');
     }
 
     getMinPoint(): Point {
-        throw new Error('Cannot get min point of animated image drawable');
+        assert(false, 'Cannot get min point of animated image drawable');
     }
 
     getMaxPoint(): Point {
-        throw new Error('Cannot get max point of animated image drawable');
+        assert(false, 'Cannot get max point of animated image drawable');
     }
 
     private copy(drawables: IImageDrawable[]): this {

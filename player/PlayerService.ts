@@ -1,6 +1,7 @@
 import { Config } from '@/config/Config';
 import { Color } from '@/drawable/Color';
 import { TankTier } from '@/tank/TankTier';
+import { assert } from '@/utils/assert';
 import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import { ButtonPressAction, MOVE_BUTTON_TYPES, ButtonState, BUTTON_TYPE_DIRECTION, ButtonType } from '../actions/ButtonPressAction';
@@ -93,9 +94,8 @@ export class PlayerService {
     }
 
     createPlayer(playerId: string): void {
-        if (this.repository.exists(playerId)) {
-            throw new Error('Player is already connected');
-        }
+        assert(!this.repository.exists(playerId),
+            `Player with id '${playerId}' is already connected`);
  
         const player = new Player({
             id: playerId,

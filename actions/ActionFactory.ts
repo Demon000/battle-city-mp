@@ -8,7 +8,7 @@ export class ActionFactory {
         if (options.type === ActionType.BUTTON_PRESS) {
             return new ButtonPressAction(options as ButtonPressActionOptions);
         } else {
-            throw new Error('Action options type is invalid');
+            assert(false, 'Action options type is invalid');
         }
     }
 
@@ -23,7 +23,7 @@ export class ActionFactory {
         } else if (event.type === 'keyup') {
             buttonState = ButtonState.UNPRESSED;
         } else {
-            throw new Error('Invalid keyboard event type');
+            assert(false, 'Invalid keyboard event type');
         }
 
         let buttonType;
@@ -71,7 +71,7 @@ export class ActionFactory {
                 buttonState = ButtonState.PRESSED;
                 break;
             default:
-                throw new Error(`Invalid joystick event type: ${type}`);
+                assert(false, `Invalid joystick event type '${type}'`);
         }
 
         let buttonType;
@@ -89,7 +89,7 @@ export class ActionFactory {
                 buttonType = ButtonType.LEFT;
                 break;
             default:
-                throw new Error(`Invalid joystick button angle: ${angle}`);
+                assert(false, `Invalid joystick button angle '${angle}'`);
         }
 
         return new ButtonPressAction({
@@ -109,7 +109,7 @@ export class ActionFactory {
                 buttonState = ButtonState.PRESSED;
                 break;
             default:
-                throw new Error(`Invalid button event type: ${type}`);
+                assert(false, `Invalid button event type '${type}'`);
         }
 
         return new ButtonPressAction({

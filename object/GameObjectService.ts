@@ -15,6 +15,7 @@ import { RequestedPositionComponent } from '@/physics/point/RequestedPositionCom
 import { RequestedDirectionComponent } from '@/physics/RequestedDirectionComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
 import { PlayerSpawn } from '@/player-spawn/PlayerSpawn';
+import { assert } from '@/utils/assert';
 import { Random } from '@/utils/Random';
 import EventEmitter from 'eventemitter3';
 import { Direction } from '../physics/Direction';
@@ -88,9 +89,8 @@ export class GameObjectService {
         }
 
         const playerSpawnObject = Random.getRandomArrayElement(playerSpawnObjects);
-        if (playerSpawnObject === undefined) {
-            throw new Error('Failed to get random spawn object');
-        }
+        assert(playerSpawnObject !== undefined,
+            'Failed to get random spawn object');
 
         return playerSpawnObject.getComponent(PositionComponent);
     }
