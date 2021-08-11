@@ -6,6 +6,7 @@ import { Entity } from './Entity';
 import { EntityId } from './EntityId';
 import { RegistryIdGenerator } from './RegistryIdGenerator';
 import { LazyIterable } from '@/utils/LazyIterable';
+import { nonenumerable } from '@/utils/enumerable';
 
 export enum RegistryEvent {
     ENTITY_REGISTERED = 'entity-registered',
@@ -57,10 +58,15 @@ export type DataHandlingFn = <C extends Component<C>>(
 ) => C;
 
 export class Registry {
+    @nonenumerable
     private tagsComponentsMap = new Map<string, Set<Component<any>>>();
+
+    @nonenumerable
     private componentsEmitterMap = new Map<string, EventEmitter<RegistryComponentEvents>>();
 
+    @nonenumerable
     private idsEntityMap = new Map<EntityId, Entity>();
+
     emitter = new EventEmitter<RegistryEvents & RegistryComponentEvents>();
 
     constructor(
