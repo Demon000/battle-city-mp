@@ -1,4 +1,3 @@
-import { Bullet, BulletOptions } from '@/bullet/Bullet';
 import { Config } from '@/config/Config';
 import { Registry } from '@/ecs/Registry';
 import { EntityBlueprint } from '@/ecs/EntityBlueprint';
@@ -53,8 +52,6 @@ export class GameObjectFactory {
 
         if (options.type === GameObjectType.TANK) {
             object = new Tank(options as TankOptions, properties as TankProperties, this.registry);
-        } else if (options.type === GameObjectType.BULLET) {
-            object = new Bullet(options as BulletOptions, properties, this.registry);
         } else if (options.type === GameObjectType.EXPLOSION) {
             object = new Explosion(options as ExplosionOptions, properties, this.registry);
         } else if (options.type === GameObjectType.PLAYER_SPAWN) {

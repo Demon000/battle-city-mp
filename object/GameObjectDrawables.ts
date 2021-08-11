@@ -1,5 +1,5 @@
-import { Bullet } from '@/bullet/Bullet';
 import { BulletPower } from '@/bullet/BulletPower';
+import { BulletComponent } from '@/components/BulletComponent';
 import { IsMovingComponent } from '@/components/IsMovingComponent';
 import { IsUnderBushComponent } from '@/components/IsUnderBushComponent';
 import { AnimatedImageDrawable } from '@/drawable/AnimatedImageDrawable';
@@ -435,9 +435,10 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                             tests: [
                                 directionTest(direction),
                                 (object: GameObject): boolean => {
-                                    const bullet = object as Bullet;
+                                    const bulletPower = object
+                                        .getComponent(BulletComponent).power;
 
-                                    if (bullet.power !== power) {
+                                    if (bulletPower !== power) {
                                         return false;
                                     }
 

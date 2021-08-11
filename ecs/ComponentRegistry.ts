@@ -20,6 +20,9 @@ import { RequestedDirectionComponent, RequestedDirectionComponentData } from '@/
 import { TankComponent, TankComponentData } from '@/tank/TankComponent';
 import { SpawnComponent, SpawnComponentData } from '@/components/SpawnComponent';
 import { IsMovingTrackingComponent, IsMovingTrackingComponentData } from '@/components/IsMovingTrackingComponent';
+import { PlayerOwnedComponent, PlayerOwnedComponentData } from '@/components/PlayerOwnedComponent';
+import { EntityOwnedComponent, EntityOwnedComponentData } from '@/components/EntityOwnedComponent';
+import { BulletComponent, BulletComponentData } from '@/components/BulletComponent';
 
 export interface ProcessResults {
     clazz: ComponentClassType<any>;
@@ -110,6 +113,18 @@ export class ComponentRegistry {
             case IsMovingTrackingComponent.tag:
                 clazz = IsMovingTrackingComponent;
                 if (data !== undefined) assertType<Partial<IsMovingTrackingComponentData>>(data);
+                break;
+            case PlayerOwnedComponent.tag:
+                clazz = PlayerOwnedComponent;
+                if (data !== undefined) assertType<Partial<PlayerOwnedComponentData>>(data);
+                break;
+            case EntityOwnedComponent.tag:
+                clazz = EntityOwnedComponent;
+                if (data !== undefined) assertType<Partial<EntityOwnedComponentData>>(data);
+                break;
+            case BulletComponent.tag:
+                clazz = BulletComponent;
+                if (data !== undefined) assertType<Partial<BulletComponentData>>(data);
                 break;
             default:
                 assert(false, `Invalid tag '${tag}'`);

@@ -61,6 +61,10 @@ export class PlayerService {
         private repository: MapRepository<string, Player>,
     ) {}
 
+    findPlayer(playerId: string): Player | undefined {
+        return this.repository.find(playerId);
+    }
+
     getPlayer(playerId: string): Player {
         return this.repository.get(playerId);
     }

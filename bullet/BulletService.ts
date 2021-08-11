@@ -1,4 +1,7 @@
+import { BulletComponent } from '@/components/BulletComponent';
+import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
+import { GameObject, GameObjectOptions } from '@/object/GameObject';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
@@ -11,7 +14,6 @@ import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent
 import { PositionComponent } from '@/physics/point/PositionComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
 import { Tank } from '@/tank/Tank';
-import { Bullet, BulletOptions } from './Bullet';
 import { BulletPower } from './BulletPower';
 
 export class BulletService {
@@ -21,7 +23,7 @@ export class BulletService {
     ) {}
 
     getBulletBrickWallDestroyBox(bulletId: number, brickWallId: number): BoundingBox {
-        const bullet = this.registry.getEntityById(bulletId) as Bullet;
+        const bullet = this.registry.getEntityById(bulletId);
         const brickWall = this.registry.getEntityById(brickWallId);
         const brickWallBoundingBox = BoundingBoxUtils.clone(
             brickWall.getComponent(BoundingBoxComponent),
@@ -33,6 +35,8 @@ export class BulletService {
             brickWall.getComponent(CenterPositionComponent);
         const bulletDirection =
             bullet.getComponent(DirectionComponent).value;
+        const bulletPower =
+            bullet.getComponent(BulletComponent).power;
 
         const brickWallSize = brickWall.getComponent(SizeComponent);
         const brickWallWidth = brickWallSize.width;
@@ -46,7 +50,7 @@ export class BulletService {
                 brickWallBoundingBox.br.y += brickWallHeight;
             }
 
-            if (bullet.power === BulletPower.HEAVY) {
+            if (bulletPower === BulletPower.HEAVY) {
                 if (bulletDirection === Direction.RIGHT) {
                     brickWallBoundingBox.br.x += brickWallWidth;
                 } else {
@@ -62,7 +66,7 @@ export class BulletService {
                 brickWallBoundingBox.br.x += brickWallWidth;
             }
 
-            if (bullet.power === BulletPower.HEAVY) {
+            if (bulletPower === BulletPower.HEAVY) {
                 if (bulletDirection === Direction.DOWN) {
                     brickWallBoundingBox.br.y += brickWallHeight;
                 } else {
@@ -74,22 +78,29 @@ export class BulletService {
         return brickWallBoundingBox;
     }
 
-    createBulletForTank(tank: Tank): Bullet {
+    createBulletForTank(tank: Tank): GameObject {
         const centerPosition = tank.getComponent(CenterPositionComponent);
         const direction = tank.getComponent(DirectionComponent);
         const bullet = this.gameObjectFactory.buildFromOptions({
             type: GameObjectType.BULLET,
+            subtypes: [tank.bulletPower],
             options: {
                 movementDirection: direction.value,
                 movementSpeed: tank.bulletSpeed,
-                tankId: tank.id,
-                playerId: tank.playerId,
-                power: tank.bulletPower,
-            } as BulletOptions,
+            },
             components: {
                 DirectionComponent: direction,
+                BulletComponent: {
+                    power: tank.bulletPower,
+                },
+                PlayerOwnedComponent: {
+                    playerId: tank.playerId,
+                },
+                EntityOwnedComponent: {
+                    entityId: tank.id,
+                },
             },
-        }) as Bullet;
+        });
 
         const bulletSize = bullet.getComponent(SizeComponent);
         bullet.updateComponent(PositionComponent, {

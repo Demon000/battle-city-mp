@@ -1,4 +1,3 @@
-import { Bullet } from '@/bullet/Bullet';
 import { BulletPower } from '@/bullet/BulletPower';
 import { BulletService } from '@/bullet/BulletService';
 import { Color } from '@/drawable/Color';
@@ -49,6 +48,9 @@ import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent
 import { PositionComponent } from '@/physics/point/PositionComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
 import { Entity } from '@/ecs/Entity';
+import { EntityOwnedComponent } from '@/components/EntityOwnedComponent';
+import { BulletComponent } from '@/components/BulletComponent';
+import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -147,8 +149,10 @@ export class GameServer {
                         break;
                     }
                     case GameObjectType.BULLET: {
-                        const bullet = object as Bullet;
-                        this.tankService.addTankBullet(bullet.tankId, bullet.id);
+                        const bulletOwnerEntityId =
+                            object.getComponent(EntityOwnedComponent).entityId;
+                        this.tankService.addTankBullet(bulletOwnerEntityId,
+                            object.id);
                         break;
                     }
                 }
@@ -165,13 +169,10 @@ export class GameServer {
                         break;
                     }
                     case GameObjectType.BULLET: {
-                        const bullet = object as Bullet;
-                        const tank = this.registry.findEntityById(bullet.tankId);
-                        if (tank === undefined) {
-                            break;
-                        }
-
-                        this.tankService.removeTankBullet(bullet.tankId, entity.id);
+                        const bulletOwnerEntityId =
+                            object.getComponent(EntityOwnedComponent).entityId;
+                        this.tankService.removeTankBullet(bulletOwnerEntityId,
+                            entity.id);
                         break;
                     }
                 }
@@ -407,10 +408,11 @@ export class GameServer {
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_STEEL_WALL,
             (bulletId: number, steelWallId: number, _position: Point) => {
-                const bullet = this.registry.getEntityById(bulletId) as Bullet;
+                const bullet = this.registry.getEntityById(bulletId);
                 const steelWall = this.registry.getEntityById(steelWallId);
                 this.gameObjectService.markDestroyed(bullet);
-                if (bullet.power === BulletPower.HEAVY) {
+                const bulletPower = bullet.getComponent(BulletComponent).power;
+                if (bulletPower === BulletPower.HEAVY) {
                     spawnExplosion(bullet, ExplosionType.SMALL);
                     this.gameObjectService.markDestroyed(steelWall);
                 } else {
@@ -436,54 +438,65 @@ export class GameServer {
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_TANK,
             (bulletId: number, tankId: number, _position: Point) => {
-                const bullet = this.registry.getEntityById(bulletId) as Bullet;
-                if (bullet.tankId === tankId) {
+                const bullet = this.registry.getEntityById(bulletId);
+
+                const bulletOwnerEntityId =
+                    bullet.getComponent(EntityOwnedComponent).entityId;
+                if (bulletOwnerEntityId === tankId) {
                     return;
                 }
 
                 const tank = this.registry.getEntityById(tankId) as Tank;
+                const bulletOwnerPlayerId =
+                    bullet.getComponent(PlayerOwnedComponent).playerId;
+                const tankPlayer = this.playerService.findPlayer(tank.playerId);
+                const bulletPlayer = this.playerService.findPlayer(bulletOwnerPlayerId);
+                const isSameTeamShot = tankPlayer?.teamId === bulletPlayer?.teamId;
+
                 const gameModeProperties = this.gameModeService.getGameModeProperties();
-
-                let ignoreBulletDamage = false;
                 let destroyBullet = false;
-                if (SameTeamBulletHitMode.DESTROY === gameModeProperties.sameTeamBulletHitMode
-                    || SameTeamBulletHitMode.PASS === gameModeProperties.sameTeamBulletHitMode) {
-                    const tankPlayer = this.playerService.getPlayer(tank.playerId);
+                let ignoreBulletDamage = false;
 
-                    let bulletPlayer;
-                    if (bullet.playerId !== undefined) {
-                        bulletPlayer = this.playerService.getPlayer(bullet.playerId);
-                    }
-
-                    if (bulletPlayer !== undefined && bulletPlayer.teamId === tankPlayer.teamId) {
-                        ignoreBulletDamage = true;
-
-                        if (gameModeProperties.sameTeamBulletHitMode === SameTeamBulletHitMode.DESTROY) {
-                            destroyBullet = true;
-                        }
-                    }
+                if (isSameTeamShot
+                    && gameModeProperties.sameTeamBulletHitMode
+                        === SameTeamBulletHitMode.DESTROY) {
+                    destroyBullet = true;
+                    ignoreBulletDamage = true;
+                } else if (isSameTeamShot
+                    && gameModeProperties.sameTeamBulletHitMode
+                        === SameTeamBulletHitMode.PASS) {
+                    ignoreBulletDamage = true;
+                } else if (!isSameTeamShot ||
+                    gameModeProperties.sameTeamBulletHitMode
+                        === SameTeamBulletHitMode.ALLOW) {
+                    destroyBullet = true;
                 }
 
+                const bulletComponent = bullet.getComponent(BulletComponent);
+                let bulletDamage = bulletComponent.damage;
                 if (!ignoreBulletDamage) {
                     const tankHealth = tank.health;
-                    const bulletDamage = bullet.damage;
 
                     this.tankService.decreaseTankHealth(tankId, bulletDamage);
-                    bullet.damage -= tankHealth;
+                    bulletDamage -= tankHealth;
+
+                    bulletComponent.update({
+                        damage: bulletDamage,
+                    });
                 }
 
                 if (tank.health <= 0) {
                     spawnExplosion(tank, ExplosionType.BIG, GameObjectType.TANK);
                     this.playerService.setPlayerRequestedSpawnStatus(tank.playerId, PlayerSpawnStatus.DESPAWN);
                     this.playerService.addPlayerDeath(tank.playerId);
-                    if (bullet.playerId !== undefined) {
-                        this.playerService.addPlayerKill(bullet.playerId);
+                    if (bulletPlayer !== undefined) {
+                        this.playerService.addPlayerKill(bulletPlayer.id);
                     }
                 } else {
                     spawnExplosion(bullet, ExplosionType.SMALL, GameObjectType.NONE);
                 }
 
-                if (destroyBullet || bullet.damage <= 0) {
+                if (destroyBullet || bulletDamage <= 0) {
                     spawnExplosion(bullet, ExplosionType.SMALL);
                     this.gameObjectService.markDestroyed(bullet);
                 }
@@ -491,9 +504,13 @@ export class GameServer {
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BULLET,
             (movingBulletId: number, staticBulletId: number, _position: Point) => {
-                const movingBullet = this.registry.getEntityById(movingBulletId) as Bullet;
-                const staticBullet = this.registry.getEntityById(staticBulletId) as Bullet;
-                if (movingBullet.tankId === staticBullet.tankId) {
+                const movingBullet = this.registry.getEntityById(movingBulletId);
+                const staticBullet = this.registry.getEntityById(staticBulletId);
+                const movingBulletOwnerEntityId =
+                    staticBullet.getComponent(EntityOwnedComponent).entityId;
+                const staticBulletOwnerEntityId =
+                    staticBullet.getComponent(EntityOwnedComponent).entityId;
+                if (movingBulletOwnerEntityId === staticBulletOwnerEntityId) {
                     return;
                 }
 

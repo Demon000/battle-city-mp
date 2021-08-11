@@ -78,7 +78,10 @@ export class TankService {
     }
 
     addRemoveTankBullets(tankId: number, bulletId: number, add: boolean): void {
-        const tank = this.registry.getEntityById(tankId) as Tank;
+        const tank = this.registry.findEntityById(tankId) as Tank;
+        if (tank === undefined) {
+            return;
+        }
 
         if (add) {
             tank.bulletIds.push(bulletId);

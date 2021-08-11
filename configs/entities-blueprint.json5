@@ -147,6 +147,32 @@
             IsMovingComponent: {},
             IsMovingTrackingComponent: {},
         },
+        serverComponents: {
+            PlayerOwnedComponent: {},
+            EntityOwnedComponent: {},
+        },
+    },
+    'bullet-light': {
+        extends: [
+            'bullet',
+        ],
+        localComponents: {
+            BulletComponent: {
+                damage: 1,
+                power: 'light',
+            },
+        },
+    },
+    'bullet-heavy': {
+        extends: [
+            'bullet',
+        ],
+        localComponents: {
+            BulletComponent: {
+                damage: 2,
+                power: 'heavy',
+            },
+        },
     },
     'explosion': {
         extends: [
