@@ -118,12 +118,12 @@ export class Registry {
     }
 
     destroyEntity(entity: Entity): void {
-        entity.removeComponents();
-
         const entityIdExists = this.idsEntityMap.has(entity.id);
         assert(entityIdExists);
 
         this.emitter.emit(RegistryEvent.ENTITY_BEFORE_DESTROY, entity);
+
+        entity.removeComponents();
 
         const entityIdExisted = this.idsEntityMap.delete(entity.id);
         assert(entityIdExisted);
