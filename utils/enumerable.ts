@@ -1,4 +1,4 @@
-export const enumerable = <T>(target: T, key: keyof T): void => {
+export const enumerable = <T>(target: T, key: any): void => {
     Object.defineProperty(target, key,  {
         set(value) {
             Object.defineProperty(this, key, {
@@ -13,7 +13,7 @@ export const enumerable = <T>(target: T, key: keyof T): void => {
     });
 };
 
-export const nonenumerable = <T>(target: T, key: keyof T): void => {
+export const nonenumerable = <T>(target: T, key: any): void => {
     Object.defineProperty(target, key,  {
         set(value) {
             Object.defineProperty(this, key, {
