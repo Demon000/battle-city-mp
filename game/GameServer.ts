@@ -51,6 +51,7 @@ import { Entity } from '@/ecs/Entity';
 import { EntityOwnedComponent } from '@/components/EntityOwnedComponent';
 import { BulletComponent } from '@/bullet/BulletComponent';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
+import { ColorComponent } from '@/components/ColorComponent';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -616,16 +617,20 @@ export class GameServer {
         interaction: FlagTankInteraction,
     ): void {
         switch (interaction) {
-            case FlagTankInteraction.STEAL:
+            case FlagTankInteraction.STEAL: {
                 assert(flag !== undefined);
-                this.tankService.setTankFlag(tank.id, flag.teamId, flag.color, flag.id);
+                const flagColor = flag.getComponent(ColorComponent).value;
+                this.tankService.setTankFlag(tank.id, flag.teamId, flagColor, flag.id);
                 this.flagService.setFlagType(flag.id, FlagType.BASE_ONLY);
                 break;
-            case FlagTankInteraction.PICK:
+            }
+            case FlagTankInteraction.PICK: {
                 assert(flag !== undefined);
-                this.tankService.setTankFlag(tank.id, flag.teamId, flag.color, flag.sourceId);
+                const flagColor = flag.getComponent(ColorComponent).value;
+                this.tankService.setTankFlag(tank.id, flag.teamId, flagColor, flag.sourceId);
                 this.gameObjectService.markDestroyed(flag);
                 break;
+            }
             case FlagTankInteraction.RETURN:
                 assert(flag !== undefined);
                 this.tankService.clearTankFlag(tank.id);

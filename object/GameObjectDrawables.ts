@@ -192,10 +192,10 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             renderPass: RenderPass.FLAG_POLE,
             offsetX: 8,
             offsetY: -15,
-            processor: function (object: GameObject) {
+            processor: function (entity: Entity) {
                 const drawable = this as IImageDrawable;
-                const flag = object as Flag;
-                return drawable.colorMask(flag.color);
+                const color = entity.getComponent(ColorComponent).value;
+                return drawable.colorMask(color);
             },
             tests: [
                 (object: GameObject): boolean => {

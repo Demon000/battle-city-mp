@@ -43,13 +43,15 @@ export class FlagService {
             type: GameObjectType.FLAG,
             options: {
                 teamId: tank.flagTeamId,
-                color: tank.flagColor,
                 flagType: FlagType.POLE_ONLY,
                 sourceId: tank.flagSourceId,
                 droppedTankId: tank.id,
             } as FlagOptions,
             components: {
                 PositionComponent: position,
+                ColorComponent: {
+                    value: tank.flagColor,
+                },
             },
         }) as Flag;
     }

@@ -11,6 +11,7 @@ import { GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
 import { Point } from '@/physics/point/Point';
 import { GameObjectOptions } from '@/object/GameObject';
 import { assert } from '@/utils/assert';
+import { ComponentsInitialization } from '@/ecs/Component';
 
 export interface GameMapOptions {
     name: string;
@@ -24,6 +25,7 @@ export interface GameMapOptions {
 
 export interface LegacyGameObjectOptions extends GameObjectOptions {
     position: Point;
+    color?: Color;
 }
 
 export class GameMap {
@@ -76,12 +78,20 @@ export class GameMap {
         const fileData = fs.readFileSync(filePath, 'utf8');
         const data = JSON5.parse(fileData).map(
             (options: LegacyGameObjectOptions) => {
+                const components: ComponentsInitialization = {
+                    PositionComponent: options.position,
+                };
+
+                if (options.color !== undefined) {
+                    components.ColorComponent = {
+                        value: options.color,
+                    };
+                }
+
                 return {
                     type: options.type,
                     options: options,
-                    components: {
-                        PositionComponent: options.position,
-                    },
+                    components: components,
                 };
             },
         );

@@ -228,6 +228,9 @@
             'positioned-entity',
             'bounding-boxed-entity',
         ],
+        components: {
+            ColorComponent: {},
+        },
         localComponents: {
             SizeComponent: {
                 width: 16,
