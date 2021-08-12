@@ -245,6 +245,7 @@
         ],
         components: {
             DirectionComponent: {},
+            ColorComponent: {},
         },
         localComponents: {
             SizeComponent: {

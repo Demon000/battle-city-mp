@@ -1,5 +1,6 @@
 import { BulletPower } from '@/bullet/BulletPower';
 import { BulletComponent } from '@/bullet/BulletComponent';
+import { ColorComponent } from '@/components/ColorComponent';
 import { IsMovingComponent } from '@/components/IsMovingComponent';
 import { IsUnderBushComponent } from '@/components/IsUnderBushComponent';
 import { AnimatedImageDrawable } from '@/drawable/AnimatedImageDrawable';
@@ -7,6 +8,7 @@ import { IDrawable, DrawableProcessingFunction, DrawableTestFunction } from '@/d
 import { IImageDrawable } from '@/drawable/IImageDrawable';
 import { ImageDrawable } from '@/drawable/ImageDrawable';
 import { TextDrawable, TextPositionReference } from '@/drawable/TextDrawable';
+import { Entity } from '@/ecs/Entity';
 import { Explosion } from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { Flag, FlagType } from '@/flag/Flag';
@@ -241,10 +243,10 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                 ];
             };
 
-            const tankColorProcessor: DrawableProcessingFunction = function (object: GameObject) {
+            const tankColorProcessor: DrawableProcessingFunction = function (entity: Entity) {
                 const drawable = this as IImageDrawable;
-                const tank = object as Tank;
-                return drawable.colorMask(tank.color);
+                const color = entity.getComponent(ColorComponent).value;
+                return drawable.colorMask(color);
             };
 
             const generateTankDrawableFrame = (

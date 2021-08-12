@@ -23,6 +23,7 @@ import { IsMovingTrackingComponent, IsMovingTrackingComponentData } from '@/comp
 import { PlayerOwnedComponent, PlayerOwnedComponentData } from '@/components/PlayerOwnedComponent';
 import { EntityOwnedComponent, EntityOwnedComponentData } from '@/components/EntityOwnedComponent';
 import { BulletComponent, BulletComponentData } from '@/bullet/BulletComponent';
+import { ColorComponent, ColorComponentData } from '@/components/ColorComponent';
 
 export interface ProcessResults {
     clazz: ComponentClassType<any>;
@@ -125,6 +126,10 @@ export class ComponentRegistry {
             case BulletComponent.tag:
                 clazz = BulletComponent;
                 if (data !== undefined) assertType<Partial<BulletComponentData>>(data);
+                break;
+            case ColorComponent.tag:
+                clazz = ColorComponent;
+                if (data !== undefined) assertType<Partial<ColorComponentData>>(data);
                 break;
             default:
                 assert(false, `Invalid tag '${tag}'`);

@@ -38,7 +38,6 @@ export interface TankOptions extends GameObjectOptions {
     lastSmokeTime?: number;
     bulletIds?: number[];
     teamId?: string | null;
-    color: Color;
     health?: number;
     flagTeamId?: string | null;
     flagColor?: Color | null;
@@ -60,7 +59,6 @@ export class Tank extends GameObject {
     lastSmokeTime: number;
     bulletIds: number[];
     teamId: string | null;
-    color: Color;
     health: number;
     flagTeamId: string | null;
     flagSourceId: number | null;
@@ -82,7 +80,6 @@ export class Tank extends GameObject {
         this.lastSmokeTime = options.lastSmokeTime ?? 0;
         this.bulletIds = options.bulletIds ?? new Array<number>();
         this.teamId = options.teamId ?? null;
-        this.color = options.color;
         this.health = options.health ?? this.maxHealth;
         this.flagTeamId = options.flagTeamId ?? null;
         this._flagColor = options.flagColor ?? null;
@@ -98,7 +95,6 @@ export class Tank extends GameObject {
             lastBulletShotTime: this.lastBulletShotTime,
             bulletIds: this.bulletIds,
             teamId: this.teamId,
-            color: this.color,
             health: this.health,
             flagColor: this.flagColor,
         };
@@ -114,7 +110,6 @@ export class Tank extends GameObject {
         if (options.lastSmokeTime !== undefined) this.lastSmokeTime = options.lastSmokeTime;
         if (options.bulletIds !== undefined) this.bulletIds = options.bulletIds;
         if (options.teamId !== undefined) this.teamId = options.teamId;
-        if (options.color !== undefined) this.color = options.color;
         if (options.health !== undefined) this.health = options.health;
         if (options.flagColor !== undefined) this.flagColor = options.flagColor;
     }
