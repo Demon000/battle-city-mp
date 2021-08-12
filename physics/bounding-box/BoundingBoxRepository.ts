@@ -20,8 +20,12 @@ export class BoundingBoxRepository<V> {
         return this.map.has(value);
     }
 
+    findNode(value: V): BoundingBoxNode<V> | undefined {
+        return this.map.get(value);
+    }
+
     private getNode(value: V): BoundingBoxNode<V> {
-        const node = this.map.get(value);
+        const node = this.findNode(value);
         assert(node !== undefined, `Node does not exist for value '${value}'`);
         return node;
     }
@@ -58,11 +62,6 @@ export class BoundingBoxRepository<V> {
     updateBoxValue(value: V, box: BoundingBox): void {
         const node = this.getNode(value);
         node.realBox = box;
-
-        if (node.isFatBoxFitting()) {
-            return;
-        }
-
         this.tree.removeNode(node);
         node.recalculateFatBox();
         this.addNode(value, node);

@@ -87,12 +87,16 @@ export class BoundingBoxNode<V> {
         this.children.right = node;
     }
 
-    isFatBoxFitting(): boolean {
+    isFatBoxFitting(box?: BoundingBox): boolean {
         if (this.fatBox === undefined) {
             return true;
         }
 
-        return BoundingBoxUtils.contains(this.fatBox, this.realBox);
+        if (box === undefined) {
+            box = this.realBox;
+        }
+
+        return BoundingBoxUtils.contains(this.fatBox, box);
     }
 
     recalculateFatBox(): void {

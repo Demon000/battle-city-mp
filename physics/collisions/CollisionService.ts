@@ -400,13 +400,23 @@ export class CollisionService {
     }
 
     markDirtyCollisions(entity: Entity): void {
+        const node = this.boundingBoxRepository.findNode(entity.id);
+        const boundingBox = entity.findComponent(BoundingBoxComponent);
+        if (node !== undefined && boundingBox !== undefined
+            && node.isFatBoxFitting(boundingBox)) {
+            return;
+        }
+
         entity.upsertComponent(DirtyCollisionsComponent, undefined, {
             flags: ComponentFlags.LOCAL_ONLY,
         });
     }
 
     processObjectsDirtyCollisions(): void {
-        for (const entity of this.registry.getEntitiesWithComponent(DirtyCollisionsComponent)) {
+        for (const component of this.registry.getComponents(DirtyCollisionsComponent)) {
+            component.remove();
+
+            const entity = component.entity;
             const boundingBox = entity.findComponent(BoundingBoxComponent);
             if (boundingBox === undefined) {
                 this.boundingBoxRepository.removeValue(entity.id);
