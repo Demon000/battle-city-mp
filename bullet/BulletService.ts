@@ -1,4 +1,4 @@
-import { BulletComponent } from '@/components/BulletComponent';
+import { BulletComponent } from '@/bullet/BulletComponent';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 import { GameObject, GameObjectOptions } from '@/object/GameObject';

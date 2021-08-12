@@ -22,7 +22,7 @@ import { SpawnComponent, SpawnComponentData } from '@/components/SpawnComponent'
 import { IsMovingTrackingComponent, IsMovingTrackingComponentData } from '@/components/IsMovingTrackingComponent';
 import { PlayerOwnedComponent, PlayerOwnedComponentData } from '@/components/PlayerOwnedComponent';
 import { EntityOwnedComponent, EntityOwnedComponentData } from '@/components/EntityOwnedComponent';
-import { BulletComponent, BulletComponentData } from '@/components/BulletComponent';
+import { BulletComponent, BulletComponentData } from '@/bullet/BulletComponent';
 
 export interface ProcessResults {
     clazz: ComponentClassType<any>;

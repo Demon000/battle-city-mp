@@ -1,5 +1,5 @@
 import { BulletPower } from '@/bullet/BulletPower';
-import { BulletComponent } from '@/components/BulletComponent';
+import { BulletComponent } from '@/bullet/BulletComponent';
 import { IsMovingComponent } from '@/components/IsMovingComponent';
 import { IsUnderBushComponent } from '@/components/IsUnderBushComponent';
 import { AnimatedImageDrawable } from '@/drawable/AnimatedImageDrawable';

@@ -49,7 +49,7 @@ import { PositionComponent } from '@/physics/point/PositionComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
 import { Entity } from '@/ecs/Entity';
 import { EntityOwnedComponent } from '@/components/EntityOwnedComponent';
-import { BulletComponent } from '@/components/BulletComponent';
+import { BulletComponent } from '@/bullet/BulletComponent';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 
 export enum GameServerEvent {
