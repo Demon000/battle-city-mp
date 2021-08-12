@@ -11,14 +11,13 @@ import { nonenumerable } from '@/utils/enumerable';
 export enum RegistryEvent {
     ENTITY_REGISTERED = 'entity-registered',
     ENTITY_BEFORE_DESTROY = 'entity-before-destroy',
-    ENTITY_DESTROYED = 'entity-destroyed',
 }
 
 export enum RegistryComponentEvent {
     COMPONENT_ADDED = 'component-added',
     COMPONENT_UPDATED = 'component-updated',
     COMPONENT_BEFORE_REMOVE = 'component-before-remove',
-    COMPONENT_REMOVED = 'component-removed',
+    COMPONENT_CHANGED = 'component-changed',
 }
 
 export interface RegistryOperationOptions {
@@ -30,7 +29,6 @@ export interface RegistryOperationOptions {
 export interface RegistryEvents {
     [RegistryEvent.ENTITY_REGISTERED]: (entity: Entity) => void;
     [RegistryEvent.ENTITY_BEFORE_DESTROY]: (entity: Entity) => void;
-    [RegistryEvent.ENTITY_DESTROYED]: (entity: Entity) => void;
 }
 
 export interface RegistryComponentEvents {
@@ -45,8 +43,10 @@ export interface RegistryComponentEvents {
     [RegistryComponentEvent.COMPONENT_BEFORE_REMOVE]: <C extends Component<C>>(
         component: C,
     ) => void;
-    [RegistryComponentEvent.COMPONENT_REMOVED]: <C extends Component<C>>(
+    [RegistryComponentEvent.COMPONENT_CHANGED]: <C extends Component<C>>(
+        event: RegistryComponentEvent,
         component: C,
+        data?: any,
     ) => void;
 }
 
@@ -99,17 +99,25 @@ export class Registry {
         return componentEmitter;
     }
 
-    registerEntity(entity: Entity): void {
+    registerEntity(
+        entity: Entity,
+        options?: RegistryOperationOptions,
+    ): void {
         const entityIdExists = this.idsEntityMap.has(entity.id);
         assert(!entityIdExists);
         this.idsEntityMap.set(entity.id, entity);
 
-        this.emitter.emit(RegistryEvent.ENTITY_REGISTERED, entity);
+        if (!options?.silent) {
+            this.emitter.emit(RegistryEvent.ENTITY_REGISTERED, entity);
+        }
     }
 
-    registerEntities(entities: Iterable<Entity>): void {
+    registerEntities(
+        entities: Iterable<Entity>,
+        options: RegistryOperationOptions,
+    ): void {
         for (const entity of entities) {
-            this.registerEntity(entity);
+            this.registerEntity(entity, options);
         }
     }
 
@@ -117,18 +125,25 @@ export class Registry {
         return this.idGenerator.generate();
     }
 
-    destroyEntity(entity: Entity): void {
+    destroyEntity(
+        entity: Entity,
+        options?: RegistryOperationOptions,
+    ): void {
         const entityIdExists = this.idsEntityMap.has(entity.id);
         assert(entityIdExists);
 
-        this.emitter.emit(RegistryEvent.ENTITY_BEFORE_DESTROY, entity);
+        if (!options?.silent) {
+            entity.emitForEachComponent(RegistryComponentEvent.COMPONENT_BEFORE_REMOVE);
+            this.emitter.emit(RegistryEvent.ENTITY_BEFORE_DESTROY, entity);
+        }
 
-        entity.removeComponents();
+        entity.removeComponents({
+            ...options,
+            silent: true,
+        });
 
         const entityIdExisted = this.idsEntityMap.delete(entity.id);
         assert(entityIdExisted);
-
-        this.emitter.emit(RegistryEvent.ENTITY_DESTROYED, entity);
     }
 
     destroyAllEntities(): void {
@@ -163,15 +178,19 @@ export class Registry {
         return clazz;
     }
 
-    private emit<
+    emit<
         C extends Component<C>,
     >(event: RegistryComponentEvent, component: C, data?: any): void {
         const componentEmitter = this.componentEmitter(component.clazz);
         if (componentEmitter !== undefined) {
             componentEmitter.emit(event, component, data);
+            componentEmitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
+                event, component, data);
         }
 
         this.emitter.emit(event, component, data);
+        this.emitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
+            event, component, data);
     }
 
     runForComponentsInitialization(
@@ -320,10 +339,6 @@ export class Registry {
 
         const tagsHadComponent = tagComponents.delete(component);
         assert(tagsHadComponent);
-
-        if (!options?.silent) {
-            this.emit(RegistryComponentEvent.COMPONENT_REMOVED, component);
-        }
 
         return component;
     }

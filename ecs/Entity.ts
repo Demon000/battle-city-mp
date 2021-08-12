@@ -1,7 +1,7 @@
 import { assert } from '@/utils/assert';
 import { ClazzOrTag, Component, ComponentClassType, ComponentsInitialization } from './Component';
 import { EntityId } from './EntityId';
-import { Registry, RegistryOperationOptions } from './Registry';
+import { Registry, RegistryComponentEvent, RegistryOperationOptions } from './Registry';
 
 export interface EntityComponentsOptions {
     withFlags?: number;
@@ -137,9 +137,15 @@ export class Entity {
         return this.registry.removeComponentIfExists(component, options);
     }
 
-    removeComponents(): void {
+    removeComponents(options?: RegistryOperationOptions): void {
         for (const component of this.tagComponentMap.values()) {
-            this.registry.removeComponent(component);
+            this.registry.removeComponent(component, options);
+        }
+    }
+
+    emitForEachComponent(event: RegistryComponentEvent): void {
+        for (const component of this.tagComponentMap.values()) {
+            this.registry.emit(event, component, component.getData());
         }
     }
 

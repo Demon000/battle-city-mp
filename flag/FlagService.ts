@@ -39,7 +39,7 @@ export class FlagService {
         }
 
         const position = tank.getComponent(PositionComponent);
-        return this.gameObjectFactory.buildFromOptions({
+        this.gameObjectFactory.buildFromOptions({
             type: GameObjectType.FLAG,
             options: {
                 teamId: tank.flagTeamId,

@@ -15,6 +15,7 @@ export interface GameObjectFactoryBuildOptions {
     subtypes?: string[],
     options?: GameObjectOptions,
     components?: ComponentsInitialization,
+    silent?: boolean
 }
 
 export class GameObjectFactory {
@@ -78,6 +79,8 @@ export class GameObjectFactory {
                 silent: true,
             });
         }
+
+        this.registry.registerEntity(object);
 
         return object;
     }

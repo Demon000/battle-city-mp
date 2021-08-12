@@ -23,6 +23,7 @@ import { RequestedDirectionComponent } from '../RequestedDirectionComponent';
 import { SizeComponent } from '../size/SizeComponent';
 import { CollisionTracker } from './CollisionTracker';
 import { DirectionUtils } from './DirectionUtils';
+import { DirtyCollisionsComponent } from './DirtyCollisionsComponent';
 import { ICollisionRule, CollisionEvent, CollisionEvents, CollisionResultEvent } from './ICollisionRule';
 
 export enum CollisionServiceEvent {
@@ -395,21 +396,32 @@ export class CollisionService {
                     y: bry,
                 },
             });
+        }
+    }
 
-            if (this.boundingBoxRepository.hasNode(entity.id)) {
-                this.boundingBoxRepository.updateBoxValue(entity.id, boundingBox);
+    markDirtyCollisions(entity: Entity): void {
+        entity.upsertComponent(DirtyCollisionsComponent, undefined, {
+            flags: ComponentFlags.LOCAL_ONLY,
+        });
+    }
+
+    processObjectsDirtyCollisions(): void {
+        for (const entity of this.registry.getEntitiesWithComponent(DirtyCollisionsComponent)) {
+            const boundingBox = entity.findComponent(BoundingBoxComponent);
+            if (boundingBox === undefined) {
+                this.boundingBoxRepository.removeValue(entity.id);
+            } else if (this.boundingBoxRepository.hasNode(entity.id)) {
+                this.boundingBoxRepository.updateBoxValue(entity.id,
+                    boundingBox);
             } else {
-                this.boundingBoxRepository.addBoxValue(entity.id, boundingBox);
+                this.boundingBoxRepository.addBoxValue(entity.id,
+                    boundingBox);
             }
         }
     }
 
-    processObjectsDestroyedBoundingBox(): void {
+    processObjectsDestroyedWithCollisions(): void {
         for (const entity of this.registry.getEntitiesWithComponent(DestroyedComponent)) {
-            if (!entity.hasComponent(BoundingBoxComponent)) {
-                continue;
-            }
-
             if (!this.boundingBoxRepository.hasNode(entity.id)) {
                 continue;
             }

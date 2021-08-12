@@ -33,6 +33,7 @@ import { PositionComponent } from '@/physics/point/PositionComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
 import { EntityId } from '@/ecs/EntityId';
 import { Entity } from '@/ecs/Entity';
+import { BoundingBoxComponent } from '@/physics/bounding-box/BoundingBoxComponent';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -134,33 +135,30 @@ export class GameClient {
         this.emitter = new EventEmitter<GameClientEvents>();
         this.ticker = new Ticker();
 
-        this.registry.emitter.on(RegistryComponentEvent.COMPONENT_ADDED, component => {
-            this.gameGraphicsService.processObjectsGraphicsDependencies(component.entity.id,
-                component.clazz.tag);
-        });
-
-        this.registry.emitter.on(RegistryComponentEvent.COMPONENT_UPDATED, component => {
-            this.gameGraphicsService.processObjectsGraphicsDependencies(component.entity.id,
-                component.clazz.tag);
-        });
-
-        this.registry.emitter.on(RegistryComponentEvent.COMPONENT_REMOVED, component => {
-            this.gameGraphicsService.processObjectsGraphicsDependencies(component.entity.id,
-                component.clazz.tag);
-        });
+        this.registry.emitter.on(RegistryComponentEvent.COMPONENT_CHANGED,
+            (_event, component) => {
+                this.gameGraphicsService.processObjectsGraphicsDependencies(component.entity.id,
+                    component.clazz.tag);
+            });
         this.registry.componentEmitter(PositionComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_UPDATED,
-                (component) => {
+            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+                (_event, component) => {
                     const entity = component.entity;
                     this.collisionService.markDirtyBoundingBox(entity);
                     this.gameObjectService.markDirtyCenterPosition(entity);
                 });
         this.registry.componentEmitter(SizeComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_UPDATED,
-                (component) => {
+            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+                (_event, component) => {
                     const entity = component.entity;
                     this.collisionService.markDirtyBoundingBox(entity);
                     this.gameObjectService.markDirtyCenterPosition(entity);
+                });
+        this.registry.componentEmitter(BoundingBoxComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+                (_event, component) => {
+                    const entity = component.entity;
+                    this.collisionService.markDirtyCollisions(entity);
                 });
         this.registry.emitter.on(RegistryEvent.ENTITY_BEFORE_DESTROY,
             (entity: Entity) => {
@@ -255,8 +253,7 @@ export class GameClient {
     }
 
     onObjectRegistered(buildOptions: GameObjectFactoryBuildOptions): void {
-        const object = this.gameObjectFactory.buildFromOptions(buildOptions);
-        this.registry.registerEntity(object);
+        this.gameObjectFactory.buildFromOptions(buildOptions);
     }
 
     onObjectUnregistered(entityId: EntityId): void {
@@ -321,10 +318,8 @@ export class GameClient {
             this.teamService.addTeams(teams);
         }
 
-        const objects =
-            LazyIterable.from(serverStatus.objectsOptions)
-                .map(o => this.gameObjectFactory.buildFromOptions(o));
-        this.registry.registerEntities(objects);
+        LazyIterable.from(serverStatus.objectsOptions)
+            .forEach(o => this.gameObjectFactory.buildFromOptions(o));
 
         const visibleGameSize = this.config.get<number>('game-client', 'visibleGameSize');
         this.gameGraphicsService.setTargetGameSize(visibleGameSize);
@@ -334,8 +329,9 @@ export class GameClient {
     }
 
     onTick(): void {
-        this.collisionService.processObjectsDestroyedBoundingBox();
+        this.collisionService.processObjectsDestroyedWithCollisions();
         this.gameObjectService.processObjectsDestroyed();
+        this.collisionService.processObjectsDirtyCollisions();
         this.gameObjectService.processObjectsDirtyIsMoving();
         this.gameObjectService.processObjectsDirtyCenterPosition();
         this.collisionService.processObjectsDirtyBoundingBox();

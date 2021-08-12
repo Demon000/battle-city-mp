@@ -29,7 +29,7 @@ import { CollisionEvent } from '../physics/collisions/ICollisionRule';
 import { Point } from '../physics/point/Point';
 import { Player, PartialPlayerOptions, PlayerSpawnStatus } from '../player/Player';
 import { PlayerService, PlayerServiceEvent } from '../player/PlayerService';
-import { BroadcastBatchGameEvent, CommonBatchGameEvent, GameEntityComponentEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
+import { BroadcastBatchGameEvent, CommonBatchGameEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
 import { GameEventBatcher, GameEventBatcherEvent } from './GameEventBatcher';
 import { GameModeService } from '@/game-mode/GameModeService';
 import { Registry, RegistryComponentEvent, RegistryEvent } from '@/ecs/Registry';
@@ -46,12 +46,13 @@ import { assert } from '@/utils/assert';
 import { Component, ComponentFlags } from '@/ecs/Component';
 import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
 import { PositionComponent } from '@/physics/point/PositionComponent';
-import { SizeComponent } from '@/physics/size/SizeComponent';
 import { Entity } from '@/ecs/Entity';
 import { EntityOwnedComponent } from '@/components/EntityOwnedComponent';
 import { BulletComponent } from '@/bullet/BulletComponent';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { ColorComponent } from '@/components/ColorComponent';
+import { BoundingBoxComponent } from '@/physics/bounding-box/BoundingBoxComponent';
+import { SizeComponent } from '@/physics/size/SizeComponent';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -177,50 +178,38 @@ export class GameServer {
                         break;
                     }
                 }
-            });
-        this.registry.emitter.on(RegistryEvent.ENTITY_DESTROYED,
-            (entity: Entity) => {
+
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_UNREGISTERED, entity.id]);
             });
 
-        this.registry.emitter.on(RegistryComponentEvent.COMPONENT_ADDED,
-            (component, data) => {
+        this.registry.emitter.on(RegistryComponentEvent.COMPONENT_CHANGED,
+            (event, component, data) => {
                 this.onRegistryComponentEvent(
-                    GameEvent.ENTITY_COMPONENT_ADDED,
+                    event,
                     component,
                     data,
-                );
-            });
-        this.registry.emitter.on(RegistryComponentEvent.COMPONENT_UPDATED,
-            (component, data) => {
-                this.onRegistryComponentEvent(
-                    GameEvent.ENTITY_COMPONENT_UPDATED,
-                    component,
-                    data,
-                );
-            });
-        this.registry.emitter.on(RegistryComponentEvent.COMPONENT_BEFORE_REMOVE,
-            (component) => {
-                this.onRegistryComponentEvent(
-                    GameEvent.ENTITY_COMPONENT_REMOVED,
-                    component,
                 );
             });
         this.registry.componentEmitter(PositionComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_UPDATED,
-                (component) => {
+            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+                (_event, component) => {
                     const entity = component.entity;
                     this.collisionService.markDirtyBoundingBox(entity);
                     this.gameObjectService.markDirtyCenterPosition(entity);
                 });
         this.registry.componentEmitter(SizeComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_UPDATED,
-                (component) => {
+            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+                (_event, component) => {
                     const entity = component.entity;
                     this.collisionService.markDirtyBoundingBox(entity);
                     this.gameObjectService.markDirtyCenterPosition(entity);
                 });
-
+        this.registry.componentEmitter(BoundingBoxComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+                (_event, component) => {
+                    const entity = component.entity;
+                    this.collisionService.markDirtyCollisions(entity);
+                });
         /**
          * PlayerService event handlers
          */
@@ -298,8 +287,7 @@ export class GameServer {
                     }
 
                     const position = this.gameObjectService.getRandomSpawnPosition(player.teamId);
-                    const tank = this.tankService.createTankForPlayer(player, position, tankColor);
-                    this.registry.registerEntity(tank);
+                    this.tankService.createTankForPlayer(player, position, tankColor);
                 } else if (status === PlayerSpawnStatus.DESPAWN && player.tankId !== null) {
                     const tank = this.registry.getEntityById(player.tankId);
                     this.gameObjectService.markDestroyed(tank);
@@ -344,21 +332,19 @@ export class GameServer {
         this.tankService.emitter.on(TankServiceEvent.TANK_REQUESTED_BULLET_SPAWN,
             (tankId: number) => {
                 const tank = this.registry.getEntityById(tankId) as Tank;
-                const bullet = this.bulletService.createBulletForTank(tank);
-                this.registry.registerEntity(bullet);
+                this.bulletService.createBulletForTank(tank);
             });
 
         this.tankService.emitter.on(TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN,
             (tankId: number) => {
                 const tank = this.registry.getEntityById(tankId) as Tank;
                 const position = tank.getComponent(CenterPositionComponent);
-                const smoke = this.gameObjectFactory.buildFromOptions({
+                this.gameObjectFactory.buildFromOptions({
                     type: GameObjectType.SMOKE,
                     components: {
                         PositionComponent: position,
                     },
                 });
-                this.registry.registerEntity(smoke);
             });
 
         this.tankService.emitter.on(TankServiceEvent.TANK_UPDATED,
@@ -376,7 +362,7 @@ export class GameServer {
          */
         const spawnExplosion = (source: Entity, type: string, destroyedObjectType?: string) => {
             const position = source.getComponent(CenterPositionComponent);
-            const explosion = this.gameObjectFactory.buildFromOptions({
+            this.gameObjectFactory.buildFromOptions({
                 type: GameObjectType.EXPLOSION,
                 options: {
                     explosionType: type,
@@ -386,7 +372,6 @@ export class GameServer {
                     PositionComponent: position,
                 },
             });
-            this.registry.registerEntity(explosion);
         };
 
         this.collisionService.emitter.on(CollisionServiceEvent.OBJECT_TRACKED_COLLISIONS,
@@ -565,8 +550,9 @@ export class GameServer {
                 this.playerService.processPlayersStatus(deltaSeconds);
                 this.tankService.processTanksStatus();
                 this.gameObjectService.processObjectsAutomaticDestroy();
-                this.collisionService.processObjectsDestroyedBoundingBox();
+                this.collisionService.processObjectsDestroyedWithCollisions();
                 this.gameObjectService.processObjectsDestroyed();
+                this.collisionService.processObjectsDirtyCollisions();
                 this.gameObjectService.processObjectsDirection();
                 this.collisionService.processObjectsRequestedDirection();
                 this.gameObjectService.processObjectsPosition(deltaSeconds);
@@ -588,21 +574,36 @@ export class GameServer {
 
     onRegistryComponentEvent<
         C extends Component<C>,
-    >(event: GameEntityComponentEvent, component: C, data?: any): void {
+    >(event: RegistryComponentEvent, component: C, data?: any): void {
         if (component.flags & ComponentFlags.LOCAL_ONLY) {
             return;
         }
 
-        if (data === undefined
-            || event === GameEvent.ENTITY_COMPONENT_REMOVED) {
+        let gameEvent;
+        switch (event) {
+            case RegistryComponentEvent.COMPONENT_ADDED:
+                gameEvent = GameEvent.ENTITY_COMPONENT_ADDED;
+                break;
+            case RegistryComponentEvent.COMPONENT_UPDATED:
+                gameEvent = GameEvent.ENTITY_COMPONENT_UPDATED;
+                break;
+            case RegistryComponentEvent.COMPONENT_BEFORE_REMOVE:
+                gameEvent = GameEvent.ENTITY_COMPONENT_REMOVED;
+                break;
+            default:
+                assert(false);
+        }
+
+        if (gameEvent === GameEvent.ENTITY_COMPONENT_REMOVED) {
             this.gameEventBatcher.addBroadcastEvent([
-                event,
+                gameEvent,
                 component.entity.id,
                 component.clazz.tag,
             ]);
-        } else {
+        } else if (gameEvent === GameEvent.ENTITY_COMPONENT_ADDED
+            || gameEvent === GameEvent.ENTITY_COMPONENT_UPDATED) {
             this.gameEventBatcher.addBroadcastEvent([
-                event,
+                gameEvent,
                 component.entity.id,
                 component.clazz.tag,
                 data,
@@ -648,7 +649,6 @@ export class GameServer {
                 flag = this.flagService.createFlagForTank(tank);
                 if (flag !== undefined) {
                     this.tankService.clearTankFlag(tank.id);
-                    this.registry.registerEntity(flag);
                 }
                 break;
             default:
@@ -797,10 +797,9 @@ export class GameServer {
 
     loadMap(gameMap: GameMap): void {
         const objectsOptions = gameMap.getObjectsOptions();
-        const objects = objectsOptions
+        objectsOptions
             .filter(o => this.gameModeService.isIgnoredObjectType(o.type))
-            .map(o => this.gameObjectFactory.buildFromOptions(o));
-        this.registry.registerEntities(objects);
+            .forEach(o => this.gameObjectFactory.buildFromOptions(o));
 
         const teamsOptions = gameMap.getTeamsOptions();
         const gameModeProperties = this.gameModeService.getGameModeProperties();
