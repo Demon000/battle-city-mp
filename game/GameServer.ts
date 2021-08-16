@@ -469,6 +469,8 @@ export class GameServer {
 
                     bulletComponent.update({
                         damage: bulletDamage,
+                    }, {
+                        flags: ComponentFlags.LOCAL_ONLY,
                     });
                 }
 

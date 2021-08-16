@@ -243,12 +243,15 @@ export class CollisionService {
             isValidPosition = false;
         }
 
-        if (isValidPosition) {
-            movingObject.updateComponent(PositionComponent, position);
-        }
-
         const preventedBoundingBox = BoundingBoxUtils
             .reposition(originalBoundingBox, originalPosition, position);
+
+        if (isValidPosition) {
+            movingObject.updateComponent(PositionComponent, position);
+
+            this.processObjectDirtyBoundingBox(movingObject);
+            this.processObjectDirtyCollisions(movingObject);
+        }
 
         for (const [name, overlappingObject] of collidingObjectNotifications) {
             const overlappingBoundingBox = overlappingObject
@@ -354,6 +357,8 @@ export class CollisionService {
 
             component.update({
                 value: isUnderBush,
+            }, {
+                flags: ComponentFlags.LOCAL_ONLY,
             });
         }
     }
@@ -368,34 +373,39 @@ export class CollisionService {
         });
     }
 
+    private processObjectDirtyBoundingBox(entity: Entity): void {
+        const size = entity.getComponent(SizeComponent);
+        const position = entity.getComponent(PositionComponent);
+        const boundingBox = entity.getComponent(BoundingBoxComponent);
+        const brx = position.x + size.width;
+        const bry = position.y + size.height;
+
+        if (boundingBox.tl.x === position.x
+            && boundingBox.tl.y === position.y
+            && boundingBox.br.x === brx
+            && boundingBox.br.y === bry) {
+            return;
+        }
+
+        boundingBox.update({
+            tl: {
+                x: position.x,
+                y: position.y,
+            },
+            br: {
+                x: brx,
+                y: bry,
+            },
+        }, {
+            flags: ComponentFlags.LOCAL_ONLY,
+        });
+    }
+
     processObjectsDirtyBoundingBox(): void {
         for (const component of this.registry.getComponents(DirtyBoundingBoxComponent)) {
             component.remove();
 
-            const entity = component.entity;
-            const size = entity.getComponent(SizeComponent);
-            const position = entity.getComponent(PositionComponent);
-            const boundingBox = entity.getComponent(BoundingBoxComponent);
-            const brx = position.x + size.width;
-            const bry = position.y + size.height;
-
-            if (boundingBox.tl.x === position.x
-                && boundingBox.tl.y === position.y
-                && boundingBox.br.x === brx
-                && boundingBox.br.y === bry) {
-                return;
-            }
-
-            boundingBox.update({
-                tl: {
-                    x: position.x,
-                    y: position.y,
-                },
-                br: {
-                    x: brx,
-                    y: bry,
-                },
-            });
+            this.processObjectDirtyBoundingBox(component.entity);
         }
     }
 
@@ -412,21 +422,24 @@ export class CollisionService {
         });
     }
 
+    private processObjectDirtyCollisions(entity: Entity): void {
+        const boundingBox = entity.findComponent(BoundingBoxComponent);
+        if (boundingBox === undefined) {
+            this.boundingBoxRepository.removeValue(entity.id);
+        } else if (this.boundingBoxRepository.hasNode(entity.id)) {
+            this.boundingBoxRepository.updateBoxValue(entity.id,
+                boundingBox);
+        } else {
+            this.boundingBoxRepository.addBoxValue(entity.id,
+                boundingBox);
+        }
+    }
+
     processObjectsDirtyCollisions(): void {
         for (const component of this.registry.getComponents(DirtyCollisionsComponent)) {
             component.remove();
 
-            const entity = component.entity;
-            const boundingBox = entity.findComponent(BoundingBoxComponent);
-            if (boundingBox === undefined) {
-                this.boundingBoxRepository.removeValue(entity.id);
-            } else if (this.boundingBoxRepository.hasNode(entity.id)) {
-                this.boundingBoxRepository.updateBoxValue(entity.id,
-                    boundingBox);
-            } else {
-                this.boundingBoxRepository.addBoxValue(entity.id,
-                    boundingBox);
-            }
+            this.processObjectDirtyCollisions(component.entity);
         }
     }
 
