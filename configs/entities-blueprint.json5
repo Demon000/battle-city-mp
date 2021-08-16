@@ -7,7 +7,6 @@
     'bounding-boxed-entity': {
         localComponents: {
             BoundingBoxComponent: {},
-            DirtyBoundingBoxComponent: {},
         },
     },
     'brick-wall': {
@@ -23,7 +22,6 @@
         },
         serverComponents: {
             CenterPositionComponent: {},
-            DirtyCenterPositionComponent: {},
         },
     },
     'steel-wall': {
@@ -39,7 +37,6 @@
         },
         serverComponents: {
             CenterPositionComponent: {},
-            DirtyCenterPositionComponent: {},
         },
     },
     'bush': {
@@ -139,7 +136,6 @@
         },
         localComponents: {
             CenterPositionComponent: {},
-            DirtyCenterPositionComponent: {},
             SizeComponent: {
                 width: 2,
                 height: 2,
@@ -185,7 +181,6 @@
         },
         clientComponents: {
             CenterPositionComponent: {},
-            DirtyCenterPositionComponent: {},
         },
         serverComponents: {
             AutomaticDestroyComponent: {
@@ -256,7 +251,6 @@
                 height: 16,
             },
             CenterPositionComponent: {},
-            DirtyCenterPositionComponent: {},
             IsMovingTrackingComponent: {},
         },
         serverComponents: {
