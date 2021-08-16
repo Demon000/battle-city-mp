@@ -1,7 +1,7 @@
 import { assert } from '@/utils/assert';
 import { ClazzOrTag, Component, ComponentClassType, ComponentsInitialization } from './Component';
 import { EntityId } from './EntityId';
-import { Registry, RegistryComponentEvent, RegistryOperationOptions } from './Registry';
+import { ComponentEmitOptions, Registry, RegistryComponentEvent, RegistryOperationOptions } from './Registry';
 
 export interface EntityComponentsOptions {
     withFlags?: number;
@@ -143,9 +143,12 @@ export class Entity {
         }
     }
 
-    emitForEachComponent(event: RegistryComponentEvent): void {
+    emitForEachComponent(
+        event: RegistryComponentEvent,
+        options?: ComponentEmitOptions,
+    ): void {
         for (const component of this.tagComponentMap.values()) {
-            this.registry.emit(event, component, component.getData());
+            this.registry.emit(event, component, component.getData(), options);
         }
     }
 

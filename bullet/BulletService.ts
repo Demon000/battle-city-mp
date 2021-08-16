@@ -100,6 +100,7 @@ export class BulletService {
                     entityId: tank.id,
                 },
             },
+            silent: true,
         });
 
         const bulletSize = bullet.getComponent(SizeComponent);
@@ -109,6 +110,8 @@ export class BulletService {
         }, {
             silent: true,
         });
+
+        this.registry.registerEntity(bullet);
 
         return bullet;
     }

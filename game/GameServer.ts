@@ -32,7 +32,7 @@ import { PlayerService, PlayerServiceEvent } from '../player/PlayerService';
 import { BroadcastBatchGameEvent, CommonBatchGameEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
 import { GameEventBatcher, GameEventBatcherEvent } from './GameEventBatcher';
 import { GameModeService } from '@/game-mode/GameModeService';
-import { Registry, RegistryComponentEvent, RegistryEvent } from '@/ecs/Registry';
+import { ComponentEmitOptions, Registry, RegistryComponentEvent, RegistryEvent } from '@/ecs/Registry';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
@@ -183,11 +183,12 @@ export class GameServer {
             });
 
         this.registry.emitter.on(RegistryComponentEvent.COMPONENT_CHANGED,
-            (event, component, data) => {
+            (event, component, data, options) => {
                 this.onRegistryComponentEvent(
                     event,
                     component,
                     data,
+                    options,
                 );
             });
         this.registry.componentEmitter(PositionComponent, true)
@@ -574,8 +575,15 @@ export class GameServer {
 
     onRegistryComponentEvent<
         C extends Component<C>,
-    >(event: RegistryComponentEvent, component: C, data?: any): void {
-        if (component.flags & ComponentFlags.LOCAL_ONLY) {
+    >(
+        event: RegistryComponentEvent,
+        component: C,
+        data?: any,
+        options?: ComponentEmitOptions,
+    ): void {
+        if (component.flags & ComponentFlags.LOCAL_ONLY
+            || event === RegistryComponentEvent.COMPONENT_ADDED
+                && options?.registration) {
             return;
         }
 

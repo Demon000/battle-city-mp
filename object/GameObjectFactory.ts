@@ -80,7 +80,9 @@ export class GameObjectFactory {
             });
         }
 
-        this.registry.registerEntity(object);
+        if (!buildOptions.silent) {
+            this.registry.registerEntity(object);
+        }
 
         return object;
     }

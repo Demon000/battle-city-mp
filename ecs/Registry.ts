@@ -26,6 +26,10 @@ export interface RegistryOperationOptions {
     optional?: boolean;
 }
 
+export interface ComponentEmitOptions {
+    registration?: boolean;
+}
+
 export interface RegistryEvents {
     [RegistryEvent.ENTITY_REGISTERED]: (entity: Entity) => void;
     [RegistryEvent.ENTITY_BEFORE_DESTROY]: (entity: Entity) => void;
@@ -35,18 +39,22 @@ export interface RegistryComponentEvents {
     [RegistryComponentEvent.COMPONENT_ADDED]: <C extends Component<C>>(
         component: C,
         data?: any,
+        options?: ComponentEmitOptions,
     ) => void;
     [RegistryComponentEvent.COMPONENT_UPDATED]: <C extends Component<C>>(
         component: C,
         data?: any,
+        options?: ComponentEmitOptions,
     ) => void;
     [RegistryComponentEvent.COMPONENT_BEFORE_REMOVE]: <C extends Component<C>>(
         component: C,
+        options?: ComponentEmitOptions,
     ) => void;
     [RegistryComponentEvent.COMPONENT_CHANGED]: <C extends Component<C>>(
         event: RegistryComponentEvent,
         component: C,
         data?: any,
+        options?: ComponentEmitOptions,
     ) => void;
 }
 
@@ -109,6 +117,9 @@ export class Registry {
 
         if (!options?.silent) {
             this.emitter.emit(RegistryEvent.ENTITY_REGISTERED, entity);
+            entity.emitForEachComponent(RegistryComponentEvent.COMPONENT_ADDED, {
+                registration: true,
+            });
         }
     }
 
@@ -180,17 +191,22 @@ export class Registry {
 
     emit<
         C extends Component<C>,
-    >(event: RegistryComponentEvent, component: C, data?: any): void {
+    >(
+        event: RegistryComponentEvent,
+        component: C,
+        data?: any,
+        options?: ComponentEmitOptions,
+    ): void {
         const componentEmitter = this.componentEmitter(component.clazz);
         if (componentEmitter !== undefined) {
             componentEmitter.emit(event, component, data);
             componentEmitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
-                event, component, data);
+                event, component, data, options);
         }
 
         this.emitter.emit(event, component, data);
         this.emitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
-            event, component, data);
+            event, component, data, options);
     }
 
     runForComponentsInitialization(
