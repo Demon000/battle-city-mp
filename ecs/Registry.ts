@@ -27,7 +27,8 @@ export interface RegistryOperationOptions {
 }
 
 export interface ComponentEmitOptions {
-    registration?: boolean;
+    register?: boolean;
+    destroy?: boolean;
 }
 
 export interface RegistryEvents {
@@ -117,9 +118,12 @@ export class Registry {
 
         if (!options?.silent) {
             this.emitter.emit(RegistryEvent.ENTITY_REGISTERED, entity);
-            entity.emitForEachComponent(RegistryComponentEvent.COMPONENT_ADDED, {
-                registration: true,
-            });
+            entity.emitForEachComponent(
+                RegistryComponentEvent.COMPONENT_ADDED,
+                {
+                    register: true,
+                },
+            );
         }
     }
 
@@ -144,7 +148,12 @@ export class Registry {
         assert(entityIdExists);
 
         if (!options?.silent) {
-            entity.emitForEachComponent(RegistryComponentEvent.COMPONENT_BEFORE_REMOVE);
+            entity.emitForEachComponent(
+                RegistryComponentEvent.COMPONENT_BEFORE_REMOVE,
+                {
+                    destroy: true,
+                },
+            );
             this.emitter.emit(RegistryEvent.ENTITY_BEFORE_DESTROY, entity);
         }
 

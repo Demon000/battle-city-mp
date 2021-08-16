@@ -583,7 +583,9 @@ export class GameServer {
     ): void {
         if (component.flags & ComponentFlags.LOCAL_ONLY
             || event === RegistryComponentEvent.COMPONENT_ADDED
-                && options?.registration) {
+                && options?.register
+            || event === RegistryComponentEvent.COMPONENT_BEFORE_REMOVE
+                && options?.destroy) {
             return;
         }
 
