@@ -357,8 +357,6 @@ export class CollisionService {
 
             component.update({
                 value: isUnderBush,
-            }, {
-                flags: ComponentFlags.LOCAL_ONLY,
             });
         }
     }
@@ -396,8 +394,6 @@ export class CollisionService {
                 x: brx,
                 y: bry,
             },
-        }, {
-            flags: ComponentFlags.LOCAL_ONLY,
         });
     }
 

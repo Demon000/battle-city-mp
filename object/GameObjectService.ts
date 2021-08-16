@@ -225,8 +225,6 @@ export class GameObjectService {
             centerPosition.update({
                 x,
                 y,
-            }, {
-                flags: ComponentFlags.LOCAL_ONLY,
             });
         }
     }
