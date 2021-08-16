@@ -549,9 +549,6 @@ export class GameServer {
             (deltaSeconds: number) => {
                 this.playerService.processPlayersStatus(deltaSeconds);
                 this.tankService.processTanksStatus();
-                this.gameObjectService.processObjectsAutomaticDestroy();
-                this.collisionService.processObjectsDestroyedWithCollisions();
-                this.gameObjectService.processObjectsDestroyed();
                 this.gameObjectService.processObjectsDirection();
                 this.collisionService.processObjectsRequestedDirection();
                 this.gameObjectService.processObjectsPosition(deltaSeconds);
@@ -560,6 +557,9 @@ export class GameServer {
                 this.gameObjectService.processObjectsDirtyCenterPosition();
                 this.collisionService.processObjectsDirtyBoundingBox();
                 this.collisionService.processObjectsDirtyCollisions();
+                this.gameObjectService.processObjectsAutomaticDestroy();
+                this.collisionService.processObjectsDestroyedWithCollisions();
+                this.gameObjectService.processObjectsDestroyed();
                 this.timeService.decreaseRoundTime(deltaSeconds);
                 if (this.timeService.isRoundEnded()) {
                     this.reload();
