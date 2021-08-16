@@ -35,6 +35,13 @@ export class BoundingBoxUtils {
         };
     }
 
+    static center(box: BoundingBox): Point {
+        return {
+            x: (box.tl.x + box.br.x) / 2,
+            y: (box.tl.y + box.br.y) / 2,
+        };
+    }
+
     static volume(box: BoundingBox): number {
         const wx = box.br.x - box.tl.x;
         const wy = box.br.y - box.tl.y;

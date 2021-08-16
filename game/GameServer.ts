@@ -53,6 +53,7 @@ import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { ColorComponent } from '@/components/ColorComponent';
 import { BoundingBoxComponent } from '@/physics/bounding-box/BoundingBoxComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
+import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -361,8 +362,18 @@ export class GameServer {
         /**
          * CollisionService event handlers
          */
-        const spawnExplosion = (source: Entity, type: string, destroyedObjectType?: string) => {
-            const position = source.getComponent(CenterPositionComponent);
+        const spawnExplosion = (
+            sourceOrPosition: Entity | Point,
+            type: string,
+            destroyedObjectType?: string,
+        ) => {
+            let position;
+            if (sourceOrPosition instanceof Entity) {
+                position = sourceOrPosition.getComponent(CenterPositionComponent);
+            } else {
+                position = sourceOrPosition;
+            }
+
             this.gameObjectFactory.buildFromOptions({
                 type: GameObjectType.EXPLOSION,
                 options: {
@@ -410,10 +421,11 @@ export class GameServer {
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BRICK_WALL,
             (bulletId: number, brickWallId: number, _position: Point) => {
                 const destroyBox = this.bulletService.getBulletBrickWallDestroyBox(bulletId, brickWallId);
+                const destroyBoxCenter = BoundingBoxUtils.center(destroyBox);
                 const objectsIds = this.collisionService.getOverlappingObjects(destroyBox);
                 const objects = this.registry.getMultipleEntitiesById(objectsIds);
                 const bullet = this.registry.getEntityById(bulletId);
-                spawnExplosion(bullet, ExplosionType.SMALL);
+                spawnExplosion(destroyBoxCenter, ExplosionType.SMALL);
                 this.gameObjectService.markDestroyed(bullet);
 
                 LazyIterable.from(objects)
