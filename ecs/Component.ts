@@ -1,6 +1,6 @@
 import { nonenumerable } from '@/utils/enumerable';
 import { Entity } from './Entity';
-import { Registry } from './Registry';
+import { Registry, RegistryOperationOptions } from './Registry';
 
 export type ClazzOrTag<C = any> = ComponentClassType<C> | string;
 export type ComponentsInitialization = Record<string, any>;
@@ -46,12 +46,12 @@ export class Component<C extends Component<C>> {
         Object.assign(this, encoding);
     }
 
-    update(data?: any): C {
-        return this.entity.updateComponent(this.clazz, data);
+    update(data?: any, options?: RegistryOperationOptions): C {
+        return this.entity.updateComponent(this.clazz, data, options);
     }
 
-    remove(): C | undefined {
-        return this.entity.removeComponent(this.clazz);
+    remove(options?: RegistryOperationOptions): C | undefined {
+        return this.entity.removeComponent(this.clazz, options);
     }
 }
 
