@@ -248,9 +248,6 @@ export class CollisionService {
 
         if (isValidPosition) {
             movingObject.updateComponent(PositionComponent, position);
-
-            this.processObjectDirtyBoundingBox(movingObject);
-            this.processObjectDirtyCollisions(movingObject);
         }
 
         for (const [name, overlappingObject] of collidingObjectNotifications) {
@@ -371,7 +368,11 @@ export class CollisionService {
         });
     }
 
-    private processObjectDirtyBoundingBox(entity: Entity): void {
+    processObjectDirtyBoundingBox(entity: Entity): void {
+        if (!entity.hasComponent(BoundingBoxComponent)) {
+            return;
+        }
+
         const size = entity.getComponent(SizeComponent);
         const position = entity.getComponent(PositionComponent);
         const boundingBox = entity.getComponent(BoundingBoxComponent);
@@ -418,9 +419,9 @@ export class CollisionService {
         });
     }
 
-    private processObjectDirtyCollisions(entity: Entity): void {
+    processObjectDirtyCollisions(entity: Entity): void {
         const boundingBox = entity.findComponent(BoundingBoxComponent);
-        if (boundingBox === undefined) {
+        if (boundingBox === undefined || entity.hasComponent(DestroyedComponent)) {
             this.boundingBoxRepository.removeValue(entity.id);
         } else if (this.boundingBoxRepository.hasNode(entity.id)) {
             this.boundingBoxRepository.updateBoxValue(entity.id,
@@ -436,16 +437,6 @@ export class CollisionService {
             component.remove();
 
             this.processObjectDirtyCollisions(component.entity);
-        }
-    }
-
-    processObjectsDestroyedWithCollisions(): void {
-        for (const entity of this.registry.getEntitiesWithComponent(DestroyedComponent)) {
-            if (!this.boundingBoxRepository.hasNode(entity.id)) {
-                continue;
-            }
-
-            this.boundingBoxRepository.removeValue(entity.id);
         }
     }
 

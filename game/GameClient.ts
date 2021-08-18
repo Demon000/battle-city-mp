@@ -144,21 +144,21 @@ export class GameClient {
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
                 (_event, component) => {
                     const entity = component.entity;
-                    this.collisionService.markDirtyBoundingBox(entity);
+                    this.collisionService.processObjectDirtyBoundingBox(entity);
                     this.gameObjectService.markDirtyCenterPosition(entity);
                 });
         this.registry.componentEmitter(SizeComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
                 (_event, component) => {
                     const entity = component.entity;
-                    this.collisionService.markDirtyBoundingBox(entity);
+                    this.collisionService.processObjectDirtyBoundingBox(entity);
                     this.gameObjectService.markDirtyCenterPosition(entity);
                 });
         this.registry.componentEmitter(BoundingBoxComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
                 (_event, component) => {
                     const entity = component.entity;
-                    this.collisionService.markDirtyCollisions(entity);
+                    this.collisionService.processObjectDirtyCollisions(entity);
                 });
         this.registry.emitter.on(RegistryEvent.ENTITY_BEFORE_DESTROY,
             (entity: Entity) => {
@@ -331,9 +331,6 @@ export class GameClient {
     onTick(): void {
         this.gameObjectService.processObjectsDirtyIsMoving();
         this.gameObjectService.processObjectsDirtyCenterPosition();
-        this.collisionService.processObjectsDirtyBoundingBox();
-        this.collisionService.processObjectsDirtyCollisions();
-        this.collisionService.processObjectsDestroyedWithCollisions();
         this.gameObjectService.processObjectsDestroyed();
         this.collisionService.processObjectsIsUnderBush();
         this.gameGraphicsService.processObjectsDirtyGraphics();

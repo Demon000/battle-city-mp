@@ -196,21 +196,21 @@ export class GameServer {
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
                 (_event, component) => {
                     const entity = component.entity;
-                    this.collisionService.markDirtyBoundingBox(entity);
+                    this.collisionService.processObjectDirtyBoundingBox(entity);
                     this.gameObjectService.markDirtyCenterPosition(entity);
                 });
         this.registry.componentEmitter(SizeComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
                 (_event, component) => {
                     const entity = component.entity;
-                    this.collisionService.markDirtyBoundingBox(entity);
+                    this.collisionService.processObjectDirtyBoundingBox(entity);
                     this.gameObjectService.markDirtyCenterPosition(entity);
                 });
         this.registry.componentEmitter(BoundingBoxComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
                 (_event, component) => {
                     const entity = component.entity;
-                    this.collisionService.markDirtyCollisions(entity);
+                    this.collisionService.processObjectDirtyCollisions(entity);
                 });
         /**
          * PlayerService event handlers
@@ -568,10 +568,7 @@ export class GameServer {
                 this.collisionService.processObjectsRequestedPosition();
                 this.gameObjectService.processObjectsDirtyIsMoving();
                 this.gameObjectService.processObjectsDirtyCenterPosition();
-                this.collisionService.processObjectsDirtyBoundingBox();
-                this.collisionService.processObjectsDirtyCollisions();
                 this.gameObjectService.processObjectsAutomaticDestroy();
-                this.collisionService.processObjectsDestroyedWithCollisions();
                 this.gameObjectService.processObjectsDestroyed();
                 this.timeService.decreaseRoundTime(deltaSeconds);
                 if (this.timeService.isRoundEnded()) {
