@@ -44,7 +44,6 @@ export class GameObject extends Entity {
     toOptions(): GameObjectOptions {
         return {
             id: this.id,
-            subtypes: this.subtypes,
             movementSpeed: this.movementSpeed,
             movementDirection: this.movementDirection,
         };
