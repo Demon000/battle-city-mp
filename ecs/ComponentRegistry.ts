@@ -4,7 +4,7 @@ import { PositionComponent, PositionComponentData } from '@/physics/point/Positi
 import { SizeComponent, SizeComponentData } from '@/physics/size/SizeComponent';
 import { AutomaticDestroyComponent, AutomaticDestroyComponentData } from '../components/AutomaticDestroyComponent';
 import { assert } from '@/utils/assert';
-import { assertType } from 'typescript-is';
+import { is } from 'typescript-is';
 import { DestroyedComponent, DestroyedComponentData } from '@/components/DestroyedComponent';
 import { GraphicDependenciesComponent, GraphicDependenciesComponentData } from '@/components/GraphicDependenciesComponent';
 import { IsMovingComponent, IsMovingComponentData } from '@/components/IsMovingComponent';
@@ -31,6 +31,15 @@ export interface ProcessResults {
 }
 
 export class ComponentRegistry {
+    private validate<T>(clazz: ComponentClassType<any>, data?: any) {
+        if (data === undefined) {
+            return;
+        }
+
+        assert(is<Partial<T>>(data),
+            `Object is not assignable to component '${clazz.name}'`, data);
+    }
+
     private process(tag?: string, clazz?: ComponentClassType<any>, data?: any): ProcessResults {
         assert(tag !== undefined || clazz !== undefined);
 
@@ -41,95 +50,95 @@ export class ComponentRegistry {
         switch(tag) {
             case BoundingBoxComponent.tag:
                 clazz = BoundingBoxComponent;
-                if (data !== undefined) assertType<Partial<BoundingBoxComponentData>>(data);
+                this.validate<BoundingBoxComponentData>(BoundingBoxComponent, data);
                 break;
             case PositionComponent.tag:
                 clazz = PositionComponent;
-                if (data !== undefined) assertType<Partial<PositionComponentData>>(data);
+                this.validate<PositionComponentData>(PositionComponent, data);
                 break;
             case SizeComponent.tag:
                 clazz = SizeComponent;
-                if (data !== undefined) assertType<Partial<SizeComponentData>>(data);
+                this.validate<SizeComponentData>(SizeComponent, data);
                 break;
             case AutomaticDestroyComponent.tag:
                 clazz = AutomaticDestroyComponent;
-                if (data !== undefined) assertType<Partial<AutomaticDestroyComponentData>>(data);
+                this.validate<AutomaticDestroyComponentData>(AutomaticDestroyComponent, data);
                 break;
             case DestroyedComponent.tag:
                 clazz = DestroyedComponent;
-                if (data !== undefined) assertType<Partial<DestroyedComponentData>>(data);
+                this.validate<DestroyedComponentData>(DestroyedComponent, data);
                 break;
             case GraphicDependenciesComponent.tag:
                 clazz = GraphicDependenciesComponent;
-                if (data !== undefined) assertType<Partial<GraphicDependenciesComponentData>>(data);
+                this.validate<GraphicDependenciesComponentData>(GraphicDependenciesComponent, data);
                 break;
             case IsMovingComponent.tag:
                 clazz = IsMovingComponent;
-                if (data !== undefined) assertType<Partial<IsMovingComponentData>>(data);
+                this.validate<IsMovingComponentData>(IsMovingComponent, data);
                 break;
             case DirectionAxisSnappingComponent.tag:
                 clazz = DirectionAxisSnappingComponent;
-                if (data !== undefined) assertType<Partial<DirectionAxisSnappingComponentData>>(data);
+                this.validate<DirectionAxisSnappingComponentData>(DirectionAxisSnappingComponent, data);
                 break;
             case SpawnTimeComponent.tag:
                 clazz = SpawnTimeComponent;
-                if (data !== undefined) assertType<Partial<SpawnTimeComponentData>>(data);
+                this.validate<SpawnTimeComponentData>(SpawnTimeComponent, data);
                 break;
             case IsUnderBushComponent.tag:
                 clazz = IsUnderBushComponent;
-                if (data !== undefined) assertType<Partial<IsUnderBushComponentData>>(data);
+                this.validate<IsUnderBushComponentData>(IsUnderBushComponent, data);
                 break;
             case CenterPositionComponent.tag:
                 clazz = CenterPositionComponent;
-                if (data !== undefined) assertType<Partial<CenterPositionComponentData>>(data);
+                this.validate<CenterPositionComponentData>(CenterPositionComponent, data);
                 break;
             case DirtyBoundingBoxComponent.tag:
                 clazz = DirtyBoundingBoxComponent;
-                if (data !== undefined) assertType<Partial<DirtyBoundingBoxComponentData>>(data);
+                this.validate<DirtyBoundingBoxComponentData>(DirtyBoundingBoxComponent, data);
                 break;
             case RequestedPositionComponent.tag:
                 clazz = RequestedPositionComponent;
-                if (data !== undefined) assertType<Partial<RequestedPositionComponentData>>(data);
+                this.validate<RequestedPositionComponentData>(RequestedPositionComponent, data);
                 break;
             case DirtyCenterPositionComponent.tag:
                 clazz = DirtyCenterPositionComponent;
-                if (data !== undefined) assertType<Partial<DirtyCenterPositionComponentData>>(data);
+                this.validate<DirtyCenterPositionComponentData>(DirtyCenterPositionComponent, data);
                 break;
             case DirectionComponent.tag:
                 clazz = DirectionComponent;
-                if (data !== undefined) assertType<Partial<DirectionComponentData>>(data);
+                this.validate<DirectionComponentData>(DirectionComponent, data);
                 break;
             case RequestedDirectionComponent.tag:
                 clazz = RequestedDirectionComponent;
-                if (data !== undefined) assertType<Partial<RequestedDirectionComponentData>>(data);
+                this.validate<RequestedDirectionComponentData>(RequestedDirectionComponent, data);
                 break;
             case TankComponent.tag:
                 clazz = TankComponent;
-                if (data !== undefined) assertType<Partial<TankComponentData>>(data);
+                this.validate<TankComponentData>(TankComponent, data);
                 break;
             case SpawnComponent.tag:
                 clazz = SpawnComponent;
-                if (data !== undefined) assertType<Partial<SpawnComponentData>>(data);
+                this.validate<SpawnComponentData>(SpawnComponent, data);
                 break;
             case IsMovingTrackingComponent.tag:
                 clazz = IsMovingTrackingComponent;
-                if (data !== undefined) assertType<Partial<IsMovingTrackingComponentData>>(data);
+                this.validate<IsMovingTrackingComponentData>(IsMovingTrackingComponent, data);
                 break;
             case PlayerOwnedComponent.tag:
                 clazz = PlayerOwnedComponent;
-                if (data !== undefined) assertType<Partial<PlayerOwnedComponentData>>(data);
+                this.validate<PlayerOwnedComponentData>(PlayerOwnedComponent, data);
                 break;
             case EntityOwnedComponent.tag:
                 clazz = EntityOwnedComponent;
-                if (data !== undefined) assertType<Partial<EntityOwnedComponentData>>(data);
+                this.validate<EntityOwnedComponentData>(EntityOwnedComponent, data);
                 break;
             case BulletComponent.tag:
                 clazz = BulletComponent;
-                if (data !== undefined) assertType<Partial<BulletComponentData>>(data);
+                this.validate<BulletComponentData>(BulletComponent, data);
                 break;
             case ColorComponent.tag:
                 clazz = ColorComponent;
-                if (data !== undefined) assertType<Partial<ColorComponentData>>(data);
+                this.validate<ColorComponentData>(ColorComponent, data);
                 break;
             default:
                 assert(false, `Invalid tag '${tag}'`);
