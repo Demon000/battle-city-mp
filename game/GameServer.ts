@@ -844,9 +844,8 @@ export class GameServer {
 
         this.gameObjectService.markAllDestroyed();
         this.gameObjectService.processObjectsDestroyed();
-        this.gameEventBatcher.flush();
-
         this.playerService.resetFields();
+        this.gameEventBatcher.flush();
 
         const gameMap = this.gameMapService.getLoadedMap();
         assert(gameMap !== undefined, 'Cannot reload game without a loaded map');
