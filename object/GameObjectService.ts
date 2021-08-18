@@ -159,7 +159,7 @@ export class GameObjectService {
 
     markAllDestroyed(): void {
         for (const entity of this.registry.getEntities()) {
-            entity.addComponent(DestroyedComponent);
+            this.markDestroyed(entity);
         }
     }
 
