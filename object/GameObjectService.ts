@@ -157,6 +157,12 @@ export class GameObjectService {
         });
     }
 
+    markAllDestroyed(): void {
+        for (const entity of this.registry.getEntities()) {
+            entity.addComponent(DestroyedComponent);
+        }
+    }
+
     processObjectsDestroyed(): void {
         for (const component of this.registry.getComponents(DestroyedComponent)) {
             this.registry.destroyEntity(component.entity);

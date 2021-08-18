@@ -571,10 +571,11 @@ export class GameServer {
                 this.gameObjectService.processObjectsAutomaticDestroy();
                 this.gameObjectService.processObjectsDestroyed();
                 this.timeService.decreaseRoundTime(deltaSeconds);
+                this.gameEventBatcher.flush();
+
                 if (this.timeService.isRoundEnded()) {
                     this.reload();
                 }
-                this.gameEventBatcher.flush();
             });
 
         this.gameModeService.setGameMode(gameMode);
@@ -841,7 +842,10 @@ export class GameServer {
     reload(): void {
         this.ticker.stop();
 
-        this.registry.destroyAllEntities();
+        this.gameObjectService.markAllDestroyed();
+        this.gameObjectService.processObjectsDestroyed();
+        this.gameEventBatcher.flush();
+
         this.playerService.resetFields();
 
         const gameMap = this.gameMapService.getLoadedMap();
@@ -849,7 +853,7 @@ export class GameServer {
 
         this.loadMap(gameMap);
 
-        this.ticker.start();
         this.timeService.restartRoundTime();
+        this.ticker.start();
     }
 }
