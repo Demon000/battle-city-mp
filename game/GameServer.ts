@@ -624,12 +624,20 @@ export class GameServer {
             ]);
         } else if (gameEvent === GameEvent.ENTITY_COMPONENT_ADDED
             || gameEvent === GameEvent.ENTITY_COMPONENT_UPDATED) {
-            this.gameEventBatcher.addBroadcastEvent([
-                gameEvent,
-                component.entity.id,
-                component.clazz.tag,
-                data,
-            ]);
+            if (data === undefined) {
+                this.gameEventBatcher.addBroadcastEvent([
+                    gameEvent,
+                    component.entity.id,
+                    component.clazz.tag,
+                ]);
+            } else {
+                this.gameEventBatcher.addBroadcastEvent([
+                    gameEvent,
+                    component.entity.id,
+                    component.clazz.tag,
+                    data,
+                ]);
+            }
         }
 
     }
