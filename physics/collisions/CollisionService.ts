@@ -54,7 +54,7 @@ export class CollisionService {
                         movingMap = new Map<string, ICollisionRule>();
                         this.rulesMap.set(movingType, movingMap);
                     }
-            
+
                     for (const staticType of rule.staticTypes) {
                         movingMap.set(staticType, rule);
                     }
