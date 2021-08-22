@@ -1,4 +1,3 @@
-import { Direction } from '../physics/Direction';
 import { AudioEffect, GameObjectProperties, ResourceMeta } from './GameObjectProperties';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
@@ -8,21 +7,17 @@ export interface GameObjectOptions {
     id?: number;
     type?: string;
     subtypes?: string[];
-    movementSpeed?: number;
-    movementDirection?: Direction | null;
 }
 
 export type PartialGameObjectOptions = Partial<GameObjectOptions>;
 
 export class GameObject extends Entity {
     protected _audioMeta: ResourceMeta | undefined | null;
-    protected _movementSpeed: number;
     graphicsDirty: boolean;
 
     properties;
     type: string;
     subtypes?: string[];
-    movementDirection: Direction | null;
 
     graphicsRenderer?: any;
     audioRenderer?: any;
@@ -36,42 +31,17 @@ export class GameObject extends Entity {
         this.properties = properties;
         this.type = options.type;
         this.subtypes = options.subtypes;
-        this._movementSpeed = options.movementSpeed ?? 0;
-        this.movementDirection = options.movementDirection ?? null;
         this.graphicsDirty = true;
     }
 
     toOptions(): GameObjectOptions {
         return {
             id: this.id,
-            movementSpeed: this.movementSpeed,
-            movementDirection: this.movementDirection,
         };
     }
 
-    setOptions(options: PartialGameObjectOptions): void {
-        if (options.movementSpeed !== undefined) this.movementSpeed = options.movementSpeed;
-        if (options.movementDirection !== undefined) this.movementDirection = options.movementDirection;
-    }
-
-    get movementSpeed(): number {
-        return this._movementSpeed;
-    }
-
-    set movementSpeed(value: number) {
-        this._movementSpeed = value;
-    }
-
-    get maxMovementSpeed(): number {
-        return this.movementSpeed;
-    }
-
-    get accelerationFactor(): number {
-        return 0;
-    }
-
-    get decelerationFactor(): number {
-        return 0;
+    setOptions(_options: PartialGameObjectOptions): void {
+        // empty
     }
 
     protected markGraphicsDirty(): void {

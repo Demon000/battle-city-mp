@@ -3,11 +3,13 @@ import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { DirtyIsMovingComponent } from '@/components/DirtyIsMovingComponent';
 import { IsMovingComponent } from '@/components/IsMovingComponent';
 import { IsMovingTrackingComponent } from '@/components/IsMovingTrackingComponent';
+import { MovementComponent } from '@/components/MovementComponent';
 import { SpawnComponent } from '@/components/SpawnComponent';
 import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
 import { WorldEntityComponent } from '@/components/WorldEntityComponent';
 import { ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
+import { EntityId } from '@/ecs/EntityId';
 import { Registry } from '@/ecs/Registry';
 import { DirectionComponent } from '@/physics/DirectionComponent';
 import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
@@ -60,35 +62,26 @@ export class GameObjectService {
     updateObject(objectId: number, objectOptions: PartialGameObjectOptions): void {
         const object = this.registry.getEntityById(objectId) as GameObject;
         object.setOptions(objectOptions);
-
-        if (objectOptions.movementDirection !== undefined
-            || objectOptions.movementSpeed !== undefined) {
-            this.markDirtyIsMoving(object);
-        }
-
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, objectOptions);
     }
 
-    setObjectMovementDirection(objectId: number, direction: Direction | null): void {
-        const object = this.registry.getEntityById(objectId) as GameObject;
-        if (object.movementDirection === direction) {
+    setObjectMovementDirection(entityId: EntityId, direction: Direction | null): void {
+        const entity = this.registry.getEntityById(entityId);
+        const movement = entity.getComponent(MovementComponent);
+        if (movement.direction === direction) {
             return;
         }
 
-        object.movementDirection = direction;
-
-        this.markDirtyIsMoving(object);
-
-        this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
-            movementDirection: direction,
-        } as PartialGameObjectOptions);
+        movement.update({
+            direction,
+        });
     }
 
-    processObjectDirection(object: GameObject): void {
-        const direction = object.getComponent(DirectionComponent).value;
-        if (object.movementDirection !== null && direction !== object.movementDirection) {
-            object.upsertComponent(RequestedDirectionComponent, {
-                value: object.movementDirection,
+    processObjectDirection(entity: Entity): void {
+        const movement = entity.getComponent(MovementComponent);
+        const direction = entity.getComponent(DirectionComponent).value;
+        if (movement.direction !== null && direction !== movement.direction) {
+            entity.upsertComponent(RequestedDirectionComponent, {
+                value: movement.direction,
             }, {
                 flags: ComponentFlags.LOCAL_ONLY,
             });
@@ -115,34 +108,38 @@ export class GameObjectService {
         return playerSpawnObject.getComponent(PositionComponent);
     }
 
-    private processObjectMovement(object: GameObject, delta: number): void {
-        let newMovementSpeed = object.movementSpeed;
-        if (object.movementDirection === null || object.maxMovementSpeed < newMovementSpeed) {
-            newMovementSpeed -= object.maxMovementSpeed * object.decelerationFactor * delta;
+    private processMovementSpeed(movement: MovementComponent, delta: number): void {
+        let newMovementSpeed = movement.speed;
+        if (movement.direction === null || movement.maxSpeed < newMovementSpeed) {
+            newMovementSpeed -= movement.maxSpeed * movement.decelerationFactor * delta;
             newMovementSpeed = Math.max(0, newMovementSpeed);
-        } else if (newMovementSpeed < object.maxMovementSpeed) {
-            newMovementSpeed += object.maxMovementSpeed * object.accelerationFactor * delta;
-            newMovementSpeed = Math.min(newMovementSpeed, object.maxMovementSpeed);
+        } else if (newMovementSpeed < movement.maxSpeed) {
+            newMovementSpeed += movement.maxSpeed * movement.accelerationFactor * delta;
+            newMovementSpeed = Math.min(newMovementSpeed, movement.maxSpeed);
         }
 
-        if (object.movementSpeed !== newMovementSpeed) {
-            object.movementSpeed = newMovementSpeed;
-
-            this.markDirtyIsMoving(object);
-
-            this.emitter.emit(GameObjectServiceEvent.OBJECT_CHANGED, object.id, {
-                movementSpeed: newMovementSpeed,
-            } as PartialGameObjectOptions);
+        if (newMovementSpeed === movement.speed) {
+            return;
         }
 
-        const distance = object.movementSpeed * delta;
+        movement.update({
+            speed: newMovementSpeed,
+        });
+    }
+
+    private processObjectMovement(entity: Entity, delta: number): void {
+        const movement = entity.getComponent(MovementComponent);
+
+        this.processMovementSpeed(movement, delta);
+
+        const distance = movement.speed * delta;
         if (distance === 0) {
             return;
         }
 
-        const positionComponent = object.getComponent(PositionComponent);
+        const positionComponent = entity.getComponent(PositionComponent);
         const position = PointUtils.clone(positionComponent);
-        const direction = object.getComponent(DirectionComponent).value;
+        const direction = entity.getComponent(DirectionComponent).value;
         if (direction === Direction.UP) {
             position.y -= distance;
         } else if (direction === Direction.RIGHT) {
@@ -153,7 +150,7 @@ export class GameObjectService {
             position.x -= distance;
         }
 
-        object.upsertComponent(RequestedPositionComponent, position, {
+        entity.upsertComponent(RequestedPositionComponent, position, {
             flags: ComponentFlags.LOCAL_ONLY,
         });
     }
@@ -194,9 +191,9 @@ export class GameObjectService {
 
             const entity = component.entity;
             const isMovingComponent = entity.findComponent(IsMovingComponent);
-            const object = entity as GameObject;
-            const isMoving = object.movementSpeed > 0
-                || object.movementDirection !== null;
+            const movement = entity.getComponent(MovementComponent);
+
+            const isMoving = movement.speed > 0 || movement.direction !== null;
             if (isMoving && isMovingComponent === undefined) {
                 entity.addComponent(IsMovingComponent, undefined, {
                     flags: ComponentFlags.LOCAL_ONLY,

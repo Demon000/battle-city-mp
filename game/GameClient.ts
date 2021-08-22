@@ -34,6 +34,7 @@ import { SizeComponent } from '@/physics/size/SizeComponent';
 import { EntityId } from '@/ecs/EntityId';
 import { Entity } from '@/ecs/Entity';
 import { BoundingBoxComponent } from '@/physics/bounding-box/BoundingBoxComponent';
+import { MovementComponent } from '@/components/MovementComponent';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -160,6 +161,13 @@ export class GameClient {
                     const entity = component.entity;
                     this.collisionService.processObjectDirtyCollisions(entity);
                 });
+        this.registry.componentEmitter(MovementComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+                (_event, component) => {
+                    const entity = component.entity;
+                    this.gameObjectService.markDirtyIsMoving(entity);
+                });
+
         this.registry.emitter.on(RegistryEvent.ENTITY_BEFORE_DESTROY,
             (entity: Entity) => {
                 const object = entity as GameObject;

@@ -54,6 +54,7 @@ import { ColorComponent } from '@/components/ColorComponent';
 import { BoundingBoxComponent } from '@/physics/bounding-box/BoundingBoxComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
+import { MovementComponent } from '@/components/MovementComponent';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -212,6 +213,13 @@ export class GameServer {
                     const entity = component.entity;
                     this.collisionService.processObjectDirtyCollisions(entity);
                 });
+        this.registry.componentEmitter(MovementComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+                (_event, component) => {
+                    const entity = component.entity;
+                    this.gameObjectService.markDirtyIsMoving(entity);
+                });
+
         /**
          * PlayerService event handlers
          */

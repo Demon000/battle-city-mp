@@ -28,9 +28,6 @@
     'tank': {
         tiers: {
             normal: {
-                maxSpeed: 114,
-                accelerationFactor: 3,
-                decelerationFactor: 3,
                 bulletSpeed: 128,
                 maxBullets: 3,
                 bulletCooldown: 250,
@@ -44,10 +41,7 @@
                 maxHealth: 2,
             },
             light: {
-                maxSpeed: 128,
-                accelerationFactor: 2,
                 bulletSpeed: 128,
-                decelerationFactor: 2,
                 maxBullets: 2,
                 bulletCooldown: 250,
                 bulletPower: 'light',
@@ -60,10 +54,7 @@
                 maxHealth: 1,
             },
             heavy: {
-                maxSpeed: 96,
-                accelerationFactor: 1,
                 bulletSpeed: 192,
-                decelerationFactor: 1,
                 maxBullets: 1,
                 bulletCooldown: 500,
                 bulletPower: 'heavy',

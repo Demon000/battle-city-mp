@@ -84,10 +84,6 @@ export class BulletService {
         const bullet = this.gameObjectFactory.buildFromOptions({
             type: GameObjectType.BULLET,
             subtypes: [tank.bulletPower],
-            options: {
-                movementDirection: direction.value,
-                movementSpeed: tank.bulletSpeed,
-            },
             components: {
                 DirectionComponent: direction,
                 BulletComponent: {
@@ -98,6 +94,10 @@ export class BulletService {
                 },
                 EntityOwnedComponent: {
                     entityId: tank.id,
+                },
+                MovementComponent: {
+                    direction: direction.value,
+                    speed: tank.bulletSpeed,
                 },
             },
             silent: true,

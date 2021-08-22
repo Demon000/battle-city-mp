@@ -1,3 +1,4 @@
+import { MovementComponent } from '@/components/MovementComponent';
 import { Color } from '@/drawable/Color';
 import { Registry } from '@/ecs/Registry';
 import { GameObjectProperties } from '@/object/GameObjectProperties';
@@ -173,7 +174,8 @@ export class Tank extends GameObject {
     }
 
     get bulletSpeed(): number {
-        return this.tierProperties.bulletSpeed + this.movementSpeed;
+        const movementComponent = this.getComponent(MovementComponent);
+        return this.tierProperties.bulletSpeed + movementComponent.speed;
     }
 
     get bulletPower(): string {

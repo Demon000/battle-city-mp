@@ -148,6 +148,7 @@
         ],
         components: {
             DirectionComponent: {},
+            MovementComponent: {},
         },
         localComponents: {
             CenterPositionComponent: {},
@@ -263,6 +264,7 @@
         ],
         components: {
             DirectionComponent: {},
+            MovementComponent: {},
             ColorComponent: {},
         },
         localComponents: {
@@ -289,6 +291,42 @@
                 },
             },
             SpawnTimeComponent: {},
+        },
+    },
+    'tank-normal': {
+        extends: [
+            'tank',
+        ],
+        components: {
+            MovementComponent: {
+                maxSpeed: 114,
+                accelerationFactor: 3,
+                decelerationFactor: 3,
+            },
+        },
+    },
+    'tank-light': {
+        extends: [
+            'tank',
+        ],
+        components: {
+            MovementComponent: {
+                maxSpeed: 128,
+                accelerationFactor: 2,
+                decelerationFactor: 2,
+            },
+        },
+    },
+    'tank-heavy': {
+        extends: [
+            'tank',
+        ],
+        components: {
+            MovementComponent: {
+                maxSpeed: 96,
+                accelerationFactor: 1,
+                decelerationFactor: 1,
+            },
         },
     },
 }
