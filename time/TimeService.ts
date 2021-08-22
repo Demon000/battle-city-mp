@@ -78,6 +78,10 @@ export class TimeService {
     }
 
     setRoundTime(roundTime: number): void {
+        if (roundTime < 0) {
+            roundTime = 0;
+        }
+
         const roundSeconds = Math.floor(roundTime);
         this.setRoundSeconds(roundSeconds);
         this.roundTime = roundTime;
