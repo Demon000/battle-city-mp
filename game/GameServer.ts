@@ -560,6 +560,11 @@ export class GameServer {
          */
         this.ticker.emitter.on(TickerEvent.TICK,
             (deltaSeconds: number) => {
+                this.timeService.decreaseRoundTime(deltaSeconds);
+                if (this.timeService.isRoundEnded()) {
+                    this.reload();
+                }
+
                 this.playerService.processPlayersStatus(deltaSeconds);
                 this.tankService.processTanksStatus();
                 this.gameObjectService.processObjectsDirection();
@@ -570,12 +575,7 @@ export class GameServer {
                 this.gameObjectService.processObjectsDirtyCenterPosition();
                 this.gameObjectService.processObjectsAutomaticDestroy();
                 this.gameObjectService.processObjectsDestroyed();
-                this.timeService.decreaseRoundTime(deltaSeconds);
                 this.gameEventBatcher.flush();
-
-                if (this.timeService.isRoundEnded()) {
-                    this.reload();
-                }
             });
 
         this.gameModeService.setGameMode(gameMode);
@@ -842,8 +842,7 @@ export class GameServer {
     reload(): void {
         this.ticker.stop();
 
-        this.gameObjectService.markAllDestroyed();
-        this.gameObjectService.processObjectsDestroyed();
+        this.gameObjectService.destroyAllWorldEntities();
         this.playerService.resetFields();
         this.gameEventBatcher.flush();
 

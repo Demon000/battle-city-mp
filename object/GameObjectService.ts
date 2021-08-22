@@ -5,6 +5,7 @@ import { IsMovingComponent } from '@/components/IsMovingComponent';
 import { IsMovingTrackingComponent } from '@/components/IsMovingTrackingComponent';
 import { SpawnComponent } from '@/components/SpawnComponent';
 import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
+import { WorldEntityComponent } from '@/components/WorldEntityComponent';
 import { ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
@@ -157,15 +158,18 @@ export class GameObjectService {
         });
     }
 
-    markAllDestroyed(): void {
-        for (const entity of this.registry.getEntities()) {
-            this.markDestroyed(entity);
+    processObjectsDestroyed(): void {
+        for (const entity of this.registry.getEntitiesWithComponent(DestroyedComponent)) {
+            entity.destroy();
         }
     }
 
-    processObjectsDestroyed(): void {
-        for (const component of this.registry.getComponents(DestroyedComponent)) {
-            this.registry.destroyEntity(component.entity);
+    destroyAllWorldEntities(): void {
+        for (const entity of this.registry.getEntitiesWithComponent(WorldEntityComponent)) {
+            entity.upsertComponent(DestroyedComponent, undefined, {
+                flags: ComponentFlags.LOCAL_ONLY,
+            });
+            entity.destroy();
         }
     }
 

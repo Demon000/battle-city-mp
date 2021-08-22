@@ -24,6 +24,7 @@ import { PlayerOwnedComponent, PlayerOwnedComponentData } from '@/components/Pla
 import { EntityOwnedComponent, EntityOwnedComponentData } from '@/components/EntityOwnedComponent';
 import { BulletComponent, BulletComponentData } from '@/bullet/BulletComponent';
 import { ColorComponent, ColorComponentData } from '@/components/ColorComponent';
+import { WorldEntityComponent, WorldEntityComponentData } from '@/components/WorldEntityComponent';
 
 export interface ProcessResults {
     clazz: ComponentClassType<any>;
@@ -139,6 +140,10 @@ export class ComponentRegistry {
             case ColorComponent.tag:
                 clazz = ColorComponent;
                 this.validate<ColorComponentData>(ColorComponent, data);
+                break;
+            case WorldEntityComponent.tag:
+                clazz = WorldEntityComponent;
+                this.validate<WorldEntityComponentData>(WorldEntityComponent, data);
                 break;
             default:
                 assert(false, `Invalid tag '${tag}'`);
