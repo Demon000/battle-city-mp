@@ -68,7 +68,16 @@ export class EntityBlueprint {
                 continue;
             }
 
-            target[key] = Object.assign({}, blueprintData[key], target[key]);
+            let targetComponentsData = target[key];
+            if (targetComponentsData === undefined) {
+                target[key] = targetComponentsData = {};
+            }
+
+            for (const tag of Object.keys(blueprintComponentsData)) {
+                targetComponentsData[tag] = Object.assign({},
+                    blueprintComponentsData[tag],
+                    targetComponentsData[tag]);
+            }
         }
     }
 
