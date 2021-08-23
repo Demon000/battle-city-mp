@@ -1,6 +1,7 @@
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { DirectionAxisSnappingComponent } from '@/components/DirectionAxisSnappingComponent';
 import { IsUnderBushComponent } from '@/components/IsUnderBushComponent';
+import { MovementMultipliersComponent } from '@/components/MovementMultipliersComponent';
 import { ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
@@ -21,23 +22,14 @@ import { PositionComponent } from '../point/PositionComponent';
 import { RequestedPositionComponent } from '../point/RequestedPositionComponent';
 import { RequestedDirectionComponent } from '../RequestedDirectionComponent';
 import { SizeComponent } from '../size/SizeComponent';
-import { CollisionTracker } from './CollisionTracker';
 import { DirectionUtils } from './DirectionUtils';
 import { DirtyCollisionsComponent } from './DirtyCollisionsComponent';
 import { ICollisionRule, CollisionEvent, CollisionEvents, CollisionResultEvent } from './ICollisionRule';
 
-export enum CollisionServiceEvent {
-    OBJECT_TRACKED_COLLISIONS = 'object-tracked-collisions',
-}
-
-interface CollisionServiceEvents extends CollisionEvents {
-    [CollisionServiceEvent.OBJECT_TRACKED_COLLISIONS]: (movingObjectId: number, tracker: CollisionTracker) => void;
-}
-
 export class CollisionService {
     private rulesMap?: Map<string, Map<string, ICollisionRule>>;
 
-    emitter = new EventEmitter<CollisionServiceEvents>();
+    emitter = new EventEmitter<CollisionEvents>();
 
     constructor(
         private boundingBoxRepository: BoundingBoxRepository<number>,
@@ -148,6 +140,43 @@ export class CollisionService {
         return false;
     }
 
+    private updateObjectMovementMultipliers(
+        movingEntity: Entity,
+        overlappingEntities: Iterable<Entity>,
+    ): void {
+        const movingMultipliers =
+            movingEntity.findComponent(MovementMultipliersComponent);
+        if (movingMultipliers === undefined) {
+            return;
+        }
+
+        movingMultipliers.accelerationFactorMultiplier = 1;
+        movingMultipliers.decelerationFactorMultiplier = 1;
+        movingMultipliers.maxSpeedMultiplier = 1;
+        movingMultipliers.typeMultipliersMarkedMap = {};
+
+        for (const overlappingEntity of overlappingEntities) {
+            const typeMultipliers =
+                movingMultipliers.typeMultipliersMap[overlappingEntity.type];
+            if (typeMultipliers === undefined) {
+                continue;
+            }
+
+            if (movingMultipliers.typeMultipliersMarkedMap[movingEntity.type]) {
+                continue;
+            }
+
+            movingMultipliers.typeMultipliersMarkedMap[movingEntity.type] = true;
+
+            movingMultipliers.accelerationFactorMultiplier
+                *= typeMultipliers.accelerationFactor;
+            movingMultipliers.decelerationFactorMultiplier
+                *= typeMultipliers.decelerationFactor;
+            movingMultipliers.maxSpeedMultiplier
+                *= typeMultipliers.maxSpeed;
+        }
+    }
+
     private _validateObjectMovement(
         movingObject: Entity,
         position: Point,
@@ -175,7 +204,6 @@ export class CollisionService {
 
         let movementPreventingObject;
         const collidingObjectNotifications = new Array<[CollisionEvent, Entity]>();
-        const collidingObjectTrackings = new Array<Entity>();
         for (const overlappingObject of overlappingObjects) {
             if (movingObject.id === overlappingObject.id) {
                 continue;
@@ -210,8 +238,6 @@ export class CollisionService {
                     if (!isAlreadyInside && isCloser) {
                         movementPreventingObject = overlappingObject;
                     }
-                } else if (result.type === CollisionResultEvent.TRACK) {
-                    collidingObjectTrackings.push(overlappingObject);
                 } else if (result.type === CollisionResultEvent.NOTIFY) {
                     collidingObjectNotifications.push([result.name, overlappingObject]);
                 }
@@ -259,18 +285,7 @@ export class CollisionService {
             }
         }
 
-        const collisionTracker = new CollisionTracker();
-        for (const overlappingObject of collidingObjectTrackings) {
-            const overlappingBoundingBox = overlappingObject
-                .getComponent(BoundingBoxComponent);
-            if (this.isObjectOverlapping(isValidPosition, preventedBoundingBox, movedBoundingBox,
-                overlappingBoundingBox)) {
-                collisionTracker.markTypeObject(overlappingObject.type, overlappingObject.id);
-            }
-        }
-
-        this.emitter.emit(CollisionServiceEvent.OBJECT_TRACKED_COLLISIONS,
-            movingObject.id, collisionTracker);
+        this.updateObjectMovementMultipliers(movingObject, overlappingObjects);
     }
 
     processObjectsRequestedPosition(): void {

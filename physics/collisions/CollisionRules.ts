@@ -20,18 +20,6 @@ export const rules: ICollisionRule[] = [
     {
         movingTypes: [GameObjectType.TANK],
         staticTypes: [
-            GameObjectType.ICE,
-            GameObjectType.SAND,
-        ],
-        result: [
-            {
-                type: CollisionResultEvent.TRACK,
-            },
-        ],
-    },
-    {
-        movingTypes: [GameObjectType.TANK],
-        staticTypes: [
             GameObjectType.FLAG,
         ],
         result: [

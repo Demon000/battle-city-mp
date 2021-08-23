@@ -6,7 +6,6 @@ import { ExplosionType } from '@/explosion/ExplosionType';
 import { SameTeamBulletHitMode } from '@/game-mode/IGameModeProperties';
 import { GameObjectFactory, GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
-import { CollisionTracker } from '@/physics/collisions/CollisionTracker';
 import { Direction } from '@/physics/Direction';
 import { Tank, PartialTankOptions } from '@/tank/Tank';
 import { TankService, TankServiceEvent } from '@/tank/TankService';
@@ -24,7 +23,7 @@ import { GameObject, PartialGameObjectOptions } from '../object/GameObject';
 import { GameObjectService, GameObjectServiceEvent } from '../object/GameObjectService';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
 import { rules } from '../physics/collisions/CollisionRules';
-import { CollisionService, CollisionServiceEvent } from '../physics/collisions/CollisionService';
+import { CollisionService } from '../physics/collisions/CollisionService';
 import { CollisionEvent } from '../physics/collisions/ICollisionRule';
 import { Point } from '../physics/point/Point';
 import { Player, PartialPlayerOptions, PlayerSpawnStatus } from '../player/Player';
@@ -393,17 +392,6 @@ export class GameServer {
                 },
             });
         };
-
-        this.collisionService.emitter.on(CollisionServiceEvent.OBJECT_TRACKED_COLLISIONS,
-            (objectId: number, tracker: CollisionTracker) => {
-                const object = this.registry.getEntityById(objectId);
-
-                switch (object.type) {
-                    case GameObjectType.TANK:
-                        this.tankService.updateTankCollisions(objectId, tracker);
-                        break;
-                }
-            });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_LEVEL_BORDER,
             (bulletId: number, _staticObjectId: number, _position: Point) => {

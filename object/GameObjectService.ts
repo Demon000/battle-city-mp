@@ -4,6 +4,7 @@ import { DirtyIsMovingComponent } from '@/components/DirtyIsMovingComponent';
 import { IsMovingComponent } from '@/components/IsMovingComponent';
 import { IsMovingTrackingComponent } from '@/components/IsMovingTrackingComponent';
 import { MovementComponent } from '@/components/MovementComponent';
+import { MovementMultipliersComponent } from '@/components/MovementMultipliersComponent';
 import { SpawnComponent } from '@/components/SpawnComponent';
 import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
 import { WorldEntityComponent } from '@/components/WorldEntityComponent';
@@ -108,14 +109,26 @@ export class GameObjectService {
         return playerSpawnObject.getComponent(PositionComponent);
     }
 
-    private processMovementSpeed(movement: MovementComponent, delta: number): void {
+    private processMovementSpeed(entity: Entity, delta: number): void {
+        const movement = entity.getComponent(MovementComponent);
+        const multipliers = entity.findComponent(MovementMultipliersComponent);
+
+        let accelerationFactor = movement.accelerationFactor;
+        let decelerationFactor = movement.decelerationFactor;
+        let maxSpeed = movement.maxSpeed;
+        if (multipliers !== undefined) {
+            accelerationFactor *= multipliers.accelerationFactorMultiplier;
+            decelerationFactor *= multipliers.decelerationFactorMultiplier;
+            maxSpeed *= multipliers.maxSpeedMultiplier;
+        }
+
         let newMovementSpeed = movement.speed;
-        if (movement.direction === null || movement.maxSpeed < newMovementSpeed) {
-            newMovementSpeed -= movement.maxSpeed * movement.decelerationFactor * delta;
+        if (movement.direction === null || maxSpeed < newMovementSpeed) {
+            newMovementSpeed -= maxSpeed * decelerationFactor * delta;
             newMovementSpeed = Math.max(0, newMovementSpeed);
-        } else if (newMovementSpeed < movement.maxSpeed) {
-            newMovementSpeed += movement.maxSpeed * movement.accelerationFactor * delta;
-            newMovementSpeed = Math.min(newMovementSpeed, movement.maxSpeed);
+        } else if (newMovementSpeed < maxSpeed) {
+            newMovementSpeed += maxSpeed * accelerationFactor * delta;
+            newMovementSpeed = Math.min(newMovementSpeed, maxSpeed);
         }
 
         if (newMovementSpeed === movement.speed) {
@@ -128,10 +141,9 @@ export class GameObjectService {
     }
 
     private processObjectMovement(entity: Entity, delta: number): void {
+        this.processMovementSpeed(entity, delta);
+
         const movement = entity.getComponent(MovementComponent);
-
-        this.processMovementSpeed(movement, delta);
-
         const distance = movement.speed * delta;
         if (distance === 0) {
             return;

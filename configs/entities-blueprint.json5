@@ -297,6 +297,22 @@
         extends: [
             'tank',
         ],
+        serverComponents: {
+            MovementMultipliersComponent: {
+                typeMultipliersMap: {
+                    'sand': {
+                        maxSpeed: 0.5,
+                        accelerationFactor: 1,
+                        decelerationFactor: 2,
+                    },
+                    'ice': {
+                        maxSpeed: 1.5,
+                        accelerationFactor: 2,
+                        decelerationFactor: 0.5,
+                    },
+                },
+            },
+        },
         components: {
             MovementComponent: {
                 maxSpeed: 114,
@@ -309,6 +325,22 @@
         extends: [
             'tank',
         ],
+        serverComponents: {
+            MovementMultipliersComponent: {
+                typeMultipliersMap: {
+                    'sand': {
+                        maxSpeed: 0.25,
+                        accelerationFactor: 1,
+                        decelerationFactor: 2,
+                    },
+                    'ice': {
+                        maxSpeed: 1.5,
+                        accelerationFactor: 2,
+                        decelerationFactor: 0.5,
+                    },
+                },
+            },
+        },
         components: {
             MovementComponent: {
                 maxSpeed: 128,
@@ -321,6 +353,22 @@
         extends: [
             'tank',
         ],
+        serverComponents: {
+            MovementMultipliersComponent: {
+                typeMultipliersMap: {
+                    'sand': {
+                        maxSpeed: 1,
+                        accelerationFactor: 1,
+                        decelerationFactor: 2,
+                    },
+                    'ice': {
+                        maxSpeed: 1.5,
+                        accelerationFactor: 2,
+                        decelerationFactor: 0.5,
+                    },
+                },
+            },
+        },
         components: {
             MovementComponent: {
                 maxSpeed: 96,

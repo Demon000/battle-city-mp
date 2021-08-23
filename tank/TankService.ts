@@ -2,7 +2,6 @@ import { Color } from '@/drawable/Color';
 import { Registry } from '@/ecs/Registry';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
-import { CollisionTracker } from '@/physics/collisions/CollisionTracker';
 import { Point } from '@/physics/point/Point';
 import { Player } from '@/player/Player';
 import EventEmitter from 'eventemitter3';
@@ -161,13 +160,6 @@ export class TankService {
                     tankOptions.bulletIds.length);
             }
         }
-    }
-
-    updateTankCollisions(tankId: number, tracker: CollisionTracker): void {
-        const tank = this.registry.getEntityById(tankId) as Tank;
-
-        tank.isOnIce = tracker.isCollidingWithType(GameObjectType.ICE);
-        tank.isOnSand = tracker.isCollidingWithType(GameObjectType.SAND);
     }
 
     processTanksStatus(): void {

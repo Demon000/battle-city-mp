@@ -26,6 +26,7 @@ import { BulletComponent, BulletComponentData } from '@/bullet/BulletComponent';
 import { ColorComponent, ColorComponentData } from '@/components/ColorComponent';
 import { WorldEntityComponent, WorldEntityComponentData } from '@/components/WorldEntityComponent';
 import { MovementComponent, MovementComponentData } from '@/components/MovementComponent';
+import { MovementMultipliersComponent, MovementMultipliersComponentData } from '@/components/MovementMultipliersComponent';
 
 export interface ProcessResults {
     clazz: ComponentClassType<any>;
@@ -149,6 +150,10 @@ export class ComponentRegistry {
             case MovementComponent.tag:
                 clazz = MovementComponent;
                 this.validate<MovementComponentData>(MovementComponent, data);
+                break;
+            case MovementMultipliersComponent.tag:
+                clazz = MovementMultipliersComponent;
+                this.validate<MovementMultipliersComponentData>(MovementMultipliersComponent, data);
                 break;
             default:
                 assert(false, `Invalid tag '${tag}'`);

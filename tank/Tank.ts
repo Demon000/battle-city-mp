@@ -7,19 +7,10 @@ import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
 
 export interface TankTierProperties {
-    maxSpeed: number;
-    accelerationFactor: number;
-    decelerationFactor: number;
     bulletSpeed: number;
     maxBullets: number;
     bulletCooldown: number;
     bulletPower: string;
-    sandMaxSpeedFactor: number;
-    sandAccelerationFactor: number;
-    sandDecelerationFactor: number;
-    iceMaxSpeedFactor: number;
-    iceAccelerationFactor: number;
-    iceDecelerationFactor: number;
     maxHealth: number;
 }
 
@@ -129,48 +120,6 @@ export class Tank extends GameObject {
         }
 
         return this.properties.healthSmokeTime[this.health];
-    }
-
-    get maxMovementSpeed(): number {
-        let speed = this.tierProperties.maxSpeed;
-
-        if (this.isOnIce) {
-            speed *= this.tierProperties.iceMaxSpeedFactor;
-        }
-
-        if (this.isOnSand) {
-            speed *= this.tierProperties.sandMaxSpeedFactor;
-        }
-
-        return speed;
-    }
-
-    get accelerationFactor(): number {
-        let factor = this.tierProperties.accelerationFactor;
-
-        if (this.isOnIce) {
-            factor *= this.tierProperties.iceAccelerationFactor;
-        }
-
-        if (this.isOnSand) {
-            factor *= this.tierProperties.sandAccelerationFactor;
-        }
-
-        return factor;
-    }
-
-    get decelerationFactor(): number {
-        let factor = this.tierProperties.decelerationFactor;
-
-        if (this.isOnIce) {
-            factor *= this.tierProperties.iceDecelerationFactor;
-        }
-
-        if (this.isOnSand) {
-            factor *= this.tierProperties.sandDecelerationFactor;
-        }
-
-        return factor;
     }
 
     get bulletSpeed(): number {
