@@ -59,7 +59,7 @@
             },
         },
     },
-    'ice': {
+    ice: {
         extends: [
             'positioned-entity',
             'bounding-boxed-entity',
@@ -72,7 +72,7 @@
             },
         },
     },
-    'sand': {
+    sand: {
         extends: [
             'positioned-entity',
             'bounding-boxed-entity',
@@ -300,12 +300,12 @@
         serverComponents: {
             MovementMultipliersComponent: {
                 typeMultipliersMap: {
-                    'sand': {
+                    sand: {
                         maxSpeed: 0.5,
                         accelerationFactor: 1,
                         decelerationFactor: 2,
                     },
-                    'ice': {
+                    ice: {
                         maxSpeed: 1.5,
                         accelerationFactor: 2,
                         decelerationFactor: 0.5,
@@ -332,12 +332,12 @@
         serverComponents: {
             MovementMultipliersComponent: {
                 typeMultipliersMap: {
-                    'sand': {
+                    sand: {
                         maxSpeed: 0.25,
                         accelerationFactor: 1,
                         decelerationFactor: 2,
                     },
-                    'ice': {
+                    ice: {
                         maxSpeed: 1.5,
                         accelerationFactor: 2,
                         decelerationFactor: 0.5,
@@ -364,12 +364,12 @@
         serverComponents: {
             MovementMultipliersComponent: {
                 typeMultipliersMap: {
-                    'sand': {
+                    sand: {
                         maxSpeed: 1,
                         accelerationFactor: 1,
                         decelerationFactor: 2,
                     },
-                    'ice': {
+                    ice: {
                         maxSpeed: 1.5,
                         accelerationFactor: 2,
                         decelerationFactor: 0.5,
