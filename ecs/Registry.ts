@@ -36,22 +36,22 @@ export interface RegistryEvents {
     [RegistryEvent.ENTITY_BEFORE_DESTROY]: (entity: Entity) => void;
 }
 
-export interface RegistryComponentEvents {
-    [RegistryComponentEvent.COMPONENT_ADDED]: <C extends Component<C>>(
+export interface RegistryComponentEvents<C extends Component<C> = any> {
+    [RegistryComponentEvent.COMPONENT_ADDED]: (
         component: C,
         data?: any,
         options?: ComponentEmitOptions,
     ) => void;
-    [RegistryComponentEvent.COMPONENT_UPDATED]: <C extends Component<C>>(
+    [RegistryComponentEvent.COMPONENT_UPDATED]: (
         component: C,
         data?: any,
         options?: ComponentEmitOptions,
     ) => void;
-    [RegistryComponentEvent.COMPONENT_BEFORE_REMOVE]: <C extends Component<C>>(
+    [RegistryComponentEvent.COMPONENT_BEFORE_REMOVE]: (
         component: C,
         options?: ComponentEmitOptions,
     ) => void;
-    [RegistryComponentEvent.COMPONENT_CHANGED]: <C extends Component<C>>(
+    [RegistryComponentEvent.COMPONENT_CHANGED]: (
         event: RegistryComponentEvent,
         component: C,
         data?: any,
@@ -90,15 +90,15 @@ export class Registry {
     componentEmitter<C extends Component<C>>(
         clazz: ComponentClassType<C>,
         create?: false,
-    ): EventEmitter<RegistryComponentEvents> | undefined;
+    ): EventEmitter<RegistryComponentEvents<C>> | undefined;
     componentEmitter<C extends Component<C>>(
         clazz: ComponentClassType<C>,
         create: true,
-    ): EventEmitter<RegistryComponentEvents>;
+    ): EventEmitter<RegistryComponentEvents<C>>;
     componentEmitter<C extends Component<C>>(
         clazz: ComponentClassType<C>,
         create?: boolean,
-    ): EventEmitter<RegistryComponentEvents> | undefined {
+    ): EventEmitter<RegistryComponentEvents<C>> | undefined {
         let componentEmitter = this.componentsEmitterMap.get(clazz.tag);
         if (componentEmitter === undefined && create) {
             componentEmitter = new EventEmitter<RegistryComponentEvents>();
