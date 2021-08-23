@@ -32,21 +32,18 @@
                 maxBullets: 3,
                 bulletCooldown: 250,
                 bulletPower: 'light',
-                maxHealth: 2,
             },
             light: {
                 bulletSpeed: 128,
                 maxBullets: 2,
                 bulletCooldown: 250,
                 bulletPower: 'light',
-                maxHealth: 1,
             },
             heavy: {
                 bulletSpeed: 192,
                 maxBullets: 1,
                 bulletCooldown: 500,
                 bulletPower: 'heavy',
-                maxHealth: 3,
             },
         },
         healthSmokeTime: {

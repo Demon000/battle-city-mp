@@ -1,3 +1,4 @@
+import { HealthComponent } from '@/components/HealthComponent';
 import { MovementComponent } from '@/components/MovementComponent';
 import { Color } from '@/drawable/Color';
 import { Registry } from '@/ecs/Registry';
@@ -11,7 +12,6 @@ export interface TankTierProperties {
     maxBullets: number;
     bulletCooldown: number;
     bulletPower: string;
-    maxHealth: number;
 }
 
 export interface TankProperties extends GameObjectProperties {
@@ -24,13 +24,10 @@ export interface TankOptions extends GameObjectOptions {
     playerId: string;
     playerName: string;
     isShooting?: boolean;
-    isOnIce?: boolean;
-    isOnSand?: boolean;
     lastBulletShotTime?: number;
     lastSmokeTime?: number;
     bulletIds?: number[];
     teamId?: string | null;
-    health?: number;
     flagTeamId?: string | null;
     flagColor?: Color | null;
     flagSourceId?: number | null;
@@ -45,13 +42,10 @@ export class Tank extends GameObject {
     playerId: string;
     playerName: string;
     isShooting: boolean;
-    isOnIce: boolean;
-    isOnSand: boolean;
     lastBulletShotTime: number;
     lastSmokeTime: number;
     bulletIds: number[];
     teamId: string | null;
-    health: number;
     flagTeamId: string | null;
     flagSourceId: number | null;
     properties: TankProperties;
@@ -66,13 +60,10 @@ export class Tank extends GameObject {
         this.playerId = options.playerId;
         this.playerName = options.playerName;
         this.isShooting = options.isShooting ?? false;
-        this.isOnIce = options.isOnIce ?? false;
-        this.isOnSand = options.isOnSand ?? false;
         this.lastBulletShotTime = options.lastBulletShotTime ?? 0;
         this.lastSmokeTime = options.lastSmokeTime ?? 0;
         this.bulletIds = options.bulletIds ?? new Array<number>();
         this.teamId = options.teamId ?? null;
-        this.health = options.health ?? this.maxHealth;
         this.flagTeamId = options.flagTeamId ?? null;
         this._flagColor = options.flagColor ?? null;
         this.flagSourceId = options.flagSourceId ?? null;
@@ -87,7 +78,6 @@ export class Tank extends GameObject {
             lastBulletShotTime: this.lastBulletShotTime,
             bulletIds: this.bulletIds,
             teamId: this.teamId,
-            health: this.health,
             flagColor: this.flagColor,
         };
     }
@@ -102,7 +92,6 @@ export class Tank extends GameObject {
         if (options.lastSmokeTime !== undefined) this.lastSmokeTime = options.lastSmokeTime;
         if (options.bulletIds !== undefined) this.bulletIds = options.bulletIds;
         if (options.teamId !== undefined) this.teamId = options.teamId;
-        if (options.health !== undefined) this.health = options.health;
         if (options.flagColor !== undefined) this.flagColor = options.flagColor;
     }
 
@@ -110,16 +99,13 @@ export class Tank extends GameObject {
         return this.properties.tiers[this.tier];
     }
 
-    get maxHealth(): number {
-        return this.tierProperties.maxHealth;
-    }
-
     get smokeTime(): number | undefined {
-        if (this.health === this.maxHealth) {
+        const healthComponent = this.getComponent(HealthComponent);
+        if (healthComponent.value === healthComponent.max) {
             return undefined;
         }
 
-        return this.properties.healthSmokeTime[this.health];
+        return this.properties.healthSmokeTime[healthComponent.value];
     }
 
     get bulletSpeed(): number {

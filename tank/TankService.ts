@@ -1,3 +1,4 @@
+import { HealthComponent } from '@/components/HealthComponent';
 import { Color } from '@/drawable/Color';
 import { Registry } from '@/ecs/Registry';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
@@ -12,8 +13,6 @@ export enum TankServiceEvent {
     TANK_REQUESTED_BULLET_SPAWN = 'tank-requested-bullet-spawn',
     TANK_REQUESTED_SMOKE_SPAWN = 'tank-requested-smoke-spawn',
     TANK_UPDATED = 'tank-updated',
-    OWN_PLAYER_TANK_CHANGED_MAX_HEALTH = 'own-player-tank-changed-max-health',
-    OWN_PLAYER_TANK_CHANGED_HEALTH = 'own-player-tank-changed-health',
     OWN_PLAYER_TANK_CHANGED_MAX_BULLETS = 'own-player-tank-changed-max-bullets',
     OWN_PLAYER_TANK_CHANGED_BULLETS = 'own-player-tank-changed-bullets',
 }
@@ -22,8 +21,6 @@ export interface TankServiceEvents {
     [TankServiceEvent.TANK_REQUESTED_BULLET_SPAWN]: (tankId: number) => void,
     [TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN]: (tankId: number) => void,
     [TankServiceEvent.TANK_UPDATED]: (tankId: number, options: PartialTankOptions) => void,
-    [TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH]: (maxHealth: number) => void,
-    [TankServiceEvent.OWN_PLAYER_TANK_CHANGED_HEALTH]: (health: number) => void,
     [TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS]: (maxBullets: number) => void,
     [TankServiceEvent.OWN_PLAYER_TANK_CHANGED_BULLETS]: (bullets: number) => void,
 }
@@ -69,14 +66,14 @@ export class TankService {
 
         const tank = this.registry.getEntityById(tankId) as Tank;
 
-        this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
-            tank.maxHealth);
-        this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
-            tank.health);
         this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
             tank.maxBullets);
         this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
             tank.bulletIds.length);
+    }
+
+    getOwnPlayerTankId(): number | null {
+        return this.ownPlayerTankId;
     }
 
     addRemoveTankBullets(tankId: number, bulletId: number, add: boolean): void {
@@ -150,11 +147,6 @@ export class TankService {
 
     updateTank(tankId: number, tankOptions: PartialTankOptions): void {
         if (tankId === this.ownPlayerTankId) {
-            if (tankOptions.health !== undefined) {
-                this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
-                    tankOptions.health);
-            }
-
             if (tankOptions.bulletIds !== undefined) {
                 this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
                     tankOptions.bulletIds.length);
@@ -192,11 +184,10 @@ export class TankService {
     }
 
     decreaseTankHealth(tankId: number, value: number): void {
-        const tank = this.registry.getEntityById(tankId) as Tank;
-        tank.health -= value;
-
-        this.emitter.emit(TankServiceEvent.TANK_UPDATED, tankId, {
-            health: tank.health,
+        const tank = this.registry.getEntityById(tankId);
+        const health = tank.getComponent(HealthComponent);
+        health.update({
+            value: health.value - value,
         });
     }
 }

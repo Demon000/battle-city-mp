@@ -54,6 +54,7 @@ import { BoundingBoxComponent } from '@/physics/bounding-box/BoundingBoxComponen
 import { SizeComponent } from '@/physics/size/SizeComponent';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { MovementComponent } from '@/components/MovementComponent';
+import { HealthComponent } from '@/components/HealthComponent';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -442,6 +443,7 @@ export class GameServer {
                 }
 
                 const tank = this.registry.getEntityById(tankId) as Tank;
+                const tankHealth = tank.getComponent(HealthComponent);
                 const bulletOwnerPlayerId =
                     bullet.getComponent(PlayerOwnedComponent).playerId;
                 const tankPlayer = this.playerService.findPlayer(tank.playerId);
@@ -470,17 +472,17 @@ export class GameServer {
                 const bulletComponent = bullet.getComponent(BulletComponent);
                 let bulletDamage = bulletComponent.damage;
                 if (!ignoreBulletDamage) {
-                    const tankHealth = tank.health;
+                    const oldTankHealth = tankHealth.value;
 
                     this.tankService.decreaseTankHealth(tankId, bulletDamage);
-                    bulletDamage -= tankHealth;
+                    bulletDamage -= oldTankHealth;
 
                     bulletComponent.update({
                         damage: bulletDamage,
                     });
                 }
 
-                if (tank.health <= 0) {
+                if (tankHealth.value <= 0) {
                     spawnExplosion(tank, ExplosionType.BIG, GameObjectType.TANK);
                     this.playerService.setPlayerRequestedSpawnStatus(tank.playerId, PlayerSpawnStatus.DESPAWN);
                     this.playerService.addPlayerDeath(tank.playerId);

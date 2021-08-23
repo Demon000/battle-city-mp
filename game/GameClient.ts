@@ -35,6 +35,7 @@ import { EntityId } from '@/ecs/EntityId';
 import { Entity } from '@/ecs/Entity';
 import { BoundingBoxComponent } from '@/physics/bounding-box/BoundingBoxComponent';
 import { MovementComponent } from '@/components/MovementComponent';
+import { HealthComponent } from '@/components/HealthComponent';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -167,6 +168,26 @@ export class GameClient {
                     const entity = component.entity;
                     this.gameObjectService.markDirtyIsMoving(entity);
                 });
+        this.registry.componentEmitter(HealthComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+                (_event, component, data) => {
+                    const entity = component.entity;
+                    if (entity.id === this.tankService.getOwnPlayerTankId()) {
+                        if ('value' in data) {
+                            this.emitter.emit(
+                                GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
+                                data.value,
+                            );
+                        }
+
+                        if ('max' in data) {
+                            this.emitter.emit(
+                                GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
+                                data.max,
+                            );
+                        }
+                    }
+                });
 
         this.registry.emitter.on(RegistryEvent.ENTITY_BEFORE_DESTROY,
             (entity: Entity) => {
@@ -181,6 +202,18 @@ export class GameClient {
             (tankId: number | null) => {
                 this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID, tankId);
                 this.tankService.setOwnPlayerTankId(tankId);
+                if (tankId !== null) {
+                    const tank = this.registry.getEntityById(tankId);
+                    const health = tank.getComponent(HealthComponent);
+                    this.emitter.emit(
+                        GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
+                        health.value,
+                    );
+                    this.emitter.emit(
+                        GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
+                        health.max,
+                    );
+                }
             });
         this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_CHANGED_TEAM_ID,
             (teamId: string | null) => {
@@ -203,16 +236,6 @@ export class GameClient {
                 this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS, requestedSpawnStatus);
             });
 
-        this.tankService.emitter.on(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
-            (maxHealth: number) => {
-                this.emitter.emit(GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
-                    maxHealth);
-            });
-        this.tankService.emitter.on(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
-            (health: number) => {
-                this.emitter.emit(GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
-                    health);
-            });
         this.tankService.emitter.on(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
             (maxBullets: number) => {
                 this.emitter.emit(GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
