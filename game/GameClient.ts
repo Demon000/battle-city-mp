@@ -16,12 +16,12 @@ import EventEmitter from 'eventemitter3';
 import { Team } from '@/team/Team';
 import { TeamService, TeamServiceEvent } from '@/team/TeamService';
 import { PlayerStats } from '@/player/PlayerStats';
-import { TankService, TankServiceEvent } from '@/tank/TankService';
+import { TankService } from '@/tank/TankService';
 import { LazyIterable } from '@/utils/LazyIterable';
 import { GameObjectAudioRendererFactory } from '@/object/GameObjectAudioRendererFactory';
 import { TankTier } from '@/tank/TankTier';
 import { Color } from '@/drawable/Color';
-import { PartialTankOptions, Tank, TankProperties } from '@/tank/Tank';
+import { Tank, TankProperties } from '@/tank/Tank';
 import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
@@ -236,17 +236,6 @@ export class GameClient {
                 this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS, requestedSpawnStatus);
             });
 
-        this.tankService.emitter.on(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
-            (maxBullets: number) => {
-                this.emitter.emit(GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
-                    maxBullets);
-            });
-        this.tankService.emitter.on(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
-            (bullets: number) => {
-                this.emitter.emit(GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
-                    bullets);
-            });
-
         this.playerService.emitter.on(PlayerServiceEvent.PLAYERS_CHANGED,
             () => {
                 this.emitter.emit(GameClientEvent.PLAYERS_CHANGED);
@@ -275,12 +264,6 @@ export class GameClient {
 
     onObjectChanged(objectId: number, objectOptions: PartialGameObjectOptions): void {
         this.gameObjectService.updateObject(objectId, objectOptions);
-
-        const object = this.registry.getEntityById(objectId);
-        switch (object.type) {
-            case GameObjectType.TANK:
-                this.tankService.updateTank(objectId, objectOptions as PartialTankOptions);
-        }
     }
 
     onObjectRegistered(buildOptions: GameObjectFactoryBuildOptions): void {

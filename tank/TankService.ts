@@ -10,19 +10,13 @@ import { Tank, PartialTankOptions, TankOptions } from './Tank';
 import { TankComponent } from './TankComponent';
 
 export enum TankServiceEvent {
-    TANK_REQUESTED_BULLET_SPAWN = 'tank-requested-bullet-spawn',
     TANK_REQUESTED_SMOKE_SPAWN = 'tank-requested-smoke-spawn',
     TANK_UPDATED = 'tank-updated',
-    OWN_PLAYER_TANK_CHANGED_MAX_BULLETS = 'own-player-tank-changed-max-bullets',
-    OWN_PLAYER_TANK_CHANGED_BULLETS = 'own-player-tank-changed-bullets',
 }
 
 export interface TankServiceEvents {
-    [TankServiceEvent.TANK_REQUESTED_BULLET_SPAWN]: (tankId: number) => void,
     [TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN]: (tankId: number) => void,
     [TankServiceEvent.TANK_UPDATED]: (tankId: number, options: PartialTankOptions) => void,
-    [TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS]: (maxBullets: number) => void,
-    [TankServiceEvent.OWN_PLAYER_TANK_CHANGED_BULLETS]: (bullets: number) => void,
 }
 
 export class TankService {
@@ -59,68 +53,10 @@ export class TankService {
 
     setOwnPlayerTankId(tankId: number | null): void {
         this.ownPlayerTankId = tankId;
-
-        if (tankId === null) {
-            return;
-        }
-
-        const tank = this.registry.getEntityById(tankId) as Tank;
-
-        this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
-            tank.maxBullets);
-        this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
-            tank.bulletIds.length);
     }
 
     getOwnPlayerTankId(): number | null {
         return this.ownPlayerTankId;
-    }
-
-    addRemoveTankBullets(tankId: number, bulletId: number, add: boolean): void {
-        const tank = this.registry.findEntityById(tankId) as Tank;
-        if (tank === undefined) {
-            return;
-        }
-
-        if (add) {
-            tank.bulletIds.push(bulletId);
-        } else {
-            const bulletIndex = tank.bulletIds.findIndex(b => b === bulletId);
-            tank.bulletIds.splice(bulletIndex, 1);
-        }
-
-        this.emitter.emit(TankServiceEvent.TANK_UPDATED, tankId, {
-            bulletIds: tank.bulletIds,
-        });
-    }
-
-    addTankBullet(tankId: number, bulletId: number): void {
-        this.addRemoveTankBullets(tankId, bulletId, true);
-    }
-
-    removeTankBullet(tankId: number, bulletId: number): void {
-        this.addRemoveTankBullets(tankId, bulletId, false);
-    }
-
-    private canTankSpawnBullet(tank: Tank): boolean {
-        if (tank.bulletIds.length >= tank.maxBullets) {
-            return false;
-        }
-
-        if (Date.now() - tank.lastBulletShotTime < tank.bulletCooldown) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private processTankShooting(tank: Tank): void {
-        if (!tank.isShooting || !this.canTankSpawnBullet(tank)) {
-            return;
-        }
-
-        this.emitter.emit(TankServiceEvent.TANK_REQUESTED_BULLET_SPAWN, tank.id);
-        tank.lastBulletShotTime = Date.now();
     }
 
     private canTankSpawnSmoke(tank: Tank): boolean {
@@ -145,26 +81,11 @@ export class TankService {
         tank.lastSmokeTime = Date.now();
     }
 
-    updateTank(tankId: number, tankOptions: PartialTankOptions): void {
-        if (tankId === this.ownPlayerTankId) {
-            if (tankOptions.bulletIds !== undefined) {
-                this.emitter.emit(TankServiceEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
-                    tankOptions.bulletIds.length);
-            }
-        }
-    }
-
     processTanksStatus(): void {
         for (const entity of this.registry.getEntitiesWithComponent(TankComponent)) {
             const tank = entity as Tank;
-            this.processTankShooting(tank);
             this.processTankSmoking(tank);
         }
-    }
-
-    setTankShooting(tankId: number, isShooting: boolean): void {
-        const tank = this.registry.getEntityById(tankId) as Tank;
-        tank.isShooting = isShooting;
     }
 
     setTankFlag(tankId: number, teamId: string | null, color: Color | null, sourceId: number | null): void {

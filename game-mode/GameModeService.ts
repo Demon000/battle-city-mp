@@ -21,12 +21,12 @@ export class GameModeService {
         assert(this.gameMode !== undefined,
             'Cannot find properties for undefined game mode');
 
-            return this.config.get<IGameModeProperties>('game-modes-properties', this.gameMode);
+        return this.config.get<IGameModeProperties>('game-modes-properties', this.gameMode);
     }
 
     isIgnoredObjectType(type: string | undefined): boolean {
         assert(type !== undefined,
-            `Cannot check if undefined type is ignored`);
+            'Cannot check if undefined type is ignored');
 
         const gameModeProperties = this.getGameModeProperties();
         if (gameModeProperties.ignoredObjectTypes === undefined) {

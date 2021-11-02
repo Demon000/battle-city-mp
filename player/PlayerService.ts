@@ -407,11 +407,11 @@ export class PlayerService {
 
     private processPlayerShooting(player: Player): void {
         const isShooting = this.isPlayerShooting(player);
-        if (isShooting === player.lastIsShooting) {
+        if (isShooting === player.isShooting) {
             return;
         }
 
-        player.lastIsShooting = isShooting;
+        player.isShooting = isShooting;
         this.emitter.emit(PlayerServiceEvent.PLAYER_REQUESTED_SHOOT, player.id, isShooting);
     }
 

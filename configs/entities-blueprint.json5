@@ -314,6 +314,16 @@
             },
         },
         components: {
+            BulletSpawnerComponent: {
+                subtypes: ['light'],
+                cooldown: 250,
+                maxCount: 3,
+                components: {
+                    MovementComponent: {
+                        speed: 128,
+                    },
+                },
+            },
             MovementComponent: {
                 maxSpeed: 114,
                 accelerationFactor: 3,
@@ -346,6 +356,16 @@
             },
         },
         components: {
+            BulletSpawnerComponent: {
+                subtypes: ['light'],
+                cooldown: 250,
+                maxCount: 2,
+                components: {
+                    MovementComponent: {
+                        speed: 128,
+                    },
+                },
+            },
             MovementComponent: {
                 maxSpeed: 128,
                 accelerationFactor: 2,
@@ -378,6 +398,16 @@
             },
         },
         components: {
+            BulletSpawnerComponent: {
+                subtypes: ['heavy'],
+                cooldown: 500,
+                maxCount: 1,
+                components: {
+                    MovementComponent: {
+                        speed: 192,
+                    },
+                },
+            },
             MovementComponent: {
                 maxSpeed: 96,
                 accelerationFactor: 1,

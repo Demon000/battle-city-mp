@@ -1,9 +1,5 @@
 import { BulletComponent } from '@/bullet/BulletComponent';
-import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
-import { GameObject, GameObjectOptions } from '@/object/GameObject';
-import { GameObjectFactory } from '@/object/GameObjectFactory';
-import { GameObjectType } from '@/object/GameObjectType';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { BoundingBoxComponent } from '@/physics/bounding-box/BoundingBoxComponent';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
@@ -11,14 +7,11 @@ import { DirectionUtils } from '@/physics/collisions/DirectionUtils';
 import { Direction } from '@/physics/Direction';
 import { DirectionComponent } from '@/physics/DirectionComponent';
 import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
-import { PositionComponent } from '@/physics/point/PositionComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
-import { Tank } from '@/tank/Tank';
 import { BulletPower } from './BulletPower';
 
 export class BulletService {
     constructor(
-        private gameObjectFactory: GameObjectFactory,
         private registry: Registry,
     ) {}
 
@@ -76,43 +69,5 @@ export class BulletService {
         }
 
         return brickWallBoundingBox;
-    }
-
-    createBulletForTank(tank: Tank): GameObject {
-        const centerPosition = tank.getComponent(CenterPositionComponent);
-        const direction = tank.getComponent(DirectionComponent);
-        const bullet = this.gameObjectFactory.buildFromOptions({
-            type: GameObjectType.BULLET,
-            subtypes: [tank.bulletPower],
-            components: {
-                DirectionComponent: direction,
-                BulletComponent: {
-                    power: tank.bulletPower,
-                },
-                PlayerOwnedComponent: {
-                    playerId: tank.playerId,
-                },
-                EntityOwnedComponent: {
-                    entityId: tank.id,
-                },
-                MovementComponent: {
-                    direction: direction.value,
-                    speed: tank.bulletSpeed,
-                },
-            },
-            silent: true,
-        });
-
-        const bulletSize = bullet.getComponent(SizeComponent);
-        bullet.updateComponent(PositionComponent, {
-            x: centerPosition.x - bulletSize.width / 2,
-            y: centerPosition.y - bulletSize.height / 2,
-        }, {
-            silent: true,
-        });
-
-        this.registry.registerEntity(bullet);
-
-        return bullet;
     }
 }

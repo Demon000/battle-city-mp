@@ -124,7 +124,7 @@
 import { Color } from '@/drawable/Color';
 import { ColorUtils } from '@/utils/ColorUtils';
 import { WebpackUtils } from '@/client/utils/WebpackUtils';
-import { TankProperties, TankTierProperties } from '@/tank/Tank';
+import { TankProperties } from '@/tank/Tank';
 import { TankTier } from '@/tank/TankTier';
 import { Vue, Prop, Watch, Options } from 'vue-property-decorator';
 import { Team } from '@/team/Team';
@@ -225,18 +225,6 @@ export default class Settings extends Vue {
 
     onSpawnButtonClick(): void {
         this.$emit('spawn-click');
-    }
-
-    get selectedTierProperties(): TankTierProperties | null {
-        if (this.tankTier === null) {
-            return null;
-        }
-
-        if (this.tankProperties === null) {
-            return null;
-        }
-
-        return this.tankProperties.tiers[this.tankTier];
     }
 
     get rgbTankColor(): string | null {

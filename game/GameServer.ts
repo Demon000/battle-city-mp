@@ -55,6 +55,8 @@ import { SizeComponent } from '@/physics/size/SizeComponent';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
+import { EntitySpawnerService } from '@/entity-spawner/EntitySpawnerService';
+import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -79,6 +81,7 @@ export class GameServer {
     private playerRepository;
     private playerService;
     private gameObjectService;
+    private entitySpawnerService;
     private tankService;
     private flagService;
     private bulletService;
@@ -114,9 +117,10 @@ export class GameServer {
             this.collisionRules,
         );
         this.gameObjectService = new GameObjectService(this.registry);
+        this.entitySpawnerService = new EntitySpawnerService(this.gameObjectFactory, this.registry);
         this.tankService = new TankService(this.gameObjectFactory, this.registry);
         this.flagService = new FlagService(this.gameObjectFactory, this.registry, this.config);
-        this.bulletService = new BulletService(this.gameObjectFactory, this.registry);
+        this.bulletService = new BulletService(this.registry);
         this.gameMapService = new GameMapService(this.config, this.entityBlueprint);
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.config, this.playerRepository);
@@ -152,14 +156,9 @@ export class GameServer {
                         this.playerService.setPlayerTankId(tank.playerId, tank.id);
                         break;
                     }
-                    case GameObjectType.BULLET: {
-                        const bulletOwnerEntityId =
-                            object.getComponent(EntityOwnedComponent).entityId;
-                        this.tankService.addTankBullet(bulletOwnerEntityId,
-                            object.id);
-                        break;
-                    }
                 }
+
+                this.entitySpawnerService.handleEntityRegistered(entity);
             });
         this.registry.emitter.on(RegistryEvent.ENTITY_BEFORE_DESTROY,
             (entity: Entity) => {
@@ -172,14 +171,9 @@ export class GameServer {
                         this.playerService.setPlayerTankId(tank.playerId, null);
                         break;
                     }
-                    case GameObjectType.BULLET: {
-                        const bulletOwnerEntityId =
-                            object.getComponent(EntityOwnedComponent).entityId;
-                        this.tankService.removeTankBullet(bulletOwnerEntityId,
-                            entity.id);
-                        break;
-                    }
                 }
+
+                this.entitySpawnerService.handleEntityDestroyed(entity);
 
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_UNREGISTERED, entity.id]);
             });
@@ -260,7 +254,9 @@ export class GameServer {
                     return;
                 }
 
-                this.tankService.setTankShooting(player.tankId, isShooting);
+                const tank = this.registry.getEntityById(player.tankId);
+                this.entitySpawnerService.setEntitySpawnerStatus(tank,
+                    BulletSpawnerComponent, isShooting);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_MOVE,
@@ -334,15 +330,6 @@ export class GameServer {
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_CHANGED,
             (objectId: number, objectOptions: PartialGameObjectOptions) => {
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_CHANGED, objectId, objectOptions]);
-            });
-
-        /**
-         * TankService event handlers
-         */
-        this.tankService.emitter.on(TankServiceEvent.TANK_REQUESTED_BULLET_SPAWN,
-            (tankId: number) => {
-                const tank = this.registry.getEntityById(tankId) as Tank;
-                this.bulletService.createBulletForTank(tank);
             });
 
         this.tankService.emitter.on(TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN,
@@ -569,6 +556,7 @@ export class GameServer {
                 this.collisionService.processObjectsRequestedDirection();
                 this.gameObjectService.processObjectsPosition(deltaSeconds);
                 this.collisionService.processObjectsRequestedPosition();
+                this.entitySpawnerService.processActiveEntitySpawners();
                 this.gameObjectService.processObjectsDirtyIsMoving();
                 this.gameObjectService.processObjectsDirtyCenterPosition();
                 this.gameObjectService.processObjectsAutomaticDestroy();

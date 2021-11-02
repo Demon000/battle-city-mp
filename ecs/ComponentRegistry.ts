@@ -28,6 +28,9 @@ import { WorldEntityComponent, WorldEntityComponentData } from '@/components/Wor
 import { MovementComponent, MovementComponentData } from '@/components/MovementComponent';
 import { MovementMultipliersComponent, MovementMultipliersComponentData } from '@/components/MovementMultipliersComponent';
 import { HealthComponent, HealthComponentData } from '@/components/HealthComponent';
+import { EntitySpawnerComponent, EntitySpawnerComponentData } from '@/components/EntitySpawnerComponent';
+import { BulletSpawnerComponent, BulletSpawnerComponentData } from '@/components/BulletSpawnerComponent';
+import { EntitySpawnerActiveComponent, EntitySpawnerActiveComponentData } from '@/components/EntitySpawnerActiveComponent';
 
 export interface ProcessResults {
     clazz: ComponentClassType<any>;
@@ -159,6 +162,18 @@ export class ComponentRegistry {
             case HealthComponent.tag:
                 clazz = HealthComponent;
                 this.validate<HealthComponentData>(HealthComponent, data);
+                break;
+            case EntitySpawnerComponent.tag:
+                clazz = EntitySpawnerComponent;
+                this.validate<EntitySpawnerComponentData>(EntitySpawnerComponent, data);
+                break;
+            case EntitySpawnerActiveComponent.tag:
+                clazz = EntitySpawnerActiveComponent;
+                this.validate<EntitySpawnerActiveComponentData>(EntitySpawnerActiveComponent, data);
+                break;
+            case BulletSpawnerComponent.tag:
+                clazz = BulletSpawnerComponent;
+                this.validate<BulletSpawnerComponentData>(BulletSpawnerComponent, data);
                 break;
             default:
                 assert(false, `Invalid tag '${tag}'`);

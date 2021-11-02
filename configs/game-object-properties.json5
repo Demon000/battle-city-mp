@@ -26,26 +26,6 @@
         ],
     },
     'tank': {
-        tiers: {
-            normal: {
-                bulletSpeed: 128,
-                maxBullets: 3,
-                bulletCooldown: 250,
-                bulletPower: 'light',
-            },
-            light: {
-                bulletSpeed: 128,
-                maxBullets: 2,
-                bulletCooldown: 250,
-                bulletPower: 'light',
-            },
-            heavy: {
-                bulletSpeed: 192,
-                maxBullets: 1,
-                bulletCooldown: 500,
-                bulletPower: 'heavy',
-            },
-        },
         healthSmokeTime: {
             '1': 500,
             '2': 1000,

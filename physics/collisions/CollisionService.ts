@@ -140,7 +140,7 @@ export class CollisionService {
         return false;
     }
 
-    private updateObjectMovementMultipliers(
+    private updateObjectMovementModifiers(
         movingEntity: Entity,
         overlappingEntities: Iterable<Entity>,
     ): void {
@@ -285,7 +285,7 @@ export class CollisionService {
             }
         }
 
-        this.updateObjectMovementMultipliers(movingObject, overlappingObjects);
+        this.updateObjectMovementModifiers(movingObject, overlappingObjects);
     }
 
     processObjectsRequestedPosition(): void {

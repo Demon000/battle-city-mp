@@ -28,7 +28,7 @@ export enum PlayerSpawnStatus {
 export class Player {
     map = new Map<ButtonType, ButtonPressAction>();
     lastRequestedDirection: Direction | undefined;
-    lastIsShooting = false;
+    isShooting = false;
     requestedSpawnStatus: PlayerSpawnStatus;
     dirtyRequestedSpawnStatus = false;
     requestedServerStatus = false;
