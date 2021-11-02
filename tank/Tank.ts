@@ -6,15 +6,10 @@ import { GameObject, GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
 import { TankTier } from './TankTier';
 
-export interface TankProperties extends GameObjectProperties {
-    healthSmokeTime: Record<number, number>,
-}
-
 export interface TankOptions extends GameObjectOptions {
     tier: TankTier;
     playerId: string;
     playerName: string;
-    lastSmokeTime?: number;
     teamId?: string | null;
     flagTeamId?: string | null;
     flagColor?: Color | null;
@@ -29,13 +24,12 @@ export class Tank extends GameObject {
     tier: TankTier;
     playerId: string;
     playerName: string;
-    lastSmokeTime: number;
     teamId: string | null;
     flagTeamId: string | null;
     flagSourceId: number | null;
-    properties: TankProperties;
+    properties: GameObjectProperties;
 
-    constructor(options: TankOptions, properties: TankProperties, registry: Registry) {
+    constructor(options: TankOptions, properties: GameObjectProperties, registry: Registry) {
         options.type = GameObjectType.TANK;
 
         super(options, properties, registry);
@@ -44,7 +38,6 @@ export class Tank extends GameObject {
         this.tier = options.tier;
         this.playerId = options.playerId;
         this.playerName = options.playerName;
-        this.lastSmokeTime = options.lastSmokeTime ?? 0;
         this.teamId = options.teamId ?? null;
         this.flagTeamId = options.flagTeamId ?? null;
         this._flagColor = options.flagColor ?? null;
@@ -68,18 +61,8 @@ export class Tank extends GameObject {
         if (options.tier !== undefined) this.tier = options.tier;
         if (options.playerId !== undefined) this.playerId = options.playerId;
         if (options.playerName !== undefined) this.playerName = options.playerName;
-        if (options.lastSmokeTime !== undefined) this.lastSmokeTime = options.lastSmokeTime;
         if (options.teamId !== undefined) this.teamId = options.teamId;
         if (options.flagColor !== undefined) this.flagColor = options.flagColor;
-    }
-
-    get smokeTime(): number | undefined {
-        const healthComponent = this.getComponent(HealthComponent);
-        if (healthComponent.value === healthComponent.max) {
-            return undefined;
-        }
-
-        return this.properties.healthSmokeTime[healthComponent.value];
     }
 
     get flagColor(): Color | null {

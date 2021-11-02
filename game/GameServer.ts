@@ -332,18 +332,6 @@ export class GameServer {
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_CHANGED, objectId, objectOptions]);
             });
 
-        this.tankService.emitter.on(TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN,
-            (tankId: number) => {
-                const tank = this.registry.getEntityById(tankId) as Tank;
-                const position = tank.getComponent(CenterPositionComponent);
-                this.gameObjectFactory.buildFromOptions({
-                    type: GameObjectType.SMOKE,
-                    components: {
-                        PositionComponent: position,
-                    },
-                });
-            });
-
         this.tankService.emitter.on(TankServiceEvent.TANK_UPDATED,
             (tankId: number, tankOptions: PartialTankOptions) => {
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_CHANGED, tankId, tankOptions]);
@@ -551,7 +539,6 @@ export class GameServer {
                 }
 
                 this.playerService.processPlayersStatus(deltaSeconds);
-                this.tankService.processTanksStatus();
                 this.gameObjectService.processObjectsDirection();
                 this.collisionService.processObjectsRequestedDirection();
                 this.gameObjectService.processObjectsPosition(deltaSeconds);

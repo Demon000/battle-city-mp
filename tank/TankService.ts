@@ -7,15 +7,12 @@ import { Point } from '@/physics/point/Point';
 import { Player } from '@/player/Player';
 import EventEmitter from 'eventemitter3';
 import { Tank, PartialTankOptions, TankOptions } from './Tank';
-import { TankComponent } from './TankComponent';
 
 export enum TankServiceEvent {
-    TANK_REQUESTED_SMOKE_SPAWN = 'tank-requested-smoke-spawn',
     TANK_UPDATED = 'tank-updated',
 }
 
 export interface TankServiceEvents {
-    [TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN]: (tankId: number) => void,
     [TankServiceEvent.TANK_UPDATED]: (tankId: number, options: PartialTankOptions) => void,
 }
 
@@ -57,35 +54,6 @@ export class TankService {
 
     getOwnPlayerTankId(): number | null {
         return this.ownPlayerTankId;
-    }
-
-    private canTankSpawnSmoke(tank: Tank): boolean {
-        const smokeTime = tank.smokeTime;
-        if (smokeTime === undefined) {
-            return false;
-        }
-
-        if (Date.now() - tank.lastSmokeTime < smokeTime) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private processTankSmoking(tank: Tank): void {
-        if (!this.canTankSpawnSmoke(tank)) {
-            return;
-        }
-
-        this.emitter.emit(TankServiceEvent.TANK_REQUESTED_SMOKE_SPAWN, tank.id);
-        tank.lastSmokeTime = Date.now();
-    }
-
-    processTanksStatus(): void {
-        for (const entity of this.registry.getEntitiesWithComponent(TankComponent)) {
-            const tank = entity as Tank;
-            this.processTankSmoking(tank);
-        }
     }
 
     setTankFlag(tankId: number, teamId: string | null, color: Color | null, sourceId: number | null): void {
