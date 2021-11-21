@@ -35,6 +35,7 @@ import { Entity } from '@/ecs/Entity';
 import { BoundingBoxComponent } from '@/physics/bounding-box/BoundingBoxComponent';
 import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
+import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -187,6 +188,26 @@ export class GameClient {
                         }
                     }
                 });
+        this.registry.componentEmitter(BulletSpawnerComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+                (_event, component, data) => {
+                    const entity = component.entity;
+                    if (entity.id === this.tankService.getOwnPlayerTankId()) {
+                        if ('count' in data) {
+                            this.emitter.emit(
+                                GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
+                                data.count,
+                            );
+                        }
+
+                        if ('maxCount' in data) {
+                            this.emitter.emit(
+                                GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
+                                data.maxCount,
+                            );
+                        }
+                    }
+                });
 
         this.registry.emitter.on(RegistryEvent.ENTITY_BEFORE_DESTROY,
             (entity: Entity) => {
@@ -204,6 +225,7 @@ export class GameClient {
                 if (tankId !== null) {
                     const tank = this.registry.getEntityById(tankId);
                     const health = tank.getComponent(HealthComponent);
+                    const bulletSpawner = tank.getComponent(BulletSpawnerComponent);
                     this.emitter.emit(
                         GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
                         health.value,
@@ -211,6 +233,14 @@ export class GameClient {
                     this.emitter.emit(
                         GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
                         health.max,
+                    );
+                    this.emitter.emit(
+                        GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
+                        bulletSpawner.count,
+                    );
+                    this.emitter.emit(
+                        GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
+                        bulletSpawner.maxCount,
                     );
                 }
             });
