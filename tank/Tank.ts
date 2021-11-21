@@ -1,4 +1,3 @@
-import { HealthComponent } from '@/components/HealthComponent';
 import { Color } from '@/drawable/Color';
 import { Registry } from '@/ecs/Registry';
 import { GameObjectProperties } from '@/object/GameObjectProperties';
