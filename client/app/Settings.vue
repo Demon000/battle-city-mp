@@ -49,14 +49,6 @@
                         <span>{{ tier }}</span>
                     </div>
                 </div>
-
-                <div v-if="selectedTierProperties">
-                    <p>Health: {{ selectedTierProperties.maxHealth }}</p>
-                    <p>Max speed: {{ selectedTierProperties.maxSpeed }}</p>
-                    <p>Bullets: {{ selectedTierProperties.maxBullets }}</p>
-                    <p>Bullet power: {{ selectedTierProperties.bulletPower }}</p>
-                    <p>Bullet max speed: {{ selectedTierProperties.maxSpeed + selectedTierProperties.bulletSpeed }}</p>
-                </div>
             </div>
         
             <div
