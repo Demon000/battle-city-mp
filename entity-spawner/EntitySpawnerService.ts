@@ -159,6 +159,8 @@ export class EntitySpawnerService {
         });
 
         this.registry.registerEntity(spawnedEntity);
+
+        spawner.lastSpawnTime = Date.now();
     }
 
     processActiveEntitySpawner(component: EntitySpawnerActiveComponent) {
