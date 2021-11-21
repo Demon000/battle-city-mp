@@ -172,7 +172,6 @@
             :hasTeams="hasTeams"
             :playerRequestedSpawnStatus="playerRequestedSpawnStatus"
             :playerRespawnTimeout="playerRespawnTimeout"
-            :tankProperties="tankProperties"
             ref="settingsElement"
             @player-name-change="onPlayerNameChanged"
             @player-team-change="onPlayerTeamChanged"
@@ -206,7 +205,6 @@ import { GamepadWrapper, GamepadWrapperEvent, GamepadWrapperEventData } from '..
 import { ColorUtils } from '@/utils/ColorUtils';
 import { Vue, Watch } from 'vue-property-decorator';
 import { WebpackUtils } from '../utils/WebpackUtils';
-import { TankProperties } from '@/tank/Tank';
 
 @Options({
     components: {
@@ -245,7 +243,6 @@ export default class App extends Vue {
     isUserShowingSettings = false;
     roundTimeSeconds = 0;
     isScoreboardWatchTime = false;
-    tankProperties: TankProperties | null = null;
 
     mounted(): void {
         const canvasContainerElement = this.$refs.canvasContainerElement as HTMLDivElement;
@@ -327,10 +324,6 @@ export default class App extends Vue {
         gameClient.emitter.on(GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
             (bullets: number) => {
                 this.tankBullets = bullets;
-            });
-        gameClient.emitter.on(GameClientEvent.CONFIG_CHANGED,
-            () => {
-                this.tankProperties = gameClient.getTankProperties();
             });
         gameClient.emitter.on(GameClientEvent.TICK,
             () => {

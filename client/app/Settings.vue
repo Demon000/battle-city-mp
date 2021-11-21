@@ -124,7 +124,6 @@
 import { Color } from '@/drawable/Color';
 import { ColorUtils } from '@/utils/ColorUtils';
 import { WebpackUtils } from '@/client/utils/WebpackUtils';
-import { TankProperties } from '@/tank/Tank';
 import { TankTier } from '@/tank/TankTier';
 import { Vue, Prop, Watch, Options } from 'vue-property-decorator';
 import { Team } from '@/team/Team';
@@ -171,9 +170,6 @@ export default class Settings extends Vue {
 
     @Prop()
     playerRespawnTimeout: number | null = null;
-
-    @Prop()
-    tankProperties: TankProperties | null = null;
 
     playerName: string | null = null;
 

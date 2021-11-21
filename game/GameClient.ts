@@ -9,7 +9,6 @@ import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxReposi
 import { CollisionService } from '../physics/collisions/CollisionService';
 import { Player, PartialPlayerOptions, PlayerOptions, PlayerSpawnStatus } from '../player/Player';
 import { PlayerService, PlayerServiceEvent } from '../player/PlayerService';
-import { GameObjectType } from '@/object/GameObjectType';
 import { GameServerStatus } from './GameServerStatus';
 import { GameObjectFactory, GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
 import EventEmitter from 'eventemitter3';
@@ -21,7 +20,7 @@ import { LazyIterable } from '@/utils/LazyIterable';
 import { GameObjectAudioRendererFactory } from '@/object/GameObjectAudioRendererFactory';
 import { TankTier } from '@/tank/TankTier';
 import { Color } from '@/drawable/Color';
-import { Tank, TankProperties } from '@/tank/Tank';
+import { Tank } from '@/tank/Tank';
 import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
@@ -427,9 +426,5 @@ export class GameClient {
 
     onRoundTimeUpdated(roundSeconds: number): void {
         this.timeService.setRoundTime(roundSeconds);
-    }
-
-    getTankProperties(): TankProperties {
-        return this.config.get('game-object-properties', GameObjectType.TANK);
     }
 }
