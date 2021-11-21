@@ -127,15 +127,6 @@ export class Registry {
         }
     }
 
-    registerEntities(
-        entities: Iterable<Entity>,
-        options: RegistryOperationOptions,
-    ): void {
-        for (const entity of entities) {
-            this.registerEntity(entity, options);
-        }
-    }
-
     generateId(): EntityId {
         return this.idGenerator.generate();
     }
@@ -164,13 +155,6 @@ export class Registry {
 
         const entityIdExisted = this.idsEntityMap.delete(entity.id);
         assert(entityIdExisted);
-    }
-
-    destroyAllEntities(): void {
-        const entities = this.getEntities();
-        for (const entity of entities) {
-            this.destroyEntity(entity);
-        }
     }
 
     private getOrCreateComponentTypeSet<C extends Component<C>>(
