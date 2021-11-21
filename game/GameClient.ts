@@ -57,8 +57,6 @@ export enum GameClientEvent {
     OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT = 'own-player-changed-respawn-timeout',
     OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS = 'own-player-changed-requested-spawn-status',
 
-    CONFIG_CHANGED = 'config-changed',
-
     TICK = 'tick',
 }
 
@@ -81,8 +79,6 @@ export interface GameClientEvents {
     [GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS]: (bullets: number) => void;
     [GameClientEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT]: (respawnTimeout: number) => void;
     [GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS]: (requestedSpawnStatus: PlayerSpawnStatus) => void;
-
-    [GameClientEvent.CONFIG_CHANGED]: () => void;
 
     [GameClientEvent.TICK]: () => void;
 }
@@ -345,8 +341,6 @@ export class GameClient {
         const configsData = serverStatus.configsData;
         this.config.setMultiple(configsData);
         this.entityBlueprint.reloadBlueprintData();
-
-        this.emitter.emit(GameClientEvent.CONFIG_CHANGED);
 
         this.playerService.clear();
         const players =
