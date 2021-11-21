@@ -19,6 +19,7 @@ export class EntitySpawnerComponent
     subtypes: string[] = [];
     components: Record<string, any> = {};
     ids: Record<EntityId, boolean> = {};
+    count = 0;
     maxCount = 0;
     cooldown = 0;
     lastSpawnTime = 0;

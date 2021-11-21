@@ -51,15 +51,19 @@ export class EntitySpawnerService {
         }
 
         const ids = {...spawnerComponent.ids};
+        let count = spawnerComponent.count;
 
         if (registered) {
             ids[entity.id] = true;
+            count++;
         } else {
             delete ids[entity.id];
+            count--;
         }
 
         spawnerComponent.update({
             ids,
+            count,
         });
     }
 
