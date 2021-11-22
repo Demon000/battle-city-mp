@@ -127,39 +127,74 @@ export class EntitySpawnerService {
 
     private spawnEntity(spawner: EntitySpawnerComponent): void {
         const entity = spawner.entity;
-        const playerOwnedComponent = entity.findComponent(PlayerOwnedComponent);
         const centerPosition = entity.getComponent(CenterPositionComponent);
-        const speed = entity.getComponent(MovementComponent).speed;
-        const direction = entity.getComponent(DirectionComponent);
 
         const options = {
-            type: spawner.type,
-            subtypes: spawner.subtypes,
-            components: {
-                ...spawner.components,
-                DirectionComponent: direction,
-                PlayerOwnedComponent: playerOwnedComponent,
-                EntityOwnedComponent: {
-                    entityId: entity.id,
-                },
-                MovementComponent: {
-                    ...spawner.components.MovementComponent,
-                    direction: direction.value,
-                    speed: spawner.components.MovementComponent.speed + speed,
-                },
-            },
             silent: true,
         };
 
-        const spawnedEntity = this.gameObjectFactory.buildFromOptions(options);
+        const buildOptions = {
+            type: spawner.type,
+            subtypes: spawner.subtypes,
+            components: { ...spawner.components, },
+            ...options,
+        };
+
+        const spawnedEntity = this.gameObjectFactory.buildFromOptions(buildOptions);
+
+        const playerOwnedComponent = entity.findComponent(PlayerOwnedComponent);
+        const spawnedPlayerOwnedComponent = spawnedEntity
+            .findComponent(PlayerOwnedComponent);
+        if (playerOwnedComponent !== undefined
+            && spawnedPlayerOwnedComponent !== undefined) {
+            spawnedPlayerOwnedComponent.update({
+                playerId: playerOwnedComponent.playerId,
+            }, options);
+        }
+
+        const spawnedEntityOwnedComponent = spawnedEntity
+            .findComponent(EntityOwnedComponent);
+        if (spawnedEntityOwnedComponent !== undefined) {
+            spawnedEntityOwnedComponent.update({
+                entityId: entity.id,
+            }, options);
+        }
+
+        const directionComponent = entity.findComponent(DirectionComponent);
+        const spawnedDirectionComponent = spawnedEntity
+            .findComponent(DirectionComponent);
+        if (directionComponent !== undefined
+            && spawnedDirectionComponent !== undefined) {
+                spawnedDirectionComponent.update({
+                value: directionComponent.value,
+            }, options);
+        }
+
+        const movementComponent = entity.findComponent(MovementComponent);
+        const spawnedMovementComponent = spawnedEntity
+            .findComponent(MovementComponent);
+        if (spawnedMovementComponent) {
+            if (movementComponent !== undefined
+                && spawnedMovementComponent !== undefined
+                && spawner.inheritSpeed) {
+                spawnedMovementComponent.update({
+                    speed: spawnedMovementComponent.speed
+                            + movementComponent.speed,
+                }, options);
+            }
+
+            if (spawnedDirectionComponent) {
+                spawnedMovementComponent.update({
+                    direction: spawnedDirectionComponent.value,
+                }, options);
+            }
+        }
 
         const size = spawnedEntity.getComponent(SizeComponent);
         spawnedEntity.updateComponent(PositionComponent, {
             x: centerPosition.x - size.width / 2,
             y: centerPosition.y - size.height / 2,
-        }, {
-            silent: true,
-        });
+        }, options);
 
         this.registry.registerEntity(spawnedEntity);
 

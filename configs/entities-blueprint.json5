@@ -318,6 +318,7 @@
                 subtypes: ['light'],
                 cooldown: 250,
                 maxCount: 3,
+                inheritSpeed: true,
                 components: {
                     MovementComponent: {
                         speed: 128,
@@ -360,6 +361,7 @@
                 subtypes: ['light'],
                 cooldown: 250,
                 maxCount: 2,
+                inheritSpeed: true,
                 components: {
                     MovementComponent: {
                         speed: 128,
@@ -402,6 +404,7 @@
                 subtypes: ['heavy'],
                 cooldown: 500,
                 maxCount: 1,
+                inheritSpeed: true,
                 components: {
                     MovementComponent: {
                         speed: 192,
