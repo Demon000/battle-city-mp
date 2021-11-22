@@ -139,7 +139,7 @@ export class EntitySpawnerService {
         const buildOptions = {
             type: spawner.type,
             subtypes: spawner.subtypes,
-            components: { ...spawner.components, },
+            components: spawner.components,
             ...options,
         };
 
