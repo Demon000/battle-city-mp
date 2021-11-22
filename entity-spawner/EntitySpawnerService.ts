@@ -114,8 +114,7 @@ export class EntitySpawnerService {
     }
 
     private canSpawnEntity(component: EntitySpawnerComponent): boolean {
-        const count = Object.keys(component.ids).length;
-        if (count >= component.maxCount) {
+        if (component.count >= component.maxCount) {
             return false;
         }
  
