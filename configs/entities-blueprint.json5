@@ -280,6 +280,13 @@
             DirectionAxisSnappingComponent: {
                 value: 4,
             },
+            SmokeSpawnerComponent: {},
+            HealthBasedSmokeSpawnerComponent: {
+                map: {
+                    '1': 500,
+                    '2': 1000,
+                },
+            },
         },
         clientComponents: {
             IsUnderBushComponent: {},

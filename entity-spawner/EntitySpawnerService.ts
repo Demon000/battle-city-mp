@@ -2,8 +2,11 @@ import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { EntityOwnedComponent } from '@/components/EntityOwnedComponent';
 import { EntitySpawnerActiveComponent } from '@/components/EntitySpawnerActiveComponent';
 import { EntitySpawnerComponent } from '@/components/EntitySpawnerComponent';
+import { HealthBasedSmokeSpawnerComponent } from '@/components/HealthBasedSmokeSpawnerComponent';
+import { HealthComponent } from '@/components/HealthComponent';
 import { MovementComponent } from '@/components/MovementComponent';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
+import { SmokeSpawnerComponent } from '@/components/SmokeSpawnerComponent';
 import { ClazzOrTag } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
@@ -199,6 +202,36 @@ export class EntitySpawnerService {
         this.registry.registerEntity(spawnedEntity);
 
         spawner.lastSpawnTime = Date.now();
+    }
+
+    updateHealthBasedSmokeSpawner(entity: Entity): void {
+        const health = entity.getComponent(HealthComponent);
+        const smokeSpawner = entity.findComponent(SmokeSpawnerComponent);
+        const healthBasedSmokeSpawner = entity
+            .findComponent(HealthBasedSmokeSpawnerComponent);
+
+        if (smokeSpawner === undefined) {
+            return;
+        }
+
+        if (healthBasedSmokeSpawner === undefined) {
+            return;
+        }
+
+        if (health.max == health.value) {
+            return;
+        }
+
+        const cooldown = healthBasedSmokeSpawner.map[health.value];
+        if (cooldown === undefined) {
+            return;
+        }
+
+        smokeSpawner.update({
+            cooldown,
+        });
+
+        this.setEntitySpawnerStatus(entity, SmokeSpawnerComponent, true);
     }
 
     processActiveEntitySpawner(component: EntitySpawnerActiveComponent) {

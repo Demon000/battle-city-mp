@@ -213,6 +213,12 @@ export class GameServer {
                     const entity = component.entity;
                     this.gameObjectService.markDirtyIsMoving(entity);
                 });
+        this.registry.componentEmitter(HealthComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+                (_event, component) => {
+                    const entity = component.entity;
+                    this.entitySpawnerService.updateHealthBasedSmokeSpawner(entity);
+                });
 
         /**
          * PlayerService event handlers

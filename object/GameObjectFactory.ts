@@ -64,7 +64,8 @@ export class GameObjectFactory {
         }
 
         let fullType = options.type;
-        if (buildOptions.subtypes) {
+        if (buildOptions.subtypes !== undefined
+            && buildOptions.subtypes.length) {
             fullType += '-';
             fullType += buildOptions.subtypes.join('-');
         }
