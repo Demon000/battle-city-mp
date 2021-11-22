@@ -3,7 +3,6 @@ import { GraphicDependenciesComponent } from '@/components/GraphicDependenciesCo
 import { EntityId } from '@/ecs/EntityId';
 import { Registry } from '@/ecs/Registry';
 import { GameObject } from '@/object/GameObject';
-import { RenderPass } from '@/object/RenderPass';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { Point } from '@/physics/point/Point';
@@ -120,35 +119,6 @@ export class GameGraphicsService {
 
         this.canvasX = point.x - this.gameWidth / 2;
         this.canvasY = point.y - this.gameHeight / 2;
-    }
-
-    renderGrid(gridSize: number): void {
-        const context = this.contexts[RenderPass.GRID];
-        context.strokeStyle = '#ffffff';
-
-        const canvasOffsetX = this.canvasX % gridSize;
-        const canvasOffsetY = this.canvasY % gridSize;
-
-        let scaledY;
-        let scaledX;
-
-        scaledY = this.gameHeight * this.scale;
-        for (let x = -canvasOffsetX; x < this.gameWidth; x +=  gridSize) {
-            scaledX = x * this.scale;
-            context.beginPath();
-            context.moveTo(scaledX, 0);
-            context.lineTo(scaledX, scaledY);
-            context.stroke();
-        }
-
-        scaledX = this.gameWidth * this.scale;
-        for (let y = -canvasOffsetY; y < this.gameHeight; y += gridSize) {
-            scaledY = y * this.scale;
-            context.beginPath();
-            context.moveTo(0, scaledY);
-            context.lineTo(scaledX, scaledY);
-            context.stroke();
-        }
     }
 
     getViewableMapBoundingBox(position: Point): BoundingBox | undefined {

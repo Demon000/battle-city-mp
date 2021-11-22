@@ -9,6 +9,5 @@ export enum RenderPass {
     BUSHES,
     EXPLOSIONS,
     SMOKE = EXPLOSIONS,
-    GRID,
     MAX,
 }
