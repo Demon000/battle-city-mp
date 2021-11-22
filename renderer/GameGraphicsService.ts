@@ -70,9 +70,6 @@ export class GameGraphicsService {
 
         this.gameWidth = width / this.scale;
         this.gameHeight = height / this.scale;
-
-        this.gameWidth -= this.gameWidth % 2;
-        this.gameHeight -= this.gameHeight % 2;
     }
 
     getObjectRenderer(object: GameObject): GameObjectGraphicsRenderer {
