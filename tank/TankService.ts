@@ -41,6 +41,7 @@ export class TankService {
             components: {
                 PlayerOwnedComponent: {
                     playerId: player.id,
+                    playerName: player.displayName,
                 },
                 PositionComponent: position,
                 ColorComponent: {

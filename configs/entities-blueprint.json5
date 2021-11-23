@@ -263,6 +263,7 @@
             'world-entity',
         ],
         components: {
+            PlayerOwnedComponent: {},
             DirectionComponent: {},
             MovementComponent: {},
             ColorComponent: {},
@@ -276,7 +277,6 @@
             IsMovingTrackingComponent: {},
         },
         serverComponents: {
-            PlayerOwnedComponent: {},
             TankComponent: {},
             DirectionAxisSnappingComponent: {
                 value: 4,

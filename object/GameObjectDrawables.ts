@@ -23,6 +23,7 @@ import { TankTier } from '@/tank/TankTier';
 import { GameObject } from './GameObject';
 import { GameObjectType } from './GameObjectType';
 import { RenderPass } from './RenderPass';
+import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 
 const positionTest = (mod: number, divide: number, points: Point[]): DrawableTestFunction => {
     return (object: GameObject): boolean => {
@@ -327,19 +328,24 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                     return true;
                 },
             ],
-            processor(this: IDrawable, object: GameObject): IDrawable | undefined {
-                const tank = object as Tank;
+            processor(this: IDrawable, entity: Entity): IDrawable | undefined {
                 let drawable: TextDrawable | undefined = this as TextDrawable;
 
-                drawable = drawable.withText(tank.playerName);
+                const playerName =
+                    entity.getComponent(PlayerOwnedComponent).playerName;
+                if (playerName === undefined) {
+                    return drawable;
+                }
+
+                drawable = drawable.withText(playerName);
                 if (drawable === undefined) {
                     return drawable;
                 }
 
-                const position = object.getComponent(PositionComponent);
-                const centerPosition = object.getComponent(CenterPositionComponent);
-                const size = object.getComponent(SizeComponent);
-                const direction = object.getComponent(DirectionComponent).value;
+                const position = entity.getComponent(PositionComponent);
+                const centerPosition = entity.getComponent(CenterPositionComponent);
+                const size = entity.getComponent(SizeComponent);
+                const direction = entity.getComponent(DirectionComponent).value;
                 const offsetX = centerPosition.x - position.x;
                 let offsetY = 0;
                 let positionYReference: TextPositionReference | undefined = 'end';
