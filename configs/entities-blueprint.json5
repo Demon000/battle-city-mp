@@ -276,6 +276,7 @@
             IsMovingTrackingComponent: {},
         },
         serverComponents: {
+            PlayerOwnedComponent: {},
             TankComponent: {},
             DirectionAxisSnappingComponent: {
                 value: 4,

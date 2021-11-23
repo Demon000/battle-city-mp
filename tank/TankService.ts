@@ -34,12 +34,14 @@ export class TankService {
             type: GameObjectType.TANK,
             subtypes: [player.requestedTankTier],
             options: {
-                playerId: player.id,
                 playerName: player.displayName,
                 teamId: player.teamId,
                 tier: player.requestedTankTier,
             } as TankOptions,
             components: {
+                PlayerOwnedComponent: {
+                    playerId: player.id,
+                },
                 PositionComponent: position,
                 ColorComponent: {
                     value: color,

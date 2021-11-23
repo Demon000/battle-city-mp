@@ -7,7 +7,6 @@ import { TankTier } from './TankTier';
 
 export interface TankOptions extends GameObjectOptions {
     tier: TankTier;
-    playerId: string;
     playerName: string;
     teamId?: string | null;
     flagTeamId?: string | null;
@@ -21,7 +20,6 @@ export class Tank extends GameObject {
     protected _flagColor: Color | null;
 
     tier: TankTier;
-    playerId: string;
     playerName: string;
     teamId: string | null;
     flagTeamId: string | null;
@@ -35,7 +33,6 @@ export class Tank extends GameObject {
 
         this.properties = properties;
         this.tier = options.tier;
-        this.playerId = options.playerId;
         this.playerName = options.playerName;
         this.teamId = options.teamId ?? null;
         this.flagTeamId = options.flagTeamId ?? null;
@@ -47,7 +44,6 @@ export class Tank extends GameObject {
         return {
             ...super.toOptions(),
             tier: this.tier,
-            playerId: this.playerId,
             playerName: this.playerName,
             teamId: this.teamId,
             flagColor: this.flagColor,
@@ -58,7 +54,6 @@ export class Tank extends GameObject {
         super.setOptions(options);
 
         if (options.tier !== undefined) this.tier = options.tier;
-        if (options.playerId !== undefined) this.playerId = options.playerId;
         if (options.playerName !== undefined) this.playerName = options.playerName;
         if (options.teamId !== undefined) this.teamId = options.teamId;
         if (options.flagColor !== undefined) this.flagColor = options.flagColor;

@@ -152,8 +152,9 @@ export class GameServer {
 
                 switch (object.type) {
                     case GameObjectType.TANK: {
-                        const tank = object as Tank;
-                        this.playerService.setPlayerTankId(tank.playerId, tank.id);
+                        const playerId = entity
+                            .getComponent(PlayerOwnedComponent).playerId;
+                        this.playerService.setPlayerTankId(playerId, entity.id);
                         break;
                     }
                 }
@@ -167,8 +168,10 @@ export class GameServer {
                 switch (object.type) {
                     case GameObjectType.TANK: {
                         const tank = object as Tank;
+                        const playerId = entity
+                            .getComponent(PlayerOwnedComponent).playerId;
                         this.handleFlagInteraction(tank, undefined, FlagTankInteraction.DROP);
-                        this.playerService.setPlayerTankId(tank.playerId, null);
+                        this.playerService.setPlayerTankId(playerId, null);
                         break;
                     }
                 }
@@ -427,7 +430,9 @@ export class GameServer {
                 const tankHealth = tank.getComponent(HealthComponent);
                 const bulletOwnerPlayerId =
                     bullet.getComponent(PlayerOwnedComponent).playerId;
-                const tankPlayer = this.playerService.findPlayer(tank.playerId);
+                const tankOwnerPlayerId =
+                    tank.getComponent(PlayerOwnedComponent).playerId;
+                const tankPlayer = this.playerService.findPlayer(tankOwnerPlayerId);
                 const bulletPlayer = this.playerService.findPlayer(bulletOwnerPlayerId);
                 const isSameTeamShot = tankPlayer?.teamId === bulletPlayer?.teamId;
 
@@ -464,9 +469,11 @@ export class GameServer {
                 }
 
                 if (tankHealth.value <= 0) {
+                    const playerId =
+                        tank.getComponent(PlayerOwnedComponent).playerId;
                     spawnExplosion(tank, ExplosionType.BIG, GameObjectType.TANK);
-                    this.playerService.setPlayerRequestedSpawnStatus(tank.playerId, PlayerSpawnStatus.DESPAWN);
-                    this.playerService.addPlayerDeath(tank.playerId);
+                    this.playerService.setPlayerRequestedSpawnStatus(playerId, PlayerSpawnStatus.DESPAWN);
+                    this.playerService.addPlayerDeath(playerId);
                     if (bulletPlayer !== undefined) {
                         this.playerService.addPlayerKill(bulletPlayer.id);
                     }
@@ -624,6 +631,8 @@ export class GameServer {
         flag: Flag | undefined,
         interaction: FlagTankInteraction,
     ): void {
+        const playerId = tank.getComponent(PlayerOwnedComponent).playerId;
+
         switch (interaction) {
             case FlagTankInteraction.STEAL: {
                 assert(flag !== undefined);
@@ -643,10 +652,10 @@ export class GameServer {
                 assert(flag !== undefined);
                 this.tankService.clearTankFlag(tank.id);
                 this.flagService.setFlagType(flag.id, FlagType.FULL);
-                this.playerService.addPlayerPoints(tank.playerId, PlayerPointsEvent.RETURN_FLAG);
+                this.playerService.addPlayerPoints(playerId, PlayerPointsEvent.RETURN_FLAG);
                 break;
             case FlagTankInteraction.CAPTURE:
-                this.playerService.addPlayerPoints(tank.playerId, PlayerPointsEvent.CAPTURE_FLAG);
+                this.playerService.addPlayerPoints(playerId, PlayerPointsEvent.CAPTURE_FLAG);
                 if (tank.flagSourceId !== null) {
                     this.flagService.setFlagType(tank.flagSourceId, FlagType.FULL);
                 }
