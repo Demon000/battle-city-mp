@@ -36,7 +36,6 @@ export class TankService {
             options: {
                 playerName: player.displayName,
                 teamId: player.teamId,
-                tier: player.requestedTankTier,
             } as TankOptions,
             components: {
                 PlayerOwnedComponent: {

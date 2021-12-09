@@ -427,10 +427,15 @@ export class GameClient {
                     team = this.teamService.getTeam(player.teamId);
                 }
 
+                let tier;
+                if (tank) {
+                    tier = tank.subtypes[0] as TankTier;
+                }
+
                 return {
                     player,
                     team,
-                    tier: tank?.tier || player.requestedTankTier,
+                    tier: tier || player.requestedTankTier,
                 };
             });
     }

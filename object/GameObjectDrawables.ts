@@ -235,7 +235,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                             return false;
                         }
 
-                        if (tank.tier !== tier) {
+                        if (tank.subtypes[0] !== tier) {
                             return false;
                         }
 

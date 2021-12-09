@@ -3,10 +3,8 @@ import { Registry } from '@/ecs/Registry';
 import { GameObjectProperties } from '@/object/GameObjectProperties';
 import { GameObject, GameObjectOptions } from '../object/GameObject';
 import { GameObjectType } from '../object/GameObjectType';
-import { TankTier } from './TankTier';
 
 export interface TankOptions extends GameObjectOptions {
-    tier: TankTier;
     teamId?: string | null;
     flagTeamId?: string | null;
     flagColor?: Color | null;
@@ -18,7 +16,6 @@ export type PartialTankOptions = Partial<TankOptions>;
 export class Tank extends GameObject {
     protected _flagColor: Color | null;
 
-    tier: TankTier;
     teamId: string | null;
     flagTeamId: string | null;
     flagSourceId: number | null;
@@ -30,7 +27,6 @@ export class Tank extends GameObject {
         super(options, properties, registry);
 
         this.properties = properties;
-        this.tier = options.tier;
         this.teamId = options.teamId ?? null;
         this.flagTeamId = options.flagTeamId ?? null;
         this._flagColor = options.flagColor ?? null;
@@ -40,7 +36,6 @@ export class Tank extends GameObject {
     toOptions(): TankOptions {
         return {
             ...super.toOptions(),
-            tier: this.tier,
             teamId: this.teamId,
             flagColor: this.flagColor,
         };
@@ -49,7 +44,6 @@ export class Tank extends GameObject {
     setOptions(options: PartialTankOptions): void {
         super.setOptions(options);
 
-        if (options.tier !== undefined) this.tier = options.tier;
         if (options.teamId !== undefined) this.teamId = options.teamId;
         if (options.flagColor !== undefined) this.flagColor = options.flagColor;
     }
