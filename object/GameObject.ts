@@ -17,7 +17,7 @@ export class GameObject extends Entity {
 
     properties;
     type: string;
-    subtypes?: string[];
+    subtypes: string[];
 
     graphicsRenderer?: any;
     audioRenderer?: any;
@@ -30,7 +30,7 @@ export class GameObject extends Entity {
 
         this.properties = properties;
         this.type = options.type;
-        this.subtypes = options.subtypes;
+        this.subtypes = options.subtypes || [];
         this.graphicsDirty = true;
     }
 
