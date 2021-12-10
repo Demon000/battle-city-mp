@@ -7,6 +7,7 @@ import { MovementComponent } from '@/components/MovementComponent';
 import { MovementMultipliersComponent } from '@/components/MovementMultipliersComponent';
 import { SpawnComponent } from '@/components/SpawnComponent';
 import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
+import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { WorldEntityComponent } from '@/components/WorldEntityComponent';
 import { ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
@@ -19,7 +20,6 @@ import { PositionComponent } from '@/physics/point/PositionComponent';
 import { RequestedPositionComponent } from '@/physics/point/RequestedPositionComponent';
 import { RequestedDirectionComponent } from '@/physics/RequestedDirectionComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
-import { PlayerSpawn } from '@/player-spawn/PlayerSpawn';
 import { assert } from '@/utils/assert';
 import { Random } from '@/utils/Random';
 import EventEmitter from 'eventemitter3';
@@ -91,13 +91,14 @@ export class GameObjectService {
 
     getRandomSpawnPosition(teamId: string | null): Point {
         const objects = this.registry.getEntitiesWithComponent(SpawnComponent);
-        const playerSpawnObjects = new Array<GameObject>();
+        const playerSpawnObjects = new Array<Entity>();
 
         for (const object of objects) {
             if (object.type === GameObjectType.PLAYER_SPAWN) {
-                const playerSpawn = object as PlayerSpawn;
-                if (teamId === null || teamId === playerSpawn.teamId) {
-                    playerSpawnObjects.push(playerSpawn);
+                const playerSpawnTeamId = object
+                    .getComponent(TeamOwnedComponent).teamId;
+                if (teamId === null || teamId === playerSpawnTeamId) {
+                    playerSpawnObjects.push(object);
                 }
             }
         }

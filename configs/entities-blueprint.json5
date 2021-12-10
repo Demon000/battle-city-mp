@@ -117,6 +117,9 @@
             'bounding-boxed-entity',
             'world-entity',
         ],
+        components: {
+            TeamOwnedComponent: {},
+        },
         localComponents: {
             SizeComponent: {
                 width: 16,

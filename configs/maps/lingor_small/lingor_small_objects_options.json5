@@ -25,7 +25,11 @@
             x: 112,
             y: 896,
         },
-        teamId: 'Red',
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Red',
+            },
+        },
     },
     {
         type: 'player-spawn',
@@ -33,7 +37,11 @@
             x: 112,
             y: 992,
         },
-        teamId: 'Red',
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Red',
+            },
+        },
     },
     {
         type: 'player-spawn',
@@ -41,7 +49,11 @@
             x: 256,
             y: 1008,
         },
-        teamId: 'Red',
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Red',
+            },
+        },
     },
     {
         type: 'player-spawn',
@@ -49,7 +61,11 @@
             x: 256,
             y: 768,
         },
-        teamId: 'Red',
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Red',
+            },
+        },
     },
     {
         type: 'player-spawn',
@@ -57,7 +73,11 @@
             x: 464,
             y: 896,
         },
-        teamId: 'Red',
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Red',
+            },
+        },
     },
 
     // Blue team
@@ -86,7 +106,11 @@
             x: 736,
             y: 864,
         },
-        teamId: 'Blue',
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Blue',
+            },
+        },
     },
     {
         type: 'player-spawn',
@@ -94,7 +118,11 @@
             x: 992,
             y: 864,
         },
-        teamId: 'Blue',
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Blue',
+            },
+        },
     },
     {
         type: 'player-spawn',
@@ -102,7 +130,11 @@
             x: 832,
             y: 720,
         },
-        teamId: 'Blue',
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Blue',
+            },
+        },
     },
     {
         type: 'player-spawn',
@@ -110,7 +142,11 @@
             x: 720,
             y: 560,
         },
-        teamId: 'Blue',
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Blue',
+            },
+        },
     },
     {
         type: 'player-spawn',
@@ -118,7 +154,11 @@
             x: 1008,
             y: 544,
         },
-        teamId: 'Blue',
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Blue',
+            },
+        },
     },
 
     // Yellow team
@@ -147,7 +187,11 @@
             x: 112,
             y: 16,
         },
-        teamId: 'Yellow',
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Yellow',
+            },
+        },
     },
     {
         type: 'player-spawn',
@@ -163,7 +207,11 @@
             x: 480,
             y: 16,
         },
-        teamId: 'Yellow',
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Yellow',
+            },
+        },
     },
     {
         type: 'player-spawn',
@@ -171,7 +219,11 @@
             x: 688,
             y: 32,
         },
-        teamId: 'Yellow',
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Yellow',
+            },
+        },
     },
     {
         type: 'player-spawn',
@@ -179,6 +231,10 @@
             x: 720,
             y: 112,
         },
-        teamId: 'Yellow',
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Yellow',
+            },
+        },
     },
 ]
