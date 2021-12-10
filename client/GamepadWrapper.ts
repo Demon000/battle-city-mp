@@ -32,7 +32,7 @@ export interface GamepadWrapperEvents {
 export class GamepadWrapper {
     emitter = new EventEmitter();
     gamepadIndex?: number;
-    buttons: Record<number, number> = {};
+    buttons: Record<string, number> = {};
 
     constructor() {
         window.addEventListener('gamepadconnected',

@@ -1,11 +1,11 @@
 import { Component, ComponentsInitialization } from '@/ecs/Component';
-import { EntityId } from '@/ecs/EntityId';
 
 export interface EntitySpawnerComponentData {
     type: string;
     subtypes?: string[];
     components?: ComponentsInitialization;
-    ids: Record<EntityId, boolean>;
+    ids: Record<string, boolean>;
+    count: number;
     maxCount: number;
     cooldown: number;
     lastSpawnTime: number;
@@ -18,7 +18,7 @@ export class EntitySpawnerComponent
     type = 'invalid';
     subtypes: string[] = [];
     components: ComponentsInitialization = {};
-    ids: Record<EntityId, boolean> = {};
+    ids: Record<string, boolean> = {};
     count = 0;
     maxCount = 0;
     cooldown = 0;

@@ -175,7 +175,7 @@ export class Registry {
         C extends Component<C>,
     >(
         clazzOrTag: ClazzOrTag<C>,
-        data?: any,
+        data: any,
     ): ComponentClassType<C> {
         let clazz;
         let tag;
@@ -185,7 +185,7 @@ export class Registry {
             clazz = clazzOrTag;
         }
 
-        return this.componentRegistry.lookupAndValidate(tag, clazz, data);
+        return this.componentRegistry.lookupAndValidate(data, tag, clazz);
     }
 
     emit<
@@ -227,6 +227,10 @@ export class Registry {
         data?: any,
         options?: RegistryOperationOptions,
     ): C {
+        if (data === undefined) {
+            data = {};
+        }
+
         const clazz = this.validateComponentData(clazzOrTag, data);
         const component = new clazz(this, entity, clazz);
 
@@ -268,6 +272,10 @@ export class Registry {
         data?: any,
         options?: RegistryOperationOptions,
     ): C {
+        if (data === undefined) {
+            data = {};
+        }
+
         const clazz = this.validateComponentData(clazzOrTag, data);
         const component = entity.getComponent(clazz);
 

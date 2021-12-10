@@ -42,9 +42,9 @@ import { DirtyIsMovingComponent, DirtyIsMovingComponentData } from '@/components
 
 export class ComponentRegistry {
     _lookupAndValidate(
+        data: any,
         tag: string,
         clazz?: ComponentClassType<any>,
-        data?: any,
     ): ComponentClassType<any> {
         switch(tag) {
             case BoundingBoxComponent.tag:
@@ -207,9 +207,9 @@ export class ComponentRegistry {
     }
 
     lookupAndValidate(
+        data: any,
         tag?: string,
         clazz?: ComponentClassType<any>,
-        data?: any,
     ): ComponentClassType<any> {
         assert(tag !== undefined || clazz !== undefined);
 
@@ -225,7 +225,7 @@ export class ComponentRegistry {
 
         const message = `Object is not assignable to component '${tag}'`;
         try {
-            return this._lookupAndValidate(tag, clazz, data);
+            return this._lookupAndValidate(data, tag, clazz);
         } catch (err) {
             console.error(message, data);
             throw err;
