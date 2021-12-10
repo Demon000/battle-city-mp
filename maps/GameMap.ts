@@ -25,7 +25,6 @@ export interface GameMapOptions {
 
 export interface LegacyGameObjectOptions extends GameObjectOptions {
     position: Point;
-    color?: Color;
     components?: ComponentsInitialization;
 }
 
@@ -85,12 +84,6 @@ export class GameMap {
 
                 if (options.components !== undefined) {
                     Object.assign(components, options.components);
-                }
-
-                if (options.color !== undefined) {
-                    components.ColorComponent = {
-                        value: options.color,
-                    };
                 }
 
                 return {
