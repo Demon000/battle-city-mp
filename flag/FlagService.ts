@@ -31,7 +31,6 @@ export class FlagService {
         assert(tank.flagColor !== null);
 
         const position = tank.getComponent(PositionComponent);
-        const teamComponent = tank.getComponent(TeamOwnedComponent);
         return this.gameObjectFactory.buildFromOptions({
             type: GameObjectType.FLAG,
             components: {
