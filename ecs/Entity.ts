@@ -15,7 +15,7 @@ export class Entity {
         private registry: Registry,
         public id: EntityId,
         public type: string,
-        public subtypes?: string[],
+        public subtypes: string[] = [],
     ) {}
 
     addLocalComponent<C extends Component<C>>(
