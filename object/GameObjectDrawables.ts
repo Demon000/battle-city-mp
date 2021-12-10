@@ -26,7 +26,11 @@ import { RenderPass } from './RenderPass';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { FlagComponent } from '@/flag/FlagComponent';
 
-const positionTest = (mod: number, divide: number, points: Point[]): DrawableTestFunction => {
+const positionTest = (
+    mod: number,
+    divide: number,
+    points: Point[],
+): DrawableTestFunction => {
     return (entity: Entity): boolean => {
         const position = entity.getComponent(PositionComponent);
         const x = Math.floor(Math.abs(position.x % mod / divide));
@@ -221,7 +225,9 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
     ],
     [GameObjectType.TANK]: [
         ...((): IDrawable[] => {
-            const generateTankDrawableTests = (
+            const tankDrawableScale = 0.5;
+
+            const tankDrawableTests = (
                 tier: TankTier,
                 direction: Direction,
                 targetIsMoving: boolean,
@@ -244,34 +250,37 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                 ];
             };
 
-            const tankColorProcessor: DrawableProcessingFunction = function (entity: Entity) {
-                const drawable = this as IImageDrawable;
-                const color = entity.getComponent(ColorComponent).value;
-                return drawable.colorMask(color);
-            };
+            const tankColorProcessor: DrawableProcessingFunction
+                = function (entity: Entity) {
+                    const drawable = this as IImageDrawable;
+                    const color = entity.getComponent(ColorComponent).value;
+                    return drawable.colorMask(color);
+                };
 
-            const generateTankDrawableFrame = (
+            const tankDrawableFrame = (
                 tier: TankTier,
                 direction: Direction,
                 isMoving: boolean,
                 frame: number,
             ) => {
-                return new ImageDrawable(`tank_${tier}_${direction}_${frame}.png`, {
+                const source = (ext: string) =>
+                    `tank_${tier}_${direction}_${frame}${ext}.png`;
+                return new ImageDrawable(source(''), {
                     renderPass: RenderPass.TANK,
-                    scaleX: 0.5,
-                    scaleY: 0.5,
-                    tests: generateTankDrawableTests(tier, direction, isMoving),
+                    scaleX: tankDrawableScale,
+                    scaleY: tankDrawableScale,
+                    tests: tankDrawableTests(tier, direction, isMoving),
                     processor: tankColorProcessor,
                     overlays: [
-                        new ImageDrawable(`tank_${tier}_${direction}_${frame}_highlights.png`, {
+                        new ImageDrawable(source('_highlights'), {
                             compositionType: 'lighter',
-                            scaleX: 0.5,
-                            scaleY: 0.5,
+                            scaleX: tankDrawableScale,
+                            scaleY: tankDrawableScale,
                         }),
-                        new ImageDrawable(`tank_${tier}_${direction}_${frame}_shadows.png`, {
+                        new ImageDrawable(source('_shadows'), {
                             compositionType: 'difference',
-                            scaleX: 0.5,
-                            scaleY: 0.5,
+                            scaleX: tankDrawableScale,
+                            scaleY: tankDrawableScale,
                         }),
                     ],
                 });
@@ -283,21 +292,21 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                 for (const direction of Object.values(Direction)) {
                     drawables.push(
                         new AnimatedImageDrawable([
-                            generateTankDrawableFrame(tier, direction, true, 0),
-                            generateTankDrawableFrame(tier, direction, true, 1),
+                            tankDrawableFrame(tier, direction, true, 0),
+                            tankDrawableFrame(tier, direction, true, 1),
                         ], [
                             62.5,
                             62.5,
                         ], true, {
-                            tests: generateTankDrawableTests(tier, direction, true),
+                            tests: tankDrawableTests(tier, direction, true),
                             processor: tankColorProcessor,
                             renderPass: RenderPass.TANK,
-                            scaleX: 0.5,
-                            scaleY: 0.5,
+                            scaleX: tankDrawableScale,
+                            scaleY: tankDrawableScale,
                         }),
                     );
                     drawables.push(
-                        generateTankDrawableFrame(tier, direction, false, 0),
+                        tankDrawableFrame(tier, direction, false, 0),
                     );
                 }
             }
@@ -341,20 +350,29 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                     return drawable;
                 }
 
-                const position = entity.getComponent(PositionComponent);
-                const centerPosition = entity.getComponent(CenterPositionComponent);
-                const size = entity.getComponent(SizeComponent);
-                const direction = entity.getComponent(DirectionComponent).value;
+                const position = entity
+                    .getComponent(PositionComponent);
+                const centerPosition = entity
+                    .getComponent(CenterPositionComponent);
+                const size = entity
+                    .getComponent(SizeComponent);
+                const direction = entity
+                    .getComponent(DirectionComponent).value;
+
                 const offsetX = centerPosition.x - position.x;
+
                 let offsetY = 0;
-                let positionYReference: TextPositionReference | undefined = 'end';
+                let positionYReference: TextPositionReference | undefined;
                 if (direction === Direction.UP) {
                     offsetY = size.height;
                     positionYReference = undefined;
+                } else {
+                    positionYReference = 'end';
                 }
 
                 if (positionYReference !== undefined) {
-                    drawable = (drawable as TextDrawable).positionYReference(positionYReference);
+                    drawable = (drawable as TextDrawable)
+                        .positionYReference(positionYReference);
                 }
 
                 if (drawable === undefined) {
@@ -431,6 +449,17 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             const drawables = [];
 
             for (const power of Object.values(BulletPower)) {
+                const bulletPowerTest = (entity: Entity) => {
+                    const bulletPower = entity
+                        .getComponent(BulletComponent).power;
+
+                    if (bulletPower !== power) {
+                        return false;
+                    }
+
+                    return true;
+                };
+
                 for (const direction of Object.values(Direction)) {
                     drawables.push(
                         new ImageDrawable(`bullet_${power}_${direction}.png`, {
@@ -441,16 +470,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                             scaleY: 0.5,
                             tests: [
                                 directionTest(direction),
-                                (entity: Entity): boolean => {
-                                    const bulletPower = entity
-                                        .getComponent(BulletComponent).power;
-
-                                    if (bulletPower !== power) {
-                                        return false;
-                                    }
-
-                                    return true;
-                                },
+                                bulletPowerTest,
                             ],
                         }),
                     );
