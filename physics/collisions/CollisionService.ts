@@ -365,14 +365,18 @@ export class CollisionService {
             component.remove();
 
             const entity = component.entity;
-            const isUnderBushComponent = entity.findComponent(IsUnderBushComponent);
+            const hasIsUnderBushComponent = entity.hasComponent(IsUnderBushComponent);
             const isUnderBush = this.isOverlappingWithType(entity, GameObjectType.BUSH);
 
-            if (isUnderBush && isUnderBushComponent === undefined) {
+            if (isUnderBush === hasIsUnderBushComponent) {
+                continue;
+            }
+
+            if (isUnderBush) {
                 entity.addComponent(IsUnderBushComponent, undefined, {
                     flags: ComponentFlags.LOCAL_ONLY,
                 });
-            } else if (!isUnderBush && isUnderBushComponent !== undefined) {
+            } else {
                 entity.removeComponent(IsUnderBushComponent);
             }
         }

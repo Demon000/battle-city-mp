@@ -215,15 +215,19 @@ export class GameObjectService {
             component.remove();
 
             const entity = component.entity;
-            const isMovingComponent = entity.findComponent(IsMovingComponent);
+            const hasIsMovingComponent = entity.hasComponent(IsMovingComponent);
             const movement = entity.getComponent(MovementComponent);
-
             const isMoving = movement.speed > 0 || movement.direction !== null;
-            if (isMoving && isMovingComponent === undefined) {
+
+            if (isMoving === hasIsMovingComponent) {
+                continue;
+            }
+
+            if (isMoving) {
                 entity.addComponent(IsMovingComponent, undefined, {
                     flags: ComponentFlags.LOCAL_ONLY,
                 });
-            } else if (!isMoving && isMovingComponent !== undefined) {
+            } else {
                 entity.removeComponent(IsMovingComponent);
             }
         }
