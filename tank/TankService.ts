@@ -33,9 +33,6 @@ export class TankService {
         return this.gameObjectFactory.buildFromOptions({
             type: GameObjectType.TANK,
             subtypes: [player.requestedTankTier],
-            options: {
-                playerName: player.displayName,
-            } as TankOptions,
             components: {
                 TeamOwnedComponent: {
                     teamId: player.teamId,
