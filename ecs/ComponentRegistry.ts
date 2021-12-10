@@ -4,7 +4,7 @@ import { PositionComponent, PositionComponentData } from '@/physics/point/Positi
 import { SizeComponent, SizeComponentData } from '@/physics/size/SizeComponent';
 import { AutomaticDestroyComponent, AutomaticDestroyComponentData } from '../components/AutomaticDestroyComponent';
 import { assert } from '@/utils/assert';
-import { is } from 'typescript-is';
+import { assertEquals } from 'typescript-is';
 import { DestroyedComponent, DestroyedComponentData } from '@/components/DestroyedComponent';
 import { GraphicDependenciesComponent, GraphicDependenciesComponentData } from '@/components/GraphicDependenciesComponent';
 import { IsMovingComponent, IsMovingComponentData } from '@/components/IsMovingComponent';
@@ -41,13 +41,170 @@ import { DirtyGraphicsComponent, DirtyGraphicsComponentData } from '@/components
 import { DirtyIsMovingComponent, DirtyIsMovingComponentData } from '@/components/DirtyIsMovingComponent';
 
 export class ComponentRegistry {
-    private validate<T>(clazz: ComponentClassType<any>, data?: any) {
-        if (data === undefined) {
-            return;
+    _lookupAndValidate(
+        tag: string,
+        message: string,
+        clazz?: ComponentClassType<any>,
+        data?: any,
+    ): ComponentClassType<any> {
+        switch(tag) {
+            case BoundingBoxComponent.tag:
+                clazz = BoundingBoxComponent;
+                assertEquals<Partial<BoundingBoxComponentData>>(data);
+                break;
+            case PositionComponent.tag:
+                clazz = PositionComponent;
+                assertEquals<Partial<PositionComponentData>>(data);
+                break;
+            case SizeComponent.tag:
+                clazz = SizeComponent;
+                assertEquals<Partial<SizeComponentData>>(data);
+                break;
+            case AutomaticDestroyComponent.tag:
+                clazz = AutomaticDestroyComponent;
+                assertEquals<Partial<AutomaticDestroyComponentData>>(data);
+                break;
+            case DestroyedComponent.tag:
+                clazz = DestroyedComponent;
+                assertEquals<Partial<DestroyedComponentData>>(data);
+                break;
+            case GraphicDependenciesComponent.tag:
+                clazz = GraphicDependenciesComponent;
+                assertEquals<Partial<GraphicDependenciesComponentData>>(data);
+                break;
+            case IsMovingComponent.tag:
+                clazz = IsMovingComponent;
+                assertEquals<Partial<IsMovingComponentData>>(data);
+                break;
+            case DirectionAxisSnappingComponent.tag:
+                clazz = DirectionAxisSnappingComponent;
+                assertEquals<Partial<DirectionAxisSnappingComponentData>>(data);
+                break;
+            case SpawnTimeComponent.tag:
+                clazz = SpawnTimeComponent;
+                assertEquals<Partial<SpawnTimeComponentData>>(data);
+                break;
+            case IsUnderBushComponent.tag:
+                clazz = IsUnderBushComponent;
+                assertEquals<Partial<IsUnderBushComponentData>>(data);
+                break;
+            case CenterPositionComponent.tag:
+                clazz = CenterPositionComponent;
+                assertEquals<Partial<CenterPositionComponentData>>(data);
+                break;
+            case DirtyBoundingBoxComponent.tag:
+                clazz = DirtyBoundingBoxComponent;
+                assertEquals<Partial<DirtyBoundingBoxComponentData>>(data);
+                break;
+            case RequestedPositionComponent.tag:
+                clazz = RequestedPositionComponent;
+                assertEquals<Partial<RequestedPositionComponentData>>(data);
+                break;
+            case DirtyCenterPositionComponent.tag:
+                clazz = DirtyCenterPositionComponent;
+                assertEquals<Partial<DirtyCenterPositionComponentData>>(data);
+                break;
+            case DirectionComponent.tag:
+                clazz = DirectionComponent;
+                assertEquals<Partial<DirectionComponentData>>(data);
+                break;
+            case RequestedDirectionComponent.tag:
+                clazz = RequestedDirectionComponent;
+                assertEquals<Partial<RequestedDirectionComponentData>>(data);
+                break;
+            case TankComponent.tag:
+                clazz = TankComponent;
+                assertEquals<Partial<TankComponentData>>(data);
+                break;
+            case SpawnComponent.tag:
+                clazz = SpawnComponent;
+                assertEquals<Partial<SpawnComponentData>>(data);
+                break;
+            case IsMovingTrackingComponent.tag:
+                clazz = IsMovingTrackingComponent;
+                assertEquals<Partial<IsMovingTrackingComponentData>>(data);
+                break;
+            case PlayerOwnedComponent.tag:
+                clazz = PlayerOwnedComponent;
+                assertEquals<Partial<PlayerOwnedComponentData>>(data);
+                break;
+            case EntityOwnedComponent.tag:
+                clazz = EntityOwnedComponent;
+                assertEquals<Partial<EntityOwnedComponentData>>(data);
+                break;
+            case BulletComponent.tag:
+                clazz = BulletComponent;
+                assertEquals<Partial<BulletComponentData>>(data);
+                break;
+            case ColorComponent.tag:
+                clazz = ColorComponent;
+                assertEquals<Partial<ColorComponentData>>(data);
+                break;
+            case WorldEntityComponent.tag:
+                clazz = WorldEntityComponent;
+                assertEquals<Partial<WorldEntityComponentData>>(data);
+                break;
+            case MovementComponent.tag:
+                clazz = MovementComponent;
+                assertEquals<Partial<MovementComponentData>>(data);
+                break;
+            case MovementMultipliersComponent.tag:
+                clazz = MovementMultipliersComponent;
+                assertEquals<Partial<MovementMultipliersComponentData>>(data);
+                break;
+            case HealthComponent.tag:
+                clazz = HealthComponent;
+                assertEquals<Partial<HealthComponentData>>(data);
+                break;
+            case EntitySpawnerComponent.tag:
+                clazz = EntitySpawnerComponent;
+                assertEquals<Partial<EntitySpawnerComponentData>>(data);
+                break;
+            case EntitySpawnerActiveComponent.tag:
+                clazz = EntitySpawnerActiveComponent;
+                assertEquals<Partial<EntitySpawnerActiveComponentData>>(data);
+                break;
+            case BulletSpawnerComponent.tag:
+                clazz = BulletSpawnerComponent;
+                assertEquals<Partial<BulletSpawnerComponentData>>(data);
+                break;
+            case SmokeSpawnerComponent.tag:
+                clazz = SmokeSpawnerComponent;
+                assertEquals<Partial<SmokeSpawnerComponentData>>(data);
+                break;
+            case HealthBasedSmokeSpawnerComponent.tag:
+                clazz = HealthBasedSmokeSpawnerComponent;
+                assertEquals<Partial<HealthBasedSmokeSpawnerComponentData>>(data);
+                break;
+            case TeamOwnedComponent.tag:
+                clazz = TeamOwnedComponent;
+                assertEquals<Partial<TeamOwnedComponentData>>(data);
+                break;
+            case FlagComponent.tag:
+                clazz = FlagComponent;
+                assertEquals<Partial<FlagComponentData>>(data);
+                break;
+            case IsUnderBushTrackingComponent.tag:
+                clazz = IsUnderBushTrackingComponent;
+                assertEquals<Partial<IsUnderBushTrackingComponentData>>(data);
+                break;
+            case DirtyIsUnderBushComponent.tag:
+                clazz = DirtyIsUnderBushComponent;
+                assertEquals<Partial<DirtyIsUnderBushComponentData>>(data);
+                break;
+            case DirtyGraphicsComponent.tag:
+                clazz = DirtyGraphicsComponent;
+                assertEquals<Partial<DirtyGraphicsComponentData>>(data);
+                break;
+            case DirtyIsMovingComponent.tag:
+                clazz = DirtyIsMovingComponent;
+                assertEquals<Partial<DirtyIsMovingComponentData>>(data);
+                break;
+            default:
+                assert(false, `Invalid tag '${tag}'`);
         }
 
-        assert(is<Partial<T>>(data),
-            `Object is not assignable to component '${clazz.name}'`, data);
+        return clazz;
     }
 
     lookupAndValidate(
@@ -61,163 +218,18 @@ export class ComponentRegistry {
             tag = clazz.tag;
         }
 
-        switch(tag) {
-            case BoundingBoxComponent.tag:
-                clazz = BoundingBoxComponent;
-                this.validate<BoundingBoxComponentData>(BoundingBoxComponent, data);
-                break;
-            case PositionComponent.tag:
-                clazz = PositionComponent;
-                this.validate<PositionComponentData>(PositionComponent, data);
-                break;
-            case SizeComponent.tag:
-                clazz = SizeComponent;
-                this.validate<SizeComponentData>(SizeComponent, data);
-                break;
-            case AutomaticDestroyComponent.tag:
-                clazz = AutomaticDestroyComponent;
-                this.validate<AutomaticDestroyComponentData>(AutomaticDestroyComponent, data);
-                break;
-            case DestroyedComponent.tag:
-                clazz = DestroyedComponent;
-                this.validate<DestroyedComponentData>(DestroyedComponent, data);
-                break;
-            case GraphicDependenciesComponent.tag:
-                clazz = GraphicDependenciesComponent;
-                this.validate<GraphicDependenciesComponentData>(GraphicDependenciesComponent, data);
-                break;
-            case IsMovingComponent.tag:
-                clazz = IsMovingComponent;
-                this.validate<IsMovingComponentData>(IsMovingComponent, data);
-                break;
-            case DirectionAxisSnappingComponent.tag:
-                clazz = DirectionAxisSnappingComponent;
-                this.validate<DirectionAxisSnappingComponentData>(DirectionAxisSnappingComponent, data);
-                break;
-            case SpawnTimeComponent.tag:
-                clazz = SpawnTimeComponent;
-                this.validate<SpawnTimeComponentData>(SpawnTimeComponent, data);
-                break;
-            case IsUnderBushComponent.tag:
-                clazz = IsUnderBushComponent;
-                this.validate<IsUnderBushComponentData>(IsUnderBushComponent, data);
-                break;
-            case CenterPositionComponent.tag:
-                clazz = CenterPositionComponent;
-                this.validate<CenterPositionComponentData>(CenterPositionComponent, data);
-                break;
-            case DirtyBoundingBoxComponent.tag:
-                clazz = DirtyBoundingBoxComponent;
-                this.validate<DirtyBoundingBoxComponentData>(DirtyBoundingBoxComponent, data);
-                break;
-            case RequestedPositionComponent.tag:
-                clazz = RequestedPositionComponent;
-                this.validate<RequestedPositionComponentData>(RequestedPositionComponent, data);
-                break;
-            case DirtyCenterPositionComponent.tag:
-                clazz = DirtyCenterPositionComponent;
-                this.validate<DirtyCenterPositionComponentData>(DirtyCenterPositionComponent, data);
-                break;
-            case DirectionComponent.tag:
-                clazz = DirectionComponent;
-                this.validate<DirectionComponentData>(DirectionComponent, data);
-                break;
-            case RequestedDirectionComponent.tag:
-                clazz = RequestedDirectionComponent;
-                this.validate<RequestedDirectionComponentData>(RequestedDirectionComponent, data);
-                break;
-            case TankComponent.tag:
-                clazz = TankComponent;
-                this.validate<TankComponentData>(TankComponent, data);
-                break;
-            case SpawnComponent.tag:
-                clazz = SpawnComponent;
-                this.validate<SpawnComponentData>(SpawnComponent, data);
-                break;
-            case IsMovingTrackingComponent.tag:
-                clazz = IsMovingTrackingComponent;
-                this.validate<IsMovingTrackingComponentData>(IsMovingTrackingComponent, data);
-                break;
-            case PlayerOwnedComponent.tag:
-                clazz = PlayerOwnedComponent;
-                this.validate<PlayerOwnedComponentData>(PlayerOwnedComponent, data);
-                break;
-            case EntityOwnedComponent.tag:
-                clazz = EntityOwnedComponent;
-                this.validate<EntityOwnedComponentData>(EntityOwnedComponent, data);
-                break;
-            case BulletComponent.tag:
-                clazz = BulletComponent;
-                this.validate<BulletComponentData>(BulletComponent, data);
-                break;
-            case ColorComponent.tag:
-                clazz = ColorComponent;
-                this.validate<ColorComponentData>(ColorComponent, data);
-                break;
-            case WorldEntityComponent.tag:
-                clazz = WorldEntityComponent;
-                this.validate<WorldEntityComponentData>(WorldEntityComponent, data);
-                break;
-            case MovementComponent.tag:
-                clazz = MovementComponent;
-                this.validate<MovementComponentData>(MovementComponent, data);
-                break;
-            case MovementMultipliersComponent.tag:
-                clazz = MovementMultipliersComponent;
-                this.validate<MovementMultipliersComponentData>(MovementMultipliersComponent, data);
-                break;
-            case HealthComponent.tag:
-                clazz = HealthComponent;
-                this.validate<HealthComponentData>(HealthComponent, data);
-                break;
-            case EntitySpawnerComponent.tag:
-                clazz = EntitySpawnerComponent;
-                this.validate<EntitySpawnerComponentData>(EntitySpawnerComponent, data);
-                break;
-            case EntitySpawnerActiveComponent.tag:
-                clazz = EntitySpawnerActiveComponent;
-                this.validate<EntitySpawnerActiveComponentData>(EntitySpawnerActiveComponent, data);
-                break;
-            case BulletSpawnerComponent.tag:
-                clazz = BulletSpawnerComponent;
-                this.validate<BulletSpawnerComponentData>(BulletSpawnerComponent, data);
-                break;
-            case SmokeSpawnerComponent.tag:
-                clazz = SmokeSpawnerComponent;
-                this.validate<SmokeSpawnerComponentData>(SmokeSpawnerComponent, data);
-                break;
-            case HealthBasedSmokeSpawnerComponent.tag:
-                clazz = HealthBasedSmokeSpawnerComponent;
-                this.validate<HealthBasedSmokeSpawnerComponentData>(HealthBasedSmokeSpawnerComponent, data);
-                break;
-            case TeamOwnedComponent.tag:
-                clazz = TeamOwnedComponent;
-                this.validate<TeamOwnedComponentData>(TeamOwnedComponent, data);
-                break;
-            case FlagComponent.tag:
-                clazz = FlagComponent;
-                this.validate<FlagComponentData>(FlagComponent, data);
-                break;
-            case IsUnderBushTrackingComponent.tag:
-                clazz = IsUnderBushTrackingComponent;
-                this.validate<IsUnderBushTrackingComponentData>(IsUnderBushTrackingComponent, data);
-                break;
-            case DirtyIsUnderBushComponent.tag:
-                clazz = DirtyIsUnderBushComponent;
-                this.validate<DirtyIsUnderBushComponentData>(DirtyIsUnderBushComponent, data);
-                break;
-            case DirtyGraphicsComponent.tag:
-                clazz = DirtyGraphicsComponent;
-                this.validate<DirtyGraphicsComponentData>(DirtyGraphicsComponent, data);
-                break;
-            case DirtyIsMovingComponent.tag:
-                clazz = DirtyIsMovingComponent;
-                this.validate<DirtyIsMovingComponentData>(DirtyIsMovingComponent, data);
-                break;
-            default:
-                assert(false, `Invalid tag '${tag}'`);
+        if (clazz !== undefined && data === undefined) {
+            return clazz;
         }
 
-        return clazz;
+        assert(tag !== undefined);
+
+        const message = `Object is not assignable to component '${tag}'`;
+        try {
+            return this._lookupAndValidate(tag, message, clazz, data);
+        } catch (err) {
+            console.error(message, data);
+            throw err;
+        }
     }
 }
