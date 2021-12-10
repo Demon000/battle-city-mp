@@ -168,7 +168,7 @@ export class EntitySpawnerService {
             .findComponent(DirectionComponent);
         if (directionComponent !== undefined
             && spawnedDirectionComponent !== undefined) {
-                spawnedDirectionComponent.update({
+            spawnedDirectionComponent.update({
                 value: directionComponent.value,
             }, options);
         }

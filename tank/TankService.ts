@@ -6,7 +6,7 @@ import { GameObjectType } from '@/object/GameObjectType';
 import { Point } from '@/physics/point/Point';
 import { Player } from '@/player/Player';
 import EventEmitter from 'eventemitter3';
-import { Tank, PartialTankOptions, TankOptions } from './Tank';
+import { Tank, PartialTankOptions } from './Tank';
 
 export enum TankServiceEvent {
     TANK_UPDATED = 'tank-updated',
