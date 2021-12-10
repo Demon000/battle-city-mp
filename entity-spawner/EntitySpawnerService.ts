@@ -9,7 +9,7 @@ import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { SmokeSpawnerComponent } from '@/components/SmokeSpawnerComponent';
 import { ClazzOrTag } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
-import { Registry } from '@/ecs/Registry';
+import { Registry, RegistryComponentEvent } from '@/ecs/Registry';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { DirectionComponent } from '@/physics/DirectionComponent';
@@ -53,21 +53,19 @@ export class EntitySpawnerService {
             return;
         }
 
-        const ids = {...spawnerComponent.ids};
-        let count = spawnerComponent.count;
-
         if (registered) {
-            ids[entity.id] = true;
-            count++;
+            spawnerComponent.ids[entity.id] = true;
+            spawnerComponent.count++;
         } else {
-            delete ids[entity.id];
-            count--;
+            delete spawnerComponent.ids[entity.id];
+            spawnerComponent.count--;
         }
 
-        spawnerComponent.update({
-            ids,
-            count,
-        });
+        this.registry.emit(RegistryComponentEvent.COMPONENT_UPDATED,
+            spawnerComponent, {
+                ids: spawnerComponent.ids,
+                count: spawnerComponent.count,
+            });
     }
 
     handleEntityRegistered(entity: Entity): void {
