@@ -88,8 +88,8 @@ export class GameMap {
 
                 return {
                     type: options.type,
-                    options: options,
-                    components: components,
+                    options,
+                    components,
                 };
             },
         );
