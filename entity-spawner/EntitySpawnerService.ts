@@ -159,7 +159,7 @@ export class EntitySpawnerService {
             .findComponent(EntityOwnedComponent);
         if (spawnedEntityOwnedComponent !== undefined) {
             spawnedEntityOwnedComponent.update({
-                entityId: entity.id,
+                id: entity.id,
             }, options);
         }
 
