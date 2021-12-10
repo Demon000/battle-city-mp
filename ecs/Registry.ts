@@ -157,7 +157,9 @@ export class Registry {
         assert(entityIdExisted);
     }
 
-    private getOrCreateComponentTypeSet<C extends Component<C>>(
+    private getOrCreateComponentTypeSet<
+        C extends Component<C>,
+    >(
         clazz: ComponentClassType<C>,
     ): Set<Component<C>> {
         let tagComponents = this.tagsComponentsMap.get(clazz.tag);
@@ -169,17 +171,21 @@ export class Registry {
         return tagComponents;
     }
 
-    getClazz<
+    validateComponentData<
         C extends Component<C>,
-    >(clazzOrTag: ClazzOrTag<C>): ComponentClassType<C> {
+    >(
+        clazzOrTag: ClazzOrTag<C>,
+        data?: any,
+    ): ComponentClassType<C> {
         let clazz;
+        let tag;
         if (typeof clazzOrTag === 'string') {
-            clazz = this.componentRegistry.getComponentClassByTag(clazzOrTag);
+            tag = clazzOrTag;
         } else {
             clazz = clazzOrTag;
         }
 
-        return clazz;
+        return this.componentRegistry.lookupAndValidate(tag, clazz, data);
     }
 
     emit<
@@ -221,11 +227,10 @@ export class Registry {
         data?: any,
         options?: RegistryOperationOptions,
     ): C {
-        const clazz = this.getClazz(clazzOrTag);
+        const clazz = this.validateComponentData(clazzOrTag, data);
         const component = new clazz(this, entity, clazz);
 
         if (data !== undefined) {
-            this.componentRegistry.validateComponentData(clazz, data);
             component.setData(data);
         }
 
@@ -263,11 +268,10 @@ export class Registry {
         data?: any,
         options?: RegistryOperationOptions,
     ): C {
-        const clazz = this.getClazz(clazzOrTag);
+        const clazz = this.validateComponentData(clazzOrTag, data);
         const component = entity.getComponent(clazz);
 
         if (data !== undefined) {
-            this.componentRegistry.validateComponentData(clazz, data);
             component.setData(data);
         }
 
@@ -295,12 +299,11 @@ export class Registry {
         data?: any,
         options?: RegistryOperationOptions,
     ): C {
-        const clazz = this.getClazz(clazzOrTag);
-        const component = entity.findComponent(clazz);
+        const component = entity.findComponent(clazzOrTag);
         if (component === undefined) {
-            return this.addComponent(entity, clazz, data, options);
+            return this.addComponent(entity, clazzOrTag, data, options);
         } else {
-            return this.updateComponent(entity, clazz, data, options);
+            return this.updateComponent(entity, clazzOrTag, data, options);
         }
     }
 

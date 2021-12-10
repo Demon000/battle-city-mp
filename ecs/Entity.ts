@@ -9,7 +9,7 @@ export interface EntityComponentsOptions {
 }
 
 export class Entity {
-    private tagComponentMap = new Map<ComponentClassType, Component<any>>();
+    private tagComponentMap = new Map<string, Component<any>>();
 
     constructor(
         private registry: Registry,
@@ -25,20 +25,20 @@ export class Entity {
         assert(existingComponent === undefined,
             'Component already exists on entity', component, this);
 
-        this.tagComponentMap.set(component.clazz, component);
+        this.tagComponentMap.set(component.clazz.tag, component);
     }
 
     removeLocalComponent<C extends Component<C>>(
         clazz: ComponentClassType<C>,
         optional = false,
     ): C | undefined {
-        const component = this.tagComponentMap.get(clazz);
+        const component = this.tagComponentMap.get(clazz.tag);
         if (optional && component === undefined) {
             return undefined;
         }
         assert(component !== undefined);
 
-        const hadComponent = this.tagComponentMap.delete(clazz);
+        const hadComponent = this.tagComponentMap.delete(clazz.tag);
         if (optional && !hadComponent) {
             return undefined;
         }
@@ -100,7 +100,7 @@ export class Entity {
 
     getComponentsData(options?: EntityComponentsOptions): ComponentsInitialization {
         const componentsInitialization: ComponentsInitialization = {};
-        for (const [clazz, component] of this.tagComponentMap) {
+        for (const [tag, component] of this.tagComponentMap) {
             if (options?.withFlags !== undefined
                 && (component.flags & options.withFlags)
                     !== options.withFlags) {
@@ -112,7 +112,7 @@ export class Entity {
                     !== 0) {
                 continue;
             }
-            componentsInitialization[clazz.tag] = component.getData();
+            componentsInitialization[tag] = component.getData();
         }
         return componentsInitialization;
     }
@@ -157,14 +157,14 @@ export class Entity {
     >(
         clazzOrTag: ClazzOrTag<C>,
     ): C | undefined {
-        let clazz;
+        let tag;
         if (typeof clazzOrTag === 'string') {
-            clazz = this.registry.getClazz(clazzOrTag);
+            tag = clazzOrTag;
         } else {
-            clazz = clazzOrTag;
+            tag = clazzOrTag.tag;
         }
 
-        return this.tagComponentMap.get(clazz) as C;
+        return this.tagComponentMap.get(tag) as C;
     }
 
     getComponent<

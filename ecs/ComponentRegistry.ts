@@ -1,4 +1,4 @@
-import { Component, ComponentClassType } from '@/ecs/Component';
+import { ComponentClassType } from '@/ecs/Component';
 import { BoundingBoxComponent, BoundingBoxComponentData } from '@/physics/bounding-box/BoundingBoxComponent';
 import { PositionComponent, PositionComponentData } from '@/physics/point/PositionComponent';
 import { SizeComponent, SizeComponentData } from '@/physics/size/SizeComponent';
@@ -40,11 +40,6 @@ import { DirtyIsUnderBushComponent, DirtyIsUnderBushComponentData } from '@/comp
 import { DirtyGraphicsComponent, DirtyGraphicsComponentData } from '@/components/DirtyGraphicsComponent';
 import { DirtyIsMovingComponent, DirtyIsMovingComponentData } from '@/components/DirtyIsMovingComponent';
 
-export interface ProcessResults {
-    clazz: ComponentClassType<any>;
-    tag: string;
-}
-
 export class ComponentRegistry {
     private validate<T>(clazz: ComponentClassType<any>, data?: any) {
         if (data === undefined) {
@@ -55,7 +50,11 @@ export class ComponentRegistry {
             `Object is not assignable to component '${clazz.name}'`, data);
     }
 
-    private process(tag?: string, clazz?: ComponentClassType<any>, data?: any): ProcessResults {
+    lookupAndValidate(
+        tag?: string,
+        clazz?: ComponentClassType<any>,
+        data?: any,
+    ): ComponentClassType<any> {
         assert(tag !== undefined || clazz !== undefined);
 
         if (tag === undefined && clazz !== undefined) {
@@ -219,26 +218,6 @@ export class ComponentRegistry {
                 assert(false, `Invalid tag '${tag}'`);
         }
 
-        return {
-            clazz,
-            tag,
-        };
-    }
-
-    getComponentClassByTag(tag: string): ComponentClassType<any> {
-        return this.process(tag).clazz;
-    }
-
-    validateTagData(tag: string, data: Record<string, any>): void {
-        this.process(tag, undefined, data);
-    }
-
-    validateComponentData<
-        C extends Component<C>,
-    >(
-        clazz: ComponentClassType<C>,
-        data: any,
-    ): void {
-        this.process(undefined, clazz, data);
+        return clazz;
     }
 }
