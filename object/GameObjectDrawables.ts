@@ -27,8 +27,8 @@ import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { FlagComponent } from '@/flag/FlagComponent';
 
 const positionTest = (mod: number, divide: number, points: Point[]): DrawableTestFunction => {
-    return (object: GameObject): boolean => {
-        const position = object.getComponent(PositionComponent);
+    return (entity: Entity): boolean => {
+        const position = entity.getComponent(PositionComponent);
         const x = Math.floor(Math.abs(position.x % mod / divide));
         const y = Math.floor(Math.abs(position.y % mod / divide));
         return points.some(p => p.x === x && p.y === y);
@@ -36,8 +36,8 @@ const positionTest = (mod: number, divide: number, points: Point[]): DrawableTes
 };
 
 const directionTest = (targetDirection: Direction): DrawableTestFunction => {
-    return (object: GameObject): boolean => {
-        const direction = object.getComponent(DirectionComponent).value;
+    return (entity: Entity): boolean => {
+        const direction = entity.getComponent(DirectionComponent).value;
         return direction === targetDirection;
     };
 };
@@ -228,15 +228,14 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             ) => {
                 return [
                     directionTest(direction),
-                    (object: GameObject): boolean => {
-                        const tank = object as Tank;
-                        const isMoving = tank.hasComponent(IsMovingComponent);
+                    (entity: Entity): boolean => {
+                        const isMoving = entity.hasComponent(IsMovingComponent);
 
                         if (isMoving !== targetIsMoving) {
                             return false;
                         }
 
-                        if (tank.subtypes[0] !== tier) {
+                        if (entity.subtypes[0] !== tier) {
                             return false;
                         }
 
@@ -317,10 +316,9 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             paddingY: 1,
             positionXReference: 'center',
             tests: [
-                (object: GameObject): boolean => {
-                    const tank = object as Tank;
+                (entity: Entity): boolean => {
                     const isUnderBush
-                        = tank.getComponent(IsUnderBushComponent).value;
+                        = entity.getComponent(IsUnderBushComponent).value;
 
                     if (isUnderBush) {
                         return false;
@@ -443,8 +441,8 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                             scaleY: 0.5,
                             tests: [
                                 directionTest(direction),
-                                (object: GameObject): boolean => {
-                                    const bulletPower = object
+                                (entity: Entity): boolean => {
+                                    const bulletPower = entity
                                         .getComponent(BulletComponent).power;
 
                                     if (bulletPower !== power) {
