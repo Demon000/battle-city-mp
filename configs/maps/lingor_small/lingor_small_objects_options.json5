@@ -7,11 +7,15 @@
             y: 1024,
         },
         teamId: 'Red',
-        color: [
-            220,
-            20,
-            60,
-        ],
+        components: {
+            ColorComponent: {
+                value: [
+                    220,
+                    20,
+                    60,
+                ],
+            },
+        },
     },
     {
         type: 'player-spawn',
@@ -62,11 +66,15 @@
             y: 704,
         },
         teamId: 'Blue',
-        color: [
-            65,
-            105,
-            255,
-        ],
+        components: {
+            ColorComponent: {
+                value: [
+                    65,
+                    105,
+                    255,
+                ],
+            },
+        },
     },
     {
         type: 'player-spawn',
@@ -117,11 +125,15 @@
             y: 16,
         },
         teamId: 'Yellow',
-        color: [
-            249,
-            166,
-            2,
-        ],
+        components: {
+            ColorComponent: {
+                value: [
+                    249,
+                    166,
+                    2,
+                ],
+            },
+        },
     },
     {
         type: 'player-spawn',
