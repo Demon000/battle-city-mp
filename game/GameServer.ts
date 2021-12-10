@@ -665,8 +665,8 @@ export class GameServer {
                 this.tankService.clearTankFlag(tank.id);
                 break;
             case FlagTankInteraction.DROP:
-                flag = this.flagService.createFlagForTank(tank);
-                if (flag !== undefined) {
+                if (tank.flagTeamId !== null) {
+                    flag = this.flagService.createFlagForTank(tank);
                     this.tankService.clearTankFlag(tank.id);
                 }
                 break;

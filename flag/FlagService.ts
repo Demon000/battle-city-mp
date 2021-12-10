@@ -6,6 +6,7 @@ import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { PositionComponent } from '@/physics/point/PositionComponent';
 import { Tank } from '@/tank/Tank';
+import { assert } from '@/utils/assert';
 import EventEmitter from 'eventemitter3';
 import { Flag, FlagOptions, FlagType, PartialFlagOptions } from './Flag';
 
@@ -34,10 +35,9 @@ export class FlagService {
         private config: Config,
     ) {}
 
-    createFlagForTank(tank: Tank): Flag | undefined {
-        if (tank.flagTeamId === null || tank.flagColor === null) {
-            return undefined;
-        }
+    createFlagForTank(tank: Tank): Flag {
+        assert(tank.flagTeamId !== null);
+        assert(tank.flagColor !== null);
 
         const position = tank.getComponent(PositionComponent);
         return this.gameObjectFactory.buildFromOptions({
