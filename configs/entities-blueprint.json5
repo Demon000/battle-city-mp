@@ -267,6 +267,7 @@
             'world-entity',
         ],
         components: {
+            TeamOwnedComponent: {},
             PlayerOwnedComponent: {},
             DirectionComponent: {},
             MovementComponent: {},

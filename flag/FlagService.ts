@@ -68,20 +68,21 @@ export class FlagService {
 
     getFlagTankInteractionType(flag: Flag, tank: Tank): FlagTankInteraction | undefined {
         const flagTeamId = flag.getComponent(TeamOwnedComponent).teamId;
+        const tankTeamId = tank.getComponent(TeamOwnedComponent).teamId;
         let interaction;
 
         if (tank.flagTeamId === null) {
-            if (tank.teamId !== flagTeamId && flag.flagType === FlagType.FULL) {
+            if (tankTeamId !== flagTeamId && flag.flagType === FlagType.FULL) {
                 interaction = FlagTankInteraction.STEAL;
             } else if (flag.flagType === FlagType.POLE_ONLY) {
                 interaction = FlagTankInteraction.PICK;
             }
         }
 
-        if (tank.flagTeamId !== null && tank.teamId === flagTeamId) {
-            if (tank.flagTeamId === tank.teamId && flag.flagType === FlagType.BASE_ONLY) {
+        if (tank.flagTeamId !== null && tankTeamId === flagTeamId) {
+            if (tank.flagTeamId === tankTeamId && flag.flagType === FlagType.BASE_ONLY) {
                 interaction = FlagTankInteraction.RETURN;
-            } else if (tank.flagTeamId !== tank.teamId && flag.flagType === FlagType.FULL) {
+            } else if (tank.flagTeamId !== tankTeamId && flag.flagType === FlagType.FULL) {
                 interaction = FlagTankInteraction.CAPTURE;
             }
         }
