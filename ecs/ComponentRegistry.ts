@@ -43,7 +43,6 @@ import { DirtyIsMovingComponent, DirtyIsMovingComponentData } from '@/components
 export class ComponentRegistry {
     _lookupAndValidate(
         tag: string,
-        message: string,
         clazz?: ComponentClassType<any>,
         data?: any,
     ): ComponentClassType<any> {
@@ -226,7 +225,7 @@ export class ComponentRegistry {
 
         const message = `Object is not assignable to component '${tag}'`;
         try {
-            return this._lookupAndValidate(tag, message, clazz, data);
+            return this._lookupAndValidate(tag, clazz, data);
         } catch (err) {
             console.error(message, data);
             throw err;
