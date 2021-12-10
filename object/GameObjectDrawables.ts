@@ -339,8 +339,8 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             processor(this: IDrawable, entity: Entity): IDrawable | undefined {
                 let drawable: TextDrawable | undefined = this as TextDrawable;
 
-                const playerName =
-                    entity.getComponent(PlayerOwnedComponent).playerName;
+                const playerName = entity
+                    .getComponent(PlayerOwnedComponent).playerName;
                 if (playerName === undefined) {
                     return drawable;
                 }
