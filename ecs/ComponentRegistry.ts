@@ -37,6 +37,8 @@ import { TeamOwnedComponent, TeamOwnedComponentData } from '@/components/TeamOwn
 import { FlagComponent, FlagComponentData } from '@/flag/FlagComponent';
 import { IsUnderBushTrackingComponent, IsUnderBushTrackingComponentData } from '@/components/IsUnderBushTrackingComponent';
 import { DirtyIsUnderBushComponent, DirtyIsUnderBushComponentData } from '@/components/DirtyIsUnderBushComponent';
+import { DirtyGraphicsComponent, DirtyGraphicsComponentData } from '@/components/DirtyGraphicsComponent';
+import { DirtyIsMovingComponent, DirtyIsMovingComponentData } from '@/components/DirtyIsMovingComponent';
 
 export interface ProcessResults {
     clazz: ComponentClassType<any>;
@@ -204,6 +206,14 @@ export class ComponentRegistry {
             case DirtyIsUnderBushComponent.tag:
                 clazz = DirtyIsUnderBushComponent;
                 this.validate<DirtyIsUnderBushComponentData>(DirtyIsUnderBushComponent, data);
+                break;
+            case DirtyGraphicsComponent.tag:
+                clazz = DirtyGraphicsComponent;
+                this.validate<DirtyGraphicsComponentData>(DirtyGraphicsComponent, data);
+                break;
+            case DirtyIsMovingComponent.tag:
+                clazz = DirtyIsMovingComponent;
+                this.validate<DirtyIsMovingComponentData>(DirtyIsMovingComponent, data);
                 break;
             default:
                 assert(false, `Invalid tag '${tag}'`);
