@@ -57,6 +57,7 @@ import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
 import { EntitySpawnerService } from '@/entity-spawner/EntitySpawnerService';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
+import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -636,15 +637,17 @@ export class GameServer {
         switch (interaction) {
             case FlagTankInteraction.STEAL: {
                 assert(flag !== undefined);
+                const flagTeamId = flag.getComponent(TeamOwnedComponent).teamId;
                 const flagColor = flag.getComponent(ColorComponent).value;
-                this.tankService.setTankFlag(tank.id, flag.teamId, flagColor, flag.id);
+                this.tankService.setTankFlag(tank.id, flagTeamId, flagColor, flag.id);
                 this.flagService.setFlagType(flag.id, FlagType.BASE_ONLY);
                 break;
             }
             case FlagTankInteraction.PICK: {
                 assert(flag !== undefined);
+                const flagTeamId = flag.getComponent(TeamOwnedComponent).teamId;
                 const flagColor = flag.getComponent(ColorComponent).value;
-                this.tankService.setTankFlag(tank.id, flag.teamId, flagColor, flag.sourceId);
+                this.tankService.setTankFlag(tank.id, flagTeamId, flagColor, flag.sourceId);
                 this.gameObjectService.markDestroyed(flag);
                 break;
             }

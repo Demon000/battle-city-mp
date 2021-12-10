@@ -1,4 +1,5 @@
 import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
+import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { Config } from '@/config/Config';
 import { Registry } from '@/ecs/Registry';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
@@ -66,17 +67,18 @@ export class FlagService {
     }
 
     getFlagTankInteractionType(flag: Flag, tank: Tank): FlagTankInteraction | undefined {
+        const flagTeamId = flag.getComponent(TeamOwnedComponent).teamId;
         let interaction;
 
         if (tank.flagTeamId === null) {
-            if (tank.teamId !== flag.teamId && flag.flagType === FlagType.FULL) {
+            if (tank.teamId !== flagTeamId && flag.flagType === FlagType.FULL) {
                 interaction = FlagTankInteraction.STEAL;
             } else if (flag.flagType === FlagType.POLE_ONLY) {
                 interaction = FlagTankInteraction.PICK;
             }
         }
 
-        if (tank.flagTeamId !== null && tank.teamId === flag.teamId) {
+        if (tank.flagTeamId !== null && tank.teamId === flagTeamId) {
             if (tank.flagTeamId === tank.teamId && flag.flagType === FlagType.BASE_ONLY) {
                 interaction = FlagTankInteraction.RETURN;
             } else if (tank.flagTeamId !== tank.teamId && flag.flagType === FlagType.FULL) {

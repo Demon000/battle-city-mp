@@ -6,8 +6,10 @@
             x: 272,
             y: 1024,
         },
-        teamId: 'Red',
         components: {
+            TeamOwnedComponent: {
+                teamId: 'Red',
+            },
             ColorComponent: {
                 value: [
                     220,
@@ -65,8 +67,10 @@
             x: 848,
             y: 704,
         },
-        teamId: 'Blue',
         components: {
+            TeamOwnedComponent: {
+                teamId: 'Blue',
+            },
             ColorComponent: {
                 value: [
                     65,
@@ -124,8 +128,10 @@
             x: 688,
             y: 16,
         },
-        teamId: 'Yellow',
         components: {
+            TeamOwnedComponent: {
+                teamId: 'Yellow',
+            },
             ColorComponent: {
                 value: [
                     249,

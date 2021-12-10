@@ -33,6 +33,7 @@ import { BulletSpawnerComponent, BulletSpawnerComponentData } from '@/components
 import { EntitySpawnerActiveComponent, EntitySpawnerActiveComponentData } from '@/components/EntitySpawnerActiveComponent';
 import { SmokeSpawnerComponent, SmokeSpawnerComponentData } from '@/components/SmokeSpawnerComponent';
 import HealthBasedSmokeSpawnerComponentData, { HealthBasedSmokeSpawnerComponent } from '@/components/HealthBasedSmokeSpawnerComponent';
+import { TeamOwnedComponent, TeamOwnedComponentData } from '@/components/TeamOwnedComponent';
 
 export interface ProcessResults {
     clazz: ComponentClassType<any>;
@@ -184,6 +185,10 @@ export class ComponentRegistry {
             case HealthBasedSmokeSpawnerComponent.tag:
                 clazz = HealthBasedSmokeSpawnerComponent;
                 this.validate<HealthBasedSmokeSpawnerComponentData>(HealthBasedSmokeSpawnerComponent, data);
+                break;
+            case TeamOwnedComponent.tag:
+                clazz = TeamOwnedComponent;
+                this.validate<TeamOwnedComponentData>(TeamOwnedComponent, data);
                 break;
             default:
                 assert(false, `Invalid tag '${tag}'`);

@@ -10,7 +10,6 @@ export enum FlagType {
 }
 
 export interface FlagOptions extends GameObjectOptions {
-    teamId: string;
     flagType?: string;
     sourceId?: number;
     droppedTankId?: number;
@@ -21,7 +20,6 @@ export type PartialFlagOptions = Partial<FlagOptions>;
 export class Flag extends GameObject {
     protected _flagType: string;
 
-    teamId: string;
     sourceId: number | null;
     droppedTankId: number | null;
 
@@ -30,7 +28,6 @@ export class Flag extends GameObject {
 
         super(options, properties, registry);
 
-        this.teamId = options.teamId;
         this._flagType = options.flagType ?? FlagType.FULL;
         this.sourceId = options.sourceId ?? null;
         this.droppedTankId = options.droppedTankId ?? null;
@@ -39,7 +36,6 @@ export class Flag extends GameObject {
     toOptions(): FlagOptions {
         return {
             ...super.toOptions(),
-            teamId: this.teamId,
             flagType: this._flagType,
         };
     }
@@ -47,7 +43,6 @@ export class Flag extends GameObject {
     setOptions(options: PartialFlagOptions): void {
         super.setOptions(options);
 
-        if (options.teamId !== undefined) this.teamId = options.teamId;
         if (options.flagType !== undefined) this.flagType = options.flagType;
     }
 
