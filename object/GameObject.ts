@@ -16,8 +16,6 @@ export class GameObject extends Entity {
     graphicsDirty: boolean;
 
     properties;
-    type: string;
-    subtypes: string[];
 
     graphicsRenderer?: any;
     audioRenderer?: any;
@@ -29,8 +27,6 @@ export class GameObject extends Entity {
         super(registry, options.id, options.type, options.subtypes);
 
         this.properties = properties;
-        this.type = options.type;
-        this.subtypes = options.subtypes || [];
         this.graphicsDirty = true;
     }
 
