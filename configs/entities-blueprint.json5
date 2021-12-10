@@ -249,6 +249,7 @@
         components: {
             ColorComponent: {},
             TeamOwnedComponent: {},
+            FlagComponent: {},
         },
         localComponents: {
             SizeComponent: {
@@ -258,6 +259,13 @@
         },
         serverComponents: {
             SpawnTimeComponent: {},
+        },
+        clientComponents: {
+            GraphicDependenciesComponent: {
+                components: {
+                    FlagComponent: true,
+                },
+            },
         },
     },
     'tank': {

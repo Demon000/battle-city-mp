@@ -11,7 +11,7 @@ import { TextDrawable, TextPositionReference } from '@/drawable/TextDrawable';
 import { Entity } from '@/ecs/Entity';
 import { Explosion } from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
-import { Flag, FlagType } from '@/flag/Flag';
+import { FlagType } from '@/flag/FlagType';
 import { Direction } from '@/physics/Direction';
 import { DirectionComponent } from '@/physics/DirectionComponent';
 import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
@@ -24,6 +24,7 @@ import { GameObject } from './GameObject';
 import { GameObjectType } from './GameObjectType';
 import { RenderPass } from './RenderPass';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
+import { FlagComponent } from '@/flag/FlagComponent';
 
 const positionTest = (mod: number, divide: number, points: Point[]): DrawableTestFunction => {
     return (object: GameObject): boolean => {
@@ -160,11 +161,11 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             offsetX: 2,
             offsetY: 2,
             tests: [
-                (object: GameObject): boolean => {
-                    const flag = object as Flag;
+                (entity: Entity): boolean => {
+                    const flagComponent = entity.getComponent(FlagComponent);
 
-                    if (flag.flagType !== FlagType.FULL
-                        && flag.flagType !== FlagType.BASE_ONLY) {
+                    if (flagComponent.type !== FlagType.FULL
+                        && flagComponent.type !== FlagType.BASE_ONLY) {
                         return false;
                     }
 
@@ -177,11 +178,11 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             offsetX: 7,
             offsetY: -15,
             tests: [
-                (object: GameObject): boolean => {
-                    const flag = object as Flag;
+                (entity: Entity): boolean => {
+                    const flagComponent = entity.getComponent(FlagComponent);
 
-                    if (flag.flagType !== FlagType.FULL
-                        && flag.flagType !== FlagType.POLE_ONLY) {
+                    if (flagComponent.type !== FlagType.FULL
+                        && flagComponent.type !== FlagType.POLE_ONLY) {
                         return false;
                     }
 
@@ -199,11 +200,11 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                 return drawable.colorMask(color);
             },
             tests: [
-                (object: GameObject): boolean => {
-                    const flag = object as Flag;
+                (entity: Entity): boolean => {
+                    const flagComponent = entity.getComponent(FlagComponent);
 
-                    if (flag.flagType !== FlagType.FULL
-                        && flag.flagType !== FlagType.POLE_ONLY) {
+                    if (flagComponent.type !== FlagType.FULL
+                        && flagComponent.type !== FlagType.POLE_ONLY) {
                         return false;
                     }
 

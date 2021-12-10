@@ -35,8 +35,8 @@ import { ComponentEmitOptions, Registry, RegistryComponentEvent, RegistryEvent }
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
-import { Flag, FlagType, PartialFlagOptions } from '@/flag/Flag';
-import { FlagService, FlagServiceEvent, FlagTankInteraction } from '@/flag/FlagService';
+import { FlagType } from '@/flag/FlagType';
+import { FlagService, FlagTankInteraction } from '@/flag/FlagService';
 import { PlayerPointsEvent } from '@/player/PlayerPoints';
 import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
@@ -58,6 +58,7 @@ import { HealthComponent } from '@/components/HealthComponent';
 import { EntitySpawnerService } from '@/entity-spawner/EntitySpawnerService';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
+import { FlagComponent } from '@/flag/FlagComponent';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -347,11 +348,6 @@ export class GameServer {
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_CHANGED, tankId, tankOptions]);
             });
 
-        this.flagService.emitter.on(FlagServiceEvent.FLAG_UPDATED,
-            (flagId: number, flagOptions: PartialFlagOptions) => {
-                this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_CHANGED, flagId, flagOptions]);
-            });
-
         /**
          * CollisionService event handlers
          */
@@ -508,7 +504,7 @@ export class GameServer {
         this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_FLAG,
             (tankId: number, flagId: number) => {
                 const tank = this.registry.getEntityById(tankId) as Tank;
-                const flag = this.registry.getEntityById(flagId) as Flag;
+                const flag = this.registry.getEntityById(flagId);
                 const interaction = this.flagService.getFlagTankInteractionType(flag, tank);
                 if (interaction !== undefined) {
                     this.handleFlagInteraction(tank, flag, interaction);
@@ -629,7 +625,7 @@ export class GameServer {
 
     handleFlagInteraction(
         tank: Tank,
-        flag: Flag | undefined,
+        flag: Entity | undefined,
         interaction: FlagTankInteraction,
     ): void {
         const playerId = tank.getComponent(PlayerOwnedComponent).playerId;
@@ -647,7 +643,8 @@ export class GameServer {
                 assert(flag !== undefined);
                 const flagTeamId = flag.getComponent(TeamOwnedComponent).teamId;
                 const flagColor = flag.getComponent(ColorComponent).value;
-                this.tankService.setTankFlag(tank.id, flagTeamId, flagColor, flag.sourceId);
+                const flagSourceId = flag.getComponent(FlagComponent).sourceId;
+                this.tankService.setTankFlag(tank.id, flagTeamId, flagColor, flagSourceId);
                 this.gameObjectService.markDestroyed(flag);
                 break;
             }
