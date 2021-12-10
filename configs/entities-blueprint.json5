@@ -303,7 +303,7 @@
             },
         },
         clientComponents: {
-            IsUnderBushComponent: {},
+            IsUnderBushTrackingComponent: {},
             GraphicDependenciesComponent: {
                 components: {
                     'IsMovingComponent': true,

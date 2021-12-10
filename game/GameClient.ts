@@ -144,6 +144,7 @@ export class GameClient {
                     const entity = component.entity;
                     this.collisionService.processObjectDirtyBoundingBox(entity);
                     this.gameObjectService.markDirtyCenterPosition(entity);
+                    this.gameObjectService.markDirtyIsUnderBush(entity);
                 });
         this.registry.componentEmitter(SizeComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
@@ -368,8 +369,8 @@ export class GameClient {
     onTick(): void {
         this.gameObjectService.processObjectsDirtyIsMoving();
         this.gameObjectService.processObjectsDirtyCenterPosition();
+        this.collisionService.processObjectsDirtyIsUnderBush();
         this.gameObjectService.processObjectsDestroyed();
-        this.collisionService.processObjectsIsUnderBush();
         this.gameGraphicsService.processObjectsDirtyGraphics();
 
         const ownPlayer = this.playerService.getOwnPlayer();

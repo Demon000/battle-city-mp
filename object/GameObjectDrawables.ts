@@ -326,8 +326,8 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             positionXReference: 'center',
             tests: [
                 (entity: Entity): boolean => {
-                    const isUnderBush
-                        = entity.getComponent(IsUnderBushComponent).value;
+                    const isUnderBush = entity
+                        .hasComponent(IsUnderBushComponent);
 
                     if (isUnderBush) {
                         return false;

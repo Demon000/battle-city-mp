@@ -1,5 +1,6 @@
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { DirectionAxisSnappingComponent } from '@/components/DirectionAxisSnappingComponent';
+import { DirtyIsUnderBushComponent } from '@/components/DirtyIsUnderBushComponent';
 import { IsUnderBushComponent } from '@/components/IsUnderBushComponent';
 import { MovementMultipliersComponent } from '@/components/MovementMultipliersComponent';
 import { ComponentFlags } from '@/ecs/Component';
@@ -359,17 +360,21 @@ export class CollisionService {
         return false;
     }
 
-    processObjectsIsUnderBush(): void {
-        for (const component of this.registry.getComponents(IsUnderBushComponent)) {
-            const object = component.entity as GameObject;
-            const isUnderBush = this.isOverlappingWithType(object, GameObjectType.BUSH);
-            if (component.value === isUnderBush) {
-                continue;
-            }
+    processObjectsDirtyIsUnderBush(): void {
+        for (const component of this.registry.getComponents(DirtyIsUnderBushComponent)) {
+            component.remove();
 
-            component.update({
-                value: isUnderBush,
-            });
+            const entity = component.entity;
+            const isUnderBushComponent = entity.findComponent(IsUnderBushComponent);
+            const isUnderBush = this.isOverlappingWithType(entity, GameObjectType.BUSH);
+
+            if (isUnderBush && isUnderBushComponent === undefined) {
+                entity.addComponent(IsUnderBushComponent, undefined, {
+                    flags: ComponentFlags.LOCAL_ONLY,
+                });
+            } else if (!isUnderBush && isUnderBushComponent !== undefined) {
+                entity.removeComponent(IsUnderBushComponent);
+            }
         }
     }
 

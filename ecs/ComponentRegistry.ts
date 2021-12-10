@@ -35,6 +35,8 @@ import { SmokeSpawnerComponent, SmokeSpawnerComponentData } from '@/components/S
 import HealthBasedSmokeSpawnerComponentData, { HealthBasedSmokeSpawnerComponent } from '@/components/HealthBasedSmokeSpawnerComponent';
 import { TeamOwnedComponent, TeamOwnedComponentData } from '@/components/TeamOwnedComponent';
 import { FlagComponent, FlagComponentData } from '@/flag/FlagComponent';
+import { IsUnderBushTrackingComponent, IsUnderBushTrackingComponentData } from '@/components/IsUnderBushTrackingComponent';
+import { DirtyIsUnderBushComponent, DirtyIsUnderBushComponentData } from '@/components/DirtyIsUnderBushComponent';
 
 export interface ProcessResults {
     clazz: ComponentClassType<any>;
@@ -194,6 +196,14 @@ export class ComponentRegistry {
             case FlagComponent.tag:
                 clazz = FlagComponent;
                 this.validate<FlagComponentData>(FlagComponent, data);
+                break;
+            case IsUnderBushTrackingComponent.tag:
+                clazz = IsUnderBushTrackingComponent;
+                this.validate<IsUnderBushTrackingComponentData>(IsUnderBushTrackingComponent, data);
+                break;
+            case DirtyIsUnderBushComponent.tag:
+                clazz = DirtyIsUnderBushComponent;
+                this.validate<DirtyIsUnderBushComponentData>(DirtyIsUnderBushComponent, data);
                 break;
             default:
                 assert(false, `Invalid tag '${tag}'`);
