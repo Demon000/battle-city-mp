@@ -422,7 +422,7 @@ export class GameServer {
                 const bullet = this.registry.getEntityById(bulletId);
 
                 const bulletOwnerEntityId =
-                    bullet.getComponent(EntityOwnedComponent).entityId;
+                    bullet.getComponent(EntityOwnedComponent).id;
                 if (bulletOwnerEntityId === tankId) {
                     return;
                 }
@@ -493,9 +493,9 @@ export class GameServer {
                 const movingBullet = this.registry.getEntityById(movingBulletId);
                 const staticBullet = this.registry.getEntityById(staticBulletId);
                 const movingBulletOwnerEntityId =
-                    staticBullet.getComponent(EntityOwnedComponent).entityId;
+                    staticBullet.getComponent(EntityOwnedComponent).id;
                 const staticBulletOwnerEntityId =
-                    staticBullet.getComponent(EntityOwnedComponent).entityId;
+                    staticBullet.getComponent(EntityOwnedComponent).id;
                 if (movingBulletOwnerEntityId === staticBulletOwnerEntityId) {
                     return;
                 }

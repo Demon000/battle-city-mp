@@ -34,7 +34,7 @@ export class EntitySpawnerService {
         }
 
         const ownerEntity = this.registry
-            .getEntityById(entityOwnedComponent.entityId);
+            .getEntityById(entityOwnedComponent.id);
 
         let clazz;
         switch (entity.type) {
