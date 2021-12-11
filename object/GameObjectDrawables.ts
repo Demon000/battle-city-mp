@@ -18,13 +18,11 @@ import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent
 import { Point } from '@/physics/point/Point';
 import { PositionComponent } from '@/physics/point/PositionComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
-import { Tank } from '@/tank/Tank';
 import { TankTier } from '@/tank/TankTier';
 import { GameObject } from './GameObject';
 import { GameObjectType } from './GameObjectType';
 import { RenderPass } from './RenderPass';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
-import { FlagComponent } from '@/flag/FlagComponent';
 
 const positionTest = (
     mod: number,
@@ -159,34 +157,19 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             ],
         }),
     ],
-    [GameObjectType.FLAG]: [
+    [GameObjectType.FLAG_BASE]: [
         new ImageDrawable('flag_base.png', {
             renderPass: RenderPass.FLAG_BASE,
-            offsetX: 2,
-            offsetY: 2,
-            tests: [
-                (entity: Entity): boolean => {
-                    const flagComponent = entity.getComponent(FlagComponent);
-
-                    if (flagComponent.type !== FlagType.FULL
-                        && flagComponent.type !== FlagType.BASE_ONLY) {
-                        return false;
-                    }
-
-                    return true;
-                },
-            ],
         }),
+    ],
+    [GameObjectType.FLAG]: [
         new ImageDrawable('flag_pole.png', {
             renderPass: RenderPass.FLAG_POLE,
             offsetX: 7,
             offsetY: -15,
             tests: [
                 (entity: Entity): boolean => {
-                    const flagComponent = entity.getComponent(FlagComponent);
-
-                    if (flagComponent.type !== FlagType.FULL
-                        && flagComponent.type !== FlagType.POLE_ONLY) {
+                    if (entity.subtypes[0] !== FlagType.DROPPED) {
                         return false;
                     }
 
@@ -205,10 +188,46 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             },
             tests: [
                 (entity: Entity): boolean => {
-                    const flagComponent = entity.getComponent(FlagComponent);
+                    if (entity.subtypes[0] !== FlagType.DROPPED) {
+                        return false;
+                    }
 
-                    if (flagComponent.type !== FlagType.FULL
-                        && flagComponent.type !== FlagType.POLE_ONLY) {
+                    return true;
+                },
+            ],
+            overlays: [
+                new ImageDrawable('flag_cloth_shadows.png', {
+                    renderPass: RenderPass.FLAG_POLE,
+                    compositionType: 'difference',
+                }),
+            ],
+        }),
+        new ImageDrawable('flag_pole_tank.png', {
+            renderPass: RenderPass.FLAG_POLE,
+            offsetX: 8,
+            offsetY: -5,
+            tests: [
+                (entity: Entity): boolean => {
+                    if (entity.subtypes[0] !== FlagType.CARRIED) {
+                        return false;
+                    }
+
+                    return true;
+                },
+            ],
+        }),
+        new ImageDrawable('flag_cloth.png', {
+            renderPass: RenderPass.FLAG_POLE,
+            offsetX: 9,
+            offsetY: -5,
+            processor: function (entity: Entity) {
+                const drawable = this as IImageDrawable;
+                const color = entity.getComponent(ColorComponent).value;
+                return drawable.colorMask(color);
+            },
+            tests: [
+                (entity: Entity): boolean => {
+                    if (entity.subtypes[0] !== FlagType.CARRIED) {
                         return false;
                     }
 
@@ -381,52 +400,6 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
 
                 return drawable.offset(offsetX, offsetY);
             },
-        }),
-        new ImageDrawable('flag_pole_tank.png', {
-            renderPass: RenderPass.FLAG_POLE,
-            offsetX: 8,
-            offsetY: -5,
-            tests: [
-                (object: GameObject): boolean => {
-                    const tank = object as Tank;
-
-                    if (tank.flagColor === null) {
-                        return false;
-                    }
-
-                    return true;
-                },
-            ],
-        }),
-        new ImageDrawable('flag_cloth.png', {
-            renderPass: RenderPass.FLAG_POLE,
-            offsetX: 9,
-            offsetY: -5,
-            processor: function (object: GameObject) {
-                const tank = object as Tank;
-                if (tank.flagColor === null) {
-                    return this;
-                }
-
-                const drawable = this as IImageDrawable;
-                return drawable.colorMask(tank.flagColor);
-            },
-            tests: [
-                (object: GameObject): boolean => {
-                    const tank = object as Tank;
-                    if (tank.flagColor === null) {
-                        return false;
-                    }
-
-                    return true;
-                },
-            ],
-            overlays: [
-                new ImageDrawable('flag_cloth_shadows.png', {
-                    renderPass: RenderPass.FLAG_POLE,
-                    compositionType: 'difference',
-                }),
-            ],
         }),
     ],
     [GameObjectType.SMOKE]: [

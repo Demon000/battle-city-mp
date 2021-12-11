@@ -1,18 +1,15 @@
+import { ColorComponent } from '@/components/ColorComponent';
 import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
 import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { Config } from '@/config/Config';
 import { Entity } from '@/ecs/Entity';
-import { Registry } from '@/ecs/Registry';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
-import { PositionComponent } from '@/physics/point/PositionComponent';
-import { Tank } from '@/tank/Tank';
-import { assert } from '@/utils/assert';
+import { Point } from '@/physics/point/Point';
 import { FlagComponent } from './FlagComponent';
 import { FlagType } from './FlagType';
 
 export enum FlagTankInteraction {
-    STEAL,
     PICK,
     CAPTURE,
     RETURN,
@@ -22,79 +19,123 @@ export enum FlagTankInteraction {
 export class FlagService {
     constructor(
         private gameObjectFactory: GameObjectFactory,
-        private registry: Registry,
         private config: Config,
     ) {}
 
-    createFlagForTank(tank: Tank): Entity {
-        assert(tank.flagTeamId !== null);
-        assert(tank.flagColor !== null);
+    createCarriedFlagFromDropped(
+        flag: Entity,
+        flagBase: Entity | undefined,
+    ): Entity {
+        const teamOwnedComponent = flag.getComponent(TeamOwnedComponent);
+        const colorComponent = flag.getComponent(ColorComponent);
+        const flagComponent = flag.getComponent(FlagComponent);
 
-        const position = tank.getComponent(PositionComponent);
+        if (flagBase !== undefined && flagComponent.sourceId === -1) {
+            flagComponent.sourceId = flagBase.id;
+        }
+
         return this.gameObjectFactory.buildFromOptions({
             type: GameObjectType.FLAG,
+            subtypes: [FlagType.CARRIED],
             components: {
-                PositionComponent: position,
-                TeamOwnedComponent: {
-                    teamId: tank.flagTeamId,
-                },
-                ColorComponent: {
-                    value: tank.flagColor,
-                },
-                FlagComponent: {
-                    type: FlagType.POLE_ONLY,
-                    sourceId: tank.flagSourceId,
-                    droppedTankId: tank.id,
-                },
+                TeamOwnedComponent: teamOwnedComponent,
+                ColorComponent: colorComponent,
+                FlagComponent: flagComponent,
             },
         });
     }
 
-    setFlagType(flagId: number, type: FlagType): void {
-        const entity = this.registry.getEntityById(flagId);
-        const flagComponent = entity.getComponent(FlagComponent);
-
-        flagComponent.update({
-            type,
+    createDroppedFlagFromCarried(
+        tank: Entity,
+        flag: Entity,
+        position: Point,
+    ): Entity {
+        const teamOwnedComponent = flag.getComponent(TeamOwnedComponent);
+        const colorComponent = flag.getComponent(ColorComponent);
+        const flagComponent = flag.getComponent(FlagComponent);
+        flagComponent.droppedTankId = tank.id;
+        return this.gameObjectFactory.buildFromOptions({
+            type: GameObjectType.FLAG,
+            subtypes: [FlagType.DROPPED],
+            components: {
+                TeamOwnedComponent: teamOwnedComponent,
+                ColorComponent: colorComponent,
+                FlagComponent: flagComponent,
+                PositionComponent: position,
+            },
         });
     }
 
-    getFlagTankInteractionType(
-        flag: Entity,
-        tank: Tank,
+    findFlagTankInteractionType(
+        tank: Entity,
+        flag?: Entity,
+        carriedFlag?: Entity,
+        flagBase?: Entity,
     ): FlagTankInteraction | undefined {
-        const flagTeamId = flag.getComponent(TeamOwnedComponent).teamId;
-        const tankTeamId = tank.getComponent(TeamOwnedComponent).teamId;
-        const flagComponent = flag.getComponent(FlagComponent);
-        let interaction;
+        const tankTeamId = tank
+            .getComponent(TeamOwnedComponent).teamId;
+        const flagTeamId = flag
+            ?.getComponent(TeamOwnedComponent).teamId;
+        const carriedFlagTeamId = carriedFlag
+            ?.getComponent(TeamOwnedComponent).teamId;
+        const flagBaseTeamId = flagBase
+            ?.getComponent(TeamOwnedComponent).teamId;
 
-        if (tank.flagTeamId === null) {
-            if (tankTeamId !== flagTeamId
-                && flagComponent.type === FlagType.FULL) {
-                interaction = FlagTankInteraction.STEAL;
-            } else if (flagComponent.type === FlagType.POLE_ONLY) {
+        /*
+         * Pick up flag. Must not be carrying a flag. If the flag is from the
+         * same team as the tank, then the flag must not be on its base.
+         */
+        if (carriedFlag === undefined && flag !== undefined) {
+            let interaction;
+
+            if (flagBase === undefined && flagTeamId === tankTeamId) {
+                interaction = FlagTankInteraction.PICK;
+            } else if (flagTeamId !== tankTeamId) {
                 interaction = FlagTankInteraction.PICK;
             }
-        }
 
-        if (tank.flagTeamId !== null && tankTeamId === flagTeamId) {
-            if (tank.flagTeamId === tankTeamId
-                && flagComponent.type === FlagType.BASE_ONLY) {
-                interaction = FlagTankInteraction.RETURN;
-            } else if (tank.flagTeamId !== tankTeamId
-                && flagComponent.type === FlagType.FULL) {
-                interaction = FlagTankInteraction.CAPTURE;
+            if (interaction !== undefined) {
+                const pickupIgnoreTime = this.config
+                    .get<number>('flag', 'pickupIgnoreTime');
+                const flagComponent = flag.getComponent(FlagComponent);
+                const spawnTime = flag.getComponent(SpawnTimeComponent).value;
+                if (flagComponent.droppedTankId === tank.id
+                    && spawnTime + pickupIgnoreTime >= Date.now()) {
+                    interaction = undefined;
+                }
+            }
+
+            if (interaction !== undefined) {
+                return interaction;
             }
         }
 
-        const pickupIgnoreTime = this.config
-            .get<number>('flag', 'pickupIgnoreTime');
-        const spawnTime = flag.getComponent(SpawnTimeComponent).value;
-        if (flagComponent.droppedTankId === tank.id
-            && spawnTime + pickupIgnoreTime >= Date.now()) {
-            interaction = undefined;
+        /*
+         * Return flag to its base. Must be carrying a flag from the same team
+         * as the tank.
+         */
+        if (carriedFlag !== undefined && flag === undefined
+            && flagBase !== undefined && tankTeamId === carriedFlagTeamId) {
+            return FlagTankInteraction.RETURN;
         }
 
-        return interaction;
+        /*
+         * Capture flag. Must be carrying a flag from another team and the flag
+         * of the tank's team must be on its base.
+         */
+        if (carriedFlag !== undefined && flag !== undefined
+            && flagBase !== undefined && carriedFlagTeamId !== flagTeamId
+            && flagTeamId === flagBaseTeamId) {
+            return FlagTankInteraction.CAPTURE;
+        }
+
+        /*
+         * Drop flag. Must not be at enemies base.
+         */
+        if (carriedFlag !== undefined && flagBase === undefined) {
+            return FlagTankInteraction.DROP;
+        }
+
+        return undefined;
     }
 }

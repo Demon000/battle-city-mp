@@ -20,6 +20,7 @@ import { DirectionComponent } from '../DirectionComponent';
 import { Point } from '../point/Point';
 import { PointUtils } from '../point/PointUtils';
 import { PositionComponent } from '../point/PositionComponent';
+import { RelativePositionChildrenComponent } from '../point/RelativePositionChildrenComponent';
 import { RequestedPositionComponent } from '../point/RequestedPositionComponent';
 import { RequestedDirectionComponent } from '../RequestedDirectionComponent';
 import { SizeComponent } from '../size/SizeComponent';
@@ -345,7 +346,49 @@ export class CollisionService {
         }
     }
 
-    private isOverlappingWithType(entity: Entity, type: string): boolean {
+    findRelativePositionEntityWithType(
+        entity: Entity,
+        type: string,
+    ): Entity | undefined {
+        const relativePositionChildrenComponent = entity
+            .findComponent(RelativePositionChildrenComponent);
+        if (relativePositionChildrenComponent === undefined) {
+            return undefined;
+        }
+
+        for (const childId of
+            Object.keys(relativePositionChildrenComponent.ids)) {
+            const child = this.registry.getEntityById(+childId);
+            if (child.type === type) {
+                return child;
+            }
+        }
+
+        return undefined;
+    }
+
+    addRelativePositionEntity(parent: Entity, child: Entity): void {
+        const relativePositionChildrenComponent = parent
+            .getComponent(RelativePositionChildrenComponent);
+        relativePositionChildrenComponent.ids[child.id] = true;
+        relativePositionChildrenComponent.update({
+            ids: relativePositionChildrenComponent.ids,
+        });
+    }
+
+    removeRelativePositionEntity(parent: Entity, child: Entity): void {
+        const relativePositionChildrenComponent = parent
+            .getComponent(RelativePositionChildrenComponent);
+        delete relativePositionChildrenComponent.ids[child.id];
+        relativePositionChildrenComponent.update({
+            ids: relativePositionChildrenComponent.ids,
+        });
+    }
+
+    findOverlappingWithType(
+        entity: Entity,
+        type: string,
+    ): Entity | undefined {
         const boundingBox = entity.getComponent(BoundingBoxComponent);
         const overlappingObjectIds = this.getOverlappingObjects(boundingBox);
         const overlappingObjects = this.registry
@@ -353,11 +396,15 @@ export class CollisionService {
 
         for (const overlappingObject of overlappingObjects) {
             if (overlappingObject.type === type) {
-                return true;
+                return overlappingObject;
             }
         }
 
-        return false;
+        return undefined;
+    }
+
+    private isOverlappingWithType(entity: Entity, type: string): boolean {
+        return this.findOverlappingWithType(entity, type) !== undefined;
     }
 
     processObjectsDirtyIsUnderBush(): void {

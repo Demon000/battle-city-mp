@@ -15,6 +15,7 @@ export enum GameObjectType {
     GRASS = 'grass',
     DIRT = 'dirt',
     FLAG = 'flag',
+    FLAG_BASE = 'flag-base',
 }
 
 export function isGameObjectType(type: string): boolean {

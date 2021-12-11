@@ -1,24 +1,14 @@
 import { HealthComponent } from '@/components/HealthComponent';
 import { Color } from '@/drawable/Color';
+import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { Point } from '@/physics/point/Point';
 import { Player } from '@/player/Player';
-import EventEmitter from 'eventemitter3';
-import { Tank, PartialTankOptions } from './Tank';
-
-export enum TankServiceEvent {
-    TANK_UPDATED = 'tank-updated',
-}
-
-export interface TankServiceEvents {
-    [TankServiceEvent.TANK_UPDATED]: (tankId: number, options: PartialTankOptions) => void,
-}
 
 export class TankService {
     private ownPlayerTankId: number | null = null;
-    emitter = new EventEmitter<TankServiceEvents>();
 
     constructor(
         private gameObjectFactory: GameObjectFactory,
@@ -29,7 +19,7 @@ export class TankService {
         player: Player,
         position: Point,
         color: Color,
-    ): Tank {
+    ): Entity {
         return this.gameObjectFactory.buildFromOptions({
             type: GameObjectType.TANK,
             subtypes: [player.requestedTankTier],
@@ -46,7 +36,7 @@ export class TankService {
                     value: color,
                 },
             },
-        }) as Tank;
+        });
     }
 
     setOwnPlayerTankId(tankId: number | null): void {
@@ -55,22 +45,6 @@ export class TankService {
 
     getOwnPlayerTankId(): number | null {
         return this.ownPlayerTankId;
-    }
-
-    setTankFlag(tankId: number, teamId: string | null, color: Color | null, sourceId: number | null): void {
-        const tank = this.registry.getEntityById(tankId) as Tank;
-        tank.flagTeamId = teamId;
-        tank.flagColor = color;
-        tank.flagSourceId = sourceId;
-
-        this.emitter.emit(TankServiceEvent.TANK_UPDATED, tankId, {
-            flagTeamId: teamId,
-            flagColor: color,
-        });
-    }
-
-    clearTankFlag(tankId: number): void {
-        this.setTankFlag(tankId, null, null, null);
     }
 
     decreaseTankHealth(tankId: number, value: number): void {

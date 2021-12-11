@@ -1,7 +1,20 @@
 [
     // Red team
     {
+        type: 'flag-base',
+        position: {
+            x: 272,
+            y: 1024,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Red',
+            },
+        },
+    },
+    {
         type: 'flag',
+        subtypes: ['dropped'],
         position: {
             x: 272,
             y: 1024,
@@ -82,7 +95,20 @@
 
     // Blue team
     {
+        type: 'flag-base',
+        position: {
+            x: 848,
+            y: 704,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Blue',
+            },
+        },
+    },
+    {
         type: 'flag',
+        subtypes: ['dropped'],
         position: {
             x: 848,
             y: 704,
@@ -163,7 +189,20 @@
 
     // Yellow team
     {
+        type: 'flag-base',
+        position: {
+            x: 688,
+            y: 16,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Yellow',
+            },
+        },
+    },
+    {
         type: 'flag',
+        subtypes: ['dropped'],
         position: {
             x: 688,
             y: 16,

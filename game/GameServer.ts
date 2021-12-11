@@ -7,8 +7,7 @@ import { SameTeamBulletHitMode } from '@/game-mode/IGameModeProperties';
 import { GameObjectFactory, GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { Direction } from '@/physics/Direction';
-import { Tank, PartialTankOptions } from '@/tank/Tank';
-import { TankService, TankServiceEvent } from '@/tank/TankService';
+import { TankService } from '@/tank/TankService';
 import { TankTier } from '@/tank/TankTier';
 import { Team } from '@/team/Team';
 import { TeamService, TeamServiceEvent } from '@/team/TeamService';
@@ -35,7 +34,6 @@ import { ComponentEmitOptions, Registry, RegistryComponentEvent, RegistryEvent }
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
-import { FlagType } from '@/flag/FlagType';
 import { FlagService, FlagTankInteraction } from '@/flag/FlagService';
 import { PlayerPointsEvent } from '@/player/PlayerPoints';
 import { Config } from '@/config/Config';
@@ -49,7 +47,6 @@ import { Entity } from '@/ecs/Entity';
 import { EntityOwnedComponent } from '@/components/EntityOwnedComponent';
 import { BulletComponent } from '@/bullet/BulletComponent';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
-import { ColorComponent } from '@/components/ColorComponent';
 import { BoundingBoxComponent } from '@/physics/bounding-box/BoundingBoxComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
@@ -57,7 +54,6 @@ import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
 import { EntitySpawnerService } from '@/entity-spawner/EntitySpawnerService';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
-import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { FlagComponent } from '@/flag/FlagComponent';
 
 export enum GameServerEvent {
@@ -121,7 +117,7 @@ export class GameServer {
         this.gameObjectService = new GameObjectService(this.registry);
         this.entitySpawnerService = new EntitySpawnerService(this.gameObjectFactory, this.registry);
         this.tankService = new TankService(this.gameObjectFactory, this.registry);
-        this.flagService = new FlagService(this.gameObjectFactory, this.registry, this.config);
+        this.flagService = new FlagService(this.gameObjectFactory, this.config);
         this.bulletService = new BulletService(this.registry);
         this.gameMapService = new GameMapService(this.config, this.entityBlueprint);
         this.playerRepository = new MapRepository<string, Player>();
@@ -169,10 +165,16 @@ export class GameServer {
 
                 switch (object.type) {
                     case GameObjectType.TANK: {
-                        const tank = object as Tank;
+                        const carriedFlag = this.collisionService
+                            .findRelativePositionEntityWithType(entity,
+                                GameObjectType.FLAG);
+                        if (carriedFlag !== undefined) {
+                            this.handleFlagInteraction(entity, undefined,
+                                carriedFlag, undefined);
+                        }
+
                         const playerId = entity
                             .getComponent(PlayerOwnedComponent).playerId;
-                        this.handleFlagInteraction(tank, undefined, FlagTankInteraction.DROP);
                         this.playerService.setPlayerTankId(playerId, null);
                         break;
                     }
@@ -318,8 +320,14 @@ export class GameServer {
                     return;
                 }
 
-                const tank = this.registry.getEntityById(player.tankId) as Tank;
-                this.handleFlagInteraction(tank, undefined, FlagTankInteraction.DROP);
+                const tank = this.registry.getEntityById(player.tankId);
+                const carriedFlag = this.collisionService
+                    .findRelativePositionEntityWithType(tank,
+                        GameObjectType.FLAG);
+                if (carriedFlag !== undefined) {
+                    this.handleFlagInteraction(tank, undefined, carriedFlag,
+                        undefined);
+                }
             });
 
         /**
@@ -341,11 +349,6 @@ export class GameServer {
         this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_CHANGED,
             (objectId: number, objectOptions: PartialGameObjectOptions) => {
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_CHANGED, objectId, objectOptions]);
-            });
-
-        this.tankService.emitter.on(TankServiceEvent.TANK_UPDATED,
-            (tankId: number, tankOptions: PartialTankOptions) => {
-                this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_CHANGED, tankId, tankOptions]);
             });
 
         /**
@@ -423,7 +426,7 @@ export class GameServer {
                     return;
                 }
 
-                const tank = this.registry.getEntityById(tankId) as Tank;
+                const tank = this.registry.getEntityById(tankId);
                 const tankHealth = tank.getComponent(HealthComponent);
                 const bulletOwnerPlayerId =
                     bullet.getComponent(PlayerOwnedComponent).playerId;
@@ -503,12 +506,25 @@ export class GameServer {
 
         this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_FLAG,
             (tankId: number, flagId: number) => {
-                const tank = this.registry.getEntityById(tankId) as Tank;
+                const tank = this.registry.getEntityById(tankId);
                 const flag = this.registry.getEntityById(flagId);
-                const interaction = this.flagService.getFlagTankInteractionType(flag, tank);
-                if (interaction !== undefined) {
-                    this.handleFlagInteraction(tank, flag, interaction);
-                }
+                const carriedFlag = this.collisionService
+                    .findRelativePositionEntityWithType(tank,
+                        GameObjectType.FLAG);
+                const flagBase = this.collisionService
+                    .findOverlappingWithType(flag, GameObjectType.FLAG_BASE);
+                this.handleFlagInteraction(tank, flag, carriedFlag, flagBase);
+            });
+
+        this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_FLAG_BASE,
+            (tankId: number, flagBaseId: number) => {
+                const tank = this.registry.getEntityById(tankId);
+                const flagBase = this.registry.getEntityById(flagBaseId);
+                const carriedFlag = this.collisionService
+                    .findRelativePositionEntityWithType(tank,
+                        GameObjectType.FLAG);
+                this.handleFlagInteraction(tank, undefined, carriedFlag,
+                    flagBase);
             });
 
         /*
@@ -623,52 +639,81 @@ export class GameServer {
 
     }
 
-    handleFlagInteraction(
-        tank: Tank,
+    handleFlagPick(
+        tank: Entity,
+        flag: Entity,
+        flagBase: Entity | undefined,
+    ): void {
+        const carriedFlag = this.flagService
+            .createCarriedFlagFromDropped(flag, flagBase);
+        this.collisionService
+            .addRelativePositionEntity(tank, carriedFlag);
+        this.gameObjectService.markDestroyed(flag);
+    }
+
+    handleFlagDrop(
+        tank: Entity,
         flag: Entity | undefined,
+        carriedFlag: Entity,
+        flagBase: Entity | undefined,
         interaction: FlagTankInteraction,
     ): void {
         const playerId = tank.getComponent(PlayerOwnedComponent).playerId;
+        let position;
 
-        switch (interaction) {
-            case FlagTankInteraction.STEAL: {
-                assert(flag !== undefined);
-                const flagTeamId = flag.getComponent(TeamOwnedComponent).teamId;
-                const flagColor = flag.getComponent(ColorComponent).value;
-                this.tankService.setTankFlag(tank.id, flagTeamId, flagColor, flag.id);
-                this.flagService.setFlagType(flag.id, FlagType.BASE_ONLY);
-                break;
-            }
-            case FlagTankInteraction.PICK: {
-                assert(flag !== undefined);
-                const flagTeamId = flag.getComponent(TeamOwnedComponent).teamId;
-                const flagColor = flag.getComponent(ColorComponent).value;
-                const flagSourceId = flag.getComponent(FlagComponent).sourceId;
-                this.tankService.setTankFlag(tank.id, flagTeamId, flagColor, flagSourceId);
-                this.gameObjectService.markDestroyed(flag);
-                break;
-            }
-            case FlagTankInteraction.RETURN:
-                assert(flag !== undefined);
-                this.tankService.clearTankFlag(tank.id);
-                this.flagService.setFlagType(flag.id, FlagType.FULL);
-                this.playerService.addPlayerPoints(playerId, PlayerPointsEvent.RETURN_FLAG);
-                break;
-            case FlagTankInteraction.CAPTURE:
-                this.playerService.addPlayerPoints(playerId, PlayerPointsEvent.CAPTURE_FLAG);
-                if (tank.flagSourceId !== null) {
-                    this.flagService.setFlagType(tank.flagSourceId, FlagType.FULL);
-                }
-                this.tankService.clearTankFlag(tank.id);
-                break;
-            case FlagTankInteraction.DROP:
-                if (tank.flagTeamId !== null) {
-                    flag = this.flagService.createFlagForTank(tank);
-                    this.tankService.clearTankFlag(tank.id);
-                }
-                break;
-            default:
-                break;
+        if (interaction === FlagTankInteraction.DROP) {
+            position = tank.getComponent(PositionComponent);
+        } else if (interaction === FlagTankInteraction.RETURN) {
+            assert(flagBase !== undefined);
+
+            position = flagBase.getComponent(PositionComponent);
+        } else if (interaction === FlagTankInteraction.CAPTURE) {
+            assert(flag !== undefined);
+            assert(carriedFlag !== undefined);
+
+            const flagComponent = carriedFlag.getComponent(FlagComponent);
+            const carriedFlagBase = this.registry
+                .getEntityById(flagComponent.sourceId);
+            position = carriedFlagBase.getComponent(PositionComponent);
+        } else {
+            assert(false);
+        }
+
+        this.collisionService
+            .removeRelativePositionEntity(tank, carriedFlag);
+        this.flagService
+            .createDroppedFlagFromCarried(tank, carriedFlag, position);
+        this.gameObjectService.markDestroyed(carriedFlag);
+
+        if (interaction === FlagTankInteraction.RETURN) {
+            this.playerService.addPlayerPoints(playerId,
+                PlayerPointsEvent.RETURN_FLAG);
+        } else if (interaction === FlagTankInteraction.CAPTURE) {
+            this.playerService.addPlayerPoints(playerId,
+                PlayerPointsEvent.CAPTURE_FLAG);
+        }
+    }
+
+    handleFlagInteraction(
+        tank: Entity,
+        flag: Entity | undefined,
+        carriedFlag: Entity | undefined,
+        flagBase: Entity | undefined,
+    ): void {
+        const interaction = this.flagService
+            .findFlagTankInteractionType(tank, flag, carriedFlag, flagBase);
+        if (interaction === undefined) {
+            return;
+        }
+
+        if (interaction === FlagTankInteraction.PICK) {
+            assert(flag !== undefined);
+            this.handleFlagPick(tank, flag, flagBase);
+        } else if (interaction === FlagTankInteraction.DROP
+            || interaction === FlagTankInteraction.RETURN
+            || interaction === FlagTankInteraction.CAPTURE) {
+            assert(carriedFlag !== undefined);
+            this.handleFlagDrop(tank, flag, carriedFlag, flagBase, interaction);
         }
     }
 

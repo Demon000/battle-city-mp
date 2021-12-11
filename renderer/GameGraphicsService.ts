@@ -7,6 +7,7 @@ import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { Point } from '@/physics/point/Point';
 import { PositionComponent } from '@/physics/point/PositionComponent';
+import { RelativePositionChildrenComponent } from '@/physics/point/RelativePositionChildrenComponent';
 import { CanvasUtils, Context2D } from '@/utils/CanvasUtils';
 import { RatioUtils } from '@/utils/RatioUtils';
 import { GameObjectGraphicsRenderer } from '../object/GameObjectGraphicsRenderer';
@@ -80,27 +81,44 @@ export class GameGraphicsService {
         return object.graphicsRenderer;
     }
 
+    _renderObject(object: GameObject, drawX: number, drawY: number): void {
+        const renderer = this.getObjectRenderer(object);
+        renderer.update(this.scale);
+        if (!renderer.isRenderable()) {
+            return;
+        }
+
+        renderer.render(this.contexts, drawX, drawY);
+    }
+
     renderObject(object: GameObject): void {
         if (this.scale === 0) {
             return;
         }
 
-        const renderer = this.getObjectRenderer(object);
         const position = object.getComponent(PositionComponent);
         const objectRelativeX = Math.floor(position.x) - this.canvasX;
         const objectRelativeY = Math.floor(position.y) - this.canvasY;
         const objectDrawX = objectRelativeX * this.scale;
         const objectDrawY = objectRelativeY * this.scale;
-        renderer.render(this.contexts, objectDrawX, objectDrawY);
+        this._renderObject(object, objectDrawX, objectDrawY);
+
+        const relativePositionChildrenComponent =
+            object.findComponent(RelativePositionChildrenComponent);
+        if (relativePositionChildrenComponent === undefined) {
+            return;
+        }
+
+        for (const childId of
+            Object.keys(relativePositionChildrenComponent.ids)) {
+            const child = this.registry.getEntityById(+childId);
+            this._renderObject(child as GameObject, objectDrawX, objectDrawY);
+        }
     }
 
-    renderObjectsOver(objects: Iterable<GameObject>): void {
+    renderObjects(objects: Iterable<GameObject>): void {
         for (const object of objects) {
-            const renderer = this.getObjectRenderer(object);
-            renderer.update(this.scale);
-            if (renderer.isRenderable()) {
-                this.renderObject(object);
-            }
+            this.renderObject(object);
         }
     }
 

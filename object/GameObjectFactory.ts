@@ -2,7 +2,6 @@ import { Config } from '@/config/Config';
 import { Registry } from '@/ecs/Registry';
 import { EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { Explosion, ExplosionOptions } from '@/explosion/Explosion';
-import { Tank, TankOptions } from '../tank/Tank';
 import { GameObject, GameObjectOptions } from './GameObject';
 import { GameObjectProperties } from './GameObjectProperties';
 import { GameObjectType } from './GameObjectType';
@@ -49,9 +48,7 @@ export class GameObjectFactory {
         }
         let object;
 
-        if (options.type === GameObjectType.TANK) {
-            object = new Tank(options as TankOptions, properties, this.registry);
-        } else if (options.type === GameObjectType.EXPLOSION) {
+        if (options.type === GameObjectType.EXPLOSION) {
             object = new Explosion(options as ExplosionOptions, properties, this.registry);
         } else {
             object = new GameObject(options, properties, this.registry);

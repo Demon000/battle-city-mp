@@ -88,6 +88,7 @@ export class GameMap {
 
                 return {
                     type: options.type,
+                    subtypes: options.subtypes,
                     options,
                     components,
                 };

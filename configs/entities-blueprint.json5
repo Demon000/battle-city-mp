@@ -240,10 +240,24 @@
             SpawnTimeComponent: {},
         },
     },
-    'flag': {
+    'flag-base': {
         extends: [
             'positioned-entity',
             'bounding-boxed-entity',
+            'world-entity',
+        ],
+        components: {
+            TeamOwnedComponent: {},
+        },
+        localComponents: {
+            SizeComponent: {
+                width: 16,
+                height: 16,
+            },
+        },
+    },
+    'flag': {
+        extends: [
             'world-entity',
         ],
         components: {
@@ -268,6 +282,18 @@
             },
         },
     },
+    'flag-carried': {
+        extends: [
+            'flag',
+        ],
+    },
+    'flag-dropped': {
+        extends: [
+            'flag',
+            'positioned-entity',
+            'bounding-boxed-entity',
+        ],
+    },
     'tank': {
         extends: [
             'positioned-entity',
@@ -275,6 +301,7 @@
             'world-entity',
         ],
         components: {
+            RelativePositionChildrenComponent: {},
             TeamOwnedComponent: {},
             PlayerOwnedComponent: {},
             DirectionComponent: {},

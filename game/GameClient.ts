@@ -20,7 +20,6 @@ import { LazyIterable } from '@/utils/LazyIterable';
 import { GameObjectAudioRendererFactory } from '@/object/GameObjectAudioRendererFactory';
 import { TankTier } from '@/tank/TankTier';
 import { Color } from '@/drawable/Color';
-import { Tank } from '@/tank/Tank';
 import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
@@ -401,7 +400,7 @@ export class GameClient {
         const viewableObjects = this.registry
             .getMultipleEntitiesById(viewableObjectIds) as Iterable<GameObject>;
         this.gameGraphicsService.initializeRender(position);
-        this.gameGraphicsService.renderObjectsOver(viewableObjects);
+        this.gameGraphicsService.renderObjects(viewableObjects);
         this.gameAudioService.playObjectsAudioEffect(viewableObjects, position, box);
 
         this.emitter.emit(GameClientEvent.TICK);
@@ -420,7 +419,7 @@ export class GameClient {
             .map(player => {
                 let tank;
                 if (player.tankId !== null) {
-                    tank = this.registry.getEntityById(player.tankId) as Tank;
+                    tank = this.registry.getEntityById(player.tankId);
                 }
 
                 let team;
@@ -430,13 +429,15 @@ export class GameClient {
 
                 let tier;
                 if (tank) {
-                    tier = tank.subtypes[0] as TankTier;
+                    tier = tank.subtypes[0];
+                } else {
+                    tier = player.requestedTankTier;
                 }
 
                 return {
                     player,
                     team,
-                    tier: tier || player.requestedTankTier,
+                    tier,
                 };
             });
     }
