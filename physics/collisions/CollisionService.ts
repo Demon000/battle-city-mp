@@ -458,15 +458,14 @@ export class CollisionService {
             return;
         }
 
+        boundingBox.tl.x = position.x;
+        boundingBox.tl.y = position.y;
+        boundingBox.br.x = brx;
+        boundingBox.br.y = bry;
+
         boundingBox.update({
-            tl: {
-                x: position.x,
-                y: position.y,
-            },
-            br: {
-                x: brx,
-                y: bry,
-            },
+            tl: boundingBox.tl,
+            br: boundingBox.br,
         });
     }
 
