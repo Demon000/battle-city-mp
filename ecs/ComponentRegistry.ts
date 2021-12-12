@@ -40,6 +40,7 @@ import { DirtyIsUnderBushComponent, DirtyIsUnderBushComponentData } from '@/comp
 import { DirtyGraphicsComponent, DirtyGraphicsComponentData } from '@/components/DirtyGraphicsComponent';
 import { DirtyIsMovingComponent, DirtyIsMovingComponentData } from '@/components/DirtyIsMovingComponent';
 import { RelativePositionChildrenComponent, RelativePositionChildrenComponentData } from '@/physics/point/RelativePositionChildrenComponent';
+import { RelativePositionComponent, RelativePositionComponentData } from '@/physics/point/RelativePositionComponent';
 
 export class ComponentRegistry {
     _lookupAndValidate(
@@ -203,6 +204,10 @@ export class ComponentRegistry {
             case RelativePositionChildrenComponent.tag:
                 clazz = RelativePositionChildrenComponent;
                 assertEquals<Partial<RelativePositionChildrenComponentData>>(data);
+                break;
+            case RelativePositionComponent.tag:
+                clazz = RelativePositionComponent;
+                assertEquals<Partial<RelativePositionComponentData>>(data);
                 break;
             default:
                 assert(false, `Invalid tag '${tag}'`);

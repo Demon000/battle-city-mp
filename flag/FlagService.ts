@@ -23,6 +23,7 @@ export class FlagService {
     ) {}
 
     createCarriedFlagFromDropped(
+        tank: Entity,
         flag: Entity,
         flagBase: Entity | undefined,
     ): Entity {
@@ -38,6 +39,9 @@ export class FlagService {
             type: GameObjectType.FLAG,
             subtypes: [FlagType.CARRIED],
             components: {
+                RelativePositionComponent: {
+                    entityId: tank.id,
+                },
                 TeamOwnedComponent: teamOwnedComponent,
                 ColorComponent: colorComponent,
                 FlagComponent: flagComponent,

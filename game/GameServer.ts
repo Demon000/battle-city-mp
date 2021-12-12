@@ -645,7 +645,7 @@ export class GameServer {
         flagBase: Entity | undefined,
     ): void {
         const carriedFlag = this.flagService
-            .createCarriedFlagFromDropped(flag, flagBase);
+            .createCarriedFlagFromDropped(tank, flag, flagBase);
         this.collisionService
             .addRelativePositionEntity(tank, carriedFlag);
         this.gameObjectService.markDestroyed(flag);

@@ -286,6 +286,9 @@
         extends: [
             'flag',
         ],
+        components: {
+            RelativePositionComponent: {},
+        },
     },
     'flag-dropped': {
         extends: [
