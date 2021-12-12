@@ -1,0 +1,4 @@
+{
+    chunkSize: 64,
+    visibleChunks: 7,
+}

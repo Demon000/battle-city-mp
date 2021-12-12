@@ -56,6 +56,12 @@ export class GameClientSocket {
             case GameEvent.OBJECT_REGISTERED:
                 this.gameClient.onObjectRegistered(batch[1]);
                 break;
+            case GameEvent.OBJECTS_REGISTERED:
+                this.gameClient.onObjectsRegistered(batch[1]);
+                break;
+            case GameEvent.OBJECTS_UNREGISTERED:
+                this.gameClient.onObjectsUnregistered(batch[1]);
+                break;
             case GameEvent.OBJECT_CHANGED:
                 this.gameClient.onObjectChanged(batch[1], batch[2]);
                 break;

@@ -4,7 +4,7 @@ import { Color } from '@/drawable/Color';
 import { ExplosionOptions } from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { SameTeamBulletHitMode } from '@/game-mode/IGameModeProperties';
-import { GameObjectFactory, GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
+import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { Direction } from '@/physics/Direction';
 import { TankService } from '@/tank/TankService';
@@ -18,8 +18,8 @@ import EventEmitter from 'eventemitter3';
 import { Action, ActionType } from '../actions/Action';
 import { ButtonPressAction } from '../actions/ButtonPressAction';
 import { GameMapService } from '../maps/GameMapService';
-import { GameObject, PartialGameObjectOptions } from '../object/GameObject';
-import { GameObjectService, GameObjectServiceEvent } from '../object/GameObjectService';
+import { GameObject } from '../object/GameObject';
+import { GameObjectService } from '../object/GameObjectService';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
 import { rules } from '../physics/collisions/CollisionRules';
 import { CollisionService } from '../physics/collisions/CollisionService';
@@ -55,6 +55,8 @@ import { HealthComponent } from '@/components/HealthComponent';
 import { EntitySpawnerService } from '@/entity-spawner/EntitySpawnerService';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { FlagComponent } from '@/flag/FlagComponent';
+import { ChunkService, ChunkServiceEvent } from '@/chunk/ChunkService';
+import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -89,6 +91,7 @@ export class GameServer {
     private gameEventBatcher;
     private teamRepository;
     private teamService;
+    private chunkService;
     private timeService;
     ticker;
 
@@ -124,6 +127,7 @@ export class GameServer {
         this.playerService = new PlayerService(this.config, this.playerRepository);
         this.teamRepository = new MapRepository<string, Team>();
         this.teamService = new TeamService(this.teamRepository);
+        this.chunkService = new ChunkService(this.config);
         this.timeService = new TimeService(this.config);
         this.gameEventBatcher = new GameEventBatcher();
 
@@ -136,17 +140,24 @@ export class GameServer {
         this.registry.emitter.on(RegistryEvent.ENTITY_REGISTERED,
             (entity: Entity) => {
                 const object = entity as GameObject;
-                this.gameEventBatcher.addBroadcastEvent([
-                    GameEvent.OBJECT_REGISTERED,
-                    {
-                        type: object.type,
-                        subtypes: object.subtypes,
-                        options: object.toOptions(),
-                        components: object.getComponentsData({
-                            withoutFlags: ComponentFlags.LOCAL_ONLY,
-                        }),
-                    },
-                ]);
+                for (const player of this.playerService.getPlayers()) {
+                    if (!this.collisionService.isOverlappingWithBox(entity,
+                        player.visibleAreaBoundingBox)) {
+                        continue;
+                    }
+
+                    this.gameEventBatcher.addPlayerEvent(player.id, [
+                        GameEvent.OBJECT_REGISTERED,
+                        {
+                            type: object.type,
+                            subtypes: object.subtypes,
+                            options: object.toOptions(),
+                            components: object.getComponentsData({
+                                withoutFlags: ComponentFlags.LOCAL_ONLY,
+                            }),
+                        },
+                    ]);
+                }
 
                 switch (object.type) {
                     case GameObjectType.TANK: {
@@ -176,7 +187,17 @@ export class GameServer {
 
                 this.entitySpawnerService.handleEntityDestroyed(entity);
 
-                this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_UNREGISTERED, entity.id]);
+                for (const player of this.playerService.getPlayers()) {
+                    if (!this.collisionService.isOverlappingWithBox(entity,
+                        player.visibleAreaBoundingBox)) {
+                        continue;
+                    }
+
+                    this.gameEventBatcher.addPlayerEvent(player.id, [
+                        GameEvent.OBJECT_UNREGISTERED,
+                        entity.id
+                    ]);
+                }
             });
 
         this.registry.emitter.on(RegistryComponentEvent.COMPONENT_CHANGED,
@@ -196,6 +217,17 @@ export class GameServer {
                     this.gameObjectService.markDirtyCenterPosition(entity);
                     this.gameObjectService
                         .markRelativeChildrenDirtyPosition(entity);
+
+                    if (entity.type === GameObjectType.TANK) {
+                        const playerId = entity
+                            .findComponent(PlayerOwnedComponent)?.playerId;
+                        if (playerId !== undefined) {
+                            const player = this.playerService
+                                .getPlayer(playerId);
+                            this.chunkService.updatePlayerVisibleChunks(
+                                player, component);
+                        }
+                    }
                 });
         this.registry.componentEmitter(SizeComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
@@ -337,14 +369,6 @@ export class GameServer {
         this.teamService.emitter.on(TeamServiceEvent.TEAM_PLAYER_REMOVED,
             (teamId: string, playerId: string) => {
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.TEAM_PLAYER_REMOVED, teamId, playerId]);
-            });
-
-        /**
-         * GameObjectService event handlers
-         */
-        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_CHANGED,
-            (objectId: number, objectOptions: PartialGameObjectOptions) => {
-                this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_CHANGED, objectId, objectOptions]);
             });
 
         /**
@@ -526,6 +550,43 @@ export class GameServer {
             });
 
         /*
+         * Chunk service event handlers
+         */
+        this.chunkService.emitter.on(ChunkServiceEvent.PLAYER_LOAD_CHUNK,
+            (player: Player, box: BoundingBox) => {
+                const objectIdsIterable = this.collisionService
+                    .getOverlappingObjects(box);
+                const objectsOptions =
+                    LazyIterable.from(objectIdsIterable)
+                        .map(objectId => {
+                            const object = this.registry
+                                .getEntityById(objectId) as GameObject;
+                            return {
+                                type: object.type,
+                                subtypes: object.subtypes,
+                                options: object.toOptions(),
+                                components: object.getComponentsData({
+                                    withoutFlags: ComponentFlags.LOCAL_ONLY,
+                                }),
+                            };
+                        })
+                        .toArray();
+                this.gameEventBatcher.addPlayerEvent(player.id,
+                    [GameEvent.OBJECTS_REGISTERED, objectsOptions]);
+            });
+
+        this.chunkService.emitter.on(ChunkServiceEvent.PLAYER_UNLOAD_CHUNK,
+            (player: Player, box: BoundingBox) => {
+                const objectIdsIterable = this.collisionService
+                    .getOverlappingObjects(box);
+                const objectIds =
+                    LazyIterable.from(objectIdsIterable)
+                    .toArray();
+                this.gameEventBatcher.addPlayerEvent(player.id,
+                    [GameEvent.OBJECTS_UNREGISTERED, objectIds]);
+            });
+
+        /*
          * Time Service event handlers
          */
         this.timeService.emitter.on(TimeServiceEvent.ROUND_TIME_UPDATED,
@@ -612,30 +673,40 @@ export class GameServer {
                 assert(false);
         }
 
-        if (gameEvent === GameEvent.ENTITY_COMPONENT_REMOVED) {
-            this.gameEventBatcher.addBroadcastEvent([
+        const eventShouldHaveData =
+            gameEvent === GameEvent.ENTITY_COMPONENT_ADDED
+            || gameEvent === GameEvent.ENTITY_COMPONENT_UPDATED;
+
+        let eventData;
+        if (gameEvent === GameEvent.ENTITY_COMPONENT_REMOVED
+            || (eventShouldHaveData && data === undefined)) {
+            eventData = [
                 gameEvent,
                 component.entity.id,
                 component.clazz.tag,
-            ]);
-        } else if (gameEvent === GameEvent.ENTITY_COMPONENT_ADDED
-            || gameEvent === GameEvent.ENTITY_COMPONENT_UPDATED) {
-            if (data === undefined) {
-                this.gameEventBatcher.addBroadcastEvent([
-                    gameEvent,
-                    component.entity.id,
-                    component.clazz.tag,
-                ]);
-            } else {
-                this.gameEventBatcher.addBroadcastEvent([
-                    gameEvent,
-                    component.entity.id,
-                    component.clazz.tag,
-                    data,
-                ]);
-            }
+            ];
+        } else if (eventShouldHaveData) {
+            eventData = [
+                gameEvent,
+                component.entity.id,
+                component.clazz.tag,
+                data,
+            ];
         }
 
+        if (eventData === undefined) {
+            return;
+        }
+
+        for (const player of this.playerService.getPlayers()) {
+            if (!this.collisionService.isOverlappingWithBox(component.entity,
+                player.visibleAreaBoundingBox)) {
+                continue;
+            }
+
+            this.gameEventBatcher.addPlayerEvent(player.id,
+                eventData as UnicastBatchGameEvent);
+        }
     }
 
     handleFlagPick(
@@ -716,21 +787,6 @@ export class GameServer {
     }
 
     sendRequestedServerStatus(playerId?: string): void {
-        const objects = this.registry.getEntities() as Iterable<GameObject>;
-        const objectsOptions =
-            LazyIterable.from(objects)
-                .map(object => {
-                    return {
-                        type: object.type,
-                        subtypes: object.subtypes,
-                        options: object.toOptions(),
-                        components: object.getComponentsData({
-                            withoutFlags: ComponentFlags.LOCAL_ONLY,
-                        }),
-                    };
-                })
-                .toArray() as Iterable<GameObjectFactoryBuildOptions>;
-
         const players = this.playerService.getPlayers();
         const playersOptions =
             LazyIterable.from(players)
@@ -755,7 +811,6 @@ export class GameServer {
         ]);
 
         const event: CommonBatchGameEvent = [GameEvent.SERVER_STATUS, {
-            objectsOptions,
             playersOptions,
             teamsOptions,
             configsData,

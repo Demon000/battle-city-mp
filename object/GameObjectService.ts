@@ -27,24 +27,13 @@ import { RequestedDirectionComponent } from '@/physics/RequestedDirectionCompone
 import { SizeComponent } from '@/physics/size/SizeComponent';
 import { assert } from '@/utils/assert';
 import { Random } from '@/utils/Random';
-import EventEmitter from 'eventemitter3';
 import { Direction } from '../physics/Direction';
 import { Point } from '../physics/point/Point';
 import { PointUtils } from '../physics/point/PointUtils';
 import { GameObject, PartialGameObjectOptions } from './GameObject';
 import { GameObjectType } from './GameObjectType';
 
-export enum GameObjectServiceEvent {
-    OBJECT_CHANGED = 'object-changed',
-}
-
-export interface GameObjectServiceEvents {
-    [GameObjectServiceEvent.OBJECT_CHANGED]: (objectId: number, options: PartialGameObjectOptions) => void,
-}
-
 export class GameObjectService {
-    emitter = new EventEmitter<GameObjectServiceEvents>();
-
     constructor(
         private registry: Registry,
     ) {}
