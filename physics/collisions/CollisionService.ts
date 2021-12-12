@@ -274,7 +274,8 @@ export class CollisionService {
         const preventedBoundingBox = BoundingBoxUtils
             .reposition(originalBoundingBox, originalPosition, position);
 
-        if (isValidPosition) {
+        if (isValidPosition && (position.x !== originalPosition.x
+            || position.y !== originalPosition.y)) {
             movingObject.updateComponent(PositionComponent, position);
         }
 
