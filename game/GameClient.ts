@@ -358,11 +358,12 @@ export class GameClient {
         LazyIterable.from(serverStatus.objectsOptions)
             .forEach(o => this.gameObjectFactory.buildFromOptions(o));
 
-        const visibleGameSize = this.config.get<number>('game-client', 'visibleGameSize');
-        this.gameGraphicsService.setTargetGameSize(visibleGameSize);
+        const maxVisibleGameSize = this.config.get<number>('game-client',
+            'maxVisibleGameSize');
+        this.gameGraphicsService.setMaxVisibleGameSize(maxVisibleGameSize);
 
         this.gameAudioService.clear();
-        this.gameAudioService.setMaxAudibleDistance(visibleGameSize);
+        this.gameAudioService.setMaxAudibleDistance(maxVisibleGameSize);
     }
 
     onTick(): void {

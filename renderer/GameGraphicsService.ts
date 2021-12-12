@@ -19,7 +19,7 @@ export class GameGraphicsService {
     private contexts!: Context2D[];
     private canvasX = 0;
     private canvasY = 0;
-    private targetGameSize = 0;
+    private maxVisibleGameSize = 0;
 
     constructor(
         private registry: Registry,
@@ -48,8 +48,8 @@ export class GameGraphicsService {
         }
     }
 
-    setTargetGameSize(targetGameSize: number): void {
-        this.targetGameSize = targetGameSize;
+    setMaxVisibleGameSize(maxVisibleGameSize: number): void {
+        this.maxVisibleGameSize = maxVisibleGameSize;
         this.calculateDimensions();
     }
 
@@ -66,8 +66,8 @@ export class GameGraphicsService {
             canvas.style.height = `${visibleHeight}px`;
         }
 
-        const minRenderSize = Math.min(width, height);
-        this.scale = Math.ceil(minRenderSize / this.targetGameSize);
+        const maxRenderSize = Math.max(width, height);
+        this.scale = Math.ceil(maxRenderSize / this.maxVisibleGameSize);
 
         this.gameWidth = width / this.scale;
         this.gameHeight = height / this.scale;
