@@ -258,9 +258,12 @@
     },
     'flag': {
         extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
             'world-entity',
         ],
         components: {
+            PickupIgnoreComponent: {},
             ColorComponent: {},
             TeamOwnedComponent: {},
             FlagComponent: {},
@@ -271,31 +274,13 @@
                 height: 16,
             },
         },
-        serverComponents: {
-            SpawnTimeComponent: {},
-        },
         clientComponents: {
             GraphicDependenciesComponent: {
                 components: {
-                    FlagComponent: true,
+                    RelativePositionComponent: true,
                 },
             },
         },
-    },
-    'flag-carried': {
-        extends: [
-            'flag',
-        ],
-        components: {
-            RelativePositionComponent: {},
-        },
-    },
-    'flag-dropped': {
-        extends: [
-            'flag',
-            'positioned-entity',
-            'bounding-boxed-entity',
-        ],
     },
     'tank': {
         extends: [

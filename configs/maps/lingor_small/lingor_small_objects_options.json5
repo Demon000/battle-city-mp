@@ -14,7 +14,6 @@
     },
     {
         type: 'flag',
-        subtypes: ['dropped'],
         position: {
             x: 272,
             y: 1024,
@@ -108,7 +107,6 @@
     },
     {
         type: 'flag',
-        subtypes: ['dropped'],
         position: {
             x: 848,
             y: 704,
@@ -202,7 +200,6 @@
     },
     {
         type: 'flag',
-        subtypes: ['dropped'],
         position: {
             x: 688,
             y: 16,

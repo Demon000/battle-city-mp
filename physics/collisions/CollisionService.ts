@@ -368,24 +368,6 @@ export class CollisionService {
         return undefined;
     }
 
-    addRelativePositionEntity(parent: Entity, child: Entity): void {
-        const relativePositionChildrenComponent = parent
-            .getComponent(RelativePositionChildrenComponent);
-        relativePositionChildrenComponent.ids[child.id] = true;
-        relativePositionChildrenComponent.update({
-            ids: relativePositionChildrenComponent.ids,
-        });
-    }
-
-    removeRelativePositionEntity(parent: Entity, child: Entity): void {
-        const relativePositionChildrenComponent = parent
-            .getComponent(RelativePositionChildrenComponent);
-        delete relativePositionChildrenComponent.ids[child.id];
-        relativePositionChildrenComponent.update({
-            ids: relativePositionChildrenComponent.ids,
-        });
-    }
-
     findOverlappingWithType(
         entity: Entity,
         type: string,

@@ -41,6 +41,8 @@ import { DirtyGraphicsComponent, DirtyGraphicsComponentData } from '@/components
 import { DirtyIsMovingComponent, DirtyIsMovingComponentData } from '@/components/DirtyIsMovingComponent';
 import { RelativePositionChildrenComponent, RelativePositionChildrenComponentData } from '@/physics/point/RelativePositionChildrenComponent';
 import { RelativePositionComponent, RelativePositionComponentData } from '@/physics/point/RelativePositionComponent';
+import { DirtyPositionComponent, DirtyPositionComponentData } from '@/physics/point/DirtyPositionComponent';
+import { PickupIgnoreComponent, PickupIgnoreComponentData } from '@/components/PickupIgnoreComponent';
 
 export class ComponentRegistry {
     _lookupAndValidate(
@@ -208,6 +210,14 @@ export class ComponentRegistry {
             case RelativePositionComponent.tag:
                 clazz = RelativePositionComponent;
                 assertEquals<Partial<RelativePositionComponentData>>(data);
+                break;
+            case DirtyPositionComponent.tag:
+                clazz = DirtyPositionComponent;
+                assertEquals<Partial<DirtyPositionComponentData>>(data);
+                break;
+            case PickupIgnoreComponent.tag:
+                clazz = PickupIgnoreComponent;
+                assertEquals<Partial<PickupIgnoreComponentData>>(data);
                 break;
             default:
                 assert(false, `Invalid tag '${tag}'`);

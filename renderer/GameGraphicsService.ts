@@ -7,7 +7,6 @@ import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { Point } from '@/physics/point/Point';
 import { PositionComponent } from '@/physics/point/PositionComponent';
-import { RelativePositionChildrenComponent } from '@/physics/point/RelativePositionChildrenComponent';
 import { CanvasUtils, Context2D } from '@/utils/CanvasUtils';
 import { RatioUtils } from '@/utils/RatioUtils';
 import { GameObjectGraphicsRenderer } from '../object/GameObjectGraphicsRenderer';
@@ -102,18 +101,6 @@ export class GameGraphicsService {
         const objectDrawX = objectRelativeX * this.scale;
         const objectDrawY = objectRelativeY * this.scale;
         this._renderObject(object, objectDrawX, objectDrawY);
-
-        const relativePositionChildrenComponent =
-            object.findComponent(RelativePositionChildrenComponent);
-        if (relativePositionChildrenComponent === undefined) {
-            return;
-        }
-
-        for (const childId of
-            Object.keys(relativePositionChildrenComponent.ids)) {
-            const child = this.registry.getEntityById(+childId);
-            this._renderObject(child as GameObject, objectDrawX, objectDrawY);
-        }
     }
 
     renderObjects(objects: Iterable<GameObject>): void {

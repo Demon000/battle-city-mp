@@ -18,7 +18,10 @@ import { Registry } from '@/ecs/Registry';
 import { DirectionComponent } from '@/physics/DirectionComponent';
 import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
 import { DirtyCenterPositionComponent } from '@/physics/point/DirtyCenterPositionComponent';
+import { DirtyPositionComponent } from '@/physics/point/DirtyPositionComponent';
 import { PositionComponent } from '@/physics/point/PositionComponent';
+import { RelativePositionChildrenComponent } from '@/physics/point/RelativePositionChildrenComponent';
+import { RelativePositionComponent } from '@/physics/point/RelativePositionComponent';
 import { RequestedPositionComponent } from '@/physics/point/RequestedPositionComponent';
 import { RequestedDirectionComponent } from '@/physics/RequestedDirectionComponent';
 import { SizeComponent } from '@/physics/size/SizeComponent';
@@ -262,6 +265,111 @@ export class GameObjectService {
                 x,
                 y,
             });
+        }
+    }
+
+    markDirtyPosition(entity: Entity): void {
+        if (!entity.hasComponent(RelativePositionComponent)) {
+            return;
+        }
+
+        entity.upsertComponent(DirtyPositionComponent, undefined, {
+            flags: ComponentFlags.LOCAL_ONLY,
+        });
+    }
+
+    attachRelativeEntity(parent: Entity, child: Entity): void {
+        const relativePositionComponent = child
+            .findComponent(RelativePositionComponent);
+        if (relativePositionComponent !== undefined) {
+            this.unattachRelativeEntity(child);
+        }
+
+        child.upsertComponent(RelativePositionComponent, {
+            entityId: parent.id,
+        });
+
+        const relativePositionChildrenComponent = parent
+            .getComponent(RelativePositionChildrenComponent);
+        relativePositionChildrenComponent.ids[child.id] = true;
+        relativePositionChildrenComponent.update({
+            ids: relativePositionChildrenComponent.ids,
+        });
+    }
+
+    unattachRelativeEntity(child: Entity): void {
+        const relativePositionComponent = child
+            .findComponent(RelativePositionComponent);
+        if (relativePositionComponent === undefined) {
+            return;
+        }
+
+        const parentId = relativePositionComponent.entityId;
+        const parent = this.registry.getEntityById(parentId);
+
+        const relativePositionChildrenComponent = parent
+            .getComponent(RelativePositionChildrenComponent);
+        delete relativePositionChildrenComponent.ids[child.id];
+        relativePositionChildrenComponent.update({
+            ids: relativePositionChildrenComponent.ids,
+        });
+
+        relativePositionComponent.remove();
+    }
+
+    unattachRelativeEntities(entity: Entity): void {
+        const relativePositionChildrenComponent = entity
+            .findComponent(RelativePositionChildrenComponent);
+        if (relativePositionChildrenComponent === undefined) {
+            return;
+        }
+
+        for (const childId of
+            Object.keys(relativePositionChildrenComponent.ids)) {
+            const child = this.registry.getEntityById(+childId);
+            this.unattachRelativeEntity(child);
+        }
+    }
+
+    setEntityPosition(entity: Entity, position: Point): void {
+        entity.upsertComponent(PositionComponent, position);
+    }
+
+    markRelativeChildrenDirtyPosition(entity: Entity): void {
+        const relativePositionChildrenComponent = entity
+            .findComponent(RelativePositionChildrenComponent);
+        if (relativePositionChildrenComponent === undefined) {
+            return;
+        }
+
+        for (const childId of
+            Object.keys(relativePositionChildrenComponent.ids)) {
+            const child = this.registry.getEntityById(+childId);
+            this.markDirtyPosition(child);
+        }
+    }
+
+    processObjectDirtyRelativePosition(entity: Entity): void {
+        const relativePositionComponent = entity
+            .findComponent(RelativePositionComponent);
+        if (relativePositionComponent === undefined) {
+            return;
+        }
+
+        const parentEntity = this.registry
+            .getEntityById(relativePositionComponent.entityId);
+        const parentPosition = parentEntity.getComponent(PositionComponent);
+
+        entity.updateComponent(PositionComponent, {
+            x: parentPosition.x + relativePositionComponent.x,
+            y: parentPosition.y + relativePositionComponent.y,
+        });
+    }
+
+    processObjectsDirtyRelativePosition(): void {
+        for (const entity of this.registry
+            .getEntitiesWithComponent(DirtyPositionComponent)) {
+            this.processObjectDirtyRelativePosition(entity);
         }
     }
 

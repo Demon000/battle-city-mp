@@ -133,8 +133,7 @@ export class Entity {
         clazzOrTag: ClazzOrTag<C>,
         options?: RegistryOperationOptions,
     ): C | undefined {
-        const component = this.getComponent(clazzOrTag);
-        return this.registry.removeComponentIfExists(component, options);
+        return this.registry.removeComponentIfExists(this, clazzOrTag, options);
     }
 
     removeComponents(options?: RegistryOperationOptions): void {

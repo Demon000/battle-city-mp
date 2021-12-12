@@ -1,13 +1,8 @@
-import { ColorComponent } from '@/components/ColorComponent';
-import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
+import { PickupIgnoreComponent } from '@/components/PickupIgnoreComponent';
 import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { Config } from '@/config/Config';
 import { Entity } from '@/ecs/Entity';
-import { GameObjectFactory } from '@/object/GameObjectFactory';
-import { GameObjectType } from '@/object/GameObjectType';
-import { Point } from '@/physics/point/Point';
 import { FlagComponent } from './FlagComponent';
-import { FlagType } from './FlagType';
 
 export enum FlagTankInteraction {
     PICK,
@@ -18,55 +13,33 @@ export enum FlagTankInteraction {
 
 export class FlagService {
     constructor(
-        private gameObjectFactory: GameObjectFactory,
         private config: Config,
     ) {}
 
-    createCarriedFlagFromDropped(
-        tank: Entity,
+    setFlagSource(
         flag: Entity,
         flagBase: Entity | undefined,
-    ): Entity {
-        const teamOwnedComponent = flag.getComponent(TeamOwnedComponent);
-        const colorComponent = flag.getComponent(ColorComponent);
+    ): void {
         const flagComponent = flag.getComponent(FlagComponent);
 
-        if (flagBase !== undefined && flagComponent.sourceId === -1) {
-            flagComponent.sourceId = flagBase.id;
+        if (flagBase === undefined || flagComponent.sourceId !== -1) {
+            return;
         }
 
-        return this.gameObjectFactory.buildFromOptions({
-            type: GameObjectType.FLAG,
-            subtypes: [FlagType.CARRIED],
-            components: {
-                RelativePositionComponent: {
-                    entityId: tank.id,
-                },
-                TeamOwnedComponent: teamOwnedComponent,
-                ColorComponent: colorComponent,
-                FlagComponent: flagComponent,
-            },
+        flagComponent.update({
+            sourceId: flagBase.id,
         });
     }
 
-    createDroppedFlagFromCarried(
-        tank: Entity,
+    setFlagDropper(
         flag: Entity,
-        position: Point,
-    ): Entity {
-        const teamOwnedComponent = flag.getComponent(TeamOwnedComponent);
-        const colorComponent = flag.getComponent(ColorComponent);
-        const flagComponent = flag.getComponent(FlagComponent);
-        flagComponent.droppedTankId = tank.id;
-        return this.gameObjectFactory.buildFromOptions({
-            type: GameObjectType.FLAG,
-            subtypes: [FlagType.DROPPED],
-            components: {
-                TeamOwnedComponent: teamOwnedComponent,
-                ColorComponent: colorComponent,
-                FlagComponent: flagComponent,
-                PositionComponent: position,
-            },
+        tank: Entity,
+    ): void {
+        const pickUpIgnoreComponent = flag.getComponent(PickupIgnoreComponent);
+
+        pickUpIgnoreComponent.update({
+            entityId: tank.id,
+            time: Date.now(),
         });
     }
 
@@ -101,10 +74,11 @@ export class FlagService {
             if (interaction !== undefined) {
                 const pickupIgnoreTime = this.config
                     .get<number>('flag', 'pickupIgnoreTime');
-                const flagComponent = flag.getComponent(FlagComponent);
-                const spawnTime = flag.getComponent(SpawnTimeComponent).value;
-                if (flagComponent.droppedTankId === tank.id
-                    && spawnTime + pickupIgnoreTime >= Date.now()) {
+                const pickupIgnoreComponent = flag
+                    .getComponent(PickupIgnoreComponent);
+                if (pickupIgnoreComponent.entityId === tank.id
+                    && pickupIgnoreComponent.time + pickupIgnoreTime
+                        >= Date.now()) {
                     interaction = undefined;
                 }
             }

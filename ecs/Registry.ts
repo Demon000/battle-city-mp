@@ -371,13 +371,16 @@ export class Registry {
     }
 
     removeComponentIfExists<C extends Component<C>>(
-        component: C,
+        entity: Entity,
+        clazzOrTag: ClazzOrTag,
         options?: RegistryOperationOptions,
     ): C | undefined {
-        return this.removeEntityComponent(component.entity, component.clazz, {
-            ...options,
-            optional: true,
-        });
+        const component = entity.findComponent(clazzOrTag);
+        if (component === undefined) {
+            return;
+        }
+
+        return this.removeEntityComponent(component.entity, component.clazz, options);
     }
 
     findEntityById(id: EntityId): Entity | undefined {

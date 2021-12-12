@@ -11,7 +11,6 @@ import { TextDrawable, TextPositionReference } from '@/drawable/TextDrawable';
 import { Entity } from '@/ecs/Entity';
 import { Explosion } from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
-import { FlagType } from '@/flag/FlagType';
 import { Direction } from '@/physics/Direction';
 import { DirectionComponent } from '@/physics/DirectionComponent';
 import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
@@ -23,6 +22,7 @@ import { GameObject } from './GameObject';
 import { GameObjectType } from './GameObjectType';
 import { RenderPass } from './RenderPass';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
+import { RelativePositionComponent } from '@/physics/point/RelativePositionComponent';
 
 const positionTest = (
     mod: number,
@@ -169,11 +169,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             offsetY: -15,
             tests: [
                 (entity: Entity): boolean => {
-                    if (entity.subtypes[0] !== FlagType.DROPPED) {
-                        return false;
-                    }
-
-                    return true;
+                    return !entity.hasComponent(RelativePositionComponent);
                 },
             ],
         }),
@@ -188,11 +184,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             },
             tests: [
                 (entity: Entity): boolean => {
-                    if (entity.subtypes[0] !== FlagType.DROPPED) {
-                        return false;
-                    }
-
-                    return true;
+                    return !entity.hasComponent(RelativePositionComponent);
                 },
             ],
             overlays: [
@@ -208,11 +200,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             offsetY: -5,
             tests: [
                 (entity: Entity): boolean => {
-                    if (entity.subtypes[0] !== FlagType.CARRIED) {
-                        return false;
-                    }
-
-                    return true;
+                    return entity.hasComponent(RelativePositionComponent);
                 },
             ],
         }),
@@ -227,11 +215,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             },
             tests: [
                 (entity: Entity): boolean => {
-                    if (entity.subtypes[0] !== FlagType.CARRIED) {
-                        return false;
-                    }
-
-                    return true;
+                    return entity.hasComponent(RelativePositionComponent);
                 },
             ],
             overlays: [

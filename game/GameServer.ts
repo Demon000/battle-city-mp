@@ -117,7 +117,7 @@ export class GameServer {
         this.gameObjectService = new GameObjectService(this.registry);
         this.entitySpawnerService = new EntitySpawnerService(this.gameObjectFactory, this.registry);
         this.tankService = new TankService(this.gameObjectFactory, this.registry);
-        this.flagService = new FlagService(this.gameObjectFactory, this.config);
+        this.flagService = new FlagService(this.config);
         this.bulletService = new BulletService(this.registry);
         this.gameMapService = new GameMapService(this.config, this.entityBlueprint);
         this.playerRepository = new MapRepository<string, Player>();
@@ -165,13 +165,7 @@ export class GameServer {
 
                 switch (object.type) {
                     case GameObjectType.TANK: {
-                        const carriedFlag = this.collisionService
-                            .findRelativePositionEntityWithType(entity,
-                                GameObjectType.FLAG);
-                        if (carriedFlag !== undefined) {
-                            this.handleFlagInteraction(entity, undefined,
-                                carriedFlag, undefined);
-                        }
+                        this.gameObjectService.unattachRelativeEntities(entity);
 
                         const playerId = entity
                             .getComponent(PlayerOwnedComponent).playerId;
@@ -200,6 +194,8 @@ export class GameServer {
                     const entity = component.entity;
                     this.collisionService.processObjectDirtyBoundingBox(entity);
                     this.gameObjectService.markDirtyCenterPosition(entity);
+                    this.gameObjectService
+                        .markRelativeChildrenDirtyPosition(entity);
                 });
         this.registry.componentEmitter(SizeComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
@@ -513,7 +509,9 @@ export class GameServer {
                         GameObjectType.FLAG);
                 const flagBase = this.collisionService
                     .findOverlappingWithType(flag, GameObjectType.FLAG_BASE);
-                this.handleFlagInteraction(tank, flag, carriedFlag, flagBase);
+                if (flag !== carriedFlag) {
+                    this.handleFlagInteraction(tank, flag, carriedFlag, flagBase);
+                }
             });
 
         this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_FLAG_BASE,
@@ -569,6 +567,7 @@ export class GameServer {
                 this.collisionService.processObjectsRequestedDirection();
                 this.gameObjectService.processObjectsPosition(deltaSeconds);
                 this.collisionService.processObjectsRequestedPosition();
+                this.gameObjectService.processObjectsDirtyRelativePosition();
                 this.entitySpawnerService.processActiveEntitySpawners();
                 this.gameObjectService.processObjectsDirtyIsMoving();
                 this.gameObjectService.processObjectsDirtyCenterPosition();
@@ -644,11 +643,8 @@ export class GameServer {
         flag: Entity,
         flagBase: Entity | undefined,
     ): void {
-        const carriedFlag = this.flagService
-            .createCarriedFlagFromDropped(tank, flag, flagBase);
-        this.collisionService
-            .addRelativePositionEntity(tank, carriedFlag);
-        this.gameObjectService.markDestroyed(flag);
+        this.gameObjectService.attachRelativeEntity(tank, flag);
+        this.flagService.setFlagSource(flag, flagBase);
     }
 
     handleFlagDrop(
@@ -679,11 +675,9 @@ export class GameServer {
             assert(false);
         }
 
-        this.collisionService
-            .removeRelativePositionEntity(tank, carriedFlag);
-        this.flagService
-            .createDroppedFlagFromCarried(tank, carriedFlag, position);
-        this.gameObjectService.markDestroyed(carriedFlag);
+        this.gameObjectService.unattachRelativeEntity(carriedFlag);
+        this.gameObjectService.setEntityPosition(carriedFlag, position);
+        this.flagService.setFlagDropper(carriedFlag, tank);
 
         if (interaction === FlagTankInteraction.RETURN) {
             this.playerService.addPlayerPoints(playerId,
