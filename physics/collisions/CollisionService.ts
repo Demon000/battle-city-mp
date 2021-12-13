@@ -123,25 +123,6 @@ export class CollisionService {
         }
     }
 
-    private isObjectOverlapping(
-        isValidPosition: boolean,
-        preventedBoundingBox: BoundingBox,
-        movedBoundingBox: BoundingBox,
-        overlappingBoundingBox: BoundingBox,
-    ): boolean {
-        if (isValidPosition && BoundingBoxUtils.overlapsEqual(preventedBoundingBox,
-            overlappingBoundingBox)) {
-            return true;
-        }
-
-        if (!isValidPosition && BoundingBoxUtils.overlaps(movedBoundingBox,
-            overlappingBoundingBox)) {
-            return true;
-        }
-
-        return false;
-    }
-
     private updateObjectMovementModifiers(
         movingEntity: Entity,
         overlappingEntities: Iterable<Entity>,
@@ -266,25 +247,27 @@ export class CollisionService {
          * then the position we're trying to move to is inside the movement preventing object,
          * which means it is invalid, and we shouldn't update the object position.
          */
-        let isValidPosition = true;
         if (!trySnapping && movementPreventingObject !== undefined) {
-            isValidPosition = false;
+            return;
         }
 
         const preventedBoundingBox = BoundingBoxUtils
             .reposition(originalBoundingBox, originalPosition, position);
 
-        if (isValidPosition && (position.x !== originalPosition.x
-            || position.y !== originalPosition.y)) {
-            movingObject.updateComponent(PositionComponent, position);
+        if (position.x === originalPosition.x
+            && position.y === originalPosition.y) {
+            return;
         }
+
+        movingObject.updateComponent(PositionComponent, position);
 
         for (const [name, overlappingObject] of collidingObjectNotifications) {
             const overlappingBoundingBox = overlappingObject
                 .getComponent(BoundingBoxComponent);
-            if (this.isObjectOverlapping(isValidPosition, preventedBoundingBox, movedBoundingBox,
+            if (BoundingBoxUtils.overlapsEqual(preventedBoundingBox,
                 overlappingBoundingBox)) {
-                this.emitter.emit(name, movingObject.id, overlappingObject.id, position);
+                this.emitter.emit(name, movingObject.id, overlappingObject.id,
+                    position);
             }
         }
 
