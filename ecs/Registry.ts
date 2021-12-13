@@ -18,6 +18,7 @@ export enum RegistryComponentEvent {
     COMPONENT_UPDATED = 'component-updated',
     COMPONENT_BEFORE_REMOVE = 'component-before-remove',
     COMPONENT_CHANGED = 'component-changed',
+    COMPONENT_ADD_OR_UPDATE = 'component-add-or-update',
 }
 
 export interface RegistryOperationOptions {
@@ -49,6 +50,12 @@ export interface RegistryComponentEvents<C extends Component<C> = any> {
     ) => void;
     [RegistryComponentEvent.COMPONENT_BEFORE_REMOVE]: (
         component: C,
+        options?: ComponentEmitOptions,
+    ) => void;
+    [RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE]: (
+        event: RegistryComponentEvent,
+        component: C,
+        data?: any,
         options?: ComponentEmitOptions,
     ) => void;
     [RegistryComponentEvent.COMPONENT_CHANGED]: (
@@ -201,6 +208,12 @@ export class Registry {
             componentEmitter.emit(event, component, data);
             componentEmitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
                 event, component, data, options);
+            if (event === RegistryComponentEvent.COMPONENT_ADDED
+                || event === RegistryComponentEvent.COMPONENT_UPDATED) {
+                componentEmitter.emit(
+                    RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
+                    event, component, data, options);
+            }
         }
 
         this.emitter.emit(event, component, data);
