@@ -2,7 +2,7 @@ import { PickupIgnoreComponent } from '@/components/PickupIgnoreComponent';
 import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { Config } from '@/config/Config';
 import { Entity } from '@/ecs/Entity';
-import { FlagComponent } from './FlagComponent';
+import { FlagComponent } from '../components/FlagComponent';
 
 export enum FlagTankInteraction {
     PICK,

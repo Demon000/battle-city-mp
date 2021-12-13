@@ -4,7 +4,7 @@ import { GameObjectAudioRenderer } from '@/object/GameObjectAudioRenderer';
 import { GameObjectAudioRendererFactory } from '@/object/GameObjectAudioRendererFactory';
 import { AudioEffectLoadingState, AudioEffect } from '@/object/GameObjectProperties';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
-import { BoundingBoxComponent } from '@/physics/bounding-box/BoundingBoxComponent';
+import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { Point } from '@/physics/point/Point';
 import { CartesianUtils } from '@/utils/CartesianUtils';

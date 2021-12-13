@@ -1,5 +1,5 @@
 import { Component } from '@/ecs/Component';
-import { Direction } from './Direction';
+import { Direction } from '@/physics/Direction';
 
 export interface RequestedDirectionComponentData {
     value: Direction;

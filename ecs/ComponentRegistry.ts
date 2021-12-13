@@ -1,7 +1,7 @@
 import { ComponentClassType } from '@/ecs/Component';
-import { BoundingBoxComponent, BoundingBoxComponentData } from '@/physics/bounding-box/BoundingBoxComponent';
-import { PositionComponent, PositionComponentData } from '@/physics/point/PositionComponent';
-import { SizeComponent, SizeComponentData } from '@/physics/size/SizeComponent';
+import { BoundingBoxComponent, BoundingBoxComponentData } from '@/components/BoundingBoxComponent';
+import { PositionComponent, PositionComponentData } from '@/components/PositionComponent';
+import { SizeComponent, SizeComponentData } from '@/components/SizeComponent';
 import { AutomaticDestroyComponent, AutomaticDestroyComponentData } from '../components/AutomaticDestroyComponent';
 import { assert } from '@/utils/assert';
 import { assertEquals } from 'typescript-is';
@@ -11,18 +11,18 @@ import { IsMovingComponent, IsMovingComponentData } from '@/components/IsMovingC
 import { DirectionAxisSnappingComponent, DirectionAxisSnappingComponentData } from '@/components/DirectionAxisSnappingComponent';
 import { SpawnTimeComponent, SpawnTimeComponentData } from '@/components/SpawnTimeComponent';
 import { IsUnderBushComponent, IsUnderBushComponentData } from '@/components/IsUnderBushComponent';
-import { CenterPositionComponent, CenterPositionComponentData } from '@/physics/point/CenterPositionComponent';
-import { DirtyBoundingBoxComponent, DirtyBoundingBoxComponentData } from '@/physics/bounding-box/DirtyBoundingBox';
-import { RequestedPositionComponent, RequestedPositionComponentData } from '@/physics/point/RequestedPositionComponent';
-import { DirtyCenterPositionComponent, DirtyCenterPositionComponentData } from '@/physics/point/DirtyCenterPositionComponent';
-import { DirectionComponent, DirectionComponentData } from '@/physics/DirectionComponent';
-import { RequestedDirectionComponent, RequestedDirectionComponentData } from '@/physics/RequestedDirectionComponent';
-import { TankComponent, TankComponentData } from '@/tank/TankComponent';
+import { CenterPositionComponent, CenterPositionComponentData } from '@/components/CenterPositionComponent';
+import { DirtyBoundingBoxComponent, DirtyBoundingBoxComponentData } from '@/components/DirtyBoundingBoxComponent';
+import { RequestedPositionComponent, RequestedPositionComponentData } from '@/components/RequestedPositionComponent';
+import { DirtyCenterPositionComponent, DirtyCenterPositionComponentData } from '@/components/DirtyCenterPositionComponent';
+import { DirectionComponent, DirectionComponentData } from '@/components/DirectionComponent';
+import { RequestedDirectionComponent, RequestedDirectionComponentData } from '@/components/RequestedDirectionComponent';
+import { TankComponent, TankComponentData } from '@/components/TankComponent';
 import { SpawnComponent, SpawnComponentData } from '@/components/SpawnComponent';
 import { IsMovingTrackingComponent, IsMovingTrackingComponentData } from '@/components/IsMovingTrackingComponent';
 import { PlayerOwnedComponent, PlayerOwnedComponentData } from '@/components/PlayerOwnedComponent';
 import { EntityOwnedComponent, EntityOwnedComponentData } from '@/components/EntityOwnedComponent';
-import { BulletComponent, BulletComponentData } from '@/bullet/BulletComponent';
+import { BulletComponent, BulletComponentData } from '@/components/BulletComponent';
 import { ColorComponent, ColorComponentData } from '@/components/ColorComponent';
 import { WorldEntityComponent, WorldEntityComponentData } from '@/components/WorldEntityComponent';
 import { MovementComponent, MovementComponentData } from '@/components/MovementComponent';
@@ -34,16 +34,16 @@ import { EntitySpawnerActiveComponent, EntitySpawnerActiveComponentData } from '
 import { SmokeSpawnerComponent, SmokeSpawnerComponentData } from '@/components/SmokeSpawnerComponent';
 import HealthBasedSmokeSpawnerComponentData, { HealthBasedSmokeSpawnerComponent } from '@/components/HealthBasedSmokeSpawnerComponent';
 import { TeamOwnedComponent, TeamOwnedComponentData } from '@/components/TeamOwnedComponent';
-import { FlagComponent, FlagComponentData } from '@/flag/FlagComponent';
+import { FlagComponent, FlagComponentData } from '@/components/FlagComponent';
 import { IsUnderBushTrackingComponent, IsUnderBushTrackingComponentData } from '@/components/IsUnderBushTrackingComponent';
 import { DirtyIsUnderBushComponent, DirtyIsUnderBushComponentData } from '@/components/DirtyIsUnderBushComponent';
 import { DirtyGraphicsComponent, DirtyGraphicsComponentData } from '@/components/DirtyGraphicsComponent';
 import { DirtyIsMovingComponent, DirtyIsMovingComponentData } from '@/components/DirtyIsMovingComponent';
-import { RelativePositionChildrenComponent, RelativePositionChildrenComponentData } from '@/physics/point/RelativePositionChildrenComponent';
-import { RelativePositionComponent, RelativePositionComponentData } from '@/physics/point/RelativePositionComponent';
-import { DirtyPositionComponent, DirtyPositionComponentData } from '@/physics/point/DirtyPositionComponent';
+import { RelativePositionChildrenComponent, RelativePositionChildrenComponentData } from '@/components/RelativePositionChildrenComponent';
+import { RelativePositionComponent, RelativePositionComponentData } from '@/components/RelativePositionComponent';
+import { DirtyPositionComponent, DirtyPositionComponentData } from '@/components/DirtyPositionComponent';
 import { PickupIgnoreComponent, PickupIgnoreComponentData } from '@/components/PickupIgnoreComponent';
-import { DirtyCollisionsComponent, DirtyCollisionsComponentData } from '@/physics/collisions/DirtyCollisionsComponent';
+import { DirtyCollisionsComponent, DirtyCollisionsComponentData } from '@/components/DirtyCollisionsComponent';
 
 export class ComponentRegistry {
     _lookupAndValidate(

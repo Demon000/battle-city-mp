@@ -41,20 +41,20 @@ import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { GameMap } from '@/maps/GameMap';
 import { assert } from '@/utils/assert';
 import { Component, ComponentFlags } from '@/ecs/Component';
-import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
-import { PositionComponent } from '@/physics/point/PositionComponent';
+import { CenterPositionComponent } from '@/components/CenterPositionComponent';
+import { PositionComponent } from '@/components/PositionComponent';
 import { Entity } from '@/ecs/Entity';
 import { EntityOwnedComponent } from '@/components/EntityOwnedComponent';
-import { BulletComponent } from '@/bullet/BulletComponent';
+import { BulletComponent } from '@/components/BulletComponent';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
-import { BoundingBoxComponent } from '@/physics/bounding-box/BoundingBoxComponent';
-import { SizeComponent } from '@/physics/size/SizeComponent';
+import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
+import { SizeComponent } from '@/components/SizeComponent';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
 import { EntitySpawnerService } from '@/entity-spawner/EntitySpawnerService';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
-import { FlagComponent } from '@/flag/FlagComponent';
+import { FlagComponent } from '@/components/FlagComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 
 export enum GameServerEvent {

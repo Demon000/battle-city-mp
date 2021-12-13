@@ -1,5 +1,5 @@
 import { Component } from '@/ecs/Component';
-import { Size } from './Size';
+import { Size } from '@/physics/size/Size';
 
 export interface SizeComponentData extends Size {}
 

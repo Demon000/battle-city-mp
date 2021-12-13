@@ -1,13 +1,13 @@
-import { BulletComponent } from '@/bullet/BulletComponent';
+import { BulletComponent } from '@/components/BulletComponent';
 import { Registry } from '@/ecs/Registry';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
-import { BoundingBoxComponent } from '@/physics/bounding-box/BoundingBoxComponent';
+import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { DirectionUtils } from '@/physics/collisions/DirectionUtils';
 import { Direction } from '@/physics/Direction';
-import { DirectionComponent } from '@/physics/DirectionComponent';
-import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
-import { SizeComponent } from '@/physics/size/SizeComponent';
+import { DirectionComponent } from '@/components/DirectionComponent';
+import { CenterPositionComponent } from '@/components/CenterPositionComponent';
+import { SizeComponent } from '@/components/SizeComponent';
 import { BulletPower } from './BulletPower';
 
 export class BulletService {

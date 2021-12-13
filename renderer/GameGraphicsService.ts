@@ -6,7 +6,7 @@ import { GameObject } from '@/object/GameObject';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { Point } from '@/physics/point/Point';
-import { PositionComponent } from '@/physics/point/PositionComponent';
+import { PositionComponent } from '@/components/PositionComponent';
 import { CanvasUtils, Context2D } from '@/utils/CanvasUtils';
 import { RatioUtils } from '@/utils/RatioUtils';
 import { GameObjectGraphicsRenderer } from '../object/GameObjectGraphicsRenderer';

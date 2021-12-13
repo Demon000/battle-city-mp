@@ -6,7 +6,7 @@ import { Color } from '@/drawable/Color';
 import { PNG } from 'pngjs';
 import JSON5 from 'json5';
 import { EntityBlueprint } from '@/ecs/EntityBlueprint';
-import { SizeComponent } from '@/physics/size/SizeComponent';
+import { SizeComponent } from '@/components/SizeComponent';
 import { GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
 import { Point } from '@/physics/point/Point';
 import { GameObjectOptions } from '@/object/GameObject';

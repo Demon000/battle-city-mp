@@ -1,4 +1,4 @@
-import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
+import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { assert } from '@/utils/assert';
 import { CartesianUtils } from '@/utils/CartesianUtils';
 import { GameObject } from './GameObject';

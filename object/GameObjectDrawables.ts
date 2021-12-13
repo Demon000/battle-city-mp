@@ -1,5 +1,5 @@
 import { BulletPower } from '@/bullet/BulletPower';
-import { BulletComponent } from '@/bullet/BulletComponent';
+import { BulletComponent } from '@/components/BulletComponent';
 import { ColorComponent } from '@/components/ColorComponent';
 import { IsMovingComponent } from '@/components/IsMovingComponent';
 import { IsUnderBushComponent } from '@/components/IsUnderBushComponent';
@@ -12,17 +12,17 @@ import { Entity } from '@/ecs/Entity';
 import { Explosion } from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
-import { DirectionComponent } from '@/physics/DirectionComponent';
-import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
+import { DirectionComponent } from '@/components/DirectionComponent';
+import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { Point } from '@/physics/point/Point';
-import { PositionComponent } from '@/physics/point/PositionComponent';
-import { SizeComponent } from '@/physics/size/SizeComponent';
+import { PositionComponent } from '@/components/PositionComponent';
+import { SizeComponent } from '@/components/SizeComponent';
 import { TankTier } from '@/tank/TankTier';
 import { GameObject } from './GameObject';
 import { GameObjectType } from './GameObjectType';
 import { RenderPass } from './RenderPass';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
-import { RelativePositionComponent } from '@/physics/point/RelativePositionComponent';
+import { RelativePositionComponent } from '@/components/RelativePositionComponent';
 
 const positionTest = (
     mod: number,

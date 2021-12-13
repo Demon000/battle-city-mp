@@ -1,5 +1,5 @@
 import { Component } from '@/ecs/Component';
-import { Point } from './Point';
+import { Point } from '@/physics/point/Point';
 
 export interface CenterPositionComponentData extends Point {}
 

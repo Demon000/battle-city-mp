@@ -12,10 +12,10 @@ import { Entity } from '@/ecs/Entity';
 import { Registry, RegistryComponentEvent } from '@/ecs/Registry';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
-import { DirectionComponent } from '@/physics/DirectionComponent';
-import { CenterPositionComponent } from '@/physics/point/CenterPositionComponent';
-import { PositionComponent } from '@/physics/point/PositionComponent';
-import { SizeComponent } from '@/physics/size/SizeComponent';
+import { DirectionComponent } from '@/components/DirectionComponent';
+import { CenterPositionComponent } from '@/components/CenterPositionComponent';
+import { PositionComponent } from '@/components/PositionComponent';
+import { SizeComponent } from '@/components/SizeComponent';
 
 export class EntitySpawnerService {
     constructor(

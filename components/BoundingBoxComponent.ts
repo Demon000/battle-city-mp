@@ -1,5 +1,5 @@
 import { Component } from '@/ecs/Component';
-import { BoundingBox } from './BoundingBox';
+import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 
 export interface BoundingBoxComponentData extends BoundingBox {}
 
