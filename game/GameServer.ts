@@ -18,8 +18,8 @@ import EventEmitter from 'eventemitter3';
 import { Action, ActionType } from '../actions/Action';
 import { ButtonPressAction } from '../actions/ButtonPressAction';
 import { GameMapService } from '../maps/GameMapService';
-import { GameObject, PartialGameObjectOptions } from '../object/GameObject';
-import { GameObjectService, GameObjectServiceEvent } from '../object/GameObjectService';
+import { GameObject } from '../object/GameObject';
+import { GameObjectService } from '../object/GameObjectService';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
 import { rules } from '../physics/collisions/CollisionRules';
 import { CollisionService } from '../physics/collisions/CollisionService';
@@ -337,14 +337,6 @@ export class GameServer {
         this.teamService.emitter.on(TeamServiceEvent.TEAM_PLAYER_REMOVED,
             (teamId: string, playerId: string) => {
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.TEAM_PLAYER_REMOVED, teamId, playerId]);
-            });
-
-        /**
-         * GameObjectService event handlers
-         */
-        this.gameObjectService.emitter.on(GameObjectServiceEvent.OBJECT_CHANGED,
-            (objectId: number, objectOptions: PartialGameObjectOptions) => {
-                this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_CHANGED, objectId, objectOptions]);
             });
 
         /**

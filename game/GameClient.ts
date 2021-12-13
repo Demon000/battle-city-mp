@@ -3,7 +3,7 @@ import { GameCamera } from '@/renderer/GameCamera';
 import { GameGraphicsService } from '@/renderer/GameGraphicsService';
 import { MapRepository } from '@/utils/MapRepository';
 import { Ticker, TickerEvent } from '@/utils/Ticker';
-import { GameObject, PartialGameObjectOptions } from '../object/GameObject';
+import { GameObject } from '../object/GameObject';
 import { GameObjectService } from '../object/GameObjectService';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
 import { CollisionService } from '../physics/collisions/CollisionService';
@@ -285,10 +285,6 @@ export class GameClient {
             });
 
         this.ticker.emitter.on(TickerEvent.TICK, this.onTick, this);
-    }
-
-    onObjectChanged(objectId: number, objectOptions: PartialGameObjectOptions): void {
-        this.gameObjectService.updateObject(objectId, objectOptions);
     }
 
     onObjectRegistered(buildOptions: GameObjectFactoryBuildOptions): void {

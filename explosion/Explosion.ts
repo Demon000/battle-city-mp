@@ -31,13 +31,6 @@ export class Explosion extends GameObject {
         };
     }
 
-    setOptions(options: PartialExplosionOptions): void {
-        super.setOptions(options);
-
-        if (options.explosionType !== undefined) this.explosionType = options.explosionType;
-        if (options.destroyedObjectType !== undefined) this.destroyedObjectType = options.destroyedObjectType;
-    }
-
     protected updateAudioMeta(): void {
         this._audioMeta = {
             destroyedObjectType: this.destroyedObjectType,

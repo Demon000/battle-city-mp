@@ -1,10 +1,8 @@
-import { PartialGameObjectOptions } from '@/object/GameObject';
 import { GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
 import { PartialPlayerOptions, PlayerOptions } from '@/player/Player';
 import { GameServerStatus } from './GameServerStatus';
 
 export enum GameEvent {
-    OBJECT_CHANGED = 'object-changed',
     OBJECT_REGISTERED = 'object-registered',
     OBJECT_UNREGISTERED = 'object-unregisterd',
 
@@ -44,7 +42,6 @@ export type BroadcastBatchGameEvent = CommonBatchGameEvent |
 [name: GameEvent.TEAM_PLAYER_REMOVED, teamId: string, playerId: string] |
 
 [name: GameEvent.OBJECT_REGISTERED, buildOptions: GameObjectFactoryBuildOptions] |
-[name: GameEvent.OBJECT_CHANGED, objectId: number, options: PartialGameObjectOptions] |
 [name: GameEvent.OBJECT_UNREGISTERED, objectId: number] |
 [name: GameEvent.ENTITY_COMPONENT_ADDED, entityId: number, tag: string, data?: any] |
 [name: GameEvent.ENTITY_COMPONENT_UPDATED, entityId: number, tag: string, data?: any] |

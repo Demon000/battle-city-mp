@@ -9,8 +9,6 @@ export interface GameObjectOptions {
     subtypes?: string[];
 }
 
-export type PartialGameObjectOptions = Partial<GameObjectOptions>;
-
 export class GameObject extends Entity {
     protected _audioMeta: ResourceMeta | undefined | null;
     graphicsDirty: boolean;
@@ -34,10 +32,6 @@ export class GameObject extends Entity {
         return {
             id: this.id,
         };
-    }
-
-    setOptions(_options: PartialGameObjectOptions): void {
-        // empty
     }
 
     protected markGraphicsDirty(): void {
