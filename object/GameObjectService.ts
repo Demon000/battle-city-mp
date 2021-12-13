@@ -350,8 +350,11 @@ export class GameObjectService {
     }
 
     processObjectsDirtyRelativePosition(): void {
-        for (const entity of this.registry
-            .getEntitiesWithComponent(DirtyPositionComponent)) {
+        for (const component of this.registry
+            .getComponents(DirtyPositionComponent)) {
+            component.remove();
+
+            const entity = component.entity;
             this.processObjectDirtyRelativePosition(entity);
         }
     }
