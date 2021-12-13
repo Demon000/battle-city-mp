@@ -295,21 +295,9 @@ export class GameClient {
         this.gameObjectFactory.buildFromOptions(buildOptions);
     }
 
-    onObjectsRegistered(buildOptions: GameObjectFactoryBuildOptions[]): void {
-        for (const o of buildOptions) {
-            this.onObjectRegistered(o);
-        }
-    }
-
     onObjectUnregistered(entityId: EntityId): void {
         const entity = this.registry.getEntityById(entityId);
         this.gameObjectService.markDestroyed(entity);
-    }
-
-    onObjectsUnregistered(entityIds: EntityId[]): void {
-        for (const entityId of entityIds) {
-            this.onObjectUnregistered(entityId);
-        }
     }
 
     onEntityComponentAdded(entityId: number, tag: string, data: any): void {
@@ -366,6 +354,9 @@ export class GameClient {
                 .map(o => new Team(o));
             this.teamService.addTeams(teams);
         }
+
+        LazyIterable.from(serverStatus.objectsOptions)
+            .forEach(o => this.gameObjectFactory.buildFromOptions(o));
 
         const maxVisibleGameSize = this.config.get<number>('game-client',
             'maxVisibleGameSize');

@@ -1,6 +1,4 @@
 import { Color } from '@/drawable/Color';
-import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
-import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { Direction } from '@/physics/Direction';
 import { TankTier } from '@/tank/TankTier';
 import { ButtonPressAction, ButtonType } from '../actions/ButtonPressAction';
@@ -45,8 +43,6 @@ export class Player {
     deaths: number;
     points: number;
     respawnTimeout;
-    chunkMap: Map<number, Map<number, boolean>> = new Map();
-    visibleAreaBoundingBox: BoundingBox = BoundingBoxUtils.create(0, 0, 0, 0);
 
     constructor(options: PlayerOptions) {
         this.id = options.id;

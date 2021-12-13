@@ -390,18 +390,6 @@ export class CollisionService {
         return this.findOverlappingWithType(entity, type) !== undefined;
     }
 
-    isOverlappingWithBox(
-        entity: Entity,
-        box: BoundingBox,
-    ): boolean {
-        const boundingBox = entity.findComponent(BoundingBoxComponent);
-        if (boundingBox === undefined) {
-            return false;
-        }
-
-        return BoundingBoxUtils.overlaps(boundingBox, box);
-    }
-
     processObjectsDirtyIsUnderBush(): void {
         for (const component of this.registry.getComponents(DirtyIsUnderBushComponent)) {
             component.remove();
