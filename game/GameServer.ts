@@ -4,7 +4,7 @@ import { Color } from '@/drawable/Color';
 import { ExplosionOptions } from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { SameTeamBulletHitMode } from '@/game-mode/IGameModeProperties';
-import { GameObjectFactory } from '@/object/GameObjectFactory';
+import { GameObjectFactory, GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
 import { Direction } from '@/physics/Direction';
 import { TankService } from '@/tank/TankService';
@@ -56,8 +56,6 @@ import { EntitySpawnerService } from '@/entity-spawner/EntitySpawnerService';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { FlagComponent } from '@/flag/FlagComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
-import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
-import { IsChunksTrackingComponent } from '@/components/IsChunksTrackingComponent';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -139,25 +137,17 @@ export class GameServer {
         this.registry.emitter.on(RegistryEvent.ENTITY_REGISTERED,
             (entity: Entity) => {
                 const object = entity as GameObject;
-                for (const player of this.playerService.getPlayers()) {
-                    if (!this.collisionService.isOverlappingWithBox(entity,
-                        player.visibleAreaBoundingBox)) {
-                        console.log('skipped', entity);
-                        continue;
-                    }
- 
-                    this.gameEventBatcher.addPlayerEvent(player.id, [
-                        GameEvent.OBJECT_REGISTERED,
-                        {
-                            type: object.type,
-                            subtypes: object.subtypes,
-                            options: object.toOptions(),
-                            components: object.getComponentsData({
-                                withoutFlags: ComponentFlags.LOCAL_ONLY,
-                            }),
-                        },
-                    ]);
-                }
+                this.gameEventBatcher.addBroadcastEvent([
+                    GameEvent.OBJECT_REGISTERED,
+                    {
+                        type: object.type,
+                        subtypes: object.subtypes,
+                        options: object.toOptions(),
+                        components: object.getComponentsData({
+                            withoutFlags: ComponentFlags.LOCAL_ONLY,
+                        }),
+                    },
+                ]);
 
                 switch (object.type) {
                     case GameObjectType.TANK: {
@@ -187,17 +177,7 @@ export class GameServer {
                 this.gameObjectService.unattachRelativeEntities(entity);
                 this.gameObjectService.unattachRelativeEntity(entity);
 
-                for (const player of this.playerService.getPlayers()) {
-                    if (!this.collisionService.isOverlappingWithBox(entity,
-                        player.visibleAreaBoundingBox)) {
-                        continue;
-                    }
- 
-                    this.gameEventBatcher.addPlayerEvent(player.id, [
-                        GameEvent.OBJECT_UNREGISTERED,
-                        entity.id,
-                    ]);
-                }
+                this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_UNREGISTERED, entity.id]);
             });
 
         this.registry.emitter.on(RegistryComponentEvent.COMPONENT_CHANGED,
@@ -223,14 +203,6 @@ export class GameServer {
                     this.gameObjectService.markDirtyCenterPosition(entity);
                     this.gameObjectService
                         .markRelativeChildrenDirtyPosition(entity);
-
-                    if (entity.hasComponent(IsChunksTrackingComponent)) {
-                        const playerId = entity
-                            .getComponent(PlayerOwnedComponent).playerId;
-                        const position = entity.getComponent(PositionComponent);
-                        this.playerService.setPlayerNeedsChunksUpdate(playerId,
-                            position);
-                    }
                 });
         this.registry.componentEmitter(SizeComponent, true)
             .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
@@ -359,40 +331,6 @@ export class GameServer {
                     this.handleFlagInteraction(tank, undefined, carriedFlag,
                         undefined);
                 }
-            });
-
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_LOAD_CHUNK,
-            (player: Player, box: BoundingBox) => {
-                const objectIdsIterable = this.collisionService
-                    .getOverlappingObjects(box);
-                const objectsOptions =
-                    LazyIterable.from(objectIdsIterable)
-                        .map(objectId => {
-                            const object = this.registry
-                                .getEntityById(objectId) as GameObject;
-                            return {
-                                type: object.type,
-                                subtypes: object.subtypes,
-                                options: object.toOptions(),
-                                components: object.getComponentsData({
-                                    withoutFlags: ComponentFlags.LOCAL_ONLY,
-                                }),
-                            };
-                        })
-                        .toArray();
-                this.gameEventBatcher.addPlayerEvent(player.id,
-                    [GameEvent.OBJECTS_REGISTERED, objectsOptions]);
-            });
-    
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_UNLOAD_CHUNK,
-            (player: Player, box: BoundingBox) => {
-                const objectIdsIterable = this.collisionService
-                    .getOverlappingObjects(box);
-                const objectIds =
-                    LazyIterable.from(objectIdsIterable)
-                        .toArray();
-                this.gameEventBatcher.addPlayerEvent(player.id,
-                    [GameEvent.OBJECTS_UNREGISTERED, objectIds]);
             });
 
         /**
@@ -675,35 +613,30 @@ export class GameServer {
                 assert(false);
         }
 
-        let eventData;
-        if (data === undefined) {
-            eventData = [
+        if (gameEvent === GameEvent.ENTITY_COMPONENT_REMOVED) {
+            this.gameEventBatcher.addBroadcastEvent([
                 gameEvent,
                 component.entity.id,
                 component.clazz.tag,
-            ];
-        } else {
-            eventData = [
-                gameEvent,
-                component.entity.id,
-                component.clazz.tag,
-                data,
-            ];
-        }
- 
-        if (eventData === undefined) {
-            return;
+            ]);
+        } else if (gameEvent === GameEvent.ENTITY_COMPONENT_ADDED
+            || gameEvent === GameEvent.ENTITY_COMPONENT_UPDATED) {
+            if (data === undefined) {
+                this.gameEventBatcher.addBroadcastEvent([
+                    gameEvent,
+                    component.entity.id,
+                    component.clazz.tag,
+                ]);
+            } else {
+                this.gameEventBatcher.addBroadcastEvent([
+                    gameEvent,
+                    component.entity.id,
+                    component.clazz.tag,
+                    data,
+                ]);
+            }
         }
 
-        for (const player of this.playerService.getPlayers()) {
-            if (!this.collisionService.isOverlappingWithBox(component.entity,
-                player.visibleAreaBoundingBox)) {
-                continue;
-            }
- 
-            this.gameEventBatcher.addPlayerEvent(player.id,
-                eventData as UnicastBatchGameEvent);
-        }
     }
 
     handleFlagPick(
@@ -784,6 +717,21 @@ export class GameServer {
     }
 
     sendRequestedServerStatus(playerId?: string): void {
+        const objects = this.registry.getEntities() as Iterable<GameObject>;
+        const objectsOptions =
+            LazyIterable.from(objects)
+                .map(object => {
+                    return {
+                        type: object.type,
+                        subtypes: object.subtypes,
+                        options: object.toOptions(),
+                        components: object.getComponentsData({
+                            withoutFlags: ComponentFlags.LOCAL_ONLY,
+                        }),
+                    };
+                })
+                .toArray() as Iterable<GameObjectFactoryBuildOptions>;
+
         const players = this.playerService.getPlayers();
         const playersOptions =
             LazyIterable.from(players)
@@ -808,6 +756,7 @@ export class GameServer {
         ]);
 
         const event: CommonBatchGameEvent = [GameEvent.SERVER_STATUS, {
+            objectsOptions,
             playersOptions,
             teamsOptions,
             configsData,
