@@ -55,6 +55,7 @@ import { HealthComponent } from '@/components/HealthComponent';
 import { EntitySpawnerService } from '@/entity-spawner/EntitySpawnerService';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { FlagComponent } from '@/flag/FlagComponent';
+import { DestroyedComponent } from '@/components/DestroyedComponent';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -188,6 +189,12 @@ export class GameServer {
                     options,
                 );
             });
+        this.registry.componentEmitter(DestroyedComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_ADDED,
+                (component) => {
+                    const entity = component.entity;
+                    this.collisionService.markDirtyCollisions(entity);
+                });
         this.registry.componentEmitter(PositionComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
                 (_event, component) => {
