@@ -175,6 +175,7 @@ export class GameServer {
 
                 this.entitySpawnerService.handleEntityDestroyed(entity);
                 this.gameObjectService.unattachRelativeEntities(entity);
+                this.gameObjectService.unattachRelativeEntity(entity);
 
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_UNREGISTERED, entity.id]);
             });
