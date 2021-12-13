@@ -166,8 +166,6 @@ export class GameServer {
 
                 switch (object.type) {
                     case GameObjectType.TANK: {
-                        this.gameObjectService.unattachRelativeEntities(entity);
-
                         const playerId = entity
                             .getComponent(PlayerOwnedComponent).playerId;
                         this.playerService.setPlayerTankId(playerId, null);
@@ -176,6 +174,7 @@ export class GameServer {
                 }
 
                 this.entitySpawnerService.handleEntityDestroyed(entity);
+                this.gameObjectService.unattachRelativeEntities(entity);
 
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.OBJECT_UNREGISTERED, entity.id]);
             });
