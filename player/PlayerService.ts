@@ -2,6 +2,7 @@ import { Config } from '@/config/Config';
 import { Color } from '@/drawable/Color';
 import { TankTier } from '@/tank/TankTier';
 import { assert } from '@/utils/assert';
+import { LazyIterable } from '@/utils/LazyIterable';
 import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import { ButtonPressAction, MOVE_BUTTON_TYPES, ButtonState, BUTTON_TYPE_DIRECTION, ButtonType } from '../actions/ButtonPressAction';
@@ -70,11 +71,13 @@ export class PlayerService {
     }
 
     getPlayers(): Iterable<Player> {
-        return this.repository.getAll();
+        const players = this.repository.getAll();
+        return LazyIterable.from(players)
+            .filter(p => p.active);
     }
 
     getSortedPlayers(): Player[] {
-        const playersIterable = this.repository.getAll();
+        const playersIterable = this.getPlayers();
         const players = Array.from(playersIterable);
         return players.sort((a, b) => b.points - a.points);
     }
@@ -458,6 +461,8 @@ export class PlayerService {
     processPlayersStatus(deltaSeconds: number): void {
         const players = this.repository.getAll();
         for (const player of players) {
+            player.active = true;
+
             this.processPlayerRespawnTimeout(player, deltaSeconds);
             this.processPlayerSpawnStatus(player);
             const disconnected = this.processPlayerDisconnectStatus(player);
