@@ -44,6 +44,7 @@ import { RelativePositionComponent, RelativePositionComponentData } from '@/phys
 import { DirtyPositionComponent, DirtyPositionComponentData } from '@/physics/point/DirtyPositionComponent';
 import { PickupIgnoreComponent, PickupIgnoreComponentData } from '@/components/PickupIgnoreComponent';
 import { DirtyCollisionsComponent, DirtyCollisionsComponentData } from '@/physics/collisions/DirtyCollisionsComponent';
+import { IsChunksTrackingComponent, IsChunksTrackingComponentData } from '@/components/IsChunksTrackingComponent';
 
 export class ComponentRegistry {
     _lookupAndValidate(
@@ -223,6 +224,10 @@ export class ComponentRegistry {
             case DirtyCollisionsComponent.tag:
                 clazz = DirtyCollisionsComponent;
                 assertEquals<Partial<DirtyCollisionsComponentData>>(data);
+                break;
+            case IsChunksTrackingComponent.tag:
+                clazz = IsChunksTrackingComponent;
+                assertEquals<Partial<IsChunksTrackingComponentData>>(data);
                 break;
             default:
                 assert(false, `Invalid tag '${tag}'`);
