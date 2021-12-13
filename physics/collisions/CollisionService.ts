@@ -446,7 +446,8 @@ export class CollisionService {
         const node = this.boundingBoxRepository.findNode(entity.id);
         const boundingBox = entity.findComponent(BoundingBoxComponent);
         if (node !== undefined && boundingBox !== undefined
-            && node.isFatBoxFitting(boundingBox)) {
+            && node.isFatBoxFitting(boundingBox)
+            && !entity.hasComponent(DestroyedComponent)) {
             return;
         }
 
