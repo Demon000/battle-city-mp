@@ -175,10 +175,7 @@ export class GameObjectService {
 
     destroyAllWorldEntities(): void {
         for (const entity of this.registry.getEntitiesWithComponent(WorldEntityComponent)) {
-            entity.upsertComponent(DestroyedComponent, undefined, {
-                flags: ComponentFlags.LOCAL_ONLY,
-            });
-            entity.destroy();
+            this.markDestroyed(entity);
         }
     }
 
@@ -190,9 +187,7 @@ export class GameObjectService {
             const spawnTime =
                 entity.getComponent(SpawnTimeComponent).value;
             if (Date.now() - spawnTime > automaticDestroyTimeMs) {
-                entity.upsertComponent(DestroyedComponent, undefined, {
-                    flags: ComponentFlags.LOCAL_ONLY,
-                });
+                this.markDestroyed(entity);
             }
         }
     }

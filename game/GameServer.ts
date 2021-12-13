@@ -866,6 +866,7 @@ export class GameServer {
         this.ticker.stop();
 
         this.gameObjectService.destroyAllWorldEntities();
+        this.gameObjectService.processObjectsDestroyed();
         this.playerService.resetFields();
         this.gameEventBatcher.flush();
 
