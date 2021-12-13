@@ -567,10 +567,12 @@ export class GameServer {
                 this.gameObjectService.processObjectsPosition(deltaSeconds);
                 this.collisionService.processObjectsRequestedPosition();
                 this.gameObjectService.processObjectsDirtyRelativePosition();
+                this.collisionService.processObjectsDirtyBoundingBox();
                 this.entitySpawnerService.processActiveEntitySpawners();
                 this.gameObjectService.processObjectsDirtyIsMoving();
                 this.gameObjectService.processObjectsDirtyCenterPosition();
                 this.gameObjectService.processObjectsAutomaticDestroy();
+                this.collisionService.processObjectsDirtyCollisions();
                 this.gameObjectService.processObjectsDestroyed();
                 this.gameEventBatcher.flush();
             });
