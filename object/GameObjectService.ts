@@ -278,6 +278,10 @@ export class GameObjectService {
         });
     }
 
+    isAttachedRelativeEntity(entity: Entity): boolean {
+        return entity.hasComponent(RelativePositionComponent);
+    }
+
     attachRelativeEntity(parent: Entity, child: Entity): void {
         const relativePositionComponent = child
             .findComponent(RelativePositionComponent);

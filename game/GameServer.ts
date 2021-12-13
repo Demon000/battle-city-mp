@@ -643,6 +643,10 @@ export class GameServer {
         flag: Entity,
         flagBase: Entity | undefined,
     ): void {
+        if (this.gameObjectService.isAttachedRelativeEntity(flag)) {
+            return;
+        }
+
         this.gameObjectService.attachRelativeEntity(tank, flag);
         this.flagService.setFlagSource(flag, flagBase);
     }
