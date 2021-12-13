@@ -173,7 +173,7 @@ export class GameObjectService {
         }
     }
 
-    destroyAllWorldEntities(): void {
+    markAllWorldEntitiesDestroyed(): void {
         for (const entity of this.registry.getEntitiesWithComponent(WorldEntityComponent)) {
             this.markDestroyed(entity);
         }

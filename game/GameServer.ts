@@ -874,7 +874,7 @@ export class GameServer {
     reload(): void {
         this.ticker.stop();
 
-        this.gameObjectService.destroyAllWorldEntities();
+        this.gameObjectService.markAllWorldEntitiesDestroyed();
         this.collisionService.processObjectsDirtyCollisions();
         this.gameObjectService.processObjectsDestroyed();
         this.playerService.resetFields();
