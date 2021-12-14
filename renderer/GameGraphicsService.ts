@@ -132,13 +132,6 @@ export class GameGraphicsService {
             position.y + this.gameHeight / 2);
     }
 
-    getWorldPosition(position: Point): Point {
-        return {
-            x: Math.floor(position.x / this.scale),
-            y: Math.floor(position.y / this.scale),
-        };
-    }
-
     processObjectsDirtyGraphics(): void {
         for (const component of this.registry.getComponents(DirtyGraphicsComponent)) {
             const object = component.entity as GameObject;
