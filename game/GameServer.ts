@@ -328,8 +328,8 @@ export class GameServer {
                     .findRelativePositionEntityWithType(tank,
                         GameObjectType.FLAG);
                 if (carriedFlag !== undefined) {
-                    this.handleFlagInteraction(tank, undefined, carriedFlag,
-                        undefined);
+                    this.handleFlagDrop(tank, undefined, carriedFlag,
+                        undefined, FlagTankInteraction.DROP);
                 }
             });
 

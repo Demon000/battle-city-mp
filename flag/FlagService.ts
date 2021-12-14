@@ -93,7 +93,8 @@ export class FlagService {
          * as the tank.
          */
         if (carriedFlag !== undefined && flag === undefined
-            && flagBase !== undefined && tankTeamId === carriedFlagTeamId) {
+            && flagBase !== undefined && tankTeamId === carriedFlagTeamId
+            && flagBaseTeamId == carriedFlagTeamId) {
             return FlagTankInteraction.RETURN;
         }
 
@@ -103,15 +104,8 @@ export class FlagService {
          */
         if (carriedFlag !== undefined && flag !== undefined
             && flagBase !== undefined && carriedFlagTeamId !== flagTeamId
-            && flagTeamId === flagBaseTeamId) {
+            && flagTeamId === flagBaseTeamId && tankTeamId === flagBaseTeamId) {
             return FlagTankInteraction.CAPTURE;
-        }
-
-        /*
-         * Drop flag. Must not be at enemies base.
-         */
-        if (carriedFlag !== undefined && flagBase === undefined) {
-            return FlagTankInteraction.DROP;
         }
 
         return undefined;
