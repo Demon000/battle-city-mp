@@ -163,6 +163,8 @@ export class GameGraphicsService {
             return;
         }
 
-        entity.upsertComponent(DirtyGraphicsComponent);
+        entity.upsertComponent(DirtyGraphicsComponent, undefined, {
+            silent: true,
+        });
     }
 }

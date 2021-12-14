@@ -83,7 +83,9 @@ export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
         }
 
         if (force) {
-            this.object.removeComponent(DirtyGraphicsComponent);
+            this.object.removeComponent(DirtyGraphicsComponent, {
+                silent: true,
+            });
         } else {
             this.object.graphicsDirty = false;
         }

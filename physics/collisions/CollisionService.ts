@@ -397,8 +397,11 @@ export class CollisionService {
     }
 
     processObjectsDirtyIsUnderBush(): void {
-        for (const component of this.registry.getComponents(DirtyIsUnderBushComponent)) {
-            component.remove();
+        for (const component of
+            this.registry.getComponents(DirtyIsUnderBushComponent)) {
+            component.remove({
+                silent: true,
+            });
 
             const entity = component.entity;
             this.updateIsUnderBush(entity);
@@ -412,6 +415,7 @@ export class CollisionService {
 
         entity.upsertComponent(DirtyBoundingBoxComponent, undefined, {
             flags: ComponentFlags.LOCAL_ONLY,
+            silent: true,
         });
     }
 
@@ -443,7 +447,9 @@ export class CollisionService {
     processObjectsDirtyBoundingBox(): void {
         for (const component of
             this.registry.getComponents(DirtyBoundingBoxComponent)) {
-            component.remove();
+            component.remove({
+                silent: true,
+            });
 
             const entity = component.entity;
             this.updateBoundingBox(entity);
@@ -461,6 +467,7 @@ export class CollisionService {
 
         entity.upsertComponent(DirtyCollisionsComponent, undefined, {
             flags: ComponentFlags.LOCAL_ONLY,
+            silent: true,
         });
     }
 
@@ -479,7 +486,9 @@ export class CollisionService {
 
     processObjectsDirtyCollisions(): void {
         for (const component of this.registry.getComponents(DirtyCollisionsComponent)) {
-            component.remove();
+            component.remove({
+                silent: true,
+            });
 
             this.processObjectDirtyCollisions(component.entity);
         }

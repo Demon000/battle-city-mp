@@ -51,6 +51,7 @@ export class GameObjectService {
 
         entity.upsertComponent(DirtyIsMovingComponent, undefined, {
             flags: ComponentFlags.LOCAL_ONLY,
+            silent: true,
         });
     }
 
@@ -61,6 +62,7 @@ export class GameObjectService {
 
         entity.upsertComponent(DirtyIsUnderBushComponent, undefined, {
             flags: ComponentFlags.LOCAL_ONLY,
+            silent: true,
         });
     }
 
@@ -216,7 +218,9 @@ export class GameObjectService {
 
     processObjectsDirtyIsMoving(): void {
         for (const component of this.registry.getComponents(DirtyIsMovingComponent)) {
-            component.remove();
+            component.remove({
+                silent: true,
+            });
 
             const entity = component.entity;
             this.updateIsMoving(entity);
@@ -230,6 +234,7 @@ export class GameObjectService {
 
         entity.upsertComponent(DirtyCenterPositionComponent, undefined, {
             flags: ComponentFlags.LOCAL_ONLY,
+            silent: true,
         });
     }
 
@@ -253,7 +258,9 @@ export class GameObjectService {
     processObjectsDirtyCenterPosition(): void {
         for (const component of
             this.registry.getComponents(DirtyCenterPositionComponent)) {
-            component.remove();
+            component.remove({
+                silent: true,
+            });
 
             const entity = component.entity;
             this.updateCenterPosition(entity);
@@ -267,6 +274,7 @@ export class GameObjectService {
 
         entity.upsertComponent(DirtyPositionComponent, undefined, {
             flags: ComponentFlags.LOCAL_ONLY,
+            silent: true,
         });
     }
 
@@ -365,7 +373,9 @@ export class GameObjectService {
     processObjectsDirtyRelativePosition(): void {
         for (const component of this.registry
             .getComponents(DirtyPositionComponent)) {
-            component.remove();
+            component.remove({
+                silent: true,
+            });
 
             const entity = component.entity;
             this.updateRelativePosition(entity);
