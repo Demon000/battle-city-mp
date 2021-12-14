@@ -8,6 +8,8 @@ export interface HealthComponentData {
 export class HealthComponent
     extends Component<HealthComponent>
     implements HealthComponentData {
+    static TAG = 'H';
+
     value = 0;
     max = 0;
 }

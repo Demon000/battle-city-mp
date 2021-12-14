@@ -8,5 +8,7 @@ export interface EntityOwnedComponentData {
 export class EntityOwnedComponent
     extends Component<EntityOwnedComponent>
     implements EntityOwnedComponentData {
+    static TAG = 'EO';
+
     id = -1;
 }

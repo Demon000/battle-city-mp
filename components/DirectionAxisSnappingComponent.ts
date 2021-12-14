@@ -7,5 +7,7 @@ export interface DirectionAxisSnappingComponentData {
 export class DirectionAxisSnappingComponent
     extends Component<DirectionAxisSnappingComponent>
     implements DirectionAxisSnappingComponentData {
+    static TAG = 'DAS';
+
     value = 0;
 }

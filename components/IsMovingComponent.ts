@@ -5,4 +5,5 @@ export interface IsMovingComponentData {}
 export class IsMovingComponent
     extends Component<IsMovingComponent>
     implements IsMovingComponentData {
+    static TAG = 'IM';
 }

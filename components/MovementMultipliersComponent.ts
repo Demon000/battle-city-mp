@@ -17,6 +17,8 @@ export interface MovementMultipliersComponentData {
 export class MovementMultipliersComponent
     extends Component<MovementMultipliersComponent>
     implements MovementMultipliersComponentData {
+    static TAG = 'MM';
+
     accelerationFactorMultiplier = 1;
     decelerationFactorMultiplier = 1;
     maxSpeedMultiplier = 1;

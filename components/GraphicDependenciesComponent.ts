@@ -7,5 +7,7 @@ export interface GraphicDependenciesComponentData {
 export class GraphicDependenciesComponent
     extends Component<GraphicDependenciesComponent>
     implements GraphicDependenciesComponentData {
+    static TAG = 'GD';
+
     components = {};
 }

@@ -3,5 +3,7 @@ import { EntitySpawnerComponent, EntitySpawnerComponentData } from './EntitySpaw
 export interface BulletSpawnerComponentData extends EntitySpawnerComponentData {}
 
 export class BulletSpawnerComponent extends EntitySpawnerComponent {
+    static TAG = 'BS';
+
     type = 'bullet';
 }

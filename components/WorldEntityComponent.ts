@@ -5,4 +5,5 @@ export interface WorldEntityComponentData {}
 export class WorldEntityComponent
     extends Component<WorldEntityComponent>
     implements WorldEntityComponentData {
+    static TAG = 'WE';
 }

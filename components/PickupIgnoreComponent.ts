@@ -9,6 +9,8 @@ export interface PickupIgnoreComponentData {
 export class PickupIgnoreComponent
     extends Component<PickupIgnoreComponent>
     implements PickupIgnoreComponentData {
+    static TAG = 'PI';
+
     time = 0;
     entityId = -1;
 }

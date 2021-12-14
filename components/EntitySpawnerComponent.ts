@@ -15,6 +15,8 @@ export interface EntitySpawnerComponentData {
 export class EntitySpawnerComponent
     extends Component<EntitySpawnerComponent>
     implements EntitySpawnerComponentData {
+    static TAG = 'ES';
+
     type = 'invalid';
     subtypes: string[] = [];
     components: ComponentsInitialization = {};

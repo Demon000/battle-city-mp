@@ -8,6 +8,8 @@ export interface PlayerOwnedComponentData {
 export class PlayerOwnedComponent
     extends Component<PlayerOwnedComponent>
     implements PlayerOwnedComponentData {
+    static TAG = 'PO';
+
     playerId = 'invalid';
     playerName?: string;
 }

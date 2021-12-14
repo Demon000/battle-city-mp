@@ -5,4 +5,5 @@ export interface IsUnderBushComponentData {}
 export class IsUnderBushComponent
     extends Component<IsUnderBushComponent>
     implements IsUnderBushComponentData {
+    static TAG = 'IUB';
 }

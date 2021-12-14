@@ -8,5 +8,7 @@ export interface FlagComponentData {
 export class FlagComponent
     extends Component<FlagComponent>
     implements FlagComponentData {
+    static TAG = 'F';
+
     sourceId = -1;
 }

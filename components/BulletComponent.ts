@@ -10,5 +10,7 @@ export class BulletComponent
     extends Component<BulletComponent>
     implements BulletComponentData {
     damage = 0;
+    tag = 'BC';
+
     power = BulletPower.LIGHT;
 }

@@ -6,6 +6,8 @@ export interface BoundingBoxComponentData extends BoundingBox {}
 export class BoundingBoxComponent
     extends Component<BoundingBoxComponent>
     implements BoundingBoxComponentData {
+    static TAG = 'BB';
+
     tl = {
         x: 0,
         y: 0,

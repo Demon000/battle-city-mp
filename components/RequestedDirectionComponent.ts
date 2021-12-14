@@ -8,5 +8,7 @@ export interface RequestedDirectionComponentData {
 export class RequestedDirectionComponent
     extends Component<RequestedDirectionComponent>
     implements RequestedDirectionComponentData {
+    static TAG = 'RD';
+
     value = Direction.UP;
 }

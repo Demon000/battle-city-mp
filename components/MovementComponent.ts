@@ -12,6 +12,8 @@ export interface MovementComponentData {
 export class MovementComponent
     extends Component<MovementComponent>
     implements MovementComponentData {
+    static TAG = 'M';
+
     speed = 0;
     maxSpeed = 0;
     direction = null;

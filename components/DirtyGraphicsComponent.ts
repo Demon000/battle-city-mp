@@ -5,4 +5,5 @@ export interface DirtyGraphicsComponentData {}
 export class DirtyGraphicsComponent
     extends Component<DirtyGraphicsComponent>
     implements DirtyGraphicsComponentData {
+    static TAG = 'DG';
 }

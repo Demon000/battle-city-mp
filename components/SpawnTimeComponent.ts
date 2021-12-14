@@ -9,6 +9,7 @@ export interface SpawnTimeComponentData {
 export class SpawnTimeComponent
     extends Component<SpawnTimeComponent>
     implements SpawnTimeComponentData {
+    static TAG = 'ST';
 
     value: number;
 

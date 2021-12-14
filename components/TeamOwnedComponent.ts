@@ -7,5 +7,7 @@ export interface TeamOwnedComponentData {
 export class TeamOwnedComponent
     extends Component<TeamOwnedComponent>
     implements TeamOwnedComponentData {
+    static TAG = 'TO';
+
     teamId = 'invalid';
 }

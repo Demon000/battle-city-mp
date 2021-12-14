@@ -4,4 +4,6 @@ export interface SpawnComponentData {}
 
 export class SpawnComponent
     extends Component<SpawnComponent>
-    implements SpawnComponentData {}
+    implements SpawnComponentData {
+    static TAG = 'S';
+}

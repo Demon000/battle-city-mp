@@ -8,5 +8,7 @@ export interface DirectionComponentData {
 export class DirectionComponent
     extends Component<DirectionComponent>
     implements DirectionComponentData {
+    static TAG = 'DI';
+
     value = Direction.UP;
 }

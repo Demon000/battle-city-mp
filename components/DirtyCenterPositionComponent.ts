@@ -5,4 +5,5 @@ export interface DirtyCenterPositionComponentData {}
 export class DirtyCenterPositionComponent
     extends Component<DirtyCenterPositionComponent>
     implements DirtyCenterPositionComponentData {
+    static TAG = 'DCP';
 }

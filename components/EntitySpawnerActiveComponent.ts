@@ -8,4 +8,5 @@ export class EntitySpawnerActiveComponent
     extends Component<EntitySpawnerActiveComponent>
     implements EntitySpawnerActiveComponentData {
     tags: Record<string, boolean> = {};
+    static TAG = 'ESA';
 }

@@ -6,6 +6,8 @@ export interface RequestedPositionComponentData extends Point {}
 export class RequestedPositionComponent
     extends Component<RequestedPositionComponent>
     implements RequestedPositionComponentData {
+    static TAG = 'RP';
+
     x = 0;
     y = 0;
 }

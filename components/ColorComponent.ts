@@ -8,5 +8,7 @@ export interface ColorComponentData {
 export class ColorComponent
     extends Component<ColorComponent>
     implements ColorComponentData {
+    static TAG = 'C';
+
     value: Color = [255, 255, 255];
 }
