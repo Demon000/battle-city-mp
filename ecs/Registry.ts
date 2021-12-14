@@ -218,8 +218,10 @@ export class Registry {
         const componentEmitter = this.componentEmitter(component.clazz);
         if (componentEmitter !== undefined) {
             componentEmitter.emit(event, component, data);
-            componentEmitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
-                event, component, data, options);
+            if (event !== RegistryComponentEvent.COMPONENT_INITIALIZED) {
+                componentEmitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
+                    event, component, data, options);
+            }
             if (event === RegistryComponentEvent.COMPONENT_ADDED
                 || event === RegistryComponentEvent.COMPONENT_UPDATED) {
                 componentEmitter.emit(
@@ -229,8 +231,10 @@ export class Registry {
         }
 
         this.emitter.emit(event, component, data);
-        this.emitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
-            event, component, data, options);
+        if (event !== RegistryComponentEvent.COMPONENT_INITIALIZED) {
+            this.emitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
+                event, component, data, options);
+        }
     }
 
     runForComponentsInitialization(
@@ -276,10 +280,8 @@ export class Registry {
         if (!options?.silent) {
             this.emit(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 component, data);
-        }
-
-        if (!options?.silent) {
-            this.emit(RegistryComponentEvent.COMPONENT_ADDED, component, data);
+            this.emit(RegistryComponentEvent.COMPONENT_ADDED,
+                component, data);
         }
 
         return component;
