@@ -10,6 +10,8 @@ import { PositionComponent } from '@/components/PositionComponent';
 import { CanvasUtils, Context2D } from '@/utils/CanvasUtils';
 import { RatioUtils } from '@/utils/RatioUtils';
 import { GameObjectGraphicsRenderer } from '../object/GameObjectGraphicsRenderer';
+import { ComponentRegistry } from '@/ecs/ComponentRegistry';
+import { ClazzOrTag } from '@/ecs/Component';
 
 export class GameGraphicsService {
     private scale = 0;
@@ -145,14 +147,19 @@ export class GameGraphicsService {
         }
     }
 
-    processObjectsGraphicsDependencies(entityId: EntityId, tag: string): void {
+    processObjectsGraphicsDependencies(
+        entityId: EntityId,
+        clazzOrTag: ClazzOrTag,
+    ): void {
         const entity = this.registry.getEntityById(entityId);
         const component = entity.findComponent(GraphicDependenciesComponent);
         if (component === undefined) {
             return;
         }
 
-        if (!(tag in component.components)) {
+        const clazz = ComponentRegistry.lookup(clazzOrTag);
+        if (!(clazz.tag in component.components)
+            && !(clazz.name in component.components)) {
             return;
         }
 
