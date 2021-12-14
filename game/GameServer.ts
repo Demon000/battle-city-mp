@@ -213,6 +213,12 @@ export class GameServer {
                     this.gameObjectService.markDirtyCenterPosition(entity);
                 });
         this.registry.componentEmitter(BoundingBoxComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
+                (component) => {
+                    const entity = component.entity;
+                    this.collisionService.processObjectDirtyBoundingBox(entity);
+                });
+        this.registry.componentEmitter(BoundingBoxComponent, true)
             .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
                 (_event, component) => {
                     const entity = component.entity;
