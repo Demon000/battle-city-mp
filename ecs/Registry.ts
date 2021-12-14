@@ -14,6 +14,7 @@ export enum RegistryEvent {
 }
 
 export enum RegistryComponentEvent {
+    COMPONENT_INITIALIZED = 'component-initialized',
     COMPONENT_ADDED = 'component-added',
     COMPONENT_UPDATED = 'component-updated',
     COMPONENT_BEFORE_REMOVE = 'component-before-remove',
@@ -38,6 +39,11 @@ export interface RegistryEvents {
 }
 
 export interface RegistryComponentEvents<C extends Component<C> = any> {
+    [RegistryComponentEvent.COMPONENT_INITIALIZED]: (
+        component: C,
+        data?: any,
+        options?: ComponentEmitOptions,
+    ) => void;
     [RegistryComponentEvent.COMPONENT_ADDED]: (
         component: C,
         data?: any,
@@ -124,6 +130,12 @@ export class Registry {
         this.idsEntityMap.set(entity.id, entity);
 
         if (!options?.silent) {
+            entity.emitForEachComponent(
+                RegistryComponentEvent.COMPONENT_INITIALIZED,
+                {
+                    register: true,
+                },
+            );
             this.emitter.emit(RegistryEvent.ENTITY_REGISTERED, entity);
             entity.emitForEachComponent(
                 RegistryComponentEvent.COMPONENT_ADDED,
@@ -259,6 +271,11 @@ export class Registry {
         if (options !== undefined && options.flags !== undefined
             && options.flags) {
             component.flags = options.flags;
+        }
+
+        if (!options?.silent) {
+            this.emit(RegistryComponentEvent.COMPONENT_INITIALIZED,
+                component, data);
         }
 
         if (!options?.silent) {
