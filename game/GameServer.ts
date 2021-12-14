@@ -520,7 +520,6 @@ export class GameServer {
                 const flagBase = this.collisionService
                     .findOverlappingWithType(flag, GameObjectType.FLAG_BASE);
                 if (flag !== carriedFlag) {
-                    console.log(tank, flag, carriedFlag);
                     this.handleFlagInteraction(tank, flag, carriedFlag, flagBase);
                 }
             });
