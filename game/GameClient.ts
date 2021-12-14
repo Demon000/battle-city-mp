@@ -115,7 +115,7 @@ export class GameClient {
 
         this.registryIdGenerator = new RegistryNumberIdGenerator();
         this.componentRegistry = new ComponentRegistry();
-        this.registry = new Registry(this.registryIdGenerator, this.componentRegistry);
+        this.registry = new Registry(this.registryIdGenerator);
         this.entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.CLIENT);
         this.gameObjectFactory = new GameObjectFactory(this.registry, this.config, this.entityBlueprint);
 
@@ -137,8 +137,9 @@ export class GameClient {
 
         this.registry.emitter.on(RegistryComponentEvent.COMPONENT_CHANGED,
             (_event, component) => {
-                this.gameGraphicsService.processObjectsGraphicsDependencies(component.entity.id,
-                    component.clazz.tag);
+                this.gameGraphicsService
+                    .processObjectsGraphicsDependencies(component.entity.id,
+                        component.clazz.tag);
             });
         this.registry.componentEmitter(DestroyedComponent, true)
             .on(RegistryComponentEvent.COMPONENT_ADDED,

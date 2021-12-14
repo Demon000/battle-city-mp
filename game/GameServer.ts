@@ -72,7 +72,6 @@ export interface GameServerEvents {
 
 export class GameServer {
     private registryIdGenerator;
-    private componentRegistry;
     private registry;
     private entityBlueprint;
 
@@ -103,8 +102,7 @@ export class GameServer {
         this.config.loadAll('./configs');
 
         this.registryIdGenerator = new RegistryNumberIdGenerator();
-        this.componentRegistry = new ComponentRegistry();
-        this.registry = new Registry(this.registryIdGenerator, this.componentRegistry);
+        this.registry = new Registry(this.registryIdGenerator);
         this.entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.SERVER);
         this.entityBlueprint.reloadBlueprintData();
 

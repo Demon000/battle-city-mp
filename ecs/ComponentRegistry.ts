@@ -1,4 +1,4 @@
-import { ComponentClassType } from '@/ecs/Component';
+import { ClazzOrTag, ComponentClassType } from '@/ecs/Component';
 import { BoundingBoxComponent, BoundingBoxComponentData } from '@/components/BoundingBoxComponent';
 import { PositionComponent, PositionComponentData } from '@/components/PositionComponent';
 import { SizeComponent, SizeComponentData } from '@/components/SizeComponent';
@@ -46,214 +46,235 @@ import { PickupIgnoreComponent, PickupIgnoreComponentData } from '@/components/P
 import { DirtyCollisionsComponent, DirtyCollisionsComponentData } from '@/components/DirtyCollisionsComponent';
 
 export class ComponentRegistry {
-    _lookupAndValidate(
+    static _lookupAndValidate(
         data: any,
         tag: string,
-        clazz?: ComponentClassType<any>,
     ): ComponentClassType<any> {
         switch(tag) {
             case BoundingBoxComponent.tag:
-                clazz = BoundingBoxComponent;
+            case BoundingBoxComponent.name:
                 assertEquals<Partial<BoundingBoxComponentData>>(data);
-                break;
+                return BoundingBoxComponent;
             case PositionComponent.tag:
-                clazz = PositionComponent;
+            case PositionComponent.name:
                 assertEquals<Partial<PositionComponentData>>(data);
-                break;
+                return PositionComponent;
             case SizeComponent.tag:
-                clazz = SizeComponent;
+            case SizeComponent.name:
                 assertEquals<Partial<SizeComponentData>>(data);
-                break;
+                return SizeComponent;
             case AutomaticDestroyComponent.tag:
-                clazz = AutomaticDestroyComponent;
+            case AutomaticDestroyComponent.name:
                 assertEquals<Partial<AutomaticDestroyComponentData>>(data);
-                break;
+                return AutomaticDestroyComponent;
             case DestroyedComponent.tag:
-                clazz = DestroyedComponent;
+            case DestroyedComponent.name:
                 assertEquals<Partial<DestroyedComponentData>>(data);
-                break;
+                return DestroyedComponent;
             case GraphicDependenciesComponent.tag:
-                clazz = GraphicDependenciesComponent;
+            case GraphicDependenciesComponent.name:
                 assertEquals<Partial<GraphicDependenciesComponentData>>(data);
-                break;
+                return GraphicDependenciesComponent;
             case IsMovingComponent.tag:
-                clazz = IsMovingComponent;
+            case IsMovingComponent.name:
                 assertEquals<Partial<IsMovingComponentData>>(data);
-                break;
+                return IsMovingComponent;
             case DirectionAxisSnappingComponent.tag:
-                clazz = DirectionAxisSnappingComponent;
+            case DirectionAxisSnappingComponent.name:
                 assertEquals<Partial<DirectionAxisSnappingComponentData>>(data);
-                break;
+                return DirectionAxisSnappingComponent;
             case SpawnTimeComponent.tag:
-                clazz = SpawnTimeComponent;
+            case SpawnTimeComponent.name:
                 assertEquals<Partial<SpawnTimeComponentData>>(data);
-                break;
+                return SpawnTimeComponent;
             case IsUnderBushComponent.tag:
-                clazz = IsUnderBushComponent;
+            case IsUnderBushComponent.name:
                 assertEquals<Partial<IsUnderBushComponentData>>(data);
-                break;
+                return IsUnderBushComponent;
             case CenterPositionComponent.tag:
-                clazz = CenterPositionComponent;
+            case CenterPositionComponent.name:
                 assertEquals<Partial<CenterPositionComponentData>>(data);
-                break;
+                return CenterPositionComponent;
             case DirtyBoundingBoxComponent.tag:
-                clazz = DirtyBoundingBoxComponent;
+            case DirtyBoundingBoxComponent.name:
                 assertEquals<Partial<DirtyBoundingBoxComponentData>>(data);
-                break;
+                return DirtyBoundingBoxComponent;
             case RequestedPositionComponent.tag:
-                clazz = RequestedPositionComponent;
+            case RequestedPositionComponent.name:
                 assertEquals<Partial<RequestedPositionComponentData>>(data);
-                break;
+                return RequestedPositionComponent;
             case DirtyCenterPositionComponent.tag:
-                clazz = DirtyCenterPositionComponent;
+            case DirtyCenterPositionComponent.name:
                 assertEquals<Partial<DirtyCenterPositionComponentData>>(data);
-                break;
+                return DirtyCenterPositionComponent;
             case DirectionComponent.tag:
-                clazz = DirectionComponent;
+            case DirectionComponent.name:
                 assertEquals<Partial<DirectionComponentData>>(data);
-                break;
+                return DirectionComponent;
             case RequestedDirectionComponent.tag:
-                clazz = RequestedDirectionComponent;
+            case RequestedDirectionComponent.name:
                 assertEquals<Partial<RequestedDirectionComponentData>>(data);
-                break;
+                return RequestedDirectionComponent;
             case TankComponent.tag:
-                clazz = TankComponent;
+            case TankComponent.name:
                 assertEquals<Partial<TankComponentData>>(data);
-                break;
+                return TankComponent;
             case SpawnComponent.tag:
-                clazz = SpawnComponent;
+            case SpawnComponent.name:
                 assertEquals<Partial<SpawnComponentData>>(data);
-                break;
+                return SpawnComponent;
             case IsMovingTrackingComponent.tag:
-                clazz = IsMovingTrackingComponent;
+            case IsMovingTrackingComponent.name:
                 assertEquals<Partial<IsMovingTrackingComponentData>>(data);
-                break;
+                return IsMovingTrackingComponent;
             case PlayerOwnedComponent.tag:
-                clazz = PlayerOwnedComponent;
+            case PlayerOwnedComponent.name:
                 assertEquals<Partial<PlayerOwnedComponentData>>(data);
-                break;
+                return PlayerOwnedComponent;
             case EntityOwnedComponent.tag:
-                clazz = EntityOwnedComponent;
+            case EntityOwnedComponent.name:
                 assertEquals<Partial<EntityOwnedComponentData>>(data);
-                break;
+                return EntityOwnedComponent;
             case BulletComponent.tag:
-                clazz = BulletComponent;
+            case BulletComponent.name:
                 assertEquals<Partial<BulletComponentData>>(data);
-                break;
+                return BulletComponent;
             case ColorComponent.tag:
-                clazz = ColorComponent;
+            case ColorComponent.name:
                 assertEquals<Partial<ColorComponentData>>(data);
-                break;
+                return ColorComponent;
             case WorldEntityComponent.tag:
-                clazz = WorldEntityComponent;
+            case WorldEntityComponent.name:
                 assertEquals<Partial<WorldEntityComponentData>>(data);
-                break;
+                return WorldEntityComponent;
             case MovementComponent.tag:
-                clazz = MovementComponent;
+            case MovementComponent.name:
                 assertEquals<Partial<MovementComponentData>>(data);
-                break;
+                return MovementComponent;
             case MovementMultipliersComponent.tag:
-                clazz = MovementMultipliersComponent;
+            case MovementMultipliersComponent.name:
                 assertEquals<Partial<MovementMultipliersComponentData>>(data);
-                break;
+                return MovementMultipliersComponent;
             case HealthComponent.tag:
-                clazz = HealthComponent;
+            case HealthComponent.name:
                 assertEquals<Partial<HealthComponentData>>(data);
-                break;
+                return HealthComponent;
             case EntitySpawnerComponent.tag:
-                clazz = EntitySpawnerComponent;
+            case EntitySpawnerComponent.name:
                 assertEquals<Partial<EntitySpawnerComponentData>>(data);
-                break;
+                return EntitySpawnerComponent;
             case EntitySpawnerActiveComponent.tag:
-                clazz = EntitySpawnerActiveComponent;
+            case EntitySpawnerActiveComponent.name:
                 assertEquals<Partial<EntitySpawnerActiveComponentData>>(data);
-                break;
+                return EntitySpawnerActiveComponent;
             case BulletSpawnerComponent.tag:
-                clazz = BulletSpawnerComponent;
+            case BulletSpawnerComponent.name:
                 assertEquals<Partial<BulletSpawnerComponentData>>(data);
-                break;
+                return BulletSpawnerComponent;
             case SmokeSpawnerComponent.tag:
-                clazz = SmokeSpawnerComponent;
+            case SmokeSpawnerComponent.name:
                 assertEquals<Partial<SmokeSpawnerComponentData>>(data);
-                break;
+                return SmokeSpawnerComponent;
             case HealthBasedSmokeSpawnerComponent.tag:
-                clazz = HealthBasedSmokeSpawnerComponent;
+            case HealthBasedSmokeSpawnerComponent.name:
                 assertEquals<Partial<HealthBasedSmokeSpawnerComponentData>>(data);
-                break;
+                return HealthBasedSmokeSpawnerComponent;
             case TeamOwnedComponent.tag:
-                clazz = TeamOwnedComponent;
+            case TeamOwnedComponent.name:
                 assertEquals<Partial<TeamOwnedComponentData>>(data);
-                break;
+                return TeamOwnedComponent;
             case FlagComponent.tag:
-                clazz = FlagComponent;
+            case FlagComponent.name:
                 assertEquals<Partial<FlagComponentData>>(data);
-                break;
+                return FlagComponent;
             case IsUnderBushTrackingComponent.tag:
-                clazz = IsUnderBushTrackingComponent;
+            case IsUnderBushTrackingComponent.name:
                 assertEquals<Partial<IsUnderBushTrackingComponentData>>(data);
-                break;
+                return IsUnderBushTrackingComponent;
             case DirtyIsUnderBushComponent.tag:
-                clazz = DirtyIsUnderBushComponent;
+            case DirtyIsUnderBushComponent.name:
                 assertEquals<Partial<DirtyIsUnderBushComponentData>>(data);
-                break;
+                return DirtyIsUnderBushComponent;
             case DirtyGraphicsComponent.tag:
-                clazz = DirtyGraphicsComponent;
+            case DirtyGraphicsComponent.name:
                 assertEquals<Partial<DirtyGraphicsComponentData>>(data);
-                break;
+                return DirtyGraphicsComponent;
             case DirtyIsMovingComponent.tag:
-                clazz = DirtyIsMovingComponent;
+            case DirtyIsMovingComponent.name:
                 assertEquals<Partial<DirtyIsMovingComponentData>>(data);
-                break;
+                return DirtyIsMovingComponent;
             case RelativePositionChildrenComponent.tag:
-                clazz = RelativePositionChildrenComponent;
+            case RelativePositionChildrenComponent.name:
                 assertEquals<Partial<RelativePositionChildrenComponentData>>(data);
-                break;
+                return RelativePositionChildrenComponent;
             case RelativePositionComponent.tag:
-                clazz = RelativePositionComponent;
+            case RelativePositionComponent.name:
                 assertEquals<Partial<RelativePositionComponentData>>(data);
-                break;
+                return RelativePositionComponent;
             case DirtyPositionComponent.tag:
-                clazz = DirtyPositionComponent;
+            case DirtyPositionComponent.name:
                 assertEquals<Partial<DirtyPositionComponentData>>(data);
-                break;
+                return DirtyPositionComponent;
             case PickupIgnoreComponent.tag:
-                clazz = PickupIgnoreComponent;
+            case PickupIgnoreComponent.name:
                 assertEquals<Partial<PickupIgnoreComponentData>>(data);
-                break;
+                return PickupIgnoreComponent;
             case DirtyCollisionsComponent.tag:
-                clazz = DirtyCollisionsComponent;
+            case DirtyCollisionsComponent.name:
                 assertEquals<Partial<DirtyCollisionsComponentData>>(data);
-                break;
+                return DirtyCollisionsComponent;
             default:
                 assert(false, `Invalid tag '${tag}'`);
         }
-
-        return clazz;
     }
 
-    lookupAndValidate(
+    static lookupAndValidate(
         data: any,
-        tag?: string,
-        clazz?: ComponentClassType<any>,
+        clazzOrTag: ClazzOrTag,
     ): ComponentClassType<any> {
-        assert(tag !== undefined || clazz !== undefined);
-
-        if (tag === undefined && clazz !== undefined) {
-            tag = clazz.tag;
+        let clazz;
+        let tag;
+        if (typeof clazzOrTag === 'string') {
+            tag = clazzOrTag;
+        } else {
+            clazz = clazzOrTag;
         }
 
         if (clazz !== undefined && data === undefined) {
             return clazz;
         }
 
+        if (clazz !== undefined) {
+            tag = clazz.tag;
+        }
+
         assert(tag !== undefined);
 
         const message = `Object is not assignable to component '${tag}'`;
         try {
-            return this._lookupAndValidate(data, tag, clazz);
+            return this._lookupAndValidate(data, tag);
         } catch (err) {
             console.error(message, data);
             throw err;
         }
+    }
+
+    static lookup(clazzOrTag: ClazzOrTag): ComponentClassType<any> {
+        let clazz;
+        let tag;
+
+        if (typeof clazzOrTag === 'string') {
+            tag = clazzOrTag;
+        } else {
+            clazz = clazzOrTag;
+        }
+
+        if (clazz !== undefined) {
+            return clazz;
+        }
+
+        assert(tag !== undefined);
+
+        return this._lookupAndValidate({}, tag);
     }
 }

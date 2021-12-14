@@ -1,5 +1,6 @@
 import { assert } from '@/utils/assert';
 import { ClazzOrTag, Component, ComponentClassType, ComponentsInitialization } from './Component';
+import { ComponentRegistry } from './ComponentRegistry';
 import { EntityId } from './EntityId';
 import { ComponentEmitOptions, Registry, RegistryComponentEvent, RegistryOperationOptions } from './Registry';
 
@@ -156,13 +157,7 @@ export class Entity {
     >(
         clazzOrTag: ClazzOrTag<C>,
     ): C | undefined {
-        let tag;
-        if (typeof clazzOrTag === 'string') {
-            tag = clazzOrTag;
-        } else {
-            tag = clazzOrTag.tag;
-        }
-
+        const tag = ComponentRegistry.lookup(clazzOrTag).tag;
         return this.tagComponentMap.get(tag) as C;
     }
 

@@ -16,6 +16,7 @@ import { DirectionComponent } from '@/components/DirectionComponent';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
+import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 
 export class EntitySpawnerService {
     constructor(
@@ -99,12 +100,7 @@ export class EntitySpawnerService {
         const activeSpawnerTags =
             entitySpawnerActiveComponent.tags;
 
-        let tag;
-        if (typeof clazzOrTag === 'string') {
-            tag = clazzOrTag;
-        } else {
-            tag = clazzOrTag.tag;
-        }
+        const tag = ComponentRegistry.lookup(clazzOrTag).tag;
 
         if (status) {
             activeSpawnerTags[tag] = true;
