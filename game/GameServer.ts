@@ -620,6 +620,8 @@ export class GameServer {
             case RegistryComponentEvent.COMPONENT_BEFORE_REMOVE:
                 gameEvent = GameEvent.ENTITY_COMPONENT_REMOVED;
                 break;
+            case RegistryComponentEvent.COMPONENT_INITIALIZED:
+                return;
             default:
                 assert(false);
         }
