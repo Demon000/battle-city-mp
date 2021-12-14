@@ -32,6 +32,7 @@ export class Component<C extends Component<C>> {
         this.clazz = clazz;
     }
 
+    @nonenumerable
     static readonly TAG?: string;
 
     static get tag(): string {

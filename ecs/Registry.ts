@@ -93,7 +93,6 @@ export class Registry {
 
     constructor(
         private idGenerator: RegistryIdGenerator,
-        private componentRegistry: ComponentRegistry,
     ) {
         this.addComponent = this.addComponent.bind(this);
         this.updateComponent = this.updateComponent.bind(this);
@@ -196,15 +195,7 @@ export class Registry {
         clazzOrTag: ClazzOrTag<C>,
         data: any,
     ): ComponentClassType<C> {
-        let clazz;
-        let tag;
-        if (typeof clazzOrTag === 'string') {
-            tag = clazzOrTag;
-        } else {
-            clazz = clazzOrTag;
-        }
-
-        return this.componentRegistry.lookupAndValidate(data, tag, clazz);
+        return ComponentRegistry.lookupAndValidate(data, clazzOrTag);
     }
 
     emit<
