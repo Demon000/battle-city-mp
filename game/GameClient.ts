@@ -68,7 +68,7 @@ export interface GameClientEvents {
     [GameClientEvent.SCOREBOARD_WATCH_TIME]: (value: boolean) => void;
 
     [GameClientEvent.OWN_PLAYER_ADDED]: () => void;
-    [GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID]: (tankId: number | null) => void;
+    [GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID]: (tankId: EntityId | null) => void;
     [GameClientEvent.OWN_PLAYER_CHANGED_TEAM_ID]: (teamId: string | null) => void;
     [GameClientEvent.OWN_PLAYER_CHANGED_TANK_TIER]: (tier: TankTier) => void;
     [GameClientEvent.OWN_PLAYER_CHANGED_TANK_COLOR]: (color: Color) => void;
@@ -222,7 +222,7 @@ export class GameClient {
             this.emitter.emit(GameClientEvent.OWN_PLAYER_ADDED);
         });
         this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_ID,
-            (tankId: number | null) => {
+            (tankId: EntityId | null) => {
                 this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID, tankId);
                 this.tankService.setOwnPlayerTankId(tankId);
                 if (tankId !== null) {
@@ -303,17 +303,17 @@ export class GameClient {
         this.gameObjectService.markDestroyed(entity);
     }
 
-    onEntityComponentAdded(entityId: number, tag: string, data: any): void {
+    onEntityComponentAdded(entityId: EntityId, tag: string, data: any): void {
         const entity = this.registry.getEntityById(entityId);
         entity.addComponent(tag, data);
     }
 
-    onEntityComponentUpdated(entityId: number, tag: string, data: any): void {
+    onEntityComponentUpdated(entityId: EntityId, tag: string, data: any): void {
         const entity = this.registry.getEntityById(entityId);
         entity.updateComponent(tag, data);
     }
 
-    onEntityComponentRemoved(entityId: number, tag: string): void {
+    onEntityComponentRemoved(entityId: EntityId, tag: string): void {
         const entity = this.registry.getEntityById(entityId);
         entity.removeComponent(tag);
     }

@@ -1,3 +1,4 @@
+import { EntityId } from '@/ecs/EntityId';
 import { GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
 import { PartialPlayerOptions, PlayerOptions } from '@/player/Player';
 import { GameServerStatus } from './GameServerStatus';
@@ -42,10 +43,10 @@ export type BroadcastBatchGameEvent = CommonBatchGameEvent |
 [name: GameEvent.TEAM_PLAYER_REMOVED, teamId: string, playerId: string] |
 
 [name: GameEvent.OBJECT_REGISTERED, buildOptions: GameObjectFactoryBuildOptions] |
-[name: GameEvent.OBJECT_UNREGISTERED, objectId: number] |
-[name: GameEvent.ENTITY_COMPONENT_ADDED, entityId: number, tag: string, data?: any] |
-[name: GameEvent.ENTITY_COMPONENT_UPDATED, entityId: number, tag: string, data?: any] |
-[name: GameEvent.ENTITY_COMPONENT_REMOVED, entityId: number, tag: string] |
+[name: GameEvent.OBJECT_UNREGISTERED, entityId: EntityId] |
+[name: GameEvent.ENTITY_COMPONENT_ADDED, entityId: EntityId, tag: string, data?: any] |
+[name: GameEvent.ENTITY_COMPONENT_UPDATED, entityId: EntityId, tag: string, data?: any] |
+[name: GameEvent.ENTITY_COMPONENT_REMOVED, entityId: EntityId, tag: string] |
 [name: GameEvent.ROUND_TIME_UPDATED, roundTime: number];
 
 export type BatchGameEvent = UnicastBatchGameEvent | BroadcastBatchGameEvent;

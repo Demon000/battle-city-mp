@@ -1,5 +1,6 @@
 import { Config } from '@/config/Config';
 import { Color } from '@/drawable/Color';
+import { EntityId } from '@/ecs/EntityId';
 import { TankTier } from '@/tank/TankTier';
 import { assert } from '@/utils/assert';
 import { MapRepository } from '@/utils/MapRepository';
@@ -44,7 +45,7 @@ export interface PlayerServiceEvents {
     [PlayerServiceEvent.PLAYER_REQUESTED_SPAWN_STATUS]: (playerId: string, spawnStatus: PlayerSpawnStatus) => void;
     [PlayerServiceEvent.PLAYER_REQUESTED_SERVER_STATUS]: (playerId: string) => void;
     [PlayerServiceEvent.OWN_PLAYER_ADDED]: (player: Player) => void;
-    [PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_ID]: (tankId: number | null) => void;
+    [PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_ID]: (tankId: EntityId | null) => void;
     [PlayerServiceEvent.OWN_PLAYER_CHANGED_TEAM_ID]: (teamId: string | null) => void;
     [PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_TIER]: (tier: TankTier) => void;
     [PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_COLOR]: (color: Color) => void;
@@ -122,7 +123,7 @@ export class PlayerService {
         });
     }
 
-    setPlayerTankId(playerId: string, tankId: number | null): void {
+    setPlayerTankId(playerId: string, tankId: EntityId | null): void {
         const player = this.repository.find(playerId);
         if (player === undefined) {
             return;

@@ -205,6 +205,7 @@ import { GamepadWrapper, GamepadWrapperEvent, GamepadWrapperEventData } from '..
 import { ColorUtils } from '@/utils/ColorUtils';
 import { Vue, Watch } from 'vue-property-decorator';
 import { WebpackUtils } from '../utils/WebpackUtils';
+import { EntityId } from '@/ecs/EntityId';
 
 @Options({
     components: {
@@ -281,7 +282,7 @@ export default class App extends Vue {
             });
 
         gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID,
-            (tankId: number | null) => {
+            (tankId: EntityId | null): void => {
                 this.isPlayerDead = tankId === null;
 
                 if (tankId === null && !this.hasTankDiedOnce) {

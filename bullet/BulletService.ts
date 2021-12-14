@@ -9,13 +9,17 @@ import { DirectionComponent } from '@/components/DirectionComponent';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
 import { BulletPower } from './BulletPower';
+import { EntityId } from '@/ecs/EntityId';
 
 export class BulletService {
     constructor(
         private registry: Registry,
     ) {}
 
-    getBulletBrickWallDestroyBox(bulletId: number, brickWallId: number): BoundingBox {
+    getBulletBrickWallDestroyBox(
+        bulletId: EntityId,
+        brickWallId: EntityId,
+    ): BoundingBox {
         const bullet = this.registry.getEntityById(bulletId);
         const brickWall = this.registry.getEntityById(brickWallId);
         const brickWallBoundingBox = BoundingBoxUtils.clone(

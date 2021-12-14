@@ -1,11 +1,12 @@
 import { Color } from '@/drawable/Color';
+import { EntityId } from '@/ecs/EntityId';
 import { Direction } from '@/physics/Direction';
 import { TankTier } from '@/tank/TankTier';
 import { ButtonPressAction, ButtonType } from '../actions/ButtonPressAction';
 
 export interface PlayerOptions {
     id: string;
-    tankId: number | null;
+    tankId: EntityId | null;
     teamId: string | null;
     name?: string;
     deaths?: number;
@@ -35,7 +36,7 @@ export class Player {
     requestedTankTier: TankTier;
     requestedTankColor: Color;
     disconnected = false;
-    tankId: number | null;
+    tankId: EntityId | null;
     teamId: string | null;
     id: string;
     name?: string;

@@ -56,6 +56,7 @@ import { EntitySpawnerService } from '@/entity-spawner/EntitySpawnerService';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { FlagComponent } from '@/components/FlagComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
+import { EntityId } from '@/ecs/EntityId';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -374,14 +375,14 @@ export class GameServer {
         };
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_LEVEL_BORDER,
-            (bulletId: number, _staticObjectId: number, _position: Point) => {
+            (bulletId: EntityId, _staticObjectId: EntityId, _position: Point) => {
                 const bullet = this.registry.getEntityById(bulletId);
                 spawnExplosion(bullet, ExplosionType.SMALL, GameObjectType.NONE);
                 this.gameObjectService.markDestroyed(bullet);
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_STEEL_WALL,
-            (bulletId: number, steelWallId: number, _position: Point) => {
+            (bulletId: EntityId, steelWallId: EntityId, _position: Point) => {
                 const bullet = this.registry.getEntityById(bulletId);
                 const steelWall = this.registry.getEntityById(steelWallId);
                 this.gameObjectService.markDestroyed(bullet);
@@ -395,7 +396,7 @@ export class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BRICK_WALL,
-            (bulletId: number, brickWallId: number, _position: Point) => {
+            (bulletId: EntityId, brickWallId: EntityId, _position: Point) => {
                 const destroyBox = this.bulletService.getBulletBrickWallDestroyBox(bulletId, brickWallId);
                 const destroyBoxCenter = BoundingBoxUtils.center(destroyBox);
                 const objectsIds = this.collisionService.getOverlappingObjects(destroyBox);
@@ -412,7 +413,7 @@ export class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_TANK,
-            (bulletId: number, tankId: number, _position: Point) => {
+            (bulletId: EntityId, tankId: EntityId, _position: Point) => {
                 const bullet = this.registry.getEntityById(bulletId);
 
                 const bulletOwnerEntityId =
@@ -483,7 +484,11 @@ export class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BULLET,
-            (movingBulletId: number, staticBulletId: number, _position: Point) => {
+            (
+                movingBulletId: EntityId,
+                staticBulletId: EntityId,
+                _position: Point
+            ) => {
                 const movingBullet = this.registry.getEntityById(movingBulletId);
                 const staticBullet = this.registry.getEntityById(staticBulletId);
                 const movingBulletOwnerEntityId =
@@ -500,7 +505,7 @@ export class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_FLAG,
-            (tankId: number, flagId: number) => {
+            (tankId: EntityId, flagId: EntityId) => {
                 const tank = this.registry.getEntityById(tankId);
                 const flag = this.registry.getEntityById(flagId);
                 const carriedFlag = this.collisionService
@@ -509,12 +514,13 @@ export class GameServer {
                 const flagBase = this.collisionService
                     .findOverlappingWithType(flag, GameObjectType.FLAG_BASE);
                 if (flag !== carriedFlag) {
+                    console.log(tank, flag, carriedFlag);
                     this.handleFlagInteraction(tank, flag, carriedFlag, flagBase);
                 }
             });
 
         this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_FLAG_BASE,
-            (tankId: number, flagBaseId: number) => {
+            (tankId: EntityId, flagBaseId: EntityId) => {
                 const tank = this.registry.getEntityById(tankId);
                 const flagBase = this.registry.getEntityById(flagBaseId);
                 const carriedFlag = this.collisionService

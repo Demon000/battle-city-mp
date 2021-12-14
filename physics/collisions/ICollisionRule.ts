@@ -1,3 +1,4 @@
+import { EntityId } from '@/ecs/EntityId';
 import { Point } from '../point/Point';
 
 export enum CollisionResultEvent {
@@ -16,7 +17,11 @@ export enum CollisionEvent {
     TANK_COLLIDE_FLAG_BASE = 'tank-collide-flag-base',
 }
 
-type CollisionEventHandler = (movingObjectId: number, staticObjectId: number, position: Point) => void;
+type CollisionEventHandler = (
+    movingObjectId: EntityId,
+    staticObjectId: EntityId,
+    position: Point,
+) => void;
 
 export interface CollisionEvents {
     [CollisionEvent.BULLET_HIT_BRICK_WALL]: CollisionEventHandler,

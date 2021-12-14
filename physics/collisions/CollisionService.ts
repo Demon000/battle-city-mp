@@ -27,6 +27,7 @@ import { SizeComponent } from '@/components/SizeComponent';
 import { DirectionUtils } from './DirectionUtils';
 import { DirtyCollisionsComponent } from '../../components/DirtyCollisionsComponent';
 import { ICollisionRule, CollisionEvent, CollisionEvents, CollisionResultEvent } from './ICollisionRule';
+import { EntityId } from '@/ecs/EntityId';
 
 export class CollisionService {
     private rulesMap?: Map<string, Map<string, ICollisionRule>>;
@@ -34,7 +35,7 @@ export class CollisionService {
     emitter = new EventEmitter<CollisionEvents>();
 
     constructor(
-        private boundingBoxRepository: BoundingBoxRepository<number>,
+        private boundingBoxRepository: BoundingBoxRepository<EntityId>,
         private registry: Registry,
         rules?: ICollisionRule[],
     ) {
@@ -69,7 +70,7 @@ export class CollisionService {
         return movingMap.get(staticType);
     }
 
-    getOverlappingObjects(box: BoundingBox): Iterable<number> {
+    getOverlappingObjects(box: BoundingBox): Iterable<EntityId> {
         return this.boundingBoxRepository.getBoxOverlappingValues(box);
     }
 

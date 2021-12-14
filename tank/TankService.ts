@@ -1,6 +1,7 @@
 import { HealthComponent } from '@/components/HealthComponent';
 import { Color } from '@/drawable/Color';
 import { Entity } from '@/ecs/Entity';
+import { EntityId } from '@/ecs/EntityId';
 import { Registry } from '@/ecs/Registry';
 import { GameObjectFactory } from '@/object/GameObjectFactory';
 import { GameObjectType } from '@/object/GameObjectType';
@@ -8,7 +9,7 @@ import { Point } from '@/physics/point/Point';
 import { Player } from '@/player/Player';
 
 export class TankService {
-    private ownPlayerTankId: number | null = null;
+    private ownPlayerTankId: EntityId | null = null;
 
     constructor(
         private gameObjectFactory: GameObjectFactory,
@@ -39,15 +40,15 @@ export class TankService {
         });
     }
 
-    setOwnPlayerTankId(tankId: number | null): void {
+    setOwnPlayerTankId(tankId: EntityId | null): void {
         this.ownPlayerTankId = tankId;
     }
 
-    getOwnPlayerTankId(): number | null {
+    getOwnPlayerTankId(): EntityId | null {
         return this.ownPlayerTankId;
     }
 
-    decreaseTankHealth(tankId: number, value: number): void {
+    decreaseTankHealth(tankId: EntityId, value: number): void {
         const tank = this.registry.getEntityById(tankId);
         const health = tank.getComponent(HealthComponent);
         health.update({
