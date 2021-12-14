@@ -28,6 +28,7 @@ import { DirectionUtils } from './DirectionUtils';
 import { DirtyCollisionsComponent } from '../../components/DirtyCollisionsComponent';
 import { ICollisionRule, CollisionEvent, CollisionEvents, CollisionResultEvent } from './ICollisionRule';
 import { EntityId } from '@/ecs/EntityId';
+import { IsUnderBushTrackingComponent } from '@/components/IsUnderBushTrackingComponent';
 
 export class CollisionService {
     private rulesMap?: Map<string, Map<string, ICollisionRule>>;
@@ -374,25 +375,33 @@ export class CollisionService {
         return this.findOverlappingWithType(entity, type) !== undefined;
     }
 
+    updateIsUnderBush(entity: Entity): void {
+        if (!entity.hasComponent(IsUnderBushTrackingComponent)) {
+            return;
+        }
+
+        const hasIsUnderBushComponent = entity.hasComponent(IsUnderBushComponent);
+        const isUnderBush = this.isOverlappingWithType(entity, GameObjectType.BUSH);
+
+        if (isUnderBush === hasIsUnderBushComponent) {
+            return;
+        }
+
+        if (isUnderBush) {
+            entity.addComponent(IsUnderBushComponent, undefined, {
+                flags: ComponentFlags.LOCAL_ONLY,
+            });
+        } else {
+            entity.removeComponent(IsUnderBushComponent);
+        }
+    }
+
     processObjectsDirtyIsUnderBush(): void {
         for (const component of this.registry.getComponents(DirtyIsUnderBushComponent)) {
             component.remove();
 
             const entity = component.entity;
-            const hasIsUnderBushComponent = entity.hasComponent(IsUnderBushComponent);
-            const isUnderBush = this.isOverlappingWithType(entity, GameObjectType.BUSH);
-
-            if (isUnderBush === hasIsUnderBushComponent) {
-                continue;
-            }
-
-            if (isUnderBush) {
-                entity.addComponent(IsUnderBushComponent, undefined, {
-                    flags: ComponentFlags.LOCAL_ONLY,
-                });
-            } else {
-                entity.removeComponent(IsUnderBushComponent);
-            }
+            this.updateIsUnderBush(entity);
         }
     }
 
@@ -406,11 +415,7 @@ export class CollisionService {
         });
     }
 
-    processObjectDirtyBoundingBox(entity: Entity): void {
-        if (!entity.hasComponent(BoundingBoxComponent)) {
-            return;
-        }
-
+    updateBoundingBox(entity: Entity): void {
         const size = entity.getComponent(SizeComponent);
         const position = entity.getComponent(PositionComponent);
         const boundingBox = entity.getComponent(BoundingBoxComponent);
@@ -436,10 +441,12 @@ export class CollisionService {
     }
 
     processObjectsDirtyBoundingBox(): void {
-        for (const component of this.registry.getComponents(DirtyBoundingBoxComponent)) {
+        for (const component of
+            this.registry.getComponents(DirtyBoundingBoxComponent)) {
             component.remove();
 
-            this.processObjectDirtyBoundingBox(component.entity);
+            const entity = component.entity;
+            this.updateBoundingBox(entity);
         }
     }
 

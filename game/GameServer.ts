@@ -57,6 +57,8 @@ import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { FlagComponent } from '@/components/FlagComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { EntityId } from '@/ecs/EntityId';
+import { RelativePositionComponent } from '@/components/RelativePositionComponent';
+import { IsMovingTrackingComponent } from '@/components/IsMovingTrackingComponent';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -196,9 +198,21 @@ export class GameServer {
                     const entity = component.entity;
                     this.collisionService.markDirtyCollisions(entity);
                 });
+        this.registry.componentEmitter(CenterPositionComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
+                (component) => {
+                    const entity = component.entity;
+                    this.gameObjectService.updateCenterPosition(entity);
+                });
+        this.registry.componentEmitter(RelativePositionComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
+                (component) => {
+                    const entity = component.entity;
+                    this.gameObjectService.updateRelativePosition(entity);
+                });
         this.registry.componentEmitter(PositionComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
-                (_event, component) => {
+            .on(RegistryComponentEvent.COMPONENT_UPDATED,
+                (component) => {
                     const entity = component.entity;
                     this.collisionService.markDirtyBoundingBox(entity);
                     this.gameObjectService.markDirtyCenterPosition(entity);
@@ -206,8 +220,8 @@ export class GameServer {
                         .markRelativeChildrenDirtyPosition(entity);
                 });
         this.registry.componentEmitter(SizeComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
-                (_event, component) => {
+            .on(RegistryComponentEvent.COMPONENT_UPDATED,
+                (component) => {
                     const entity = component.entity;
                     this.collisionService.markDirtyBoundingBox(entity);
                     this.gameObjectService.markDirtyCenterPosition(entity);
@@ -216,23 +230,29 @@ export class GameServer {
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
                     const entity = component.entity;
-                    this.collisionService.processObjectDirtyBoundingBox(entity);
+                    this.collisionService.updateBoundingBox(entity);
                 });
         this.registry.componentEmitter(BoundingBoxComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
-                (_event, component) => {
+            .on(RegistryComponentEvent.COMPONENT_UPDATED,
+                (component) => {
                     const entity = component.entity;
                     this.collisionService.markDirtyCollisions(entity);
                 });
+        this.registry.componentEmitter(IsMovingTrackingComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
+                (component) => {
+                    const entity = component.entity;
+                    this.gameObjectService.updateIsMoving(entity);
+                });
         this.registry.componentEmitter(MovementComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
-                (_event, component) => {
+            .on(RegistryComponentEvent.COMPONENT_UPDATED,
+                (component) => {
                     const entity = component.entity;
                     this.gameObjectService.markDirtyIsMoving(entity);
                 });
         this.registry.componentEmitter(HealthComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
-                (_event, component) => {
+            .on(RegistryComponentEvent.COMPONENT_UPDATED,
+                (component) => {
                     const entity = component.entity;
                     this.entitySpawnerService.updateHealthBasedSmokeSpawner(entity);
                 });

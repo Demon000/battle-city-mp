@@ -36,6 +36,8 @@ import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
+import { IsMovingTrackingComponent } from '@/components/IsMovingTrackingComponent';
+import { IsUnderBushTrackingComponent } from '@/components/IsUnderBushTrackingComponent';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -144,32 +146,56 @@ export class GameClient {
                     const entity = component.entity;
                     this.collisionService.markDirtyCollisions(entity);
                 });
+        this.registry.componentEmitter(CenterPositionComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
+                (component) => {
+                    const entity = component.entity;
+                    this.gameObjectService.updateCenterPosition(entity);
+                });
         this.registry.componentEmitter(PositionComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
-                (_event, component) => {
+            .on(RegistryComponentEvent.COMPONENT_UPDATED,
+                (component) => {
                     const entity = component.entity;
                     this.collisionService.markDirtyBoundingBox(entity);
                     this.gameObjectService.markDirtyCenterPosition(entity);
                     this.gameObjectService.markDirtyIsUnderBush(entity);
                 });
         this.registry.componentEmitter(SizeComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
-                (_event, component) => {
+            .on(RegistryComponentEvent.COMPONENT_UPDATED,
+                (component) => {
                     const entity = component.entity;
                     this.collisionService.markDirtyBoundingBox(entity);
                     this.gameObjectService.markDirtyCenterPosition(entity);
                 });
         this.registry.componentEmitter(BoundingBoxComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
-                (_event, component) => {
+            .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
+                (component) => {
+                    const entity = component.entity;
+                    this.collisionService.updateBoundingBox(entity);
+                });
+        this.registry.componentEmitter(BoundingBoxComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_UPDATED,
+                (component) => {
                     const entity = component.entity;
                     this.collisionService.markDirtyCollisions(entity);
                 });
+        this.registry.componentEmitter(IsMovingTrackingComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
+                (component) => {
+                    const entity = component.entity;
+                    this.gameObjectService.updateIsMoving(entity);
+                });
         this.registry.componentEmitter(MovementComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
-                (_event, component) => {
+            .on(RegistryComponentEvent.COMPONENT_UPDATED,
+                (component) => {
                     const entity = component.entity;
                     this.gameObjectService.markDirtyIsMoving(entity);
+                });
+        this.registry.componentEmitter(IsUnderBushTrackingComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
+                (component) => {
+                    const entity = component.entity;
+                    this.collisionService.updateIsUnderBush(entity);
                 });
         this.registry.componentEmitter(HealthComponent, true)
             .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,

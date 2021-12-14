@@ -192,26 +192,34 @@ export class GameObjectService {
         }
     }
 
+    updateIsMoving(entity: Entity): void {
+        if (!entity.hasComponent(IsMovingTrackingComponent)) {
+            return;
+        }
+
+        const hasIsMovingComponent = entity.hasComponent(IsMovingComponent);
+        const movement = entity.getComponent(MovementComponent);
+        const isMoving = movement.speed > 0 || movement.direction !== null;
+
+        if (isMoving === hasIsMovingComponent) {
+            return;
+        }
+
+        if (isMoving) {
+            entity.addComponent(IsMovingComponent, undefined, {
+                flags: ComponentFlags.LOCAL_ONLY,
+            });
+        } else {
+            entity.removeComponent(IsMovingComponent);
+        }
+    }
+
     processObjectsDirtyIsMoving(): void {
         for (const component of this.registry.getComponents(DirtyIsMovingComponent)) {
             component.remove();
 
             const entity = component.entity;
-            const hasIsMovingComponent = entity.hasComponent(IsMovingComponent);
-            const movement = entity.getComponent(MovementComponent);
-            const isMoving = movement.speed > 0 || movement.direction !== null;
-
-            if (isMoving === hasIsMovingComponent) {
-                continue;
-            }
-
-            if (isMoving) {
-                entity.addComponent(IsMovingComponent, undefined, {
-                    flags: ComponentFlags.LOCAL_ONLY,
-                });
-            } else {
-                entity.removeComponent(IsMovingComponent);
-            }
+            this.updateIsMoving(entity);
         }
     }
 
@@ -225,25 +233,30 @@ export class GameObjectService {
         });
     }
 
+    updateCenterPosition(entity: Entity): void {
+        const centerPosition = entity.getComponent(CenterPositionComponent);
+        const position = entity.getComponent(PositionComponent);
+        const size = entity.getComponent(SizeComponent);
+
+        const x = position.x + size.width / 2;
+        const y = position.y + size.height / 2;
+        if (x === centerPosition.x && y === centerPosition.y) {
+            return;
+        }
+
+        centerPosition.update({
+            x,
+            y,
+        });
+    }
+
     processObjectsDirtyCenterPosition(): void {
-        for (const component of this.registry.getComponents(DirtyCenterPositionComponent)) {
+        for (const component of
+            this.registry.getComponents(DirtyCenterPositionComponent)) {
             component.remove();
 
             const entity = component.entity;
-            const centerPosition = entity.getComponent(CenterPositionComponent);
-            const position = entity.getComponent(PositionComponent);
-            const size = entity.getComponent(SizeComponent);
-
-            const x = position.x + size.width / 2;
-            const y = position.y + size.height / 2;
-            if (x === centerPosition.x && y === centerPosition.y) {
-                continue;
-            }
-
-            centerPosition.update({
-                x,
-                y,
-            });
+            this.updateCenterPosition(entity);
         }
     }
 
@@ -332,7 +345,7 @@ export class GameObjectService {
         }
     }
 
-    processObjectDirtyRelativePosition(entity: Entity): void {
+    updateRelativePosition(entity: Entity): void {
         const relativePositionComponent = entity
             .findComponent(RelativePositionComponent);
         if (relativePositionComponent === undefined) {
@@ -355,7 +368,7 @@ export class GameObjectService {
             component.remove();
 
             const entity = component.entity;
-            this.processObjectDirtyRelativePosition(entity);
+            this.updateRelativePosition(entity);
         }
     }
 
