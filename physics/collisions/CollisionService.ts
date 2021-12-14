@@ -485,7 +485,8 @@ export class CollisionService {
     }
 
     processObjectsDirtyCollisions(): void {
-        for (const component of this.registry.getComponents(DirtyCollisionsComponent)) {
+        for (const component of
+            this.registry.getComponents(DirtyCollisionsComponent)) {
             component.remove({
                 silent: true,
             });
