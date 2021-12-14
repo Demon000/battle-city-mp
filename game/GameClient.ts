@@ -35,6 +35,7 @@ import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
 import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
+import { DestroyedComponent } from '@/components/DestroyedComponent';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -137,35 +138,41 @@ export class GameClient {
                 this.gameGraphicsService.processObjectsGraphicsDependencies(component.entity.id,
                     component.clazz.tag);
             });
+        this.registry.componentEmitter(DestroyedComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_ADDED,
+                (component) => {
+                    const entity = component.entity;
+                    this.collisionService.markDirtyCollisions(entity);
+                });
         this.registry.componentEmitter(PositionComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+            .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
                 (_event, component) => {
                     const entity = component.entity;
-                    this.collisionService.processObjectDirtyBoundingBox(entity);
+                    this.collisionService.markDirtyBoundingBox(entity);
                     this.gameObjectService.markDirtyCenterPosition(entity);
                     this.gameObjectService.markDirtyIsUnderBush(entity);
                 });
         this.registry.componentEmitter(SizeComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+            .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
                 (_event, component) => {
                     const entity = component.entity;
-                    this.collisionService.processObjectDirtyBoundingBox(entity);
+                    this.collisionService.markDirtyBoundingBox(entity);
                     this.gameObjectService.markDirtyCenterPosition(entity);
                 });
         this.registry.componentEmitter(BoundingBoxComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+            .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
                 (_event, component) => {
                     const entity = component.entity;
-                    this.collisionService.processObjectDirtyCollisions(entity);
+                    this.collisionService.markDirtyCollisions(entity);
                 });
         this.registry.componentEmitter(MovementComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+            .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
                 (_event, component) => {
                     const entity = component.entity;
                     this.gameObjectService.markDirtyIsMoving(entity);
                 });
         this.registry.componentEmitter(HealthComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+            .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
                 (_event, component, data) => {
                     const entity = component.entity;
                     if (entity.id === this.tankService.getOwnPlayerTankId()) {
@@ -185,7 +192,7 @@ export class GameClient {
                     }
                 });
         this.registry.componentEmitter(BulletSpawnerComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+            .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
                 (_event, component, data) => {
                     const entity = component.entity;
                     if (entity.id === this.tankService.getOwnPlayerTankId()) {
@@ -363,11 +370,13 @@ export class GameClient {
     }
 
     onTick(): void {
+        this.collisionService.processObjectsDirtyBoundingBox();
         this.gameObjectService.processObjectsDirtyIsMoving();
         this.gameObjectService.processObjectsDirtyCenterPosition();
         this.collisionService.processObjectsDirtyIsUnderBush();
-        this.gameObjectService.processObjectsDestroyed();
+        this.collisionService.processObjectsDirtyCollisions();
         this.gameGraphicsService.processObjectsDirtyGraphics();
+        this.gameObjectService.processObjectsDestroyed();
 
         const ownPlayer = this.playerService.getOwnPlayer();
         if (ownPlayer === undefined) {
