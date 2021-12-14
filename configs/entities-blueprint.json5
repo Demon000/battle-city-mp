@@ -316,6 +316,7 @@
                     '2': 1000,
                 },
             },
+            IsChunksTrackingComponent: {},
         },
         clientComponents: {
             IsUnderBushTrackingComponent: {},

@@ -303,6 +303,18 @@ export class GameClient {
         this.gameObjectService.markDestroyed(entity);
     }
 
+    onObjectsRegistered(buildOptions: GameObjectFactoryBuildOptions[]): void {
+        for (const o of buildOptions) {
+            this.onObjectRegistered(o);
+        }
+    }
+
+    onObjectsUnregistered(entityIds: EntityId[]): void {
+        for (const entityId of entityIds) {
+            this.onObjectUnregistered(entityId);
+        }
+    }
+
     onEntityComponentAdded(entityId: EntityId, tag: string, data: any): void {
         const entity = this.registry.getEntityById(entityId);
         entity.addComponent(tag, data);
@@ -357,9 +369,6 @@ export class GameClient {
                 .map(o => new Team(o));
             this.teamService.addTeams(teams);
         }
-
-        LazyIterable.from(serverStatus.objectsOptions)
-            .forEach(o => this.gameObjectFactory.buildFromOptions(o));
 
         const maxVisibleGameSize = this.config.get<number>('game-client',
             'maxVisibleGameSize');
