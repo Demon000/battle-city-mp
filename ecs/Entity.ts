@@ -2,7 +2,7 @@ import { assert } from '@/utils/assert';
 import { ClazzOrTag, Component, ComponentClassType, ComponentsInitialization } from './Component';
 import { ComponentRegistry } from './ComponentRegistry';
 import { EntityId } from './EntityId';
-import { ComponentEmitOptions, Registry, RegistryComponentEvent, RegistryOperationOptions } from './Registry';
+import { Registry, RegistryOperationOptions } from './Registry';
 
 export interface EntityComponentsOptions {
     withFlags?: number;
@@ -143,15 +143,6 @@ export class Entity {
         }
     }
 
-    emitForEachComponent(
-        event: RegistryComponentEvent,
-        options?: ComponentEmitOptions,
-    ): void {
-        for (const component of this.tagComponentMap.values()) {
-            this.registry.emit(event, component, component.getData(), options);
-        }
-    }
-
     findComponent<
         C extends Component<C>,
     >(
@@ -170,6 +161,10 @@ export class Entity {
         assert(component !== undefined,
             'Component does not exist on entity', clazzOrTag, this);
         return component;
+    }
+
+    getComponents(): Iterable<Component<any>> {
+        return Array.from(this.tagComponentMap.values());
     }
 
     hasComponent<C extends Component<C>>(clazz: ComponentClassType<C>): boolean {

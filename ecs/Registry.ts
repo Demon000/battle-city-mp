@@ -129,15 +129,18 @@ export class Registry {
         this.idsEntityMap.set(entity.id, entity);
 
         if (!options?.silent) {
-            entity.emitForEachComponent(
+            const components = entity.getComponents();
+            this.emitForEachComponent(
                 RegistryComponentEvent.COMPONENT_INITIALIZED,
+                components,
                 {
                     register: true,
                 },
             );
             this.emitter.emit(RegistryEvent.ENTITY_REGISTERED, entity);
-            entity.emitForEachComponent(
+            this.emitForEachComponent(
                 RegistryComponentEvent.COMPONENT_ADDED,
+                components,
                 {
                     register: true,
                 },
@@ -157,8 +160,10 @@ export class Registry {
         assert(entityIdExists);
 
         if (!options?.silent) {
-            entity.emitForEachComponent(
+            const components = entity.getComponents();
+            this.emitForEachComponent(
                 RegistryComponentEvent.COMPONENT_BEFORE_REMOVE,
+                components,
                 {
                     destroy: true,
                 },
@@ -225,6 +230,17 @@ export class Registry {
         if (event !== RegistryComponentEvent.COMPONENT_INITIALIZED) {
             this.emitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
                 event, component, data, options);
+        }
+    }
+
+
+    emitForEachComponent(
+        event: RegistryComponentEvent,
+        components: Iterable<Component<any>>,
+        options?: ComponentEmitOptions,
+    ): void {
+        for (const component of components) {
+            this.emit(event, component, component.getData(), options);
         }
     }
 
