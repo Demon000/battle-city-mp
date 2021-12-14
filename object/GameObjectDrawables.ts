@@ -159,12 +159,12 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
     ],
     [GameObjectType.FLAG_BASE]: [
         new ImageDrawable('flag_base.png', {
-            renderPass: RenderPass.FLAG_BASE,
+            renderPass: RenderPass.GROUND,
         }),
     ],
     [GameObjectType.FLAG]: [
         new ImageDrawable('flag_pole.png', {
-            renderPass: RenderPass.FLAG_POLE,
+            renderPass: RenderPass.ABOVE_WALL,
             offsetX: 7,
             offsetY: -15,
             tests: [
@@ -174,7 +174,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             ],
         }),
         new ImageDrawable('flag_cloth.png', {
-            renderPass: RenderPass.FLAG_POLE,
+            renderPass: RenderPass.ABOVE_WALL,
             offsetX: 8,
             offsetY: -15,
             processor: function (entity: Entity) {
@@ -189,13 +189,13 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             ],
             overlays: [
                 new ImageDrawable('flag_cloth_shadows.png', {
-                    renderPass: RenderPass.FLAG_POLE,
+                    renderPass: RenderPass.ABOVE_WALL,
                     compositionType: 'difference',
                 }),
             ],
         }),
         new ImageDrawable('flag_pole_tank.png', {
-            renderPass: RenderPass.FLAG_POLE,
+            renderPass: RenderPass.ABOVE_WALL,
             offsetX: 8,
             offsetY: -5,
             tests: [
@@ -205,7 +205,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             ],
         }),
         new ImageDrawable('flag_cloth.png', {
-            renderPass: RenderPass.FLAG_POLE,
+            renderPass: RenderPass.ABOVE_WALL,
             offsetX: 9,
             offsetY: -5,
             processor: function (entity: Entity) {
@@ -220,7 +220,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             ],
             overlays: [
                 new ImageDrawable('flag_cloth_shadows.png', {
-                    renderPass: RenderPass.FLAG_POLE,
+                    renderPass: RenderPass.ABOVE_WALL,
                     compositionType: 'difference',
                 }),
             ],
@@ -269,7 +269,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                 const source = (ext: string) =>
                     `tank_${tier}_${direction}_${frame}${ext}.png`;
                 return new ImageDrawable(source(''), {
-                    renderPass: RenderPass.TANK,
+                    renderPass: RenderPass.WALL,
                     scaleX: tankDrawableScale,
                     scaleY: tankDrawableScale,
                     tests: tankDrawableTests(tier, direction, isMoving),
@@ -303,7 +303,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                         ], true, {
                             tests: tankDrawableTests(tier, direction, true),
                             processor: tankColorProcessor,
-                            renderPass: RenderPass.TANK,
+                            renderPass: RenderPass.WALL,
                             scaleX: tankDrawableScale,
                             scaleY: tankDrawableScale,
                         }),
@@ -317,7 +317,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             return drawables;
         })(),
         new TextDrawable('', {
-            renderPass: RenderPass.TANK_NAME,
+            renderPass: RenderPass.BELOW_BUSH,
             fontFamily: 'Press Start 2P',
             fontUrl: 'press_start_2p.ttf',
             fontColor: [255, 255, 255],
@@ -396,7 +396,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             250,
             250,
         ], false, {
-            renderPass: RenderPass.SMOKE,
+            renderPass: RenderPass.ABOVE_BUSH,
             offsetX: -8,
             offsetY: -8,
         }),
@@ -420,7 +420,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                 for (const direction of Object.values(Direction)) {
                     drawables.push(
                         new ImageDrawable(`bullet_${power}_${direction}.png`, {
-                            renderPass: RenderPass.BULLET,
+                            renderPass: RenderPass.WALL,
                             offsetX: -2,
                             offsetY: -2,
                             scaleX: 0.5,
@@ -471,7 +471,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                     80,
                 ], false, {
                     tests: generateExplosionDrawableTests(ExplosionType.SMALL),
-                    renderPass: RenderPass.EXPLOSIONS,
+                    renderPass: RenderPass.ABOVE_BUSH,
                     offsetX: -8,
                     offsetY: -8,
                 }),
@@ -488,7 +488,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                     80,
                 ], false, {
                     tests: generateExplosionDrawableTests(ExplosionType.BIG),
-                    renderPass: RenderPass.EXPLOSIONS,
+                    renderPass: RenderPass.ABOVE_BUSH,
                     offsetX: -16,
                     offsetY: -16,
                 }),
