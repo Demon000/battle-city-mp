@@ -43,7 +43,6 @@ export class Player {
     deaths: number;
     points: number;
     respawnTimeout;
-    active = false;
 
     constructor(options: PlayerOptions) {
         this.id = options.id;
