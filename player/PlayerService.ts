@@ -1,9 +1,6 @@
 import { Config } from '@/config/Config';
 import { Color } from '@/drawable/Color';
 import { EntityId } from '@/ecs/EntityId';
-import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
-import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
-import { Point } from '@/physics/point/Point';
 import { TankTier } from '@/tank/TankTier';
 import { assert } from '@/utils/assert';
 import { MapRepository } from '@/utils/MapRepository';
@@ -19,9 +16,6 @@ export enum PlayerServiceEvent {
     PLAYER_BEFORE_REMOVE = 'player-before-remove',
     PLAYER_REMOVED = 'player-removed',
     PLAYERS_CHANGED = 'players-changed',
-
-    PLAYER_LOAD_CHUNK = 'player-load-chunk',
-    PLAYER_UNLOAD_CHUNK = 'player-unload-chunk',
 
     PLAYER_REQUESTED_MOVE = 'player-requested-move',
     PLAYER_REQUESTED_SHOOT = 'player-requested-shoot',
@@ -45,8 +39,6 @@ export interface PlayerServiceEvents {
     [PlayerServiceEvent.PLAYER_BEFORE_REMOVE]: (playerId: string) => void;
     [PlayerServiceEvent.PLAYER_REMOVED]: (playerId: string) => void;
     [PlayerServiceEvent.PLAYERS_CHANGED]: () => void;
-    [PlayerServiceEvent.PLAYER_LOAD_CHUNK]: (player: Player, box: BoundingBox) => void;
-    [PlayerServiceEvent.PLAYER_UNLOAD_CHUNK]: (player: Player, box: BoundingBox) => void;
     [PlayerServiceEvent.PLAYER_REQUESTED_MOVE]: (playerId: string, direction: Direction | undefined) => void;
     [PlayerServiceEvent.PLAYER_REQUESTED_SHOOT]: (playerId: string, isShooting: boolean) => void;
     [PlayerServiceEvent.PLAYER_REQUESTED_DROP_FLAG]: (playerId: string) => void;
@@ -129,6 +121,29 @@ export class PlayerService {
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player.id, {
             respawnTimeout: newRespawnTimeout,
         });
+    }
+
+    setPlayerTankId(playerId: string, tankId: EntityId | null): void {
+        const player = this.repository.find(playerId);
+        if (player === undefined) {
+            return;
+        }
+
+        if (player.tankId === tankId) {
+            return;
+        }
+
+        player.tankId = tankId;
+
+        if (player.tankId === null) {
+            const respawnTimeout = this.config.get<number>('player', 'respawnTimeout');
+            this.setPlayerRespawnTimeout(player, respawnTimeout);
+        }
+
+        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
+            tankId,
+        });
+        this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
     }
 
     updatePlayer(playerId: string, playerOptions: PartialPlayerOptions): void {
@@ -220,26 +235,6 @@ export class PlayerService {
         this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, playerId, {
             requestedTankTier: tier,
         });
-    }
-
-    setPlayerNeedsChunksUpdate(playerId: string, position: Point): void {
-        const player = this.repository.get(playerId);
-        player.needsChunksUpdate = true;
-        player.chunkTrackedPosition.x = position.x;
-        player.chunkTrackedPosition.y = position.y;
-    }
-
-    setPlayerNeedsTankIdUpdate(
-        playerId: string,
-        tankId: EntityId | null,
-    ): void {
-        const player = this.repository.find(playerId);
-        if (player === undefined) {
-            return;
-        }
-
-        player.needsTankIdUpdate = true;
-        player.updatedTankId = tankId;
     }
 
     setPlayerRequestedTankColor(playerId: string, color: Color): void {
@@ -461,128 +456,6 @@ export class PlayerService {
         }
     }
 
-    getChunkCoords(n: number, chunkSize: number): number {
-        return n - n % chunkSize;
-    }
-
-    getChunkBoundingBox(x: number, y: number, chunkSize: number): BoundingBox {
-        return BoundingBoxUtils.create(x, y, x + chunkSize, y + chunkSize);
-    }
-
-    processPlayerChunksUpdate(player: Player): void {
-        if (!player.needsChunksUpdate) {
-            return;
-        }
-
-        const chunkSize = this.config.get<number>('chunk', 'chunkSize');
-        const visibleChunks = this.config.get<number>('chunk', 'visibleChunks');
-
-        const centerChunkX = this.getChunkCoords(player.chunkTrackedPosition.x,
-            chunkSize);
-        const centerChunkY = this.getChunkCoords(player.chunkTrackedPosition.y,
-            chunkSize);
-
-        const offset = ((visibleChunks - 1) / 2) * chunkSize;
-        const tlChunkX = centerChunkX - offset;
-        const tlChunkY = centerChunkY - offset;
-        const brChunkX = centerChunkX + chunkSize + offset;
-        const brChunkY = centerChunkY + chunkSize + offset;
-
-        player.visibleAreaBoundingBox.tl.x = tlChunkX;
-        player.visibleAreaBoundingBox.tl.y = tlChunkY;
-        player.visibleAreaBoundingBox.br.x = brChunkX;
-        player.visibleAreaBoundingBox.br.y = brChunkY;
-
-        const loadedChunks = [];
-        const unloadedChunks = [];
-
-        for (const x of player.chunkMap.keys()) {
-            const innerMap = player.chunkMap.get(x);
-            assert(innerMap !== undefined);
-
-            for (const y of innerMap.keys()) {
-                innerMap.set(y, false);
-            }
-        }
-
-        for (let x = tlChunkX; x < brChunkX; x += chunkSize) {
-            let innerMap = player.chunkMap.get(x);
-            if (innerMap === undefined) {
-                innerMap = new Map();
-                player.chunkMap.set(x, innerMap);
-            }
-
-            for (let y = tlChunkY; y < brChunkY; y += chunkSize) {
-                let load = false;
-
-                if (innerMap.get(y) === undefined) {
-                    load = true;
-                }
-
-                innerMap.set(y, true);
-
-                if (load) {
-                    loadedChunks.push(
-                        this.getChunkBoundingBox(x, y, chunkSize));
-                }
-            }
-        }
-
-        for (const x of player.chunkMap.keys()) {
-            const innerMap = player.chunkMap.get(x);
-            assert(innerMap !== undefined);
-
-            for (const y of innerMap.keys()) {
-                if (innerMap.get(y)) {
-                    continue;
-                }
-
-                innerMap.delete(y);
-                unloadedChunks.push(this.getChunkBoundingBox(x, y, chunkSize));
-            }
-
-            if (innerMap.size === 0) {
-                player.chunkMap.delete(x);
-            }
-        }
-
-        for (const chunk of unloadedChunks) {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_UNLOAD_CHUNK, player,
-                chunk);
-        }
-
-        for (const chunk of loadedChunks) {
-            this.emitter.emit(PlayerServiceEvent.PLAYER_LOAD_CHUNK, player,
-                chunk);
-        }
-
-        player.needsChunksUpdate = false;
-    }
-
-    processPlayerTankIdUpdate(player: Player): void {
-        if (!player.needsTankIdUpdate) {
-            return;
-        }
-
-        if (player.tankId === player.updatedTankId) {
-            return;
-        }
-
-        player.tankId = player.updatedTankId;
-
-        if (player.tankId === null) {
-            const respawnTimeout = this.config.get<number>('player', 'respawnTimeout');
-            this.setPlayerRespawnTimeout(player, respawnTimeout);
-        }
-
-        this.emitter.emit(PlayerServiceEvent.PLAYER_CHANGED, player.id, {
-            tankId: player.tankId,
-        });
-        this.emitter.emit(PlayerServiceEvent.PLAYERS_CHANGED);
-
-        player.needsTankIdUpdate = true;
-    }
-
     processPlayersStatus(deltaSeconds: number): void {
         const players = this.repository.getAll();
         for (const player of players) {
@@ -597,14 +470,6 @@ export class PlayerService {
             this.processPlayerMovement(player);
             this.processPlayerShooting(player);
             this.processPlayerDroppingFlag(player);
-        }
-    }
-
-    processPlayersLateStatus(): void {
-        const players = this.repository.getAll();
-        for (const player of players) {
-            this.processPlayerChunksUpdate(player);
-            this.processPlayerTankIdUpdate(player);
         }
     }
 

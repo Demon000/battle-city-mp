@@ -1,9 +1,6 @@
 import { Color } from '@/drawable/Color';
 import { EntityId } from '@/ecs/EntityId';
-import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
-import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { Direction } from '@/physics/Direction';
-import { Point } from '@/physics/point/Point';
 import { TankTier } from '@/tank/TankTier';
 import { ButtonPressAction, ButtonType } from '../actions/ButtonPressAction';
 
@@ -40,8 +37,6 @@ export class Player {
     requestedTankColor: Color;
     disconnected = false;
     tankId: EntityId | null;
-    updatedTankId: EntityId | null = null;
-    needsTankIdUpdate = false;
     teamId: string | null;
     id: string;
     name?: string;
@@ -49,10 +44,6 @@ export class Player {
     deaths: number;
     points: number;
     respawnTimeout;
-    chunkMap: Map<number, Map<number, boolean>> = new Map();
-    visibleAreaBoundingBox: BoundingBox = BoundingBoxUtils.create(0, 0, 0, 0);
-    needsChunksUpdate = false;
-    chunkTrackedPosition: Point = {x: 0, y: 0};
 
     constructor(options: PlayerOptions) {
         this.id = options.id;

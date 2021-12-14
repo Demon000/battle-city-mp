@@ -7,9 +7,6 @@ export enum GameEvent {
     OBJECT_REGISTERED = 'object-registered',
     OBJECT_UNREGISTERED = 'object-unregisterd',
 
-    OBJECTS_REGISTERED = 'objects-registered',
-    OBJECTS_UNREGISTERED = 'objects-unregistered',
-
     ENTITY_COMPONENT_ADDED = 'entity-component-added',
     ENTITY_COMPONENT_UPDATED = 'entity-component-updated',
     ENTITY_COMPONENT_REMOVED = 'entity-component-removed',
@@ -35,14 +32,7 @@ export type GameEntityComponentEvent =
     GameEvent.ENTITY_COMPONENT_UPDATED |
     GameEvent.ENTITY_COMPONENT_REMOVED;
 
-export type UnicastBatchGameEvent = CommonBatchGameEvent |
-[name: GameEvent.OBJECT_REGISTERED, buildOptions: GameObjectFactoryBuildOptions] |
-[name: GameEvent.OBJECT_UNREGISTERED, entityId: EntityId] |
-[name: GameEvent.OBJECTS_REGISTERED, buildOptions: GameObjectFactoryBuildOptions[]] |
-[name: GameEvent.OBJECTS_UNREGISTERED, objectIds: EntityId[]] |
-[name: GameEvent.ENTITY_COMPONENT_ADDED, entityId: EntityId, tag: string, data?: any] |
-[name: GameEvent.ENTITY_COMPONENT_UPDATED, entityId: EntityId, tag: string, data?: any] |
-[name: GameEvent.ENTITY_COMPONENT_REMOVED, entityId: EntityId, tag: string];
+export type UnicastBatchGameEvent = CommonBatchGameEvent;
 
 export type BroadcastBatchGameEvent = CommonBatchGameEvent |
 [name: GameEvent.PLAYER_ADDED, playerOptions: PlayerOptions] |
@@ -52,6 +42,11 @@ export type BroadcastBatchGameEvent = CommonBatchGameEvent |
 [name: GameEvent.TEAM_PLAYER_ADDED, teamId: string, playerId: string] |
 [name: GameEvent.TEAM_PLAYER_REMOVED, teamId: string, playerId: string] |
 
+[name: GameEvent.OBJECT_REGISTERED, buildOptions: GameObjectFactoryBuildOptions] |
+[name: GameEvent.OBJECT_UNREGISTERED, entityId: EntityId] |
+[name: GameEvent.ENTITY_COMPONENT_ADDED, entityId: EntityId, tag: string, data?: any] |
+[name: GameEvent.ENTITY_COMPONENT_UPDATED, entityId: EntityId, tag: string, data?: any] |
+[name: GameEvent.ENTITY_COMPONENT_REMOVED, entityId: EntityId, tag: string] |
 [name: GameEvent.ROUND_TIME_UPDATED, roundTime: number];
 
 export type BatchGameEvent = UnicastBatchGameEvent | BroadcastBatchGameEvent;
