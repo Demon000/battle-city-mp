@@ -89,7 +89,7 @@ export class EntityBlueprint {
         }
     }
 
-    getTypeComponentData(type: string, tag: string): any {
+    findTypeComponentData(type: string, tag: string): any {
         assert(this.blueprintsData !== undefined,
             'Blueprints data is missing');
 
@@ -111,8 +111,16 @@ export class EntityBlueprint {
             return componentData;
         }
 
-        assert(false,
+        return undefined;
+    }
+
+    getTypeComponentData(type: string, tag: string): any {
+        const componentData = this.findTypeComponentData(type, tag);
+
+        assert(componentData !== undefined,
             `Blueprint data for '${type}' and component '${tag}' does not exist`);
+
+        return componentData;
     }
 
     addComponents(
