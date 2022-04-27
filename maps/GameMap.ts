@@ -101,6 +101,75 @@ export class GameMap {
         return `./configs/maps/${this.name}/${fileName}`;
     }
 
+    fillAreaWithDynamicSizeType(
+        objectsOptionsComponents: GameObjectFactoryBuildOptions[],
+        bigX: number,
+        bigY: number,
+        bigXEnd: number,
+        bigYEnd: number,
+        type: string,
+    ): void {
+        objectsOptionsComponents.push({
+            type,
+            components: {
+                PositionComponent: {
+                    x: bigX,
+                    y: bigY,
+                },
+                SizeComponent: {
+                    width: bigXEnd - bigX,
+                    height: bigYEnd - bigY,
+                },
+            },
+        });
+    }
+
+    fillAreaWithFixedSizeType(
+        objectsOptionsComponents: GameObjectFactoryBuildOptions[],
+        bigX: number,
+        bigY: number,
+        bigXEnd: number,
+        bigYEnd: number,
+        type: string,
+        size: SizeComponent,
+    ): void {
+        for (let smallY = bigY; smallY < bigYEnd; smallY += size.height) {
+            for (let smallX = bigX; smallX < bigXEnd; smallX += size.width) {
+                objectsOptionsComponents.push({
+                    type,
+                    components: {
+                        PositionComponent: {
+                            x: smallX,
+                            y: smallY,
+                        },
+                    },
+                });
+            }
+        }
+    }
+
+    fillAreaWithType(
+        objectsOptionsComponents: GameObjectFactoryBuildOptions[],
+        bigX: number,
+        bigY: number,
+        bigXEnd: number,
+        bigYEnd: number,
+        type: string,
+    ): void {
+        const size = this.entityBlueprint
+            .findTypeComponentData(type, 'SizeComponent') as SizeComponent;
+        const dynamicSize = this.entityBlueprint
+            .findTypeComponentData(type, 'DynamicSizeComponent');
+
+        if (dynamicSize === undefined) {
+            this.fillAreaWithFixedSizeType(objectsOptionsComponents,
+                bigX, bigY, bigXEnd, bigYEnd, type, size);
+        } else {
+            this.fillAreaWithDynamicSizeType(objectsOptionsComponents,
+                bigX, bigY, bigXEnd, bigYEnd, type);
+        }
+    }
+
     getObjectsOptionsFromLayers(): GameObjectFactoryBuildOptions[] {
         const objectsOptionsComponents: GameObjectFactoryBuildOptions[] = [];
 
@@ -128,30 +197,8 @@ export class GameMap {
                     const bigX = pngX * this.options.resolution;
                     const bigY = pngY * this.options.resolution;
                     const type = this.getColorGameObjectType([r, g, b]);
-                    const size = this.entityBlueprint
-                        .getTypeComponentData(type, 'SizeComponent') as SizeComponent;
-
-                    for (
-                        let smallY = bigY;
-                        smallY < bigY + resolution;
-                        smallY += size.height
-                    ) {
-                        for (
-                            let smallX = bigX;
-                            smallX < bigX + resolution;
-                            smallX += size.width
-                        ) {
-                            objectsOptionsComponents.push({
-                                type,
-                                components: {
-                                    PositionComponent: {
-                                        y: smallY,
-                                        x: smallX,
-                                    },
-                                },
-                            });
-                        }
-                    }
+                    this.fillAreaWithType(objectsOptionsComponents, bigX, bigY,
+                        bigX + resolution, bigY + resolution, type);
                 }
             }
         }
