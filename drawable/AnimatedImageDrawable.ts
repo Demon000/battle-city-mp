@@ -4,7 +4,7 @@ import { BaseImageDrawable } from './BaseImageDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
 import { IDrawable } from './IDrawable';
-import { IImageDrawable, ImageDrawableProperties } from './IImageDrawable';
+import { FillOptions, IImageDrawable, ImageDrawableProperties } from './IImageDrawable';
 
 export class AnimatedImageDrawable extends BaseImageDrawable {
     readonly type = DrawableType.ANIMATED_IMAGE;
@@ -107,6 +107,11 @@ export class AnimatedImageDrawable extends BaseImageDrawable {
     protected _colorMask(color: Color): this {
         return this.copy(this.drawables.map(drawable =>
             drawable.colorMask(color)) as IImageDrawable[]);
+    }
+
+    protected _fill(fillOptions: FillOptions): this {
+        return this.copy(this.drawables.map(drawable =>
+            drawable.fill(fillOptions)) as IImageDrawable[]);
     }
 
     protected _offset(offsetX: number, offsetY: number): this {

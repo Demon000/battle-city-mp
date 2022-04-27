@@ -1,3 +1,4 @@
+import { FillOptions } from '@/drawable/IImageDrawable';
 import { Color } from '../drawable/Color';
 import { assert } from './assert';
 import { CanvasUtils, Canvas } from './CanvasUtils';
@@ -86,6 +87,33 @@ export class ImageUtils {
         context.globalCompositeOperation = 'source-in';
         context.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
         context.fillRect(0, 0, source.width, source.height);
+        return context.canvas;
+    }
+
+    static fill(
+        source: Source,
+        options: FillOptions,
+    ): Canvas {
+        const offsetWidth = options.width + options.sourceOffsetX;
+        const offsetHeight = options.height + options.sourceOffsetY;
+        const offsetCanvas = CanvasUtils.create(offsetWidth, offsetHeight);
+        const offsetContext = offsetCanvas.getContext('2d');
+        assert(offsetContext !== null, 'Failed to create offscreen canvas context');
+
+        const pattern = offsetContext.createPattern(source, 'repeat');
+        assert(pattern !== null, 'Failed to create canvas pattern');
+        offsetContext.fillStyle = pattern;
+
+        offsetContext.fillRect(0, 0, offsetWidth, offsetHeight);
+
+        const canvas = CanvasUtils.create(options.width, options.height);
+        const context = canvas.getContext('2d');
+        assert(context !== null, 'Failed to create offscreen canvas context');
+
+        context.drawImage(offsetCanvas, options.sourceOffsetX,
+            options.sourceOffsetY, options.width, options.height, 0, 0,
+            options.width, options.height);
+
         return context.canvas;
     }
 }

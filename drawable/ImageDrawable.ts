@@ -2,7 +2,7 @@ import { CLIENT_SPRITES_RELATIVE_URL } from '@/config';
 import { BaseImageDrawable } from './BaseImageDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
-import { ImageDrawableProperties } from './IImageDrawable';
+import { FillOptions, ImageDrawableProperties } from './IImageDrawable';
 import { ImageUtils, Source } from '../utils/ImageUtils';
 import { Point } from '@/physics/point/Point';
 import { CanvasUtils, Context2D } from '@/utils/CanvasUtils';
@@ -109,6 +109,10 @@ export class ImageDrawable extends BaseImageDrawable {
         const scale = this.getScale();
 
         let canvas = this.source;
+        if (properties.fillOptions !== undefined) {
+            canvas = ImageUtils.fill(canvas, properties.fillOptions);
+        }
+
         if (scale.x !== 1 || scale.y !== 1) {
             canvas = ImageUtils.drawSourceWithScale(canvas, scale.x, scale.y);
         }
@@ -185,6 +189,13 @@ export class ImageDrawable extends BaseImageDrawable {
         return new (<any>this.constructor)(this.source, {
             ...this.properties,
             maskColor,
+        });
+    }
+
+    protected _fill(fillOptions: FillOptions): this {
+        return new (<any>this.constructor)(this.source, {
+            ...this.properties,
+            fillOptions,
         });
     }
 
