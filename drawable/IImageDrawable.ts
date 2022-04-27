@@ -13,6 +13,8 @@ export interface ImageDrawableProperties extends DrawableProperties {
     compositionType?: string;
     maskColor?: Color;
     overlays?: IImageDrawable[];
+    fillRepeatWidth?: number;
+    fillRepeatHeight?: number;
     fillOptions?: FillOptions;
 }
 

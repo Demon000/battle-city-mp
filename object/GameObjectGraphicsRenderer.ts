@@ -1,8 +1,12 @@
 import { DirtyGraphicsComponent } from '@/components/DirtyGraphicsComponent';
+import { DynamicSizeComponent } from '@/components/DynamicSizeComponent';
+import { PositionComponent } from '@/components/PositionComponent';
+import { SizeComponent } from '@/components/SizeComponent';
 import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
 import { AnimatedImageDrawable } from '@/drawable/AnimatedImageDrawable';
 import { DrawableType } from '@/drawable/DrawableType';
 import { IDrawable } from '@/drawable/IDrawable';
+import { ImageDrawable } from '@/drawable/ImageDrawable';
 import { GameObject } from '@/object/GameObject';
 import { Context2D } from '@/utils/CanvasUtils';
 import { GameObjectDrawables } from './GameObjectDrawables';
@@ -49,7 +53,51 @@ export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
         return drawables.filter(this.filterOutMissingDrawable) as IDrawable[];
     }
 
+    private processDynamicSizeDrawable(
+        drawable: IDrawable | undefined,
+    ): IDrawable | undefined {
+        if (drawable === undefined) {
+            return drawable;
+        }
+
+        if (drawable.type !== DrawableType.IMAGE &&
+            drawable.type !== DrawableType.ANIMATED_IMAGE) {
+            return drawable;
+        }
+
+        const dynamicSize = this.object.findComponent(DynamicSizeComponent);
+        if (dynamicSize === undefined) {
+            return drawable;
+        }
+
+        const imageDrawable = drawable as ImageDrawable;
+
+        const size = this.object.getComponent(SizeComponent);
+        const position = this.object.getComponent(PositionComponent);
+        let offsetX = 0;
+        let offsetY = 0;
+
+        if (imageDrawable.properties.fillRepeatWidth !== undefined) {
+            offsetX = Math.abs(position.x) %
+                imageDrawable.properties.fillRepeatWidth;
+        }
+
+        if (imageDrawable.properties.fillRepeatHeight !== undefined) {
+            offsetY = Math.abs(position.y) %
+                imageDrawable.properties.fillRepeatHeight;
+        }
+
+        return imageDrawable.fill({
+            sourceOffsetX: offsetX,
+            sourceOffsetY: offsetY,
+            width: size.width,
+            height: size.height,
+        });
+    }
+
     protected processDrawable(drawable: IDrawable | undefined): IDrawable | undefined {
+        drawable = this.processDynamicSizeDrawable(drawable);
+
         if (drawable !== undefined) {
             drawable = drawable.scale(this.scale);
         }

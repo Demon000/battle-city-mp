@@ -104,57 +104,17 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
         }),
     ],
     [GameObjectType.GRASS]: [
-        new ImageDrawable('grass_even.png', {
+        new ImageDrawable('grass.png', {
             renderPass: RenderPass.GROUND,
-            tests: [
-                positionTest(16, 8, [
-                    { x: 0, y: 0 },
-                    { x: 1, y: 1 },
-                ]),
-            ],
-        }),
-        new ImageDrawable('grass_odd.png', {
-            renderPass: RenderPass.GROUND,
-            tests: [
-                positionTest(16, 8, [
-                    { x: 0, y: 1 },
-                    { x: 1, y: 0 },
-                ]),
-            ],
+            fillRepeatWidth: 16,
+            fillRepeatHeight: 16,
         }),
     ],
     [GameObjectType.DIRT]: [
-        new ImageDrawable('dirt_tl.png', {
+        new ImageDrawable('dirt.png', {
             renderPass: RenderPass.GROUND,
-            tests: [
-                positionTest(16, 8, [
-                    { x: 0, y: 0 },
-                ]),
-            ],
-        }),
-        new ImageDrawable('dirt_tr.png', {
-            renderPass: RenderPass.GROUND,
-            tests: [
-                positionTest(16, 8, [
-                    { x: 1, y: 0 },
-                ]),
-            ],
-        }),
-        new ImageDrawable('dirt_bl.png', {
-            renderPass: RenderPass.GROUND,
-            tests: [
-                positionTest(16, 8, [
-                    { x: 0, y: 1 },
-                ]),
-            ],
-        }),
-        new ImageDrawable('dirt_br.png', {
-            renderPass: RenderPass.GROUND,
-            tests: [
-                positionTest(16, 8, [
-                    { x: 1, y: 1 },
-                ]),
-            ],
+            fillRepeatWidth: 16,
+            fillRepeatHeight: 16,
         }),
     ],
     [GameObjectType.FLAG_BASE]: [
