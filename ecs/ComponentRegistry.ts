@@ -44,6 +44,7 @@ import { RelativePositionComponent, RelativePositionComponentData } from '@/comp
 import { DirtyPositionComponent, DirtyPositionComponentData } from '@/components/DirtyPositionComponent';
 import { PickupIgnoreComponent, PickupIgnoreComponentData } from '@/components/PickupIgnoreComponent';
 import { DirtyCollisionsComponent, DirtyCollisionsComponentData } from '@/components/DirtyCollisionsComponent';
+import { DynamicSizeComponent, DynamicSizeComponentData } from '@/components/DynamicSizeComponent';
 
 export class ComponentRegistry {
     static _lookupAndValidate(
@@ -223,6 +224,10 @@ export class ComponentRegistry {
             case DirtyCollisionsComponent.name:
                 assertEquals<Partial<DirtyCollisionsComponentData>>(data);
                 return DirtyCollisionsComponent;
+            case DynamicSizeComponent.tag:
+            case DynamicSizeComponent.name:
+                assertEquals<Partial<DynamicSizeComponentData>>(data);
+                return DynamicSizeComponent;
             default:
                 assert(false, `Invalid tag '${tag}'`);
         }
