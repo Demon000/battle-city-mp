@@ -126,7 +126,7 @@ export class ImageDrawable extends BaseImageDrawable {
         }
 
         const totalSize = this.getTotalSize();
-        const canvas = CanvasUtils.create(totalSize.x, totalSize.y, true);
+        const canvas = CanvasUtils.create(totalSize.x, totalSize.y);
         const context = CanvasUtils.getContext(canvas);
 
         const minPoint = this.getMinPoint();
