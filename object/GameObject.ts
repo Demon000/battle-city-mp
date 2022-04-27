@@ -12,7 +12,6 @@ export interface GameObjectOptions {
 
 export class GameObject extends Entity {
     protected _audioMeta: ResourceMeta | undefined | null;
-    graphicsDirty: boolean;
 
     properties;
 
@@ -26,17 +25,12 @@ export class GameObject extends Entity {
         super(registry, options.id, options.type, options.subtypes);
 
         this.properties = properties;
-        this.graphicsDirty = true;
     }
 
     toOptions(): GameObjectOptions {
         return {
             id: this.id,
         };
-    }
-
-    protected markGraphicsDirty(): void {
-        this.graphicsDirty = true;
     }
 
     protected updateAudioMeta(): void {

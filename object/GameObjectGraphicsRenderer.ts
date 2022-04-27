@@ -72,7 +72,10 @@ export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
             return;
         }
 
-        if (!this.object.graphicsDirty && !force && this.scale === scale) {
+        const dirtyGraphicsComponent = this.object
+            .findComponent(DirtyGraphicsComponent);
+
+        if (dirtyGraphicsComponent === undefined && !force && this.scale === scale) {
             return;
         }
 
@@ -82,12 +85,8 @@ export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
             this.drawables = this.processDrawables(this.drawables);
         }
 
-        if (force) {
-            this.object.removeComponent(DirtyGraphicsComponent, {
-                silent: true,
-            });
-        } else {
-            this.object.graphicsDirty = false;
+        if (dirtyGraphicsComponent !== undefined) {
+            dirtyGraphicsComponent.remove();
         }
     }
 
