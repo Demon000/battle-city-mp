@@ -16,13 +16,6 @@ export interface BlueprintData extends BlueprintComponentsData {
 }
 
 export type BlueprintComponentsKeys = keyof BlueprintComponentsData;
-export const blueprintComponentsKeys: BlueprintComponentsKeys[] = [
-    'components',
-    'localComponents',
-    'clientComponents',
-    'serverComponents',
-];
-
 export type BlueprintsData = Record<string, BlueprintData>;
 
 export enum BlueprintEnv {
@@ -32,11 +25,24 @@ export enum BlueprintEnv {
 
 export class EntityBlueprint {
     private blueprintsData?: BlueprintsData;
+    private blueprintComponentsKeys: BlueprintComponentsKeys[] = [
+        'components',
+        'localComponents',
+    ];
+    private ignoredKeys: BlueprintComponentsKeys[] = [];
 
     constructor(
         private config: Config,
         private env: BlueprintEnv,
-    ) {}
+    ) {
+        if (this.env === BlueprintEnv.CLIENT) {
+            this.blueprintComponentsKeys.push('clientComponents');
+            this.ignoredKeys.push('serverComponents');
+        } else if (this.env === BlueprintEnv.SERVER) {
+            this.blueprintComponentsKeys.push('serverComponents');
+            this.ignoredKeys.push('clientComponents');
+        }
+    }
 
     private addBlueprintData(
         type: string,
@@ -58,11 +64,15 @@ export class EntityBlueprint {
             delete blueprintData.extends;
         }
 
+        for (const key of this.ignoredKeys) {
+            delete blueprintData[key];
+        }
+
         if (firstLevel) {
             return;
         }
 
-        for (const key of blueprintComponentsKeys) {
+        for (const key of this.blueprintComponentsKeys) {
             const blueprintComponentsData = blueprintData[key];
             if (blueprintComponentsData === undefined) {
                 continue;
@@ -98,7 +108,7 @@ export class EntityBlueprint {
         assert(blueprintData !== undefined,
             `Blueprint data for '${type}' does not exist`);
 
-        for (const key of blueprintComponentsKeys) {
+        for (const key of this.blueprintComponentsKeys) {
             const componentsInitialization = blueprintData[key];
             if (componentsInitialization === undefined) {
                 continue;
