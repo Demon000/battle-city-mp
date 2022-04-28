@@ -15,7 +15,6 @@ export class GameObject extends Entity {
 
     properties;
 
-    graphicsRenderer?: any;
     audioRenderer?: any;
 
     constructor(options: GameObjectOptions, properties: GameObjectProperties, registry: Registry) {

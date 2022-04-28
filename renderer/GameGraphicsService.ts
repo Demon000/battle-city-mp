@@ -12,6 +12,7 @@ import { RatioUtils } from '@/utils/RatioUtils';
 import { GameObjectGraphicsRenderer } from '../object/GameObjectGraphicsRenderer';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { ClazzOrTag } from '@/ecs/Component';
+import { GraphicsRendererComponent } from '@/components/GraphicsRendererComponent';
 
 export class GameGraphicsService {
     private scale = 0;
@@ -75,11 +76,12 @@ export class GameGraphicsService {
     }
 
     getObjectRenderer(object: GameObject): GameObjectGraphicsRenderer {
-        if (object.graphicsRenderer === undefined) {
-            object.graphicsRenderer = new GameObjectGraphicsRenderer(object);
+        const graphicsRendererComponent = object.getComponent(GraphicsRendererComponent);
+        if (graphicsRendererComponent.renderer === undefined) {
+            graphicsRendererComponent.renderer = new GameObjectGraphicsRenderer(object);
         }
 
-        return object.graphicsRenderer;
+        return graphicsRendererComponent.renderer;
     }
 
     _renderObject(object: GameObject, drawX: number, drawY: number): void {

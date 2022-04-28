@@ -13,6 +13,9 @@
         serverComponents: {
             WorldEntityComponent: {},
         },
+        clientComponents: {
+            GraphicsRendererComponent: {},
+        },
     },
     'brick-wall': {
         extends: [

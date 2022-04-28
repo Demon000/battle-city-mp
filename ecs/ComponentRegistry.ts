@@ -46,6 +46,7 @@ import { PickupIgnoreComponent, PickupIgnoreComponentData } from '@/components/P
 import { DirtyCollisionsComponent, DirtyCollisionsComponentData } from '@/components/DirtyCollisionsComponent';
 import { DynamicSizeComponent, DynamicSizeComponentData } from '@/components/DynamicSizeComponent';
 import { ExplosionComponent, ExplosionComponentData } from '@/components/ExplosionComponent';
+import { GraphicsRendererComponent, GraphicsRendererComponentData } from '@/components/GraphicsRendererComponent';
 
 export class ComponentRegistry {
     static _lookupAndValidate(
@@ -233,6 +234,10 @@ export class ComponentRegistry {
             case ExplosionComponent.name:
                 assertEquals<Partial<ExplosionComponentData>>(data);
                 return ExplosionComponent;
+            case GraphicsRendererComponent.tag:
+            case GraphicsRendererComponent.name:
+                assertEquals<Partial<GraphicsRendererComponentData>>(data);
+                return GraphicsRendererComponent;
             default:
                 assert(false, `Invalid tag '${tag}'`);
         }
