@@ -82,7 +82,8 @@ export class EntityBlueprint {
     }
 
     reloadBlueprintData(): void {
-        this.blueprintsData = this.config.getData<BlueprintsData>('entities-blueprint');
+        const data = this.config.getData('entities-blueprint');
+        this.blueprintsData = JSON.parse(JSON.stringify(data)) as BlueprintsData;
 
         for (const [type, blueprintData] of Object.entries(this.blueprintsData)) {
             this.addBlueprintData(type, blueprintData, true);
