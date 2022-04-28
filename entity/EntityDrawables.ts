@@ -16,7 +16,7 @@ import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
 import { TankTier } from '@/tank/TankTier';
-import { GameObjectType } from './GameObjectType';
+import { EntityType } from './EntityType';
 import { RenderPass } from './RenderPass';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { RelativePositionComponent } from '@/components/RelativePositionComponent';
@@ -29,32 +29,32 @@ const directionTest = (targetDirection: Direction): DrawableTestFunction => {
 };
 
 const drawables: Partial<Record<string, IDrawable[]>> = {
-    [GameObjectType.STEEL_WALL]: [
+    [EntityType.STEEL_WALL]: [
         new ImageDrawable('steel_wall.png', {
             renderPass: RenderPass.WALL,
         }),
     ],
-    [GameObjectType.BUSH]: [
+    [EntityType.BUSH]: [
         new ImageDrawable('bush.png', {
             renderPass: RenderPass.BUSHES,
         }),
     ],
-    [GameObjectType.LEVEL_BORDER]: [
+    [EntityType.LEVEL_BORDER]: [
         new ImageDrawable('level_border.png', {
             renderPass: RenderPass.WALL,
         }),
     ],
-    [GameObjectType.ICE]: [
+    [EntityType.ICE]: [
         new ImageDrawable('ice.png', {
             renderPass: RenderPass.GROUND,
         }),
     ],
-    [GameObjectType.SAND]: [
+    [EntityType.SAND]: [
         new ImageDrawable('sand.png', {
             renderPass: RenderPass.GROUND,
         }),
     ],
-    [GameObjectType.WATER]: [
+    [EntityType.WATER]: [
         new AnimatedImageDrawable([
             new ImageDrawable('water_0.png'),
             new ImageDrawable('water_1.png'),
@@ -67,33 +67,33 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             renderPass: RenderPass.GROUND,
         }),
     ],
-    [GameObjectType.BRICK_WALL]: [
+    [EntityType.BRICK_WALL]: [
         new ImageDrawable('brick_wall.png', {
             renderPass: RenderPass.WALL,
             fillRepeatWidth: 8,
             fillRepeatHeight: 8,
         }),
     ],
-    [GameObjectType.GRASS]: [
+    [EntityType.GRASS]: [
         new ImageDrawable('grass.png', {
             renderPass: RenderPass.GROUND,
             fillRepeatWidth: 16,
             fillRepeatHeight: 16,
         }),
     ],
-    [GameObjectType.DIRT]: [
+    [EntityType.DIRT]: [
         new ImageDrawable('dirt.png', {
             renderPass: RenderPass.GROUND,
             fillRepeatWidth: 16,
             fillRepeatHeight: 16,
         }),
     ],
-    [GameObjectType.FLAG_BASE]: [
+    [EntityType.FLAG_BASE]: [
         new ImageDrawable('flag_base.png', {
             renderPass: RenderPass.GROUND,
         }),
     ],
-    [GameObjectType.FLAG]: [
+    [EntityType.FLAG]: [
         new ImageDrawable('flag_pole.png', {
             renderPass: RenderPass.ABOVE_WALL,
             offsetX: 7,
@@ -157,7 +157,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             ],
         }),
     ],
-    [GameObjectType.TANK]: [
+    [EntityType.TANK]: [
         ...((): IDrawable[] => {
             const tankDrawableScale = 0.5;
 
@@ -317,7 +317,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             },
         }),
     ],
-    [GameObjectType.SMOKE]: [
+    [EntityType.SMOKE]: [
         new AnimatedImageDrawable([
             new ImageDrawable('smoke_0.png'),
             new ImageDrawable('smoke_1.png'),
@@ -332,7 +332,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             offsetY: -8,
         }),
     ],
-    [GameObjectType.BULLET]: [
+    [EntityType.BULLET]: [
         ...((): IDrawable[] => {
             const drawables = [];
 
@@ -368,7 +368,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             return drawables;
         })(),
     ],
-    [GameObjectType.EXPLOSION]: [
+    [EntityType.EXPLOSION]: [
         ...((): IDrawable[] => {
             const drawables = [];
 
@@ -430,7 +430,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
     ],
 };
 
-export class GameObjectDrawables {
+export class EntityDrawables {
     static getTypeDrawables(type: string): IDrawable[] | undefined {
         return drawables[type];
     }

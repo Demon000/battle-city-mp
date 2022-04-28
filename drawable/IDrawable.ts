@@ -2,8 +2,8 @@ import { Entity } from '@/ecs/Entity';
 import { Point } from '@/physics/point/Point';
 import { Context2D } from '@/utils/CanvasUtils';
 
-export type DrawableTestFunction = (object: Entity) => boolean;
-export type DrawableProcessingFunction = (this: IDrawable, object: Entity) => IDrawable | undefined;
+export type DrawableTestFunction = (entity: Entity) => boolean;
+export type DrawableProcessingFunction = (this: IDrawable, entity: Entity) => IDrawable | undefined;
 
 export interface DrawableProperties {
     tests?: DrawableTestFunction[];

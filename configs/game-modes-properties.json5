@@ -2,14 +2,14 @@
     'deathmatch': {
         hasTeams: false,
         sameTeamBulletHitMode: 'allow',
-        ignoredObjectTypes: [
+        ignoredEntityTypes: [
             'flag',
         ],
     },
     'team-deathmatch': {
         hasTeams: true,
         sameTeamBulletHitMode: 'destroy',
-        ignoredObjectTypes: [
+        ignoredEntityTypes: [
             'flag',
         ],
     },

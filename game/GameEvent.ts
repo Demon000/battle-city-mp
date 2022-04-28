@@ -1,11 +1,11 @@
 import { EntityId } from '@/ecs/EntityId';
-import { GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
+import { EntityBuildOptions } from '@/entity/EntityFactory';
 import { PartialPlayerOptions, PlayerOptions } from '@/player/Player';
 import { GameServerStatus } from './GameServerStatus';
 
 export enum GameEvent {
-    OBJECT_REGISTERED = 'object-registered',
-    OBJECT_UNREGISTERED = 'object-unregisterd',
+    ENTITY_REGISTERED = 'entity-registered',
+    ENTITY_UNREGISTERED = 'entity-unregisterd',
 
     ENTITY_COMPONENT_ADDED = 'entity-component-added',
     ENTITY_COMPONENT_UPDATED = 'entity-component-updated',
@@ -42,8 +42,8 @@ export type BroadcastBatchGameEvent = CommonBatchGameEvent |
 [name: GameEvent.TEAM_PLAYER_ADDED, teamId: string, playerId: string] |
 [name: GameEvent.TEAM_PLAYER_REMOVED, teamId: string, playerId: string] |
 
-[name: GameEvent.OBJECT_REGISTERED, buildOptions: GameObjectFactoryBuildOptions] |
-[name: GameEvent.OBJECT_UNREGISTERED, entityId: EntityId] |
+[name: GameEvent.ENTITY_REGISTERED, buildOptions: EntityBuildOptions] |
+[name: GameEvent.ENTITY_UNREGISTERED, entityId: EntityId] |
 [name: GameEvent.ENTITY_COMPONENT_ADDED, entityId: EntityId, tag: string, data?: any] |
 [name: GameEvent.ENTITY_COMPONENT_UPDATED, entityId: EntityId, tag: string, data?: any] |
 [name: GameEvent.ENTITY_COMPONENT_REMOVED, entityId: EntityId, tag: string] |

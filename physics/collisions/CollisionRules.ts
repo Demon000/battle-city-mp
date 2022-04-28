@@ -1,15 +1,15 @@
-import { GameObjectType } from '@/object/GameObjectType';
+import { EntityType } from '@/entity/EntityType';
 import { ICollisionRule, CollisionEvent, CollisionResultEvent } from './ICollisionRule';
 
 export const rules: ICollisionRule[] = [
     {
-        movingTypes: [GameObjectType.TANK],
+        movingTypes: [EntityType.TANK],
         staticTypes: [
-            GameObjectType.BRICK_WALL,
-            GameObjectType.STEEL_WALL,
-            GameObjectType.LEVEL_BORDER,
-            GameObjectType.TANK,
-            GameObjectType.WATER,
+            EntityType.BRICK_WALL,
+            EntityType.STEEL_WALL,
+            EntityType.LEVEL_BORDER,
+            EntityType.TANK,
+            EntityType.WATER,
         ],
         result: [
             {
@@ -18,9 +18,9 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
-        movingTypes: [GameObjectType.TANK],
+        movingTypes: [EntityType.TANK],
         staticTypes: [
-            GameObjectType.FLAG_BASE,
+            EntityType.FLAG_BASE,
         ],
         result: [
             {
@@ -30,9 +30,9 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
-        movingTypes: [GameObjectType.TANK],
+        movingTypes: [EntityType.TANK],
         staticTypes: [
-            GameObjectType.FLAG,
+            EntityType.FLAG,
         ],
         result: [
             {
@@ -42,8 +42,8 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
-        movingTypes: [GameObjectType.BULLET],
-        staticTypes: [GameObjectType.LEVEL_BORDER],
+        movingTypes: [EntityType.BULLET],
+        staticTypes: [EntityType.LEVEL_BORDER],
         result: [
             {
                 type: CollisionResultEvent.NOTIFY,
@@ -55,8 +55,8 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
-        movingTypes: [GameObjectType.BULLET],
-        staticTypes: [GameObjectType.BRICK_WALL],
+        movingTypes: [EntityType.BULLET],
+        staticTypes: [EntityType.BRICK_WALL],
         result: [
             {
                 type: CollisionResultEvent.NOTIFY,
@@ -68,8 +68,8 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
-        movingTypes: [GameObjectType.BULLET],
-        staticTypes: [GameObjectType.STEEL_WALL],
+        movingTypes: [EntityType.BULLET],
+        staticTypes: [EntityType.STEEL_WALL],
         result: [
             {
                 type: CollisionResultEvent.NOTIFY,
@@ -81,8 +81,8 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
-        movingTypes: [GameObjectType.BULLET],
-        staticTypes: [GameObjectType.TANK],
+        movingTypes: [EntityType.BULLET],
+        staticTypes: [EntityType.TANK],
         result: [
             {
                 type: CollisionResultEvent.NOTIFY,
@@ -91,8 +91,8 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
-        movingTypes: [GameObjectType.BULLET],
-        staticTypes: [GameObjectType.BULLET],
+        movingTypes: [EntityType.BULLET],
+        staticTypes: [EntityType.BULLET],
         result: [
             {
                 type: CollisionResultEvent.NOTIFY,

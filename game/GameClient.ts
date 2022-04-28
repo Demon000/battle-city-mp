@@ -2,13 +2,13 @@ import { GameCamera } from '@/renderer/GameCamera';
 import { GameGraphicsService } from '@/renderer/GameGraphicsService';
 import { MapRepository } from '@/utils/MapRepository';
 import { Ticker, TickerEvent } from '@/utils/Ticker';
-import { GameObjectService } from '../object/GameObjectService';
+import { EntityService } from '../entity/EntityService';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
 import { CollisionService } from '../physics/collisions/CollisionService';
 import { Player, PartialPlayerOptions, PlayerOptions, PlayerSpawnStatus } from '../player/Player';
 import { PlayerService, PlayerServiceEvent } from '../player/PlayerService';
 import { GameServerStatus } from './GameServerStatus';
-import { GameObjectFactory, GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
+import { EntityFactory, EntityBuildOptions } from '@/entity/EntityFactory';
 import EventEmitter from 'eventemitter3';
 import { Team } from '@/team/Team';
 import { TeamService, TeamServiceEvent } from '@/team/TeamService';
@@ -21,7 +21,6 @@ import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { Registry, RegistryComponentEvent } from '@/ecs/Registry';
-import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
@@ -86,16 +85,15 @@ export class GameClient {
     private config;
 
     private registryIdGenerator;
-    private componentRegistry;
     private registry;
     private entityBlueprint;
 
-    private gameObjectFactory;
+    private entityFactory;
     private playerRepository;
     private playerService;
     private teamRepository;
     private teamService;
-    private gameObjectService;
+    private entityService;
     private tankService;
     private boundingBoxRepository;
     private collisionService;
@@ -109,15 +107,14 @@ export class GameClient {
         this.config = new Config();
 
         this.registryIdGenerator = new RegistryNumberIdGenerator();
-        this.componentRegistry = new ComponentRegistry();
         this.registry = new Registry(this.registryIdGenerator);
         this.entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.CLIENT);
-        this.gameObjectFactory = new GameObjectFactory(this.registry, this.entityBlueprint);
+        this.entityFactory = new EntityFactory(this.registry, this.entityBlueprint);
 
         this.boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
         this.collisionService = new CollisionService(this.boundingBoxRepository, this.registry);
-        this.gameObjectService = new GameObjectService(this.registry);
-        this.tankService = new TankService(this.gameObjectFactory, this.registry);
+        this.entityService = new EntityService(this.registry);
+        this.tankService = new TankService(this.entityFactory, this.registry);
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.config, this.playerRepository);
         this.teamRepository = new MapRepository<string, Team>();
@@ -131,7 +128,7 @@ export class GameClient {
         this.registry.emitter.on(RegistryComponentEvent.COMPONENT_CHANGED,
             (_event, component) => {
                 this.gameGraphicsService
-                    .processObjectsGraphicsDependencies(component.entity.id,
+                    .processGraphicsDependencies(component.entity.id,
                         component.clazz.tag);
             });
         this.registry.componentEmitter(DestroyedComponent, true)
@@ -144,22 +141,22 @@ export class GameClient {
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
                     const entity = component.entity;
-                    this.gameObjectService.updateCenterPosition(entity);
+                    this.entityService.updateCenterPosition(entity);
                 });
         this.registry.componentEmitter(PositionComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
                 (component) => {
                     const entity = component.entity;
                     this.collisionService.markDirtyBoundingBox(entity);
-                    this.gameObjectService.markDirtyCenterPosition(entity);
-                    this.gameObjectService.markDirtyIsUnderBush(entity);
+                    this.entityService.markDirtyCenterPosition(entity);
+                    this.entityService.markDirtyIsUnderBush(entity);
                 });
         this.registry.componentEmitter(SizeComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
                 (component) => {
                     const entity = component.entity;
                     this.collisionService.markDirtyBoundingBox(entity);
-                    this.gameObjectService.markDirtyCenterPosition(entity);
+                    this.entityService.markDirtyCenterPosition(entity);
                 });
         this.registry.componentEmitter(BoundingBoxComponent, true)
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
@@ -177,13 +174,13 @@ export class GameClient {
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
                     const entity = component.entity;
-                    this.gameObjectService.updateIsMoving(entity);
+                    this.entityService.updateIsMoving(entity);
                 });
         this.registry.componentEmitter(MovementComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
                 (component) => {
                     const entity = component.entity;
-                    this.gameObjectService.markDirtyIsMoving(entity);
+                    this.entityService.markDirtyIsMoving(entity);
                 });
         this.registry.componentEmitter(IsUnderBushTrackingComponent, true)
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
@@ -308,13 +305,13 @@ export class GameClient {
         this.ticker.emitter.on(TickerEvent.TICK, this.onTick, this);
     }
 
-    onObjectRegistered(buildOptions: GameObjectFactoryBuildOptions): void {
-        this.gameObjectFactory.buildFromOptions(buildOptions);
+    onEntityRegistered(buildOptions: EntityBuildOptions): void {
+        this.entityFactory.buildFromOptions(buildOptions);
     }
 
-    onObjectUnregistered(entityId: EntityId): void {
+    onEntityUnregistered(entityId: EntityId): void {
         const entity = this.registry.getEntityById(entityId);
-        this.gameObjectService.markDestroyed(entity);
+        this.entityService.markDestroyed(entity);
     }
 
     onEntityComponentAdded(entityId: EntityId, tag: string, data: any): void {
@@ -372,8 +369,8 @@ export class GameClient {
             this.teamService.addTeams(teams);
         }
 
-        LazyIterable.from(serverStatus.objectsOptions)
-            .forEach(o => this.gameObjectFactory.buildFromOptions(o));
+        LazyIterable.from(serverStatus.entitiesOptions)
+            .forEach(o => this.entityFactory.buildFromOptions(o));
 
         const maxVisibleGameSize = this.config.get<number>('game-client',
             'maxVisibleGameSize');
@@ -381,13 +378,13 @@ export class GameClient {
     }
 
     onTick(): void {
-        this.collisionService.processObjectsDirtyBoundingBox();
-        this.gameObjectService.processObjectsDirtyIsMoving();
-        this.gameObjectService.processObjectsDirtyCenterPosition();
-        this.collisionService.processObjectsDirtyIsUnderBush();
-        this.collisionService.processObjectsDirtyCollisions();
-        this.gameGraphicsService.processObjectsDirtyGraphics();
-        this.gameObjectService.processObjectsDestroyed();
+        this.collisionService.processDirtyBoundingBox();
+        this.entityService.processDirtyIsMoving();
+        this.entityService.processDirtyCenterPosition();
+        this.collisionService.processDirtyIsUnderBush();
+        this.collisionService.processDirtyCollisions();
+        this.gameGraphicsService.processDirtyGraphics();
+        this.entityService.processDestroyed();
 
         const ownPlayer = this.playerService.getOwnPlayer();
         if (ownPlayer === undefined) {
@@ -412,12 +409,12 @@ export class GameClient {
             return;
         }
 
-        const viewableObjectIds = this.collisionService
-            .getOverlappingObjects(box);
-        const viewableObjects = this.registry
-            .getMultipleEntitiesById(viewableObjectIds) as Iterable<Entity>;
+        const viewableEntityIds = this.collisionService
+            .getOverlappingEntities(box);
+        const viewableEntities = this.registry
+            .getMultipleEntitiesById(viewableEntityIds) as Iterable<Entity>;
         this.gameGraphicsService.initializeRender(position);
-        this.gameGraphicsService.renderObjects(viewableObjects);
+        this.gameGraphicsService.renderEntites(viewableEntities);
 
         this.emitter.emit(GameClientEvent.TICK);
     }

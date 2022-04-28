@@ -1,5 +1,4 @@
 import fs from 'fs';
-import { isGameObjectType } from '@/object/GameObjectType';
 import { Team, TeamOptions } from '@/team/Team';
 import { Config } from '@/config/Config';
 import { Color } from '@/drawable/Color';
@@ -7,7 +6,7 @@ import { PNG } from 'pngjs';
 import JSON5 from 'json5';
 import { EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { SizeComponent } from '@/components/SizeComponent';
-import { GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
+import { EntityBuildOptions } from '@/entity/EntityFactory';
 import { Point } from '@/physics/point/Point';
 import { assert } from '@/utils/assert';
 import { ComponentsInitialization } from '@/ecs/Component';
@@ -18,13 +17,13 @@ export interface GameMapOptions {
     name: string;
     resolution: number;
     layerFiles?: string[];
-    objectsFromOptionsFile?: string;
-    colorsObjectTypesMap?: Record<string, Color>;
-    objectTypesColorsMap?: Map<number, string>;
+    entitiesFromOptionsFile?: string;
+    colorsEntityTypesMap?: Record<string, Color>;
+    entityTypesColorsMap?: Map<number, string>;
     teamsOptions?: TeamOptions[];
 }
 
-export interface LegacyGameObjectOptions extends GameObjectFactoryBuildOptions {
+export interface LegacyEntityOptions extends EntityBuildOptions {
     position: Point;
     components?: ComponentsInitialization;
 }
@@ -40,16 +39,12 @@ export class GameMap {
         this.name = name;
         this.options = this.config.get('maps', name);
 
-        if (this.options.colorsObjectTypesMap !== undefined) {
-            this.options.objectTypesColorsMap = new Map();
+        if (this.options.colorsEntityTypesMap !== undefined) {
+            this.options.entityTypesColorsMap = new Map();
 
-            for (const [type, color] of Object.entries(this.options.colorsObjectTypesMap)) {
-                if (!isGameObjectType(type)) {
-                    console.log(`Invalid game object type: ${type}`);
-                }
-
+            for (const [type, color] of Object.entries(this.options.colorsEntityTypesMap)) {
                 const colorIndex = this.getColorIndex(color);
-                this.options.objectTypesColorsMap.set(colorIndex, type);
+                this.options.entityTypesColorsMap.set(colorIndex, type);
             }
         }
     }
@@ -58,27 +53,27 @@ export class GameMap {
         return color[0] << 16 | color[1] << 8 | color[2];
     }
 
-    getColorGameObjectType(color: Color): string {
-        assert(this.options.objectTypesColorsMap  !== undefined,
-            'Cannot retrieve game object type of color when missing map');
+    getColorEntityType(color: Color): string {
+        assert(this.options.entityTypesColorsMap  !== undefined,
+            'Cannot retrieve entity type of color when missing map');
 
         const colorIndex = this.getColorIndex(color);
-        const type = this.options.objectTypesColorsMap.get(colorIndex);
+        const type = this.options.entityTypesColorsMap.get(colorIndex);
         assert(type !== undefined,
-            `Cannot retrieve game object type for invalid color '${color}'`);
+            `Cannot retrieve entity type for invalid color '${color}'`);
 
         return type;
     }
 
-    getObjectsOptionsFromOptions(): GameObjectFactoryBuildOptions[] {
-        if (this.options.objectsFromOptionsFile === undefined) {
+    getEntitiesOptionsFromOptions(): EntityBuildOptions[] {
+        if (this.options.entitiesFromOptionsFile === undefined) {
             return [];
         }
 
-        const filePath = this.getMapFilePath(this.options.objectsFromOptionsFile);
+        const filePath = this.getMapFilePath(this.options.entitiesFromOptionsFile);
         const fileData = fs.readFileSync(filePath, 'utf8');
         const data = JSON5.parse(fileData).map(
-            (options: LegacyGameObjectOptions) => {
+            (options: LegacyEntityOptions) => {
                 const components: ComponentsInitialization = {
                     PositionComponent: options.position,
                 };
@@ -103,11 +98,11 @@ export class GameMap {
     }
 
     fillAreaWithDynamicSizeType(
-        objectsOptionsComponents: GameObjectFactoryBuildOptions[],
+        entitiesOptionsComponents: EntityBuildOptions[],
         box: BoundingBox,
         type: string,
     ): void {
-        objectsOptionsComponents.push({
+        entitiesOptionsComponents.push({
             type,
             components: {
                 PositionComponent: box.tl,
@@ -120,14 +115,14 @@ export class GameMap {
     }
 
     fillAreaWithFixedSizeType(
-        objectsOptionsComponents: GameObjectFactoryBuildOptions[],
+        entitiesOptionsComponents: EntityBuildOptions[],
         box: BoundingBox,
         type: string,
         size: SizeComponent,
     ): void {
         for (let y = box.tl.y; y < box.br.y; y += size.height) {
             for (let x = box.tl.x; x < box.br.x; x += size.width) {
-                objectsOptionsComponents.push({
+                entitiesOptionsComponents.push({
                     type,
                     components: {
                         PositionComponent: {
@@ -141,7 +136,7 @@ export class GameMap {
     }
 
     fillAreaWithType(
-        objectsOptionsComponents: GameObjectFactoryBuildOptions[],
+        entitiesOptionsComponents: EntityBuildOptions[],
         box: BoundingBox,
         type: string,
     ): void {
@@ -151,18 +146,18 @@ export class GameMap {
             .findTypeComponentData(type, 'DynamicSizeComponent');
 
         if (dynamicSize === undefined) {
-            this.fillAreaWithFixedSizeType(objectsOptionsComponents, box, type, size);
+            this.fillAreaWithFixedSizeType(entitiesOptionsComponents, box, type, size);
         } else {
-            this.fillAreaWithDynamicSizeType(objectsOptionsComponents, box, type);
+            this.fillAreaWithDynamicSizeType(entitiesOptionsComponents, box, type);
         }
     }
 
-    getObjectsOptionsFromLayers(): GameObjectFactoryBuildOptions[] {
-        const objectsOptionsComponents: GameObjectFactoryBuildOptions[] = [];
+    getEntitiesOptionsFromLayers(): EntityBuildOptions[] {
+        const entitiesOptionsComponents: EntityBuildOptions[] = [];
 
         if (this.options.layerFiles === undefined
-            || this.options.colorsObjectTypesMap === undefined) {
-            return objectsOptionsComponents;
+            || this.options.colorsEntityTypesMap === undefined) {
+            return entitiesOptionsComponents;
         }
 
         const resolution = this.options.resolution;
@@ -194,25 +189,25 @@ export class GameMap {
                         },
                     };
 
-                    const type = this.getColorGameObjectType(color);
-                    this.fillAreaWithType(objectsOptionsComponents, box, type);
+                    const type = this.getColorEntityType(color);
+                    this.fillAreaWithType(entitiesOptionsComponents, box, type);
 
                     PNGUtils.setRectangleColor(png, rec, [0, 0, 0]);
                 }
             }
         }
 
-        return objectsOptionsComponents;
+        return entitiesOptionsComponents;
     }
 
-    getObjectsOptions(): GameObjectFactoryBuildOptions[] {
-        let options: GameObjectFactoryBuildOptions[] = [];
+    getEntitiesOptions(): EntityBuildOptions[] {
+        let options: EntityBuildOptions[] = [];
 
-        const objectsOptionsFromOptions = this.getObjectsOptionsFromOptions();
-        options = options.concat(objectsOptionsFromOptions);
+        const entitiesOptionsFromOptions = this.getEntitiesOptionsFromOptions();
+        options = options.concat(entitiesOptionsFromOptions);
 
-        const objectsOptionsFromLayers = this.getObjectsOptionsFromLayers();
-        options = options.concat(objectsOptionsFromLayers);
+        const entitiesOptionsFromLayers = this.getEntitiesOptionsFromLayers();
+        options = options.concat(entitiesOptionsFromLayers);
 
         return options;
     }

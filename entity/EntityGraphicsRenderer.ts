@@ -9,24 +9,24 @@ import { IDrawable } from '@/drawable/IDrawable';
 import { ImageDrawable } from '@/drawable/ImageDrawable';
 import { Entity } from '@/ecs/Entity';
 import { Context2D } from '@/utils/CanvasUtils';
-import { GameObjectDrawables } from './GameObjectDrawables';
+import { EntityDrawables } from './EntityDrawables';
 
-export class GameObjectGraphicsRenderer<O extends Entity = Entity> {
-    object;
+export class EntityGraphicsRenderer<O extends Entity = Entity> {
+    entity;
     drawables?: IDrawable[] | null = null;
     scale = 1;
 
-    constructor(object: O) {
-        this.object = object;
+    constructor(entity: O) {
+        this.entity = entity;
     }
 
-    private filterDrawableMatchingObject(drawable: IDrawable): boolean {
+    private filterMatchingDrawable(drawable: IDrawable): boolean {
         if (drawable.properties.tests === undefined) {
             return true;
         }
 
         for (const test of drawable.properties.tests) {
-            if (!test(this.object)) {
+            if (!test(this.entity)) {
                 return false;
             }
         }
@@ -38,13 +38,13 @@ export class GameObjectGraphicsRenderer<O extends Entity = Entity> {
         return drawable !== undefined && drawable !== null;
     }
 
-    private findDrawablesMatchingObject(): IDrawable[] | undefined {
-        let drawables = GameObjectDrawables.getTypeDrawables(this.object.type);
+    private findMatchingDrawables(): IDrawable[] | undefined {
+        let drawables = EntityDrawables.getTypeDrawables(this.entity.type);
         if (drawables === undefined) {
             return undefined;
         }
 
-        drawables = drawables.filter(this.filterDrawableMatchingObject, this);
+        drawables = drawables.filter(this.filterMatchingDrawable, this);
 
         if (drawables[0] === undefined) {
             return undefined;
@@ -65,15 +65,15 @@ export class GameObjectGraphicsRenderer<O extends Entity = Entity> {
             return drawable;
         }
 
-        const dynamicSize = this.object.findComponent(DynamicSizeComponent);
+        const dynamicSize = this.entity.findComponent(DynamicSizeComponent);
         if (dynamicSize === undefined) {
             return drawable;
         }
 
         const imageDrawable = drawable as ImageDrawable;
 
-        const size = this.object.getComponent(SizeComponent);
-        const position = this.object.getComponent(PositionComponent);
+        const size = this.entity.getComponent(SizeComponent);
+        const position = this.entity.getComponent(PositionComponent);
         let offsetX = 0;
         let offsetY = 0;
 
@@ -103,7 +103,7 @@ export class GameObjectGraphicsRenderer<O extends Entity = Entity> {
         }
 
         if (drawable !== undefined && drawable.properties.processor !== undefined) {
-            drawable = drawable.properties.processor.call(drawable, this.object);
+            drawable = drawable.properties.processor.call(drawable, this.entity);
         }
 
         return drawable;
@@ -120,7 +120,7 @@ export class GameObjectGraphicsRenderer<O extends Entity = Entity> {
             return;
         }
 
-        const dirtyGraphicsComponent = this.object
+        const dirtyGraphicsComponent = this.entity
             .findComponent(DirtyGraphicsComponent);
 
         if (dirtyGraphicsComponent === undefined && !force && this.scale === scale) {
@@ -128,7 +128,7 @@ export class GameObjectGraphicsRenderer<O extends Entity = Entity> {
         }
 
         this.scale = scale;
-        this.drawables = this.findDrawablesMatchingObject();
+        this.drawables = this.findMatchingDrawables();
         if (this.drawables !== undefined) {
             this.drawables = this.processDrawables(this.drawables);
         }
@@ -153,7 +153,7 @@ export class GameObjectGraphicsRenderer<O extends Entity = Entity> {
         }
 
         if (drawable.type === DrawableType.ANIMATED_IMAGE) {
-            const spawnTime = this.object.getComponent(SpawnTimeComponent).value;
+            const spawnTime = this.entity.getComponent(SpawnTimeComponent).value;
             drawable = (drawable as AnimatedImageDrawable).getCurrentDrawable(spawnTime);
         }
 

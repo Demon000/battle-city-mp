@@ -53,11 +53,11 @@ export class GameClientSocket {
             case GameEvent.TEAM_PLAYER_REMOVED:
                 this.gameClient.onTeamPlayerRemoved(batch[1], batch[2]);
                 break;
-            case GameEvent.OBJECT_REGISTERED:
-                this.gameClient.onObjectRegistered(batch[1]);
+            case GameEvent.ENTITY_REGISTERED:
+                this.gameClient.onEntityRegistered(batch[1]);
                 break;
-            case GameEvent.OBJECT_UNREGISTERED:
-                this.gameClient.onObjectUnregistered(batch[1]);
+            case GameEvent.ENTITY_UNREGISTERED:
+                this.gameClient.onEntityUnregistered(batch[1]);
                 break;
             case GameEvent.ENTITY_COMPONENT_ADDED:
                 this.gameClient.onEntityComponentAdded(batch[1], batch[2], batch[3]);

@@ -24,15 +24,15 @@ export class GameModeService {
         return this.config.get<IGameModeProperties>('game-modes-properties', this.gameMode);
     }
 
-    isIgnoredObjectType(type: string | undefined): boolean {
+    isIgnoredEntityType(type: string | undefined): boolean {
         assert(type !== undefined,
             'Cannot check if undefined type is ignored');
 
         const gameModeProperties = this.getGameModeProperties();
-        if (gameModeProperties.ignoredObjectTypes === undefined) {
+        if (gameModeProperties.ignoredEntityTypes === undefined) {
             return true;
         }
 
-        return !gameModeProperties.ignoredObjectTypes.includes(type);
+        return !gameModeProperties.ignoredEntityTypes.includes(type);
     }
 }

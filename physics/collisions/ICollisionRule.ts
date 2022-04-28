@@ -18,8 +18,8 @@ export enum CollisionEvent {
 }
 
 type CollisionEventHandler = (
-    movingObjectId: EntityId,
-    staticObjectId: EntityId,
+    movingEntityId: EntityId,
+    staticEntityId: EntityId,
     position: Point,
 ) => void;
 

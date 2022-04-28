@@ -7,7 +7,7 @@ export enum SameTeamBulletHitMode {
 export interface IGameModeProperties {
     hasTeams: boolean;
     sameTeamBulletHitMode: SameTeamBulletHitMode;
-    ignoredObjectTypes?: string[];
+    ignoredEntityTypes?: string[];
 }
 
 export type GameModesProperties = Record<string, IGameModeProperties>;

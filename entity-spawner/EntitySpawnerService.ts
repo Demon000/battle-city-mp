@@ -10,8 +10,8 @@ import { SmokeSpawnerComponent } from '@/components/SmokeSpawnerComponent';
 import { ClazzOrTag } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { Registry, RegistryComponentEvent } from '@/ecs/Registry';
-import { GameObjectFactory } from '@/object/GameObjectFactory';
-import { GameObjectType } from '@/object/GameObjectType';
+import { EntityFactory } from '@/entity/EntityFactory';
+import { EntityType } from '@/entity/EntityType';
 import { DirectionComponent } from '@/components/DirectionComponent';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
@@ -20,7 +20,7 @@ import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 
 export class EntitySpawnerService {
     constructor(
-        private gameObjectFactory: GameObjectFactory,
+        private entityFactory: EntityFactory,
         private registry: Registry,
     ) {}
 
@@ -42,7 +42,7 @@ export class EntitySpawnerService {
 
         let clazz;
         switch (entity.type) {
-            case GameObjectType.BULLET:
+            case EntityType.BULLET:
                 clazz = BulletSpawnerComponent;
                 break;
         }
@@ -140,7 +140,7 @@ export class EntitySpawnerService {
             ...options,
         };
 
-        const spawnedEntity = this.gameObjectFactory.buildFromOptions(buildOptions);
+        const spawnedEntity = this.entityFactory.buildFromOptions(buildOptions);
 
         const playerOwnedComponent = entity.findComponent(PlayerOwnedComponent);
         const spawnedPlayerOwnedComponent = spawnedEntity

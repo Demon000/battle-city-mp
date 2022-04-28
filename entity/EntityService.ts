@@ -30,9 +30,9 @@ import { Random } from '@/utils/Random';
 import { Direction } from '../physics/Direction';
 import { Point } from '../physics/point/Point';
 import { PointUtils } from '../physics/point/PointUtils';
-import { GameObjectType } from './GameObjectType';
+import { EntityType } from './EntityType';
 
-export class GameObjectService {
+export class EntityService {
     constructor(
         private registry: Registry,
     ) {}
@@ -65,7 +65,7 @@ export class GameObjectService {
         });
     }
 
-    setObjectMovementDirection(entityId: EntityId, direction: Direction | null): void {
+    setMovementDirection(entityId: EntityId, direction: Direction | null): void {
         const entity = this.registry.getEntityById(entityId);
         const movement = entity.getComponent(MovementComponent);
         if (movement.direction === direction) {
@@ -77,7 +77,7 @@ export class GameObjectService {
         });
     }
 
-    processObjectDirection(entity: Entity): void {
+    processEntityDirection(entity: Entity): void {
         const movement = entity.getComponent(MovementComponent);
         const direction = entity.getComponent(DirectionComponent).value;
         if (movement.direction !== null && direction !== movement.direction) {
@@ -90,24 +90,24 @@ export class GameObjectService {
     }
 
     getRandomSpawnPosition(teamId: string | null): Point {
-        const objects = this.registry.getEntitiesWithComponent(SpawnComponent);
-        const playerSpawnObjects = new Array<Entity>();
+        const entities = this.registry.getEntitiesWithComponent(SpawnComponent);
+        const playerSpawnEntities = new Array<Entity>();
 
-        for (const object of objects) {
-            if (object.type === GameObjectType.PLAYER_SPAWN) {
-                const playerSpawnTeamId = object
+        for (const entity of entities) {
+            if (entity.type === EntityType.PLAYER_SPAWN) {
+                const playerSpawnTeamId = entity
                     .getComponent(TeamOwnedComponent).teamId;
                 if (teamId === null || teamId === playerSpawnTeamId) {
-                    playerSpawnObjects.push(object);
+                    playerSpawnEntities.push(entity);
                 }
             }
         }
 
-        const playerSpawnObject = Random.getRandomArrayElement(playerSpawnObjects);
-        assert(playerSpawnObject !== undefined,
-            'Failed to get random spawn object');
+        const playerSpawnEntity = Random.getRandomArrayElement(playerSpawnEntities);
+        assert(playerSpawnEntity !== undefined,
+            'Failed to get random spawn entity');
 
-        return playerSpawnObject.getComponent(PositionComponent);
+        return playerSpawnEntity.getComponent(PositionComponent);
     }
 
     private processMovementSpeed(entity: Entity, delta: number): void {
@@ -141,7 +141,7 @@ export class GameObjectService {
         });
     }
 
-    private processObjectMovement(entity: Entity, delta: number): void {
+    private processEntityMovement(entity: Entity, delta: number): void {
         this.processMovementSpeed(entity, delta);
 
         const movement = entity.getComponent(MovementComponent);
@@ -168,7 +168,7 @@ export class GameObjectService {
         });
     }
 
-    processObjectsDestroyed(): void {
+    processDestroyed(): void {
         for (const entity of this.registry.getEntitiesWithComponent(DestroyedComponent)) {
             entity.destroy();
         }
@@ -180,7 +180,7 @@ export class GameObjectService {
         }
     }
 
-    processObjectsAutomaticDestroy(): void {
+    processAutomaticDestroy(): void {
         for (const component of this.registry.getComponents(AutomaticDestroyComponent)) {
             const entity = component.entity;
             const automaticDestroyTimeMs =
@@ -215,7 +215,7 @@ export class GameObjectService {
         }
     }
 
-    processObjectsDirtyIsMoving(): void {
+    processDirtyIsMoving(): void {
         for (const component of this.registry.getComponents(DirtyIsMovingComponent)) {
             component.remove({
                 silent: true,
@@ -254,7 +254,7 @@ export class GameObjectService {
         });
     }
 
-    processObjectsDirtyCenterPosition(): void {
+    processDirtyCenterPosition(): void {
         for (const component of
             this.registry.getComponents(DirtyCenterPositionComponent)) {
             component.remove({
@@ -369,7 +369,7 @@ export class GameObjectService {
         });
     }
 
-    processObjectsDirtyRelativePosition(): void {
+    processDirtyRelativePosition(): void {
         for (const component of this.registry
             .getComponents(DirtyPositionComponent)) {
             component.remove({
@@ -381,15 +381,15 @@ export class GameObjectService {
         }
     }
 
-    processObjectsDirection(): void {
+    processDirection(): void {
         for (const entity of this.registry.getEntitiesWithComponent(IsMovingComponent)) {
-            this.processObjectDirection(entity);
+            this.processEntityDirection(entity);
         }
     }
 
-    processObjectsPosition(delta: number): void {
+    processMovement(delta: number): void {
         for (const entity of this.registry.getEntitiesWithComponent(IsMovingComponent)) {
-            this.processObjectMovement(entity, delta);
+            this.processEntityMovement(entity, delta);
         }
     }
 }

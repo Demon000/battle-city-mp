@@ -4,7 +4,7 @@ import { ComponentsInitialization } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { EntityId } from '@/ecs/EntityId';
 
-export interface GameObjectFactoryBuildOptions {
+export interface EntityBuildOptions {
     id?: EntityId;
     type: string;
     subtypes?: string[];
@@ -12,13 +12,13 @@ export interface GameObjectFactoryBuildOptions {
     silent?: boolean
 }
 
-export class GameObjectFactory {
+export class EntityFactory {
     constructor(
         private registry: Registry,
         private entityBlueprint: EntityBlueprint,
     ) {}
 
-    buildFromOptions(buildOptions: GameObjectFactoryBuildOptions): Entity {
+    buildFromOptions(buildOptions: EntityBuildOptions): Entity {
         if (buildOptions.id === undefined) {
             buildOptions.id = this.registry.generateId();
         }
@@ -30,23 +30,23 @@ export class GameObjectFactory {
             fullType += buildOptions.subtypes.join('-');
         }
 
-        const object = new Entity(this.registry, buildOptions.id,
+        const entity = new Entity(this.registry, buildOptions.id,
             buildOptions.type, buildOptions.subtypes);
-        this.entityBlueprint.addComponents(fullType, object, {
+        this.entityBlueprint.addComponents(fullType, entity, {
             silent: true,
         });
 
         const components = buildOptions.components;
         if (components !== undefined) {
-            object.upsertComponents(components, {
+            entity.upsertComponents(components, {
                 silent: true,
             });
         }
 
         if (!buildOptions.silent) {
-            this.registry.registerEntity(object);
+            this.registry.registerEntity(entity);
         }
 
-        return object;
+        return entity;
     }
 }

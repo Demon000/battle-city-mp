@@ -8,7 +8,7 @@ import { Point } from '@/physics/point/Point';
 import { PositionComponent } from '@/components/PositionComponent';
 import { CanvasUtils, Context2D } from '@/utils/CanvasUtils';
 import { RatioUtils } from '@/utils/RatioUtils';
-import { GameObjectGraphicsRenderer } from '../object/GameObjectGraphicsRenderer';
+import { EntityGraphicsRenderer } from '../entity/EntityGraphicsRenderer';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { ClazzOrTag } from '@/ecs/Component';
 import { GraphicsRendererComponent } from '@/components/GraphicsRendererComponent';
@@ -75,17 +75,17 @@ export class GameGraphicsService {
         this.gameHeight = height / this.scale;
     }
 
-    getObjectRenderer(object: Entity): GameObjectGraphicsRenderer {
-        const graphicsRendererComponent = object.getComponent(GraphicsRendererComponent);
+    getEntityRenderer(entity: Entity): EntityGraphicsRenderer {
+        const graphicsRendererComponent = entity.getComponent(GraphicsRendererComponent);
         if (graphicsRendererComponent.renderer === undefined) {
-            graphicsRendererComponent.renderer = new GameObjectGraphicsRenderer(object);
+            graphicsRendererComponent.renderer = new EntityGraphicsRenderer(entity);
         }
 
         return graphicsRendererComponent.renderer;
     }
 
-    _renderObject(object: Entity, drawX: number, drawY: number): void {
-        const renderer = this.getObjectRenderer(object);
+    _renderEntity(entity: Entity, drawX: number, drawY: number): void {
+        const renderer = this.getEntityRenderer(entity);
         renderer.update(this.scale);
         if (!renderer.isRenderable()) {
             return;
@@ -94,22 +94,22 @@ export class GameGraphicsService {
         renderer.render(this.contexts, drawX, drawY);
     }
 
-    renderObject(object: Entity): void {
+    renderEntity(entity: Entity): void {
         if (this.scale === 0) {
             return;
         }
 
-        const position = object.getComponent(PositionComponent);
-        const objectRelativeX = Math.floor(position.x) - this.canvasX;
-        const objectRelativeY = Math.floor(position.y) - this.canvasY;
-        const objectDrawX = objectRelativeX * this.scale;
-        const objectDrawY = objectRelativeY * this.scale;
-        this._renderObject(object, objectDrawX, objectDrawY);
+        const position = entity.getComponent(PositionComponent);
+        const relativeX = Math.floor(position.x) - this.canvasX;
+        const relativeY = Math.floor(position.y) - this.canvasY;
+        const drawX = relativeX * this.scale;
+        const drawY = relativeY * this.scale;
+        this._renderEntity(entity, drawX, drawY);
     }
 
-    renderObjects(objects: Iterable<Entity>): void {
-        for (const object of objects) {
-            this.renderObject(object);
+    renderEntites(entities: Iterable<Entity>): void {
+        for (const entity of entities) {
+            this.renderEntity(entity);
         }
     }
 
@@ -134,15 +134,15 @@ export class GameGraphicsService {
             position.y + this.gameHeight / 2);
     }
 
-    processObjectsDirtyGraphics(): void {
+    processDirtyGraphics(): void {
         for (const component of this.registry.getComponents(DirtyGraphicsComponent)) {
-            const object = component.entity;
-            const renderer = this.getObjectRenderer(object);
+            const entity = component.entity;
+            const renderer = this.getEntityRenderer(entity);
             renderer.update(this.scale, true);
         }
     }
 
-    processObjectsGraphicsDependencies(
+    processGraphicsDependencies(
         entityId: EntityId,
         clazzOrTag: ClazzOrTag,
     ): void {

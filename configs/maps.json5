@@ -8,7 +8,7 @@
             'lingor_player_spawns.png',
             'lingor_bush.png',
         ],
-        colorsObjectTypesMap: {
+        colorsEntityTypesMap: {
             'grass': [70, 106, 32],
             'brick-wall': [156, 74, 0],
             'steel-wall': [255, 255, 255],
@@ -22,13 +22,13 @@
     'lingor_small': {
         name: 'Lingor Islands Small',
         resolution: 16,
-        objectsFromOptionsFile: 'lingor_small_objects_options.json5',
+        entitiesFromOptionsFile: 'lingor_small_entities_options.json5',
         layerFiles: [
             'lingor_small_ground.png',
             'lingor_small_walls.png',
             'lingor_small_bushes.png',
         ],
-        colorsObjectTypesMap: {
+        colorsEntityTypesMap: {
             'grass': [70, 106, 32],
             'brick-wall': [156, 74, 0],
             'steel-wall': [255, 255, 255],
@@ -72,7 +72,7 @@
             'performance_test_walls.png',
             'performance_test_player_spawns.png',
         ],
-        colorsObjectTypesMap: {
+        colorsEntityTypesMap: {
             'brick-wall': [156, 74, 0],
             'level-border': [99, 99, 99],
             'player-spawn': [89, 13, 121],
@@ -84,7 +84,7 @@
         layerFiles: [
             'square.png',
         ],
-        colorsObjectTypesMap: {
+        colorsEntityTypesMap: {
             'brick-wall': [156, 74, 0],
             'level-border': [99, 99, 99],
             'player-spawn': [89, 13, 121],
@@ -93,7 +93,7 @@
     'simple': {
         name: 'Simple',
         resolution: 16,
-        objectsFromOptionsFile: 'simple_objects_options.json',
+        entitiesFromOptionsFile: 'simple_entities_options.json',
         teamsOptions: [
             {
                 id: "Red",

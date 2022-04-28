@@ -6,7 +6,7 @@ import { MovementMultipliersComponent } from '@/components/MovementMultipliersCo
 import { ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
-import { GameObjectType } from '@/object/GameObjectType';
+import { EntityType } from '@/entity/EntityType';
 import { assert } from '@/utils/assert';
 import EventEmitter from 'eventemitter3';
 import { BoundingBox } from '../bounding-box/BoundingBox';
@@ -70,7 +70,7 @@ export class CollisionService {
         return movingMap.get(staticType);
     }
 
-    getOverlappingObjects(box: BoundingBox): Iterable<EntityId> {
+    getOverlappingEntities(box: BoundingBox): Iterable<EntityId> {
         return this.boundingBoxRepository.getBoxOverlappingValues(box);
     }
 
@@ -101,7 +101,7 @@ export class CollisionService {
         return false;
     }
 
-    private snapObjectToBoundingBoxEdge(
+    private snapEntityToBoundingBoxEdge(
         entity: Entity,
         position: Point,
         box: BoundingBox,
@@ -124,7 +124,7 @@ export class CollisionService {
         }
     }
 
-    private updateObjectMovementModifiers(
+    private updateMovementModifiers(
         movingEntity: Entity,
         overlappingEntities: Iterable<Entity>,
     ): void {
@@ -161,94 +161,94 @@ export class CollisionService {
         }
     }
 
-    private _validateObjectMovement(
-        movingObject: Entity,
+    private _validateEntityMovement(
+        movingEntity: Entity,
         position: Point,
         direction?: Direction,
         trySnapping = true,
     ): void {
         assert(this.rulesMap !== undefined,
-            'Cannot call validate object movement with no rules supplied');
+            'Cannot call validate entity movement with no rules supplied');
 
-        const movingObjectDirection =
-            movingObject.getComponent(DirectionComponent).value;
-        const movingDirection = direction ?? movingObjectDirection;
-        const originalBoundingBox = movingObject
+        const movingEntityDirection =
+            movingEntity.getComponent(DirectionComponent).value;
+        const movingDirection = direction ?? movingEntityDirection;
+        const originalBoundingBox = movingEntity
             .getComponent(BoundingBoxComponent);
-        const originalPosition = movingObject
+        const originalPosition = movingEntity
             .getComponent(PositionComponent);
         const movedBoundingBox = BoundingBoxUtils
             .reposition(originalBoundingBox, originalPosition, position);
         const mergedBoundingBox = BoundingBoxUtils
             .combine(originalBoundingBox, movedBoundingBox);
-        const overlappingObjectIds = this
-            .getOverlappingObjects(mergedBoundingBox);
-        const overlappingObjects = this.registry
-            .getMultipleEntitiesById(overlappingObjectIds);
+        const overlappingEntityIds = this
+            .getOverlappingEntities(mergedBoundingBox);
+        const overlappingEntities = this.registry
+            .getMultipleEntitiesById(overlappingEntityIds);
 
-        let movementPreventingObject;
-        const collidingObjectNotifications = new Array<[CollisionEvent, Entity]>();
-        for (const overlappingObject of overlappingObjects) {
-            if (movingObject.id === overlappingObject.id) {
+        let movementPreventingEntity;
+        const collidingEntityNotifications = new Array<[CollisionEvent, Entity]>();
+        for (const overlappingEntity of overlappingEntities) {
+            if (movingEntity.id === overlappingEntity.id) {
                 continue;
             }
 
-            if (overlappingObject.hasComponent(DestroyedComponent)) {
+            if (overlappingEntity.hasComponent(DestroyedComponent)) {
                 continue;
             }
 
-            const rule = this.getRule(movingObject.type, overlappingObject.type);
+            const rule = this.getRule(movingEntity.type, overlappingEntity.type);
             if (rule === undefined) {
                 continue;
             }
 
             for (const result of rule.result) {
                 if (result.type === CollisionResultEvent.PREVENT_MOVEMENT) {
-                    const overlappingBoundingBox = overlappingObject
+                    const overlappingBoundingBox = overlappingEntity
                         .getComponent(BoundingBoxComponent);
                     const isAlreadyInside = BoundingBoxUtils
                         .overlaps(originalBoundingBox, overlappingBoundingBox);
 
                     let isCloser = true;
-                    if (movementPreventingObject !== undefined) {
+                    if (movementPreventingEntity !== undefined) {
                         const overlappingPosition =
-                            overlappingObject.getComponent(PositionComponent);
+                            overlappingEntity.getComponent(PositionComponent);
                         const movementPreventingPosition =
-                            movementPreventingObject.getComponent(PositionComponent);
+                            movementPreventingEntity.getComponent(PositionComponent);
                         isCloser = this.isPositionCloserToDirection(overlappingPosition,
                             movementPreventingPosition, movingDirection);
                     }
 
                     if (!isAlreadyInside && isCloser) {
-                        movementPreventingObject = overlappingObject;
+                        movementPreventingEntity = overlappingEntity;
                     }
                 } else if (result.type === CollisionResultEvent.NOTIFY) {
-                    collidingObjectNotifications.push([result.name, overlappingObject]);
+                    collidingEntityNotifications.push([result.name, overlappingEntity]);
                 }
             }
         }
 
         /*
-         * We found a movement preventing object, snap to its edge.
-         * This usually works, because we can only move towards an object.
-         * But there's an edge case where the moving object has turned in another
+         * We found a movement preventing entity, snap to its edge.
+         * This usually works, because we can only move towards an entity.
+         * But there's an edge case where the moving entity has turned in another
          * direction, and we try to snap it so he can fit between blocks with ease,
          * in which case we cannot try to snap it again to the edge of the movement
-         * movement preventing object.
+         * movement preventing entity.
          */
-        if (movementPreventingObject !== undefined) {
-            const preventingBoundingBox = movementPreventingObject
+        if (movementPreventingEntity !== undefined) {
+            const preventingBoundingBox = movementPreventingEntity
                 .getComponent(BoundingBoxComponent);
-            this.snapObjectToBoundingBoxEdge(movingObject, position,
+            this.snapEntityToBoundingBoxEdge(movingEntity, position,
                 preventingBoundingBox, movingDirection);
         }
 
         /*
-         * If we can't try snapping to the movement preventing object's edge,
-         * then the position we're trying to move to is inside the movement preventing object,
-         * which means it is invalid, and we shouldn't update the object position.
+         * If we can't try snapping to the movement preventing entity's edge,
+         * then the position we're trying to move to is inside the movement preventing entity,
+         * which means it is invalid, and we shouldn't update the entity position.
          */
-        if (!trySnapping && movementPreventingObject !== undefined) {
+        if (!trySnapping && movementPreventingEntity !== undefined) {
             return;
         }
 
@@ -260,27 +260,27 @@ export class CollisionService {
             return;
         }
 
-        movingObject.updateComponent(PositionComponent, position);
+        movingEntity.updateComponent(PositionComponent, position);
 
-        for (const [name, overlappingObject] of collidingObjectNotifications) {
-            const overlappingBoundingBox = overlappingObject
+        for (const [name, overlappingEntity] of collidingEntityNotifications) {
+            const overlappingBoundingBox = overlappingEntity
                 .getComponent(BoundingBoxComponent);
             if (BoundingBoxUtils.overlapsEqual(preventedBoundingBox,
                 overlappingBoundingBox)) {
-                this.emitter.emit(name, movingObject.id, overlappingObject.id,
+                this.emitter.emit(name, movingEntity.id, overlappingEntity.id,
                     position);
             }
         }
 
-        this.updateObjectMovementModifiers(movingObject, overlappingObjects);
+        this.updateMovementModifiers(movingEntity, overlappingEntities);
     }
 
-    processObjectsRequestedPosition(): void {
+    processRequestedPosition(): void {
         for (const component of this.registry.getComponents(RequestedPositionComponent)) {
             component.remove();
 
-            const object = component.entity;
-            this._validateObjectMovement(object, component, undefined, true);
+            const entity = component.entity;
+            this._validateEntityMovement(entity, component, undefined, true);
         }
     }
 
@@ -293,7 +293,7 @@ export class CollisionService {
         return snapped;
     }
 
-    validateObjectDirection(entity: Entity, direction: Direction): void {
+    validateDirection(entity: Entity, direction: Direction): void {
         const directionComponent = entity.getComponent(DirectionComponent);
         const oldDirection = directionComponent.value;
 
@@ -320,14 +320,14 @@ export class CollisionService {
             newPosition.x = this.calculateSnappedCoordinates(position.x, value);
         }
 
-        this._validateObjectMovement(entity, newPosition, oldDirection, false);
+        this._validateEntityMovement(entity, newPosition, oldDirection, false);
     }
 
-    processObjectsRequestedDirection(): void {
+    processRequestedDirection(): void {
         for (const component of this.registry.getComponents(RequestedDirectionComponent)) {
             component.remove();
 
-            this.validateObjectDirection(component.entity, component.value);
+            this.validateDirection(component.entity, component.value);
         }
     }
 
@@ -357,13 +357,13 @@ export class CollisionService {
         type: string,
     ): Entity | undefined {
         const boundingBox = entity.getComponent(BoundingBoxComponent);
-        const overlappingObjectIds = this.getOverlappingObjects(boundingBox);
-        const overlappingObjects = this.registry
-            .getMultipleEntitiesById(overlappingObjectIds);
+        const overlappingEntityIds = this.getOverlappingEntities(boundingBox);
+        const overlappingEntities = this.registry
+            .getMultipleEntitiesById(overlappingEntityIds);
 
-        for (const overlappingObject of overlappingObjects) {
-            if (overlappingObject.type === type) {
-                return overlappingObject;
+        for (const overlappingEntity of overlappingEntities) {
+            if (overlappingEntity.type === type) {
+                return overlappingEntity;
             }
         }
 
@@ -380,7 +380,7 @@ export class CollisionService {
         }
 
         const hasIsUnderBushComponent = entity.hasComponent(IsUnderBushComponent);
-        const isUnderBush = this.isOverlappingWithType(entity, GameObjectType.BUSH);
+        const isUnderBush = this.isOverlappingWithType(entity, EntityType.BUSH);
 
         if (isUnderBush === hasIsUnderBushComponent) {
             return;
@@ -395,7 +395,7 @@ export class CollisionService {
         }
     }
 
-    processObjectsDirtyIsUnderBush(): void {
+    processDirtyIsUnderBush(): void {
         for (const component of
             this.registry.getComponents(DirtyIsUnderBushComponent)) {
             component.remove({
@@ -443,7 +443,7 @@ export class CollisionService {
         });
     }
 
-    processObjectsDirtyBoundingBox(): void {
+    processDirtyBoundingBox(): void {
         for (const component of
             this.registry.getComponents(DirtyBoundingBoxComponent)) {
             component.remove({
@@ -470,7 +470,7 @@ export class CollisionService {
         });
     }
 
-    processObjectDirtyCollisions(entity: Entity): void {
+    processEntityDirtyCollision(entity: Entity): void {
         const boundingBox = entity.findComponent(BoundingBoxComponent);
         if (boundingBox === undefined || entity.hasComponent(DestroyedComponent)) {
             this.boundingBoxRepository.removeValue(entity.id);
@@ -483,14 +483,14 @@ export class CollisionService {
         }
     }
 
-    processObjectsDirtyCollisions(): void {
+    processDirtyCollisions(): void {
         for (const component of
             this.registry.getComponents(DirtyCollisionsComponent)) {
             component.remove({
                 silent: true,
             });
 
-            this.processObjectDirtyCollisions(component.entity);
+            this.processEntityDirtyCollision(component.entity);
         }
     }
 

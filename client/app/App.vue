@@ -190,7 +190,7 @@ import { Color } from '@/drawable/Color';
 import { GameClient, GameClientEvent } from '@/game/GameClient';
 import { GameClientSocket } from '@/game/GameClientSocket';
 import { GameSocketEvents } from '@/game/GameSocketEvent';
-import { RenderPass } from '@/object/RenderPass';
+import { RenderPass } from '@/entity/RenderPass';
 import { Player, PlayerSpawnStatus } from '@/player/Player';
 import { PlayerStats } from '@/player/PlayerStats';
 import { TankTier } from '@/tank/TankTier';

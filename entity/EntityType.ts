@@ -1,4 +1,4 @@
-export enum GameObjectType {
+export enum EntityType {
     NONE = 'none',
     BRICK_WALL = 'brick-wall',
     STEEL_WALL = 'steel-wall',
@@ -16,8 +16,4 @@ export enum GameObjectType {
     DIRT = 'dirt',
     FLAG = 'flag',
     FLAG_BASE = 'flag-base',
-}
-
-export function isGameObjectType(type: string): boolean {
-    return Object.values(GameObjectType).includes(type as any);
 }

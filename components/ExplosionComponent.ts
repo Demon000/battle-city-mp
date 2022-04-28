@@ -1,8 +1,8 @@
 import { Component } from '@/ecs/Component';
-import { GameObjectType } from '@/object/GameObjectType';
+import { EntityType } from '@/entity/EntityType';
 
 export interface ExplosionComponentData {
-    destroyedType: GameObjectType;
+    destroyedType: EntityType;
 }
 
 export class ExplosionComponent
@@ -10,5 +10,5 @@ export class ExplosionComponent
     implements ExplosionComponentData {
     static TAG = 'EC';
 
-    destroyedType = GameObjectType.NONE;
+    destroyedType = EntityType.NONE;
 }
