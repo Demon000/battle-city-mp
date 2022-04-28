@@ -24,4 +24,18 @@ export class ColorUtils {
 
         return parts as Color;
     }
+
+    static isEqual(first: Color | undefined, second: Color | undefined): boolean {
+        if (first === undefined || second === undefined) {
+            return false;
+        }
+
+        for (let i = 0; i < 3; i++) {
+            if (first[i] !== second[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

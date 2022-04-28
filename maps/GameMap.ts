@@ -3,7 +3,7 @@ import { isGameObjectType } from '@/object/GameObjectType';
 import { Team, TeamOptions } from '@/team/Team';
 import { Config } from '@/config/Config';
 import { Color } from '@/drawable/Color';
-import { PNG } from 'pngjs';
+import { PNG, PNGWithMetadata } from 'pngjs';
 import JSON5 from 'json5';
 import { EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { SizeComponent } from '@/components/SizeComponent';
@@ -12,6 +12,10 @@ import { Point } from '@/physics/point/Point';
 import { GameObjectOptions } from '@/object/GameObject';
 import { assert } from '@/utils/assert';
 import { ComponentsInitialization } from '@/ecs/Component';
+import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
+import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
+import { ColorUtils } from '@/utils/ColorUtils';
+import { PNGUtils } from '@/utils/PNGUtils';
 
 export interface GameMapOptions {
     name: string;
@@ -103,22 +107,16 @@ export class GameMap {
 
     fillAreaWithDynamicSizeType(
         objectsOptionsComponents: GameObjectFactoryBuildOptions[],
-        bigX: number,
-        bigY: number,
-        bigXEnd: number,
-        bigYEnd: number,
+        box: BoundingBox,
         type: string,
     ): void {
         objectsOptionsComponents.push({
             type,
             components: {
-                PositionComponent: {
-                    x: bigX,
-                    y: bigY,
-                },
+                PositionComponent: box.tl,
                 SizeComponent: {
-                    width: bigXEnd - bigX,
-                    height: bigYEnd - bigY,
+                    width: box.br.x - box.tl.x,
+                    height: box.br.y - box.tl.y,
                 },
             },
         });
@@ -126,21 +124,18 @@ export class GameMap {
 
     fillAreaWithFixedSizeType(
         objectsOptionsComponents: GameObjectFactoryBuildOptions[],
-        bigX: number,
-        bigY: number,
-        bigXEnd: number,
-        bigYEnd: number,
+        box: BoundingBox,
         type: string,
         size: SizeComponent,
     ): void {
-        for (let smallY = bigY; smallY < bigYEnd; smallY += size.height) {
-            for (let smallX = bigX; smallX < bigXEnd; smallX += size.width) {
+        for (let y = box.tl.y; y < box.br.y; y += size.height) {
+            for (let x = box.tl.x; x < box.br.x; x += size.width) {
                 objectsOptionsComponents.push({
                     type,
                     components: {
                         PositionComponent: {
-                            x: smallX,
-                            y: smallY,
+                            x,
+                            y,
                         },
                     },
                 });
@@ -150,10 +145,7 @@ export class GameMap {
 
     fillAreaWithType(
         objectsOptionsComponents: GameObjectFactoryBuildOptions[],
-        bigX: number,
-        bigY: number,
-        bigXEnd: number,
-        bigYEnd: number,
+        box: BoundingBox,
         type: string,
     ): void {
         const size = this.entityBlueprint
@@ -162,11 +154,9 @@ export class GameMap {
             .findTypeComponentData(type, 'DynamicSizeComponent');
 
         if (dynamicSize === undefined) {
-            this.fillAreaWithFixedSizeType(objectsOptionsComponents,
-                bigX, bigY, bigXEnd, bigYEnd, type, size);
+            this.fillAreaWithFixedSizeType(objectsOptionsComponents, box, type, size);
         } else {
-            this.fillAreaWithDynamicSizeType(objectsOptionsComponents,
-                bigX, bigY, bigXEnd, bigYEnd, type);
+            this.fillAreaWithDynamicSizeType(objectsOptionsComponents, box, type);
         }
     }
 
@@ -184,21 +174,33 @@ export class GameMap {
             const data = fs.readFileSync(layerPath);
             const png = PNG.sync.read(data);
 
-            for (let pngY = 0; pngY < png.height; pngY++) {
-                for (let pngX = 0; pngX < png.width; pngX++) {
-                    const id = (png.width * pngY + pngX) << 2;
-                    const r = png.data[id];
-                    const g = png.data[id + 1];
-                    const b = png.data[id + 2];
-                    if (r === 0 && g === 0 && b === 0) {
+            for (let y = 0; y < png.height; y++) {
+                for (let x = 0; x < png.width; x++) {
+                    const color = PNGUtils.getPixelColor(png, x, y);
+                    if (color === undefined) {
                         continue;
                     }
 
-                    const bigX = pngX * this.options.resolution;
-                    const bigY = pngY * this.options.resolution;
-                    const type = this.getColorGameObjectType([r, g, b]);
-                    this.fillAreaWithType(objectsOptionsComponents, bigX, bigY,
-                        bigX + resolution, bigY + resolution, type);
+                    const rec = PNGUtils.findSameColorRectangle(png, color, x, y);
+                    if (rec === undefined) {
+                        continue;
+                    }
+
+                    const box = {
+                        tl: {
+                            x: rec.tl.x * resolution,
+                            y: rec.tl.y * resolution,
+                        },
+                        br: {
+                            x: rec.br.x * resolution,
+                            y: rec.br.y * resolution,
+                        },
+                    };
+
+                    const type = this.getColorGameObjectType(color);
+                    this.fillAreaWithType(objectsOptionsComponents, box, type);
+
+                    PNGUtils.setRectangleColor(png, rec, [0, 0, 0]);
                 }
             }
         }
