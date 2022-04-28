@@ -6,7 +6,6 @@ import { MovementMultipliersComponent } from '@/components/MovementMultipliersCo
 import { ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
-import { GameObject } from '@/object/GameObject';
 import { GameObjectType } from '@/object/GameObjectType';
 import { assert } from '@/utils/assert';
 import EventEmitter from 'eventemitter3';
@@ -280,7 +279,7 @@ export class CollisionService {
         for (const component of this.registry.getComponents(RequestedPositionComponent)) {
             component.remove();
 
-            const object = component.entity as GameObject;
+            const object = component.entity;
             this._validateObjectMovement(object, component, undefined, true);
         }
     }

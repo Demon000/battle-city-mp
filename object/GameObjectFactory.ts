@@ -1,13 +1,14 @@
 import { Registry } from '@/ecs/Registry';
 import { EntityBlueprint } from '@/ecs/EntityBlueprint';
-import { GameObject, GameObjectOptions } from './GameObject';
 import { ComponentsInitialization } from '@/ecs/Component';
+import { Entity } from '@/ecs/Entity';
+import { EntityId } from '@/ecs/EntityId';
 
 export interface GameObjectFactoryBuildOptions {
-    type: string,
-    subtypes?: string[],
-    options?: GameObjectOptions,
-    components?: ComponentsInitialization,
+    id?: EntityId;
+    type: string;
+    subtypes?: string[];
+    components?: ComponentsInitialization;
     silent?: boolean
 }
 
@@ -17,32 +18,20 @@ export class GameObjectFactory {
         private entityBlueprint: EntityBlueprint,
     ) {}
 
-    buildFromOptions(buildOptions: GameObjectFactoryBuildOptions): GameObject {
-        if (buildOptions.options === undefined) {
-            buildOptions.options = {};
-        }
-        const options = buildOptions.options;
-
-        if (options.id === undefined) {
-            options.id = this.registry.generateId();
+    buildFromOptions(buildOptions: GameObjectFactoryBuildOptions): Entity {
+        if (buildOptions.id === undefined) {
+            buildOptions.id = this.registry.generateId();
         }
 
-        if (options.type === undefined) {
-            options.type = buildOptions.type;
-        }
-
-        if (options.subtypes === undefined) {
-            options.subtypes = buildOptions.subtypes;
-        }
-
-        let fullType = options.type;
+        let fullType = buildOptions.type;
         if (buildOptions.subtypes !== undefined
             && buildOptions.subtypes.length) {
             fullType += '-';
             fullType += buildOptions.subtypes.join('-');
         }
 
-        const object = new GameObject(options, this.registry);
+        const object = new Entity(this.registry, buildOptions.id,
+            buildOptions.type, buildOptions.subtypes);
         this.entityBlueprint.addComponents(fullType, object, {
             silent: true,
         });

@@ -17,7 +17,6 @@ import EventEmitter from 'eventemitter3';
 import { Action, ActionType } from '../actions/Action';
 import { ButtonPressAction } from '../actions/ButtonPressAction';
 import { GameMapService } from '../maps/GameMapService';
-import { GameObject } from '../object/GameObject';
 import { GameObjectService } from '../object/GameObjectService';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
 import { rules } from '../physics/collisions/CollisionRules';
@@ -135,20 +134,19 @@ export class GameServer {
          */
         this.registry.emitter.on(RegistryEvent.ENTITY_REGISTERED,
             (entity: Entity) => {
-                const object = entity as GameObject;
                 this.gameEventBatcher.addBroadcastEvent([
                     GameEvent.OBJECT_REGISTERED,
                     {
-                        type: object.type,
-                        subtypes: object.subtypes,
-                        options: object.toOptions(),
-                        components: object.getComponentsData({
+                        id: entity.id,
+                        type: entity.type,
+                        subtypes: entity.subtypes,
+                        components: entity.getComponentsData({
                             withoutFlags: ComponentFlags.LOCAL_ONLY,
                         }),
                     },
                 ]);
 
-                switch (object.type) {
+                switch (entity.type) {
                     case GameObjectType.TANK: {
                         const playerId = entity
                             .getComponent(PlayerOwnedComponent).playerId;
@@ -161,9 +159,7 @@ export class GameServer {
             });
         this.registry.emitter.on(RegistryEvent.ENTITY_BEFORE_DESTROY,
             (entity: Entity) => {
-                const object = entity as GameObject;
-
-                switch (object.type) {
+                switch (entity.type) {
                     case GameObjectType.TANK: {
                         const playerId = entity
                             .getComponent(PlayerOwnedComponent).playerId;
@@ -744,14 +740,14 @@ export class GameServer {
     }
 
     sendRequestedServerStatus(playerId?: string): void {
-        const objects = this.registry.getEntities() as Iterable<GameObject>;
+        const objects = this.registry.getEntities() as Iterable<Entity>;
         const objectsOptions =
             LazyIterable.from(objects)
                 .map(object => {
                     return {
+                        id: object.id,
                         type: object.type,
                         subtypes: object.subtypes,
-                        options: object.toOptions(),
                         components: object.getComponentsData({
                             withoutFlags: ComponentFlags.LOCAL_ONLY,
                         }),

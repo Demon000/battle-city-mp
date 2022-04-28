@@ -2,7 +2,6 @@ import { GameCamera } from '@/renderer/GameCamera';
 import { GameGraphicsService } from '@/renderer/GameGraphicsService';
 import { MapRepository } from '@/utils/MapRepository';
 import { Ticker, TickerEvent } from '@/utils/Ticker';
-import { GameObject } from '../object/GameObject';
 import { GameObjectService } from '../object/GameObjectService';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
 import { CollisionService } from '../physics/collisions/CollisionService';
@@ -35,6 +34,7 @@ import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { IsMovingTrackingComponent } from '@/components/IsMovingTrackingComponent';
 import { IsUnderBushTrackingComponent } from '@/components/IsUnderBushTrackingComponent';
+import { Entity } from '@/ecs/Entity';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -415,7 +415,7 @@ export class GameClient {
         const viewableObjectIds = this.collisionService
             .getOverlappingObjects(box);
         const viewableObjects = this.registry
-            .getMultipleEntitiesById(viewableObjectIds) as Iterable<GameObject>;
+            .getMultipleEntitiesById(viewableObjectIds) as Iterable<Entity>;
         this.gameGraphicsService.initializeRender(position);
         this.gameGraphicsService.renderObjects(viewableObjects);
 

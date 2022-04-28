@@ -7,11 +7,11 @@ import { AnimatedImageDrawable } from '@/drawable/AnimatedImageDrawable';
 import { DrawableType } from '@/drawable/DrawableType';
 import { IDrawable } from '@/drawable/IDrawable';
 import { ImageDrawable } from '@/drawable/ImageDrawable';
-import { GameObject } from '@/object/GameObject';
+import { Entity } from '@/ecs/Entity';
 import { Context2D } from '@/utils/CanvasUtils';
 import { GameObjectDrawables } from './GameObjectDrawables';
 
-export class GameObjectGraphicsRenderer<O extends GameObject = GameObject> {
+export class GameObjectGraphicsRenderer<O extends Entity = Entity> {
     object;
     drawables?: IDrawable[] | null = null;
     scale = 1;

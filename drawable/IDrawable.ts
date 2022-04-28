@@ -1,9 +1,9 @@
-import { GameObject } from '@/object/GameObject';
+import { Entity } from '@/ecs/Entity';
 import { Point } from '@/physics/point/Point';
 import { Context2D } from '@/utils/CanvasUtils';
 
-export type DrawableTestFunction = (object: GameObject) => boolean;
-export type DrawableProcessingFunction = (this: IDrawable, object: GameObject) => IDrawable | undefined;
+export type DrawableTestFunction = (object: Entity) => boolean;
+export type DrawableProcessingFunction = (this: IDrawable, object: Entity) => IDrawable | undefined;
 
 export interface DrawableProperties {
     tests?: DrawableTestFunction[];

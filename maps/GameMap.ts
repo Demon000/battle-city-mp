@@ -3,18 +3,15 @@ import { isGameObjectType } from '@/object/GameObjectType';
 import { Team, TeamOptions } from '@/team/Team';
 import { Config } from '@/config/Config';
 import { Color } from '@/drawable/Color';
-import { PNG, PNGWithMetadata } from 'pngjs';
+import { PNG } from 'pngjs';
 import JSON5 from 'json5';
 import { EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { SizeComponent } from '@/components/SizeComponent';
 import { GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
 import { Point } from '@/physics/point/Point';
-import { GameObjectOptions } from '@/object/GameObject';
 import { assert } from '@/utils/assert';
 import { ComponentsInitialization } from '@/ecs/Component';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
-import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
-import { ColorUtils } from '@/utils/ColorUtils';
 import { PNGUtils } from '@/utils/PNGUtils';
 
 export interface GameMapOptions {
@@ -27,7 +24,7 @@ export interface GameMapOptions {
     teamsOptions?: TeamOptions[];
 }
 
-export interface LegacyGameObjectOptions extends GameObjectOptions {
+export interface LegacyGameObjectOptions extends GameObjectFactoryBuildOptions {
     position: Point;
     components?: ComponentsInitialization;
 }

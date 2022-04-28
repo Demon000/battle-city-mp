@@ -30,7 +30,6 @@ import { Random } from '@/utils/Random';
 import { Direction } from '../physics/Direction';
 import { Point } from '../physics/point/Point';
 import { PointUtils } from '../physics/point/PointUtils';
-import { GameObject } from './GameObject';
 import { GameObjectType } from './GameObjectType';
 
 export class GameObjectService {
@@ -384,15 +383,13 @@ export class GameObjectService {
 
     processObjectsDirection(): void {
         for (const entity of this.registry.getEntitiesWithComponent(IsMovingComponent)) {
-            const object = entity as GameObject;
-            this.processObjectDirection(object);
+            this.processObjectDirection(entity);
         }
     }
 
     processObjectsPosition(delta: number): void {
         for (const entity of this.registry.getEntitiesWithComponent(IsMovingComponent)) {
-            const object = entity as GameObject;
-            this.processObjectMovement(object, delta);
+            this.processObjectMovement(entity, delta);
         }
     }
 }

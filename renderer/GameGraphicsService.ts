@@ -2,7 +2,6 @@ import { DirtyGraphicsComponent } from '@/components/DirtyGraphicsComponent';
 import { GraphicDependenciesComponent } from '@/components/GraphicDependenciesComponent';
 import { EntityId } from '@/ecs/EntityId';
 import { Registry } from '@/ecs/Registry';
-import { GameObject } from '@/object/GameObject';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { Point } from '@/physics/point/Point';
@@ -13,6 +12,7 @@ import { GameObjectGraphicsRenderer } from '../object/GameObjectGraphicsRenderer
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { ClazzOrTag } from '@/ecs/Component';
 import { GraphicsRendererComponent } from '@/components/GraphicsRendererComponent';
+import { Entity } from '@/ecs/Entity';
 
 export class GameGraphicsService {
     private scale = 0;
@@ -75,7 +75,7 @@ export class GameGraphicsService {
         this.gameHeight = height / this.scale;
     }
 
-    getObjectRenderer(object: GameObject): GameObjectGraphicsRenderer {
+    getObjectRenderer(object: Entity): GameObjectGraphicsRenderer {
         const graphicsRendererComponent = object.getComponent(GraphicsRendererComponent);
         if (graphicsRendererComponent.renderer === undefined) {
             graphicsRendererComponent.renderer = new GameObjectGraphicsRenderer(object);
@@ -84,7 +84,7 @@ export class GameGraphicsService {
         return graphicsRendererComponent.renderer;
     }
 
-    _renderObject(object: GameObject, drawX: number, drawY: number): void {
+    _renderObject(object: Entity, drawX: number, drawY: number): void {
         const renderer = this.getObjectRenderer(object);
         renderer.update(this.scale);
         if (!renderer.isRenderable()) {
@@ -94,7 +94,7 @@ export class GameGraphicsService {
         renderer.render(this.contexts, drawX, drawY);
     }
 
-    renderObject(object: GameObject): void {
+    renderObject(object: Entity): void {
         if (this.scale === 0) {
             return;
         }
@@ -107,7 +107,7 @@ export class GameGraphicsService {
         this._renderObject(object, objectDrawX, objectDrawY);
     }
 
-    renderObjects(objects: Iterable<GameObject>): void {
+    renderObjects(objects: Iterable<Entity>): void {
         for (const object of objects) {
             this.renderObject(object);
         }
@@ -136,7 +136,7 @@ export class GameGraphicsService {
 
     processObjectsDirtyGraphics(): void {
         for (const component of this.registry.getComponents(DirtyGraphicsComponent)) {
-            const object = component.entity as GameObject;
+            const object = component.entity;
             const renderer = this.getObjectRenderer(object);
             renderer.update(this.scale, true);
         }
