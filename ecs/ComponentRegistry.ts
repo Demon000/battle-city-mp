@@ -45,6 +45,7 @@ import { DirtyPositionComponent, DirtyPositionComponentData } from '@/components
 import { PickupIgnoreComponent, PickupIgnoreComponentData } from '@/components/PickupIgnoreComponent';
 import { DirtyCollisionsComponent, DirtyCollisionsComponentData } from '@/components/DirtyCollisionsComponent';
 import { DynamicSizeComponent, DynamicSizeComponentData } from '@/components/DynamicSizeComponent';
+import { ExplosionComponent, ExplosionComponentData } from '@/components/ExplosionComponent';
 
 export class ComponentRegistry {
     static _lookupAndValidate(
@@ -228,6 +229,10 @@ export class ComponentRegistry {
             case DynamicSizeComponent.name:
                 assertEquals<Partial<DynamicSizeComponentData>>(data);
                 return DynamicSizeComponent;
+            case ExplosionComponent.tag:
+            case ExplosionComponent.name:
+                assertEquals<Partial<ExplosionComponentData>>(data);
+                return ExplosionComponent;
             default:
                 assert(false, `Invalid tag '${tag}'`);
         }

@@ -1,7 +1,6 @@
 import { BulletPower } from '@/bullet/BulletPower';
 import { BulletService } from '@/bullet/BulletService';
 import { Color } from '@/drawable/Color';
-import { ExplosionOptions } from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { SameTeamBulletHitMode } from '@/game-mode/IGameModeProperties';
 import { GameObjectFactory, GameObjectFactoryBuildOptions } from '@/object/GameObjectFactory';
@@ -32,7 +31,6 @@ import { GameEventBatcher, GameEventBatcherEvent } from './GameEventBatcher';
 import { GameModeService } from '@/game-mode/GameModeService';
 import { ComponentEmitOptions, Registry, RegistryComponentEvent, RegistryEvent } from '@/ecs/Registry';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
-import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { FlagService, FlagTankInteraction } from '@/flag/FlagService';
 import { PlayerPointsEvent } from '@/player/PlayerPoints';
@@ -376,8 +374,8 @@ export class GameServer {
          */
         const spawnExplosion = (
             sourceOrPosition: Entity | Point,
-            type: string,
-            destroyedObjectType?: string,
+            type: ExplosionType,
+            destroyedType?: string,
         ) => {
             let position;
             if (sourceOrPosition instanceof Entity) {
@@ -388,12 +386,12 @@ export class GameServer {
 
             this.gameObjectFactory.buildFromOptions({
                 type: GameObjectType.EXPLOSION,
-                options: {
-                    explosionType: type,
-                    destroyedObjectType,
-                } as ExplosionOptions,
+                subtypes: [type],
                 components: {
                     PositionComponent: position,
+                    ExplosionComponent: {
+                        destroyedType,
+                    },
                 },
             });
         };

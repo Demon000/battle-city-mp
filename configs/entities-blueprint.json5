@@ -216,6 +216,9 @@
             'bounding-boxed-entity',
             'world-entity',
         ],
+        components: {
+            ExplosionComponent: {},
+        },
         localComponents: {
             SizeComponent: {},
             SpawnTimeComponent: {},
@@ -228,6 +231,16 @@
                 timeMs: 240,
             },
         },
+    },
+    'explosion-small': {
+        extends: [
+            'explosion',
+        ],
+    },
+    'explosion-big': {
+        extends: [
+            'explosion',
+        ],
     },
     'smoke': {
         extends: [

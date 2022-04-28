@@ -9,7 +9,6 @@ import { IImageDrawable } from '@/drawable/IImageDrawable';
 import { ImageDrawable } from '@/drawable/ImageDrawable';
 import { TextDrawable, TextPositionReference } from '@/drawable/TextDrawable';
 import { Entity } from '@/ecs/Entity';
-import { Explosion } from '@/explosion/Explosion';
 import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
 import { DirectionComponent } from '@/components/DirectionComponent';
@@ -17,7 +16,6 @@ import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
 import { TankTier } from '@/tank/TankTier';
-import { GameObject } from './GameObject';
 import { GameObjectType } from './GameObjectType';
 import { RenderPass } from './RenderPass';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
@@ -377,10 +375,10 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             const generateExplosionDrawableTests = (
                 type: string,
             ) => [
-                (object: GameObject): boolean => {
-                    const explosion = object as Explosion;
+                (entity: Entity): boolean => {
+                    const explosionType = entity.subtypes[0];
 
-                    if (explosion.explosionType !== type) {
+                    if (explosionType !== type) {
                         return false;
                     }
 

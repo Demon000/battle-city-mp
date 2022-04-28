@@ -1,10 +1,8 @@
 import { Config } from '@/config/Config';
 import { Registry } from '@/ecs/Registry';
 import { EntityBlueprint } from '@/ecs/EntityBlueprint';
-import { Explosion, ExplosionOptions } from '@/explosion/Explosion';
 import { GameObject, GameObjectOptions } from './GameObject';
 import { GameObjectProperties } from './GameObjectProperties';
-import { GameObjectType } from './GameObjectType';
 import { ComponentsInitialization } from '@/ecs/Component';
 
 export interface GameObjectFactoryBuildOptions {
@@ -46,13 +44,6 @@ export class GameObjectFactory {
                 type: options.type,
             };
         }
-        let object;
-
-        if (options.type === GameObjectType.EXPLOSION) {
-            object = new Explosion(options as ExplosionOptions, properties, this.registry);
-        } else {
-            object = new GameObject(options, properties, this.registry);
-        }
 
         let fullType = options.type;
         if (buildOptions.subtypes !== undefined
@@ -61,6 +52,7 @@ export class GameObjectFactory {
             fullType += buildOptions.subtypes.join('-');
         }
 
+        const object = new GameObject(options, properties, this.registry);
         this.entityBlueprint.addComponents(fullType, object, {
             silent: true,
         });
