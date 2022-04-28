@@ -217,6 +217,8 @@ export class GameMap {
         const objectsOptionsFromLayers = this.getObjectsOptionsFromLayers();
         options = options.concat(objectsOptionsFromLayers);
 
+        console.log(`Loaded ${options.length} objects!`);
+
         return options;
     }
 
