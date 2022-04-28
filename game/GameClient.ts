@@ -1,4 +1,3 @@
-import { GameAudioService } from '@/renderer/GameAudioService';
 import { GameCamera } from '@/renderer/GameCamera';
 import { GameGraphicsService } from '@/renderer/GameGraphicsService';
 import { MapRepository } from '@/utils/MapRepository';
@@ -17,7 +16,6 @@ import { TeamService, TeamServiceEvent } from '@/team/TeamService';
 import { PlayerStats } from '@/player/PlayerStats';
 import { TankService } from '@/tank/TankService';
 import { LazyIterable } from '@/utils/LazyIterable';
-import { GameObjectAudioRendererFactory } from '@/object/GameObjectAudioRendererFactory';
 import { TankTier } from '@/tank/TankTier';
 import { Color } from '@/drawable/Color';
 import { Config } from '@/config/Config';
@@ -104,8 +102,6 @@ export class GameClient {
     private collisionService;
     private gameCamera;
     private gameGraphicsService;
-    private audioRendererFactory;
-    private gameAudioService;
     private timeService;
     emitter;
     ticker;
@@ -129,8 +125,6 @@ export class GameClient {
         this.teamService = new TeamService(this.teamRepository);
         this.gameCamera = new GameCamera();
         this.gameGraphicsService = new GameGraphicsService(this.registry, canvases);
-        this.audioRendererFactory = new GameObjectAudioRendererFactory();
-        this.gameAudioService = new GameAudioService(this.audioRendererFactory);
         this.timeService = new TimeService(this.config);
         this.emitter = new EventEmitter<GameClientEvents>();
         this.ticker = new Ticker();
@@ -238,12 +232,6 @@ export class GameClient {
                         }
                     }
                 });
-
-        this.registry.emitter.on(RegistryEvent.ENTITY_BEFORE_DESTROY,
-            (entity: Entity) => {
-                const object = entity as GameObject;
-                this.gameAudioService.stopAudioPlayback(object);
-            });
 
         this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_ADDED, () => {
             this.emitter.emit(GameClientEvent.OWN_PLAYER_ADDED);
@@ -391,9 +379,6 @@ export class GameClient {
         const maxVisibleGameSize = this.config.get<number>('game-client',
             'maxVisibleGameSize');
         this.gameGraphicsService.setMaxVisibleGameSize(maxVisibleGameSize);
-
-        this.gameAudioService.clear();
-        this.gameAudioService.setMaxAudibleDistance(maxVisibleGameSize);
     }
 
     onTick(): void {
@@ -434,7 +419,6 @@ export class GameClient {
             .getMultipleEntitiesById(viewableObjectIds) as Iterable<GameObject>;
         this.gameGraphicsService.initializeRender(position);
         this.gameGraphicsService.renderObjects(viewableObjects);
-        this.gameAudioService.playObjectsAudioEffect(viewableObjects, position, box);
 
         this.emitter.emit(GameClientEvent.TICK);
     }
