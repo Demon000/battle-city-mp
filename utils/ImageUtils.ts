@@ -109,12 +109,6 @@ export class ImageUtils {
             options.sourceOffsetY, options.width, options.height, 0, 0,
             options.width, options.height);
 
-        context.beginPath();
-        context.translate(0.5, 0.5);
-        context.strokeStyle = 'red';
-        context.rect(0, 0, options.width - 1, options.height - 1);
-        context.stroke();
-
         return context.canvas;
     }
 }
