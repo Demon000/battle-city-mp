@@ -20,11 +20,14 @@
             'bounding-boxed-entity',
             'world-entity',
         ],
-        localComponents: {
+        components: {
             SizeComponent: {
                 width: 4,
                 height: 4,
             },
+        },
+        clientComponents: {
+            DynamicSizeComponent: {},
         },
         serverComponents: {
             CenterPositionComponent: {},

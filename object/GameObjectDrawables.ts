@@ -14,7 +14,6 @@ import { ExplosionType } from '@/explosion/ExplosionType';
 import { Direction } from '@/physics/Direction';
 import { DirectionComponent } from '@/components/DirectionComponent';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
-import { Point } from '@/physics/point/Point';
 import { PositionComponent } from '@/components/PositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
 import { TankTier } from '@/tank/TankTier';
@@ -23,19 +22,6 @@ import { GameObjectType } from './GameObjectType';
 import { RenderPass } from './RenderPass';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { RelativePositionComponent } from '@/components/RelativePositionComponent';
-
-const positionTest = (
-    mod: number,
-    divide: number,
-    points: Point[],
-): DrawableTestFunction => {
-    return (entity: Entity): boolean => {
-        const position = entity.getComponent(PositionComponent);
-        const x = Math.floor(Math.abs(position.x % mod / divide));
-        const y = Math.floor(Math.abs(position.y % mod / divide));
-        return points.some(p => p.x === x && p.y === y);
-    };
-};
 
 const directionTest = (targetDirection: Direction): DrawableTestFunction => {
     return (entity: Entity): boolean => {
@@ -84,23 +70,10 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
         }),
     ],
     [GameObjectType.BRICK_WALL]: [
-        new ImageDrawable('brick_wall_even.png', {
+        new ImageDrawable('brick_wall.png', {
             renderPass: RenderPass.WALL,
-            tests: [
-                positionTest(8, 4, [
-                    { x: 0, y: 0 },
-                    { x: 1, y: 1 },
-                ]),
-            ],
-        }),
-        new ImageDrawable('brick_wall_odd.png', {
-            renderPass: RenderPass.WALL,
-            tests: [
-                positionTest(8, 4, [
-                    { x: 0, y: 1 },
-                    { x: 1, y: 0 },
-                ]),
-            ],
+            fillRepeatWidth: 8,
+            fillRepeatHeight: 8,
         }),
     ],
     [GameObjectType.GRASS]: [
