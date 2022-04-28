@@ -21,14 +21,13 @@ import { Color } from '@/drawable/Color';
 import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
-import { Registry, RegistryComponentEvent, RegistryEvent } from '@/ecs/Registry';
+import { Registry, RegistryComponentEvent } from '@/ecs/Registry';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
 import { EntityId } from '@/ecs/EntityId';
-import { Entity } from '@/ecs/Entity';
 import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
 import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
@@ -113,7 +112,7 @@ export class GameClient {
         this.componentRegistry = new ComponentRegistry();
         this.registry = new Registry(this.registryIdGenerator);
         this.entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.CLIENT);
-        this.gameObjectFactory = new GameObjectFactory(this.registry, this.config, this.entityBlueprint);
+        this.gameObjectFactory = new GameObjectFactory(this.registry, this.entityBlueprint);
 
         this.boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
         this.collisionService = new CollisionService(this.boundingBoxRepository, this.registry);

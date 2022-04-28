@@ -104,7 +104,7 @@ export class GameServer {
         this.entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.SERVER);
         this.entityBlueprint.reloadBlueprintData();
 
-        this.gameObjectFactory = new GameObjectFactory(this.registry, this.config, this.entityBlueprint);
+        this.gameObjectFactory = new GameObjectFactory(this.registry, this.entityBlueprint);
 
         this.gameModeService = new GameModeService(this.config);
         this.boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
@@ -776,7 +776,6 @@ export class GameServer {
 
         const configsData = this.config.getDataMultiple([
             'bounding-box',
-            'game-object-properties',
             'entities-blueprint',
             'game-client',
             'time',

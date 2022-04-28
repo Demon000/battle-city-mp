@@ -1,8 +1,6 @@
-import { Config } from '@/config/Config';
 import { Registry } from '@/ecs/Registry';
 import { EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { GameObject, GameObjectOptions } from './GameObject';
-import { GameObjectProperties } from './GameObjectProperties';
 import { ComponentsInitialization } from '@/ecs/Component';
 
 export interface GameObjectFactoryBuildOptions {
@@ -16,7 +14,6 @@ export interface GameObjectFactoryBuildOptions {
 export class GameObjectFactory {
     constructor(
         private registry: Registry,
-        private config: Config,
         private entityBlueprint: EntityBlueprint,
     ) {}
 
@@ -38,13 +35,6 @@ export class GameObjectFactory {
             options.subtypes = buildOptions.subtypes;
         }
 
-        let properties = this.config.find<GameObjectProperties>('game-object-properties', options.type);
-        if (properties === undefined) {
-            properties = {
-                type: options.type,
-            };
-        }
-
         let fullType = options.type;
         if (buildOptions.subtypes !== undefined
             && buildOptions.subtypes.length) {
@@ -52,7 +42,7 @@ export class GameObjectFactory {
             fullType += buildOptions.subtypes.join('-');
         }
 
-        const object = new GameObject(options, properties, this.registry);
+        const object = new GameObject(options, this.registry);
         this.entityBlueprint.addComponents(fullType, object, {
             silent: true,
         });
