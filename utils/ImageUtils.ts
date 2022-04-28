@@ -16,8 +16,7 @@ export interface ContentMeasurements {
 
 export class ImageUtils {
     static measureContents(canvas: Canvas): ContentMeasurements {
-        const context = canvas.getContext('2d');
-        assert(context !== null, 'Failed to create offscreen canvas context');
+        const context = CanvasUtils.getContext(canvas);
 
         let minX = undefined;
         let minY = undefined;
@@ -67,8 +66,7 @@ export class ImageUtils {
         const width = source.width * scaleX;
         const height = source.height * scaleY;
         const canvas = CanvasUtils.create(width, height);
-        const context = canvas.getContext('2d');
-        assert(context !== null, 'Failed to create offscreen canvas context');
+        const context = CanvasUtils.getContext(canvas);
 
         context.imageSmoothingEnabled = false;
         context.drawImage(source, 0, 0, width, height);
@@ -80,8 +78,7 @@ export class ImageUtils {
         color: Color,
     ): Canvas {
         const canvas = CanvasUtils.create(source.width, source.height);
-        const context = canvas.getContext('2d');
-        assert(context !== null, 'Failed to create offscreen canvas context');
+        const context = CanvasUtils.getContext(canvas);
 
         context.drawImage(source, 0, 0);
         context.globalCompositeOperation = 'source-in';
@@ -97,8 +94,7 @@ export class ImageUtils {
         const offsetWidth = options.width + options.sourceOffsetX;
         const offsetHeight = options.height + options.sourceOffsetY;
         const offsetCanvas = CanvasUtils.create(offsetWidth, offsetHeight);
-        const offsetContext = offsetCanvas.getContext('2d');
-        assert(offsetContext !== null, 'Failed to create offscreen canvas context');
+        const offsetContext = CanvasUtils.getContext(offsetCanvas);
 
         const pattern = offsetContext.createPattern(source, 'repeat');
         assert(pattern !== null, 'Failed to create canvas pattern');
@@ -107,8 +103,7 @@ export class ImageUtils {
         offsetContext.fillRect(0, 0, offsetWidth, offsetHeight);
 
         const canvas = CanvasUtils.create(options.width, options.height);
-        const context = canvas.getContext('2d');
-        assert(context !== null, 'Failed to create offscreen canvas context');
+        const context = CanvasUtils.getContext(canvas);
 
         context.drawImage(offsetCanvas, options.sourceOffsetX,
             options.sourceOffsetY, options.width, options.height, 0, 0,
