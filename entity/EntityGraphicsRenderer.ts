@@ -53,12 +53,8 @@ export class EntityGraphicsRenderer<O extends Entity = Entity> {
     }
 
     private processDynamicSizeDrawable(
-        drawable: IDrawable | undefined,
+        drawable: IDrawable,
     ): IDrawable | undefined {
-        if (drawable === undefined) {
-            return drawable;
-        }
-
         if (drawable.type !== DrawableType.IMAGE &&
             drawable.type !== DrawableType.ANIMATED_IMAGE) {
             return drawable;
@@ -95,13 +91,23 @@ export class EntityGraphicsRenderer<O extends Entity = Entity> {
     }
 
     protected processDrawable(drawable: IDrawable | undefined): IDrawable | undefined {
-        drawable = this.processDynamicSizeDrawable(drawable);
-
-        if (drawable !== undefined) {
-            drawable = drawable.scale(this.scale);
+        if (drawable === undefined) {
+            return drawable;
         }
 
-        if (drawable !== undefined && drawable.properties.processor !== undefined) {
+        drawable = this.processDynamicSizeDrawable(drawable);
+
+        if (drawable === undefined) {
+            return drawable;
+        }
+
+        drawable = drawable.scale(this.scale);
+
+        if (drawable === undefined) {
+            return drawable;
+        }
+
+        if (drawable.properties.processor !== undefined) {
             drawable = drawable.properties.processor.call(drawable, this.entity);
         }
 
