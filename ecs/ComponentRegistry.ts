@@ -265,11 +265,11 @@ export class ComponentRegistry {
 
         assert(tag !== undefined);
 
-        const message = `Object is not assignable to component '${tag}'`;
         try {
             return this._lookupAndValidate(data, tag);
         } catch (err) {
-            console.error(message, data);
+            console.error(`Object is not assignable to component '${tag}'`,
+                data);
             throw err;
         }
     }
