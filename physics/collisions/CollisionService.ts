@@ -24,7 +24,7 @@ import { RequestedPositionComponent } from '@/components/RequestedPositionCompon
 import { RequestedDirectionComponent } from '@/components/RequestedDirectionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
 import { DirectionUtils } from './DirectionUtils';
-import { DirtyCollisionsComponent } from '../../components/DirtyCollisionsComponent';
+import { DirtyCollisionsComponent, DirtyCollisionType } from '../../components/DirtyCollisionsComponent';
 import { ICollisionRule, CollisionEvent, CollisionEvents, CollisionResultEvent } from './ICollisionRule';
 import { EntityId } from '@/ecs/EntityId';
 import { IsUnderBushTrackingComponent } from '@/components/IsUnderBushTrackingComponent';
@@ -457,42 +457,61 @@ export class CollisionService {
         }
     }
 
-    markDirtyCollisions(entity: Entity): void {
-        const node = this.boundingBoxRepository.findNode(entity.id);
-        const boundingBox = entity.findComponent(BoundingBoxComponent);
-        if (node !== undefined && boundingBox !== undefined
-            && node.isFatBoxFitting(boundingBox)
-            && !entity.hasComponent(DestroyedComponent)) {
-            return;
+    markDirtyCollisions(entity: Entity, type: DirtyCollisionType): void {
+        const dirtyCollisionsComponent = entity
+            .findComponent(DirtyCollisionsComponent);
+
+        if (dirtyCollisionsComponent !== undefined) {
+            if (dirtyCollisionsComponent.type === DirtyCollisionType.ADD
+                && type === DirtyCollisionType.UPDATE) {
+                return;
+            }
+
+            if (dirtyCollisionsComponent.type === DirtyCollisionType.REMOVE) {
+                return;
+            }
+
+            if (dirtyCollisionsComponent.type === type) {
+                return;
+            }
         }
 
-        entity.upsertComponent(DirtyCollisionsComponent, undefined, {
+        entity.upsertComponent(DirtyCollisionsComponent, {
+            type,
+        }, {
             flags: ComponentFlags.LOCAL_ONLY,
             silent: true,
         });
     }
 
-    processEntityDirtyCollision(entity: Entity): void {
+    processEntityDirtyCollision(component: DirtyCollisionsComponent): void {
+        const entity = component.entity;
         const boundingBox = entity.findComponent(BoundingBoxComponent);
-        if (boundingBox === undefined || entity.hasComponent(DestroyedComponent)) {
-            this.boundingBoxRepository.removeValue(entity.id);
-        } else if (this.boundingBoxRepository.hasNode(entity.id)) {
-            this.boundingBoxRepository.updateBoxValue(entity.id,
-                boundingBox);
-        } else {
+        const hasNode = this.boundingBoxRepository.hasNode(entity.id);
+
+        if (component.type === DirtyCollisionType.ADD
+            || (component.type === DirtyCollisionType.UPDATE && !hasNode)) {
+            assert(boundingBox !== undefined);
             this.boundingBoxRepository.addBoxValue(entity.id,
                 boundingBox);
+        } else if (component.type === DirtyCollisionType.UPDATE) {
+            assert(boundingBox !== undefined);
+            this.boundingBoxRepository.updateBoxValue(entity.id,
+                boundingBox);
+        } else if (component.type === DirtyCollisionType.REMOVE && hasNode) {
+            this.boundingBoxRepository.removeValue(entity.id);
         }
     }
 
     processDirtyCollisions(): void {
         for (const component of
             this.registry.getComponents(DirtyCollisionsComponent)) {
+
+            this.processEntityDirtyCollision(component);
+
             component.remove({
                 silent: true,
             });
-
-            this.processEntityDirtyCollision(component.entity);
         }
     }
 

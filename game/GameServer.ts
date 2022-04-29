@@ -52,10 +52,11 @@ import { HealthComponent } from '@/components/HealthComponent';
 import { EntitySpawnerService } from '@/entity-spawner/EntitySpawnerService';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { FlagComponent } from '@/components/FlagComponent';
-import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { EntityId } from '@/ecs/EntityId';
 import { RelativePositionComponent } from '@/components/RelativePositionComponent';
 import { IsMovingTrackingComponent } from '@/components/IsMovingTrackingComponent';
+import { DirtyCollisionType } from '@/components/DirtyCollisionsComponent';
+import { DestroyedComponent } from '@/components/DestroyedComponent';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -188,7 +189,8 @@ export class GameServer {
             .on(RegistryComponentEvent.COMPONENT_ADDED,
                 (component) => {
                     const entity = component.entity;
-                    this.collisionService.markDirtyCollisions(entity);
+                    this.collisionService.markDirtyCollisions(entity,
+                        DirtyCollisionType.REMOVE);
                 });
         this.registry.componentEmitter(CenterPositionComponent, true)
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
@@ -225,10 +227,29 @@ export class GameServer {
                     this.collisionService.updateBoundingBox(entity, true);
                 });
         this.registry.componentEmitter(BoundingBoxComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_ADDED,
+                (component) => {
+                    const entity = component.entity;
+                    this.collisionService.markDirtyCollisions(entity,
+                        DirtyCollisionType.ADD);
+                });
+        this.registry.componentEmitter(BoundingBoxComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
                 (component) => {
                     const entity = component.entity;
-                    this.collisionService.markDirtyCollisions(entity);
+                    this.collisionService.markDirtyCollisions(entity,
+                        DirtyCollisionType.UPDATE);
+                });
+        this.registry.componentEmitter(BoundingBoxComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_BEFORE_REMOVE,
+                (component, options) => {
+                    if (options?.destroy) {
+                        return;
+                    }
+
+                    const entity = component.entity;
+                    this.collisionService.markDirtyCollisions(entity,
+                        DirtyCollisionType.REMOVE);
                 });
         this.registry.componentEmitter(IsMovingTrackingComponent, true)
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,

@@ -34,6 +34,7 @@ import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { IsMovingTrackingComponent } from '@/components/IsMovingTrackingComponent';
 import { IsUnderBushTrackingComponent } from '@/components/IsUnderBushTrackingComponent';
 import { Entity } from '@/ecs/Entity';
+import { DirtyCollisionType } from '@/components/DirtyCollisionsComponent';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -137,7 +138,8 @@ export class GameClient {
             .on(RegistryComponentEvent.COMPONENT_ADDED,
                 (component) => {
                     const entity = component.entity;
-                    this.collisionService.markDirtyCollisions(entity);
+                    this.collisionService.markDirtyCollisions(entity,
+                        DirtyCollisionType.REMOVE);
                 });
         this.registry.componentEmitter(CenterPositionComponent, true)
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
@@ -167,10 +169,29 @@ export class GameClient {
                     this.collisionService.updateBoundingBox(entity, true);
                 });
         this.registry.componentEmitter(BoundingBoxComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_ADDED,
+                (component) => {
+                    const entity = component.entity;
+                    this.collisionService.markDirtyCollisions(entity,
+                        DirtyCollisionType.ADD);
+                });
+        this.registry.componentEmitter(BoundingBoxComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
                 (component) => {
                     const entity = component.entity;
-                    this.collisionService.markDirtyCollisions(entity);
+                    this.collisionService.markDirtyCollisions(entity,
+                        DirtyCollisionType.UPDATE);
+                });
+        this.registry.componentEmitter(BoundingBoxComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_BEFORE_REMOVE,
+                (component, options) => {
+                    if (options?.destroy) {
+                        return;
+                    }
+
+                    const entity = component.entity;
+                    this.collisionService.markDirtyCollisions(entity,
+                        DirtyCollisionType.REMOVE);
                 });
         this.registry.componentEmitter(IsMovingTrackingComponent, true)
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
