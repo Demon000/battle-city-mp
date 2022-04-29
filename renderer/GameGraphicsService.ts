@@ -8,7 +8,6 @@ import { Point } from '@/physics/point/Point';
 import { PositionComponent } from '@/components/PositionComponent';
 import { CanvasUtils, Context2D } from '@/utils/CanvasUtils';
 import { RatioUtils } from '@/utils/RatioUtils';
-import { EntityGraphicsRenderer } from '../entity/EntityGraphicsRenderer';
 import { ClazzOrTag } from '@/ecs/Component';
 import { GraphicsRendererComponent } from '@/components/GraphicsRendererComponent';
 import { Entity } from '@/ecs/Entity';
@@ -74,22 +73,8 @@ export class GameGraphicsService {
         this.gameHeight = height / this.scale;
     }
 
-    getEntityRenderer(entity: Entity): EntityGraphicsRenderer {
-        const graphicsRendererComponent = entity.getComponent(GraphicsRendererComponent);
-        if (graphicsRendererComponent.renderer === undefined) {
-            graphicsRendererComponent.renderer = new EntityGraphicsRenderer(entity);
-        }
-
-        return graphicsRendererComponent.renderer;
-    }
-
     _renderEntity(entity: Entity, drawX: number, drawY: number): void {
-        const renderer = this.getEntityRenderer(entity);
-        renderer.update(this.scale);
-        if (!renderer.isRenderable()) {
-            return;
-        }
-
+        const renderer = entity.getComponent(GraphicsRendererComponent).renderer;
         renderer.render(this.contexts, drawX, drawY);
     }
 
@@ -136,7 +121,7 @@ export class GameGraphicsService {
     processDirtyGraphics(): void {
         for (const component of this.registry.getComponents(DirtyGraphicsComponent)) {
             const entity = component.entity;
-            const renderer = this.getEntityRenderer(entity);
+            const renderer = entity.getComponent(GraphicsRendererComponent).renderer;
             renderer.update(this.scale, true);
         }
     }

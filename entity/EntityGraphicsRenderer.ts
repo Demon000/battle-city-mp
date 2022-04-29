@@ -138,11 +138,7 @@ export class EntityGraphicsRenderer<O extends Entity = Entity> {
         }
     }
 
-    isRenderable(): boolean {
-        return this.drawables !== undefined && this.drawables !== null && this.drawables.length !== 0;
-    }
-
-    renderDrawable(
+    private renderDrawable(
         drawable: IDrawable | undefined,
         layersContext: Context2D[],
         drawX: number,
@@ -168,7 +164,9 @@ export class EntityGraphicsRenderer<O extends Entity = Entity> {
     }
 
     render(layersContext: Context2D[], drawX: number, drawY: number): void {
-        if (this.drawables === undefined || this.drawables === null) {
+        if (this.drawables === undefined
+            || this.drawables === null
+            || this.drawables.length === 0) {
             return;
         }
 
