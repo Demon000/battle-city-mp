@@ -49,10 +49,10 @@ import { ExplosionComponent, ExplosionComponentData } from '@/components/Explosi
 import { GraphicsRendererComponent, GraphicsRendererComponentData } from '@/components/GraphicsRendererComponent';
 
 export class ComponentRegistry {
-    static _lookupAndValidate(
-        data: any,
+    protected static lookupAndValidate(
         tag: string,
-    ): ComponentClassType<any> {
+        data: any,
+    ): ComponentClassType<any> | undefined {
         switch(tag) {
             case BoundingBoxComponent.tag:
             case BoundingBoxComponent.name:
@@ -238,15 +238,10 @@ export class ComponentRegistry {
             case GraphicsRendererComponent.name:
                 assertEquals<Partial<GraphicsRendererComponentData>>(data);
                 return GraphicsRendererComponent;
-            default:
-                assert(false, `Invalid tag '${tag}'`);
         }
     }
 
-    static lookupAndValidate(
-        data: any,
-        clazzOrTag: ClazzOrTag,
-    ): ComponentClassType<any> {
+    static lookup(clazzOrTag: ClazzOrTag, data?: any): ComponentClassType<any> {
         let clazz;
         let tag;
         if (typeof clazzOrTag === 'string') {
@@ -263,33 +258,20 @@ export class ComponentRegistry {
             tag = clazz.tag;
         }
 
+        if (data === undefined) {
+            data = {};
+        }
+
         assert(tag !== undefined);
 
         try {
-            return this._lookupAndValidate(data, tag);
+            const clazz = this.lookupAndValidate(tag, data);
+            assert(clazz !== undefined, `Invalid tag '${tag}'`);
+            return clazz;
         } catch (err) {
             console.error(`Object is not assignable to component '${tag}'`,
                 data);
             throw err;
         }
-    }
-
-    static lookup(clazzOrTag: ClazzOrTag): ComponentClassType<any> {
-        let clazz;
-        let tag;
-
-        if (typeof clazzOrTag === 'string') {
-            tag = clazzOrTag;
-        } else {
-            clazz = clazzOrTag;
-        }
-
-        if (clazz !== undefined) {
-            return clazz;
-        }
-
-        assert(tag !== undefined);
-
-        return this._lookupAndValidate({}, tag);
     }
 }

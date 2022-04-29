@@ -200,7 +200,7 @@ export class Registry {
         clazzOrTag: ClazzOrTag<C>,
         data: any,
     ): ComponentClassType<C> {
-        return ComponentRegistry.lookupAndValidate(data, clazzOrTag);
+        return ComponentRegistry.lookup(clazzOrTag, data);
     }
 
     emit<
