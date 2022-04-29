@@ -45,12 +45,11 @@ export class EntityGraphicsRenderer<O extends Entity = Entity> {
         }
 
         drawables = drawables.filter(this.filterMatchingDrawable, this);
-
-        if (drawables[0] === undefined) {
-            return undefined;
+        if (drawables.length === 0) {
+            drawables = undefined;
         }
 
-        return drawables.filter(this.filterOutMissingDrawable) as IDrawable[];
+        return drawables;
     }
 
     private processDynamicSizeDrawable(
@@ -109,7 +108,7 @@ export class EntityGraphicsRenderer<O extends Entity = Entity> {
         return drawable;
     }
 
-    protected processDrawables(drawables: (IDrawable | undefined)[]): IDrawable[] {
+    protected processDrawables(drawables: IDrawable[]): IDrawable[] {
         return drawables
             .map(this.processDrawable, this)
             .filter(this.filterOutMissingDrawable, this) as IDrawable[];
