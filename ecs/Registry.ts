@@ -89,14 +89,20 @@ export class Registry {
     @nonenumerable
     private idsEntityMap = new Map<EntityId, Entity>();
 
+    @nonenumerable
+    private componentRegistry;
+
     emitter = new EventEmitter<RegistryEvents & RegistryComponentEvents>();
 
     constructor(
+        componentRegistry: ComponentRegistry,
         private idGenerator: RegistryIdGenerator,
     ) {
         this.addComponent = this.addComponent.bind(this);
         this.updateComponent = this.updateComponent.bind(this);
         this.upsertComponent = this.upsertComponent.bind(this);
+
+        this.componentRegistry = componentRegistry;
     }
 
     componentEmitter<C extends Component<C>>(
@@ -200,7 +206,7 @@ export class Registry {
         clazzOrTag: ClazzOrTag<C>,
         data: any,
     ): ComponentClassType<C> {
-        return ComponentRegistry.lookup(clazzOrTag, data);
+        return this.componentRegistry.lookup(clazzOrTag, data);
     }
 
     emit<
@@ -461,5 +467,9 @@ export class Registry {
         const components = this.getComponents(clazz);
         return LazyIterable.from(components)
             .map(component => component.entity);
+    }
+
+    lookup(clazzOrTag: ClazzOrTag, data?: any): ComponentClassType<any> {
+        return this.componentRegistry.lookup(clazzOrTag, data);
     }
 }

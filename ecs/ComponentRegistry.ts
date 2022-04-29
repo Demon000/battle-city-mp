@@ -46,10 +46,9 @@ import { PickupIgnoreComponent, PickupIgnoreComponentData } from '@/components/P
 import { DirtyCollisionsComponent, DirtyCollisionsComponentData } from '@/components/DirtyCollisionsComponent';
 import { DynamicSizeComponent, DynamicSizeComponentData } from '@/components/DynamicSizeComponent';
 import { ExplosionComponent, ExplosionComponentData } from '@/components/ExplosionComponent';
-import { GraphicsRendererComponent, GraphicsRendererComponentData } from '@/components/GraphicsRendererComponent';
 
 export class ComponentRegistry {
-    protected static lookupAndValidate(
+    protected lookupAndValidate(
         tag: string,
         data: any,
     ): ComponentClassType<any> | undefined {
@@ -234,14 +233,11 @@ export class ComponentRegistry {
             case ExplosionComponent.name:
                 assertEquals<Partial<ExplosionComponentData>>(data);
                 return ExplosionComponent;
-            case GraphicsRendererComponent.tag:
-            case GraphicsRendererComponent.name:
-                assertEquals<Partial<GraphicsRendererComponentData>>(data);
-                return GraphicsRendererComponent;
+
         }
     }
 
-    static lookup(clazzOrTag: ClazzOrTag, data?: any): ComponentClassType<any> {
+    lookup(clazzOrTag: ClazzOrTag, data?: any): ComponentClassType<any> {
         let clazz;
         let tag;
         if (typeof clazzOrTag === 'string') {

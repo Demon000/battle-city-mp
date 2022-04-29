@@ -57,6 +57,7 @@ import { RelativePositionComponent } from '@/components/RelativePositionComponen
 import { IsMovingTrackingComponent } from '@/components/IsMovingTrackingComponent';
 import { DirtyCollisionType } from '@/components/DirtyCollisionsComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
+import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'player-batch',
@@ -69,6 +70,7 @@ export interface GameServerEvents {
 }
 
 export class GameServer {
+    private componentRegistry;
     private registryIdGenerator;
     private registry;
     private entityBlueprint;
@@ -99,8 +101,9 @@ export class GameServer {
         this.config = new Config();
         this.config.loadAll('./configs');
 
+        this.componentRegistry = new ComponentRegistry();
         this.registryIdGenerator = new RegistryNumberIdGenerator();
-        this.registry = new Registry(this.registryIdGenerator);
+        this.registry = new Registry(this.componentRegistry, this.registryIdGenerator);
         this.entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.SERVER);
         this.entityBlueprint.reloadBlueprintData();
 

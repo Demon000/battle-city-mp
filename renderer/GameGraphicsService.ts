@@ -9,7 +9,6 @@ import { PositionComponent } from '@/components/PositionComponent';
 import { CanvasUtils, Context2D } from '@/utils/CanvasUtils';
 import { RatioUtils } from '@/utils/RatioUtils';
 import { EntityGraphicsRenderer } from '../entity/EntityGraphicsRenderer';
-import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { ClazzOrTag } from '@/ecs/Component';
 import { GraphicsRendererComponent } from '@/components/GraphicsRendererComponent';
 import { Entity } from '@/ecs/Entity';
@@ -152,7 +151,7 @@ export class GameGraphicsService {
             return;
         }
 
-        const clazz = ComponentRegistry.lookup(clazzOrTag);
+        const clazz = this.registry.lookup(clazzOrTag);
         if (!(clazz.tag in component.components)
             && !(clazz.name in component.components)) {
             return;

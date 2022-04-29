@@ -35,6 +35,7 @@ import { IsMovingTrackingComponent } from '@/components/IsMovingTrackingComponen
 import { IsUnderBushTrackingComponent } from '@/components/IsUnderBushTrackingComponent';
 import { Entity } from '@/ecs/Entity';
 import { DirtyCollisionType } from '@/components/DirtyCollisionsComponent';
+import { ClientComponentRegistry } from '@/ecs/ClientComponentRegistry';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -87,6 +88,7 @@ export interface GameClientEvents {
 export class GameClient {
     private config;
 
+    private componentRegistry;
     private registryIdGenerator;
     private registry;
     private entityBlueprint;
@@ -109,8 +111,9 @@ export class GameClient {
     constructor(canvases: HTMLCanvasElement[]) {
         this.config = new Config();
 
+        this.componentRegistry = new ClientComponentRegistry();
         this.registryIdGenerator = new RegistryNumberIdGenerator();
-        this.registry = new Registry(this.registryIdGenerator);
+        this.registry = new Registry(this.componentRegistry, this.registryIdGenerator);
         this.entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.CLIENT);
         this.entityFactory = new EntityFactory(this.registry, this.entityBlueprint);
 

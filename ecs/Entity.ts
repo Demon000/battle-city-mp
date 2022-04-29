@@ -148,7 +148,7 @@ export class Entity {
     >(
         clazzOrTag: ClazzOrTag<C>,
     ): C | undefined {
-        const tag = ComponentRegistry.lookup(clazzOrTag).tag;
+        const tag = this.registry.lookup(clazzOrTag).tag;
         return this.tagComponentMap.get(tag) as C;
     }
 

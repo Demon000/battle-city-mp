@@ -100,7 +100,7 @@ export class EntitySpawnerService {
         const activeSpawnerTags =
             entitySpawnerActiveComponent.tags;
 
-        const tag = ComponentRegistry.lookup(clazzOrTag).tag;
+        const tag = this.registry.lookup(clazzOrTag).tag;
 
         if (status) {
             activeSpawnerTags[tag] = true;
