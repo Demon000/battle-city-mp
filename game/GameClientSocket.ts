@@ -3,7 +3,7 @@ import { Color } from '@/drawable/Color';
 import { TankTier } from '@/tank/TankTier';
 import { assert } from '@/utils/assert';
 import { Socket } from 'socket.io-client';
-import { GameClient } from './GameClient';
+import { GameClient, GameClientEvent } from './GameClient';
 import { BatchGameEvent, GameEvent } from './GameEvent';
 import { GameSocketEvent, GameSocketEvents } from './GameSocketEvent';
 
@@ -11,6 +11,7 @@ export class GameClientSocket {
     socket;
     gameClient;
     initialized = false;
+    events: BatchGameEvent[] = [];
 
     constructor(socket: Socket<GameSocketEvents>, gameClient: GameClient) {
         this.socket = socket;
@@ -30,10 +31,14 @@ export class GameClientSocket {
             this.gameClient.ticker.stop();
         });
 
+        this.gameClient.emitter.on(GameClientEvent.FLUSH_EVENTS, () => {
+            this.flushEvents();
+        });
+
         this.socket.connect();
     }
 
-    onEvent(batch: BatchGameEvent): void {
+    flushEvent(batch: BatchGameEvent) {
         switch (batch[0]) {
             case GameEvent.SERVER_STATUS:
                 this.gameClient.onServerStatus(batch[1]);
@@ -74,6 +79,18 @@ export class GameClientSocket {
             default:
                 assert(false, `Invalid event '${batch[0]}'`);
         }
+    }
+
+    flushEvents(): void {
+        for (const event of this.events) {
+            this.flushEvent(event);
+        }
+
+        this.events = [];
+    }
+
+    onEvent(batch: BatchGameEvent): void {
+        this.events.push(batch);
     }
 
     requestPlayerTankSpawn(): void {

@@ -55,6 +55,7 @@ export enum GameClientEvent {
     OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT = 'own-player-changed-respawn-timeout',
     OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS = 'own-player-changed-requested-spawn-status',
 
+    FLUSH_EVENTS = 'flush-events',
     TICK = 'tick',
 }
 
@@ -78,6 +79,7 @@ export interface GameClientEvents {
     [GameClientEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT]: (respawnTimeout: number) => void;
     [GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS]: (requestedSpawnStatus: PlayerSpawnStatus) => void;
 
+    [GameClientEvent.FLUSH_EVENTS]: () => void;
     [GameClientEvent.TICK]: () => void;
 }
 
@@ -378,6 +380,8 @@ export class GameClient {
     }
 
     onTick(): void {
+        this.emitter.emit(GameClientEvent.FLUSH_EVENTS);
+
         this.collisionService.processDirtyBoundingBox();
         this.entityService.processDirtyIsMoving();
         this.entityService.processDirtyCenterPosition();
