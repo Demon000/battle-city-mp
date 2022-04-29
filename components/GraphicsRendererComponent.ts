@@ -4,7 +4,6 @@ import { Registry } from '@/ecs/Registry';
 import { EntityGraphicsRenderer } from '@/entity/EntityGraphicsRenderer';
 
 export interface GraphicsRendererComponentData {
-    renderer: any;
 }
 
 export class GraphicsRendererComponent
