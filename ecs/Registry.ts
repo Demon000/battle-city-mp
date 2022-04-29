@@ -213,7 +213,11 @@ export class Registry {
     ): void {
         const componentEmitter = this.componentEmitter(component.clazz);
         if (componentEmitter !== undefined) {
-            componentEmitter.emit(event, component, data);
+            if (event === RegistryComponentEvent.COMPONENT_BEFORE_REMOVE) {
+                componentEmitter.emit(event, component, options);
+            } else {
+                componentEmitter.emit(event, component, data, options);
+            }
             if (event !== RegistryComponentEvent.COMPONENT_INITIALIZED) {
                 componentEmitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
                     event, component, data, options);
@@ -226,7 +230,11 @@ export class Registry {
             }
         }
 
-        this.emitter.emit(event, component, data);
+        if (event === RegistryComponentEvent.COMPONENT_BEFORE_REMOVE) {
+            this.emitter.emit(event, component, options);
+        } else {
+            this.emitter.emit(event, component, data, options);
+        }
         if (event !== RegistryComponentEvent.COMPONENT_INITIALIZED) {
             this.emitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
                 event, component, data, options);
