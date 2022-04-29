@@ -418,7 +418,7 @@ export class CollisionService {
         });
     }
 
-    updateBoundingBox(entity: Entity): void {
+    updateBoundingBox(entity: Entity, silent = false): void {
         const size = entity.getComponent(SizeComponent);
         const position = entity.getComponent(PositionComponent);
         const boundingBox = entity.getComponent(BoundingBoxComponent);
@@ -440,6 +440,8 @@ export class CollisionService {
         boundingBox.update({
             tl: boundingBox.tl,
             br: boundingBox.br,
+        }, {
+            silent,
         });
     }
 

@@ -222,7 +222,7 @@ export class GameServer {
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
                     const entity = component.entity;
-                    this.collisionService.updateBoundingBox(entity);
+                    this.collisionService.updateBoundingBox(entity, true);
                 });
         this.registry.componentEmitter(BoundingBoxComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
