@@ -178,15 +178,18 @@ export class ImageDrawable extends BaseImageDrawable {
 
     protected _scale(scaleX: number, scaleY: number = scaleX): this {
         const scale = this.getScale();
-        scale.x *= scaleX;
-        scale.y *= scaleY;
+        const overlayScaleX = scaleX;
+        const overlayScaleY = scaleY;
+
+        scaleX *= scale.x;
+        scaleY *= scale.y;
 
         return new (<any>this.constructor)(this.source, {
             ...this.properties,
-            scaleX: scale.x,
-            scaleY: scale.y,
+            scaleX,
+            scaleY,
             overlays: this.properties.overlays
-                ?.map(overlay => overlay.scale(scaleX, scaleY)),
+                ?.map(overlay => overlay.scale(overlayScaleX, overlayScaleY)),
         });
     }
 
