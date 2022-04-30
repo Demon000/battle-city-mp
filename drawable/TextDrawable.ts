@@ -32,19 +32,17 @@ export class TextDrawable extends BaseDrawable {
     private textCache = new Map<string, this>();
     private positionXReferenceCache = new Map<string, this>();
     private positionYReferenceCache = new Map<string, this>();
-    properties: TextDrawableProperties;
     private cachedSource?: Source;
     private _isLoaded = false;
     text;
 
     constructor(
         text: string,
-        properties: TextDrawableProperties = {},
+        public properties: TextDrawableProperties = {},
     ) {
-        super();
+        super(properties);
 
         this.text = text;
-        this.properties = properties;
 
         if (properties.fontFace === undefined
             && properties.fontFamily !== undefined

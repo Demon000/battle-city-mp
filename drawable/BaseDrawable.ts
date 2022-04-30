@@ -7,13 +7,14 @@ export abstract class BaseDrawable implements IDrawable {
     private scaleCache = new Map<number, this>();
     private offsetCache = new Map<number, this>();
 
-    properties: DrawableProperties = {};
-
     protected abstract _scale(scaleX: number, scaleY: number): this;
     protected abstract _offset(offsetX: number, offsetY: number): this;
 
     abstract draw(context: CanvasRenderingContext2D, drawX: number, drawY: number): void;
     abstract isLoaded(): boolean;
+
+    constructor(public properties: DrawableProperties) {
+    }
 
     getRenderPass(): number {
         return this.properties.renderPass ?? 0;

@@ -18,9 +18,9 @@ export class AnimatedImageDrawable extends BaseImageDrawable {
         drawables: IImageDrawable[],
         durations: number[],
         loop = true,
-        properties: ImageDrawableProperties = {},
+        public properties: ImageDrawableProperties = {},
     ) {
-        super();
+        super(properties);
 
         assert(drawables.length === durations.length,
             'Timings do not match animated drawables, ' +
@@ -30,7 +30,6 @@ export class AnimatedImageDrawable extends BaseImageDrawable {
         this.durations = durations;
         this.loop = loop;
         this.totalDuration = durations.reduce((sum, timing) => sum + timing, 0);
-        this.properties = properties;
     }
 
     getCurrentDrawable(referenceTime: number): IImageDrawable | undefined {
