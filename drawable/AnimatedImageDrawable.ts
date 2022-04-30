@@ -30,8 +30,7 @@ export class AnimatedImageDrawable extends BaseImageDrawable {
         this.durations = durations;
         this.loop = loop;
         this.totalDuration = durations.reduce((sum, timing) => sum + timing, 0);
-        this.ownProperties = properties;
-        this.updateDrawablesInheritedProperties();
+        this.properties = properties;
     }
 
     getCurrentDrawable(referenceTime: number): IImageDrawable | undefined {
@@ -55,22 +54,12 @@ export class AnimatedImageDrawable extends BaseImageDrawable {
         return undefined;
     }
 
-    private updateDrawablesInheritedProperties(): void {
-        for (const drawable of this.drawables) {
-            drawable.setInheritedProperties(this.ownProperties);
-        }
-    }
-
     isDrawableLoaded(drawable: IDrawable): boolean {
         return drawable.isLoaded();
     }
 
     isLoaded(): boolean {
         return this.drawables.every(this.isDrawableLoaded);
-    }
-
-    setInheritedProperties(_properties: ImageDrawableProperties): void {
-        assert(false, 'Cannot set inherited properties of animated image drawable');
     }
 
     getRenderPass(): number {

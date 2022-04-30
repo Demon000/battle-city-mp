@@ -32,7 +32,7 @@ export class TextDrawable extends BaseDrawable {
     private textCache = new Map<string, this>();
     private positionXReferenceCache = new Map<string, this>();
     private positionYReferenceCache = new Map<string, this>();
-    protected ownProperties: TextDrawableProperties;
+    properties: TextDrawableProperties;
     private cachedSource?: Source;
     private _isLoaded = false;
     text;
@@ -44,7 +44,7 @@ export class TextDrawable extends BaseDrawable {
         super();
 
         this.text = text;
-        this.ownProperties = properties;
+        this.properties = properties;
 
         if (properties.fontFace === undefined
             && properties.fontFamily !== undefined
@@ -55,18 +55,14 @@ export class TextDrawable extends BaseDrawable {
                 .then((fontFace: FontFace) => {
                     document.fonts.add(fontFace);
                 }).catch(_err => {
-                    this.ownProperties.fontFamily = undefined;
-                    this.ownProperties.fontUrl = undefined;
+                    this.properties.fontFamily = undefined;
+                    this.properties.fontUrl = undefined;
                 }).finally(() => {
                     this._isLoaded = true;
                 });
         } else {
             this._isLoaded = true;
         }
-    }
-
-    get properties(): TextDrawableProperties {
-        return super.properties;
     }
 
     isLoaded(): boolean {

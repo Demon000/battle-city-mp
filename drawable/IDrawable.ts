@@ -18,11 +18,11 @@ export interface DrawableProperties {
 export interface IDrawable {
     readonly type: string;
 
-    setInheritedProperties(properties: DrawableProperties): void;
+    properties: DrawableProperties;
+
     getRenderPass(): number;
     isLoaded(): boolean;
 
-    properties: DrawableProperties;
     getScale(): Point;
     getOffset(): Point;
 

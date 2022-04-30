@@ -7,9 +7,7 @@ export abstract class BaseDrawable implements IDrawable {
     private scaleCache = new Map<number, this>();
     private offsetCache = new Map<number, this>();
 
-    protected inheritedProperties: DrawableProperties = {};
-    protected ownProperties: DrawableProperties = {};
-    protected _properties?: DrawableProperties;
+    properties: DrawableProperties = {};
 
     protected abstract _scale(scaleX: number, scaleY: number): this;
     protected abstract _offset(offsetX: number, offsetY: number): this;
@@ -18,11 +16,12 @@ export abstract class BaseDrawable implements IDrawable {
     abstract isLoaded(): boolean;
 
     getRenderPass(): number {
-        return this.ownProperties.renderPass ?? 0;
+        return this.properties.renderPass ?? 0;
     }
 
     getScale(): Point {
         const properties = this.properties;
+
         return {
             x: properties.scaleX ?? 1,
             y: properties.scaleY ?? 1,
@@ -37,20 +36,6 @@ export abstract class BaseDrawable implements IDrawable {
             x: (properties.offsetX ?? 0) * scale.x,
             y: (properties.offsetY ?? 0) * scale.y,
         };
-    }
-
-    setInheritedProperties(properties: DrawableProperties = {}): void {
-        this.inheritedProperties = properties;
-        this._properties = undefined;
-    }
-
-    get properties(): DrawableProperties {
-        if (this._properties !== undefined) {
-            return this._properties;
-        }
-
-        this._properties = Object.assign({}, this.inheritedProperties, this.ownProperties);
-        return this._properties;
     }
 
     getScaleKey(scaleX: number, scaleY: number): number {

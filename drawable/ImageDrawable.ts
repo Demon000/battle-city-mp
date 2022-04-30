@@ -10,6 +10,7 @@ import { PointUtils } from '@/physics/point/PointUtils';
 
 export class ImageDrawable extends BaseImageDrawable {
     readonly type = DrawableType.IMAGE;
+    properties: ImageDrawableProperties;
     private baseCachedSource?: Source;
     private cachedSource?: Source;
     private _isLoaded;
@@ -34,11 +35,7 @@ export class ImageDrawable extends BaseImageDrawable {
             this.source = source;
         }
 
-        this.ownProperties = properties;
-    }
-
-    get properties(): ImageDrawableProperties {
-        return super.properties;
+        this.properties = properties;
     }
 
     getMinPoint(): Point {
