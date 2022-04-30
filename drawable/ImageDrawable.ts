@@ -14,6 +14,9 @@ export class ImageDrawable extends BaseImageDrawable {
     private cachedSource?: Source;
     private _isLoaded;
     private source;
+    private minPoint: Point | undefined;
+    private maxPoint: Point | undefined;
+    private totalSize: Point | undefined;
 
     constructor(
         source: Source | string,
@@ -36,6 +39,10 @@ export class ImageDrawable extends BaseImageDrawable {
     }
 
     getMinPoint(): Point {
+        if (this.minPoint !== undefined) {
+            return this.minPoint;
+        }
+
         const baseMinPoint = this.getOffset();
         const minPoint = PointUtils.clone(baseMinPoint);
 
@@ -47,10 +54,14 @@ export class ImageDrawable extends BaseImageDrawable {
             }
         }
 
-        return minPoint;
+        return this.minPoint = minPoint;
     }
 
     getMaxPoint(): Point {
+        if (this.maxPoint !== undefined) {
+            return this.maxPoint;
+        }
+
         const offset = this.getOffset();
         const source = this.getBaseCachedSource();
         const maxPoint = {
@@ -66,13 +77,17 @@ export class ImageDrawable extends BaseImageDrawable {
             }
         }
 
-        return maxPoint;
+        return this.maxPoint = maxPoint;
     }
 
     private getTotalSize(): Point {
+        if (this.totalSize !== undefined) {
+            return this.totalSize;
+        }
+
         const minPoint = this.getMinPoint();
         const maxPoint = this.getMaxPoint();
-        return {
+        return this.totalSize = {
             x: maxPoint.x - minPoint.x,
             y: maxPoint.y - minPoint.y,
         };
