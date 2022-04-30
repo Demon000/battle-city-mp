@@ -6,6 +6,7 @@ import { FillOptions, ImageDrawableProperties } from './IImageDrawable';
 import { ImageUtils, Source } from '../utils/ImageUtils';
 import { Point } from '@/physics/point/Point';
 import { CanvasUtils, Context2D } from '@/utils/CanvasUtils';
+import { PointUtils } from '@/physics/point/PointUtils';
 
 export class ImageDrawable extends BaseImageDrawable {
     readonly type = DrawableType.IMAGE;
@@ -42,10 +43,7 @@ export class ImageDrawable extends BaseImageDrawable {
 
     getMinPoint(): Point {
         const baseMinPoint = this.getOffset();
-        const minPoint = {
-            x: baseMinPoint.x,
-            y: baseMinPoint.y,
-        };
+        const minPoint = PointUtils.clone(baseMinPoint);
 
         if (this.properties.overlays !== undefined) {
             for (const overlay of this.properties.overlays) {
