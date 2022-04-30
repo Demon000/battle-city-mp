@@ -68,26 +68,24 @@ export class TextDrawable extends BaseDrawable {
     }
 
     private getContextBackgroundFillStyle(): string {
-        const properties = this.properties;
-        const bgColor = properties.backgroundColor ?? [0, 0, 0];
-        const bgAlpha = properties.backgroundAlpha ?? 1;
+        const bgColor = this.properties.backgroundColor ?? [0, 0, 0];
+        const bgAlpha = this.properties.backgroundAlpha ?? 1;
         return `rgba(${bgColor[0]}, ${bgColor[1]}, ${bgColor[2]}, ${bgAlpha})`;
     }
 
     private drawText(): Canvas {
-        const properties = this.properties;
         const scale = this.getScale();
-        const fontSize = (properties.fontSize ?? 16) * scale.y;
+        const fontSize = (this.properties.fontSize ?? 16) * scale.y;
         const width = (fontSize * (this.text.length + 2)) * scale.x;
         const height = (fontSize * 4) * scale.y;
 
         const canvas = CanvasUtils.create(width, height);
         const context = CanvasUtils.getContext(canvas);
 
-        const fontFamily = properties.fontFamily ?? 'Arial';
+        const fontFamily = this.properties.fontFamily ?? 'Arial';
         context.font = `${fontSize}px '${fontFamily}'`;
 
-        const color = properties.fontColor ?? [255, 255, 255];
+        const color = this.properties.fontColor ?? [255, 255, 255];
         context.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
 
         const offsetX = fontSize * scale.x;
@@ -104,13 +102,12 @@ export class TextDrawable extends BaseDrawable {
 
         const textCanvas = this.drawText();
         const textMeasurements = ImageUtils.measureContents(textCanvas);
-        const properties = this.properties;
         const scale = this.getScale();
-        const paddingX = (properties.paddingX ?? 0) * scale.x;
-        const paddingY = (properties.paddingY ?? 0) * scale.y;
+        const paddingX = (this.properties.paddingX ?? 0) * scale.x;
+        const paddingY = (this.properties.paddingY ?? 0) * scale.y;
         let maxTextWidth;
-        if (properties.maxTextWidth !== undefined) {
-            maxTextWidth = properties.maxTextWidth * scale.x;
+        if (this.properties.maxTextWidth !== undefined) {
+            maxTextWidth = this.properties.maxTextWidth * scale.x;
         }
         let textWidth = textMeasurements.width;
         if (maxTextWidth !== undefined
@@ -123,7 +120,7 @@ export class TextDrawable extends BaseDrawable {
         const canvas = CanvasUtils.create(width, height);
         const context = CanvasUtils.getContext(canvas);
 
-        if (properties.backgroundColor !== undefined) {
+        if (this.properties.backgroundColor !== undefined) {
             context.fillStyle = this.getContextBackgroundFillStyle();
             context.fillRect(0, 0, width, height);
         }
@@ -143,21 +140,19 @@ export class TextDrawable extends BaseDrawable {
         }
 
         const source = this.getCachedSource();
-        const properties = this.properties;
-
         const offset = this.getOffset();
         drawX += offset.x;
         drawY += offset.y;
 
-        if (properties.positionXReference === 'center') {
+        if (this.properties.positionXReference === 'center') {
             drawX -= Math.floor(source.width / 2);
-        } else if (properties.positionXReference === 'end') {
+        } else if (this.properties.positionXReference === 'end') {
             drawX -= source.width;
         }
 
-        if (properties.positionYReference === 'center') {
+        if (this.properties.positionYReference === 'center') {
             drawY -= Math.floor(source.height / 2);
-        } else if (properties.positionYReference === 'end') {
+        } else if (this.properties.positionYReference === 'end') {
             drawY -= source.height;
         }
 

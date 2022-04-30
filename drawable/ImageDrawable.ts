@@ -97,20 +97,19 @@ export class ImageDrawable extends BaseImageDrawable {
             return this.baseCachedSource;
         }
 
-        const properties = this.properties;
         const scale = this.getScale();
 
         let canvas = this.source;
-        if (properties.fillOptions !== undefined) {
-            canvas = ImageUtils.fill(canvas, properties.fillOptions);
+        if (this.properties.fillOptions !== undefined) {
+            canvas = ImageUtils.fill(canvas, this.properties.fillOptions);
         }
 
         if (scale.x !== 1 || scale.y !== 1) {
             canvas = ImageUtils.drawSourceWithScale(canvas, scale.x, scale.y);
         }
 
-        if (properties.maskColor !== undefined) {
-            canvas = ImageUtils.maskColor(canvas, properties.maskColor);
+        if (this.properties.maskColor !== undefined) {
+            canvas = ImageUtils.maskColor(canvas, this.properties.maskColor);
         }
 
         return this.baseCachedSource = canvas;
@@ -148,23 +147,21 @@ export class ImageDrawable extends BaseImageDrawable {
         drawX += minPoint.x;
         drawY += minPoint.y;
 
-        const properties = this.properties;
         let oldCompositionType;
 
-        if (properties.compositionType !== undefined) {
+        if (this.properties.compositionType !== undefined) {
             oldCompositionType = context.globalCompositeOperation;
-            context.globalCompositeOperation = properties.compositionType;
+            context.globalCompositeOperation = this.properties.compositionType;
         }
 
         context.drawImage(source, drawX, drawY);
 
-        if (properties.compositionType !== undefined && oldCompositionType !== undefined) {
+        if (this.properties.compositionType !== undefined && oldCompositionType !== undefined) {
             context.globalCompositeOperation = oldCompositionType;
         }
     }
 
     protected _scale(scaleX: number, scaleY: number = scaleX): this {
-        const properties = this.properties;
         const scale = this.getScale();
         scale.x *= scaleX;
         scale.y *= scaleY;
@@ -173,7 +170,8 @@ export class ImageDrawable extends BaseImageDrawable {
             ...this.properties,
             scaleX: scale.x,
             scaleY: scale.y,
-            overlays: properties.overlays?.map(overlay => overlay.scale(scaleX, scaleY)),
+            overlays: this.properties.overlays
+                ?.map(overlay => overlay.scale(scaleX, scaleY)),
         });
     }
 
