@@ -36,6 +36,7 @@ import { IsUnderBushTrackingComponent } from '@/components/IsUnderBushTrackingCo
 import { Entity } from '@/ecs/Entity';
 import { DirtyCollisionType } from '@/components/DirtyCollisionsComponent';
 import { ClientComponentRegistry } from '@/ecs/ClientComponentRegistry';
+import { EntityGraphicsRenderer } from '@/entity/EntityGraphicsRenderer';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -103,6 +104,7 @@ export class GameClient {
     private boundingBoxRepository;
     private collisionService;
     private gameCamera;
+    private entityGraphicsRenderer;
     private gameGraphicsService;
     private timeService;
     emitter;
@@ -126,7 +128,9 @@ export class GameClient {
         this.teamRepository = new MapRepository<string, Team>();
         this.teamService = new TeamService(this.teamRepository);
         this.gameCamera = new GameCamera();
-        this.gameGraphicsService = new GameGraphicsService(this.registry, canvases);
+        this.entityGraphicsRenderer = new EntityGraphicsRenderer();
+        this.gameGraphicsService = new GameGraphicsService(this.registry,
+            this.entityGraphicsRenderer, canvases);
         this.timeService = new TimeService(this.config);
         this.emitter = new EventEmitter<GameClientEvents>();
         this.ticker = new Ticker();

@@ -1,5 +1,5 @@
-import { DirtyGraphicsComponent } from '@/components/DirtyGraphicsComponent';
 import { DynamicSizeComponent } from '@/components/DynamicSizeComponent';
+import { GraphicsRendererComponent } from '@/components/GraphicsRendererComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
 import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
@@ -11,22 +11,16 @@ import { Entity } from '@/ecs/Entity';
 import { Context2D } from '@/utils/CanvasUtils';
 import { EntityDrawables } from './EntityDrawables';
 
-export class EntityGraphicsRenderer<O extends Entity = Entity> {
-    entity;
-    drawables?: IDrawable[] | null = null;
+export class EntityGraphicsRenderer {
     scale = 1;
 
-    constructor(entity: O) {
-        this.entity = entity;
-    }
-
-    private filterMatchingDrawable(drawable: IDrawable): boolean {
+    private filterMatchingDrawable(entity: Entity, drawable: IDrawable): boolean {
         if (drawable.properties.tests === undefined) {
             return true;
         }
 
         for (const test of drawable.properties.tests) {
-            if (!test(this.entity)) {
+            if (!test(entity)) {
                 return false;
             }
         }
@@ -38,13 +32,16 @@ export class EntityGraphicsRenderer<O extends Entity = Entity> {
         return drawable !== undefined && drawable !== null;
     }
 
-    private findMatchingDrawables(): IDrawable[] | undefined {
-        let drawables = EntityDrawables.getTypeDrawables(this.entity.type);
+    private findMatchingDrawables(entity: Entity): IDrawable[] | undefined {
+        let drawables = EntityDrawables.getTypeDrawables(entity.type);
         if (drawables === undefined) {
             return undefined;
         }
 
-        drawables = drawables.filter(this.filterMatchingDrawable, this);
+        drawables = drawables.filter(drawable => {
+            return this.filterMatchingDrawable(entity, drawable);
+        });
+
         if (drawables.length === 0) {
             drawables = undefined;
         }
@@ -53,6 +50,7 @@ export class EntityGraphicsRenderer<O extends Entity = Entity> {
     }
 
     private processDynamicSizeDrawable(
+        entity: Entity,
         drawable: IDrawable,
     ): IDrawable | undefined {
         if (drawable.type !== DrawableType.IMAGE &&
@@ -60,15 +58,15 @@ export class EntityGraphicsRenderer<O extends Entity = Entity> {
             return drawable;
         }
 
-        const dynamicSize = this.entity.findComponent(DynamicSizeComponent);
+        const dynamicSize = entity.findComponent(DynamicSizeComponent);
         if (dynamicSize === undefined) {
             return drawable;
         }
 
         const imageDrawable = drawable as ImageDrawable;
 
-        const size = this.entity.getComponent(SizeComponent);
-        const position = this.entity.getComponent(PositionComponent);
+        const size = entity.getComponent(SizeComponent);
+        const position = entity.getComponent(PositionComponent);
         let offsetX = 0;
         let offsetY = 0;
 
@@ -90,12 +88,15 @@ export class EntityGraphicsRenderer<O extends Entity = Entity> {
         });
     }
 
-    protected processDrawable(drawable: IDrawable | undefined): IDrawable | undefined {
+    protected processDrawable(
+        entity: Entity,
+        drawable: IDrawable | undefined,
+    ): IDrawable | undefined {
         if (drawable === undefined) {
             return drawable;
         }
 
-        drawable = this.processDynamicSizeDrawable(drawable);
+        drawable = this.processDynamicSizeDrawable(entity, drawable);
 
         if (drawable === undefined) {
             return drawable;
@@ -108,42 +109,37 @@ export class EntityGraphicsRenderer<O extends Entity = Entity> {
         }
 
         if (drawable.properties.processor !== undefined) {
-            drawable = drawable.properties.processor.call(drawable, this.entity);
+            drawable = drawable.properties.processor.call(drawable, entity);
         }
 
         return drawable;
     }
 
-    protected processDrawables(drawables: IDrawable[]): IDrawable[] {
+    protected processDrawables(entity: Entity, drawables: IDrawable[]): IDrawable[] {
         return drawables
-            .map(this.processDrawable, this)
+            .map(drawable => {
+                return this.processDrawable(entity, drawable);
+            })
             .filter(this.filterOutMissingDrawable, this) as IDrawable[];
     }
 
-    update(scale: number, force = false): void {
-        if (this.drawables === undefined) {
+    update(component: GraphicsRendererComponent): void {
+        const entity = component.entity;
+
+        if (component.drawables === undefined) {
             return;
         }
 
-        const dirtyGraphicsComponent = this.entity
-            .findComponent(DirtyGraphicsComponent);
-
-        if (dirtyGraphicsComponent === undefined && !force && this.scale === scale) {
-            return;
+        let drawables = this.findMatchingDrawables(entity);
+        if (drawables !== undefined) {
+            drawables = this.processDrawables(entity, drawables);
         }
 
-        this.scale = scale;
-        this.drawables = this.findMatchingDrawables();
-        if (this.drawables !== undefined) {
-            this.drawables = this.processDrawables(this.drawables);
-        }
-
-        if (dirtyGraphicsComponent !== undefined) {
-            dirtyGraphicsComponent.remove();
-        }
+        component.drawables = drawables;
     }
 
     private renderDrawable(
+        entity: Entity,
         drawable: IDrawable | undefined,
         layersContext: Context2D[],
         drawX: number,
@@ -154,7 +150,7 @@ export class EntityGraphicsRenderer<O extends Entity = Entity> {
         }
 
         if (drawable.type === DrawableType.ANIMATED_IMAGE) {
-            const spawnTime = this.entity.getComponent(SpawnTimeComponent).value;
+            const spawnTime = entity.getComponent(SpawnTimeComponent).value;
             drawable = (drawable as AnimatedImageDrawable).getCurrentDrawable(spawnTime);
         }
 
@@ -168,15 +164,21 @@ export class EntityGraphicsRenderer<O extends Entity = Entity> {
         drawable.draw(context, drawX, drawY);
     }
 
-    render(layersContext: Context2D[], drawX: number, drawY: number): void {
-        if (this.drawables === undefined
-            || this.drawables === null
-            || this.drawables.length === 0) {
+    render(
+        component: GraphicsRendererComponent,
+        layersContext: Context2D[],
+        drawX: number,
+        drawY: number,
+    ): void {
+        if (component.drawables === undefined
+            || component.drawables === null
+            || component.drawables.length === 0) {
             return;
         }
 
-        for (const drawable of this.drawables) {
-            this.renderDrawable(drawable, layersContext, drawX, drawY);
+        const entity = component.entity;
+        for (const drawable of component.drawables) {
+            this.renderDrawable(entity, drawable, layersContext, drawX, drawY);
         }
     }
 }

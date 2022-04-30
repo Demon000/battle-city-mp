@@ -11,9 +11,9 @@ import { RatioUtils } from '@/utils/RatioUtils';
 import { ClazzOrTag } from '@/ecs/Component';
 import { GraphicsRendererComponent } from '@/components/GraphicsRendererComponent';
 import { Entity } from '@/ecs/Entity';
+import { EntityGraphicsRenderer } from '@/entity/EntityGraphicsRenderer';
 
 export class GameGraphicsService {
-    private scale = 0;
     private gameWidth = 0;
     private gameHeight = 0;
     private contexts!: Context2D[];
@@ -23,6 +23,7 @@ export class GameGraphicsService {
 
     constructor(
         private registry: Registry,
+        private renderer: EntityGraphicsRenderer,
         private canvases: HTMLCanvasElement[],
     ) {
         this.initializeContexts();
@@ -67,27 +68,36 @@ export class GameGraphicsService {
         }
 
         const maxRenderSize = Math.max(width, height);
-        this.scale = Math.ceil(maxRenderSize / this.maxVisibleGameSize);
+        this.renderer.scale = Math.ceil(maxRenderSize / this.maxVisibleGameSize);
 
-        this.gameWidth = width / this.scale;
-        this.gameHeight = height / this.scale;
+        for (const entity of
+            this.registry.getEntitiesWithComponent(GraphicsRendererComponent)) {
+            entity.upsertComponent(DirtyGraphicsComponent, undefined, {
+                silent: true,
+            });
+        }
+
+        this.gameWidth = width / this.renderer.scale;
+        this.gameHeight = height / this.renderer.scale;
     }
 
     _renderEntity(entity: Entity, drawX: number, drawY: number): void {
-        const renderer = entity.getComponent(GraphicsRendererComponent).renderer;
-        renderer.render(this.contexts, drawX, drawY);
+        const graphicsRendererComponent = entity
+            .getComponent(GraphicsRendererComponent);
+        this.renderer.render(graphicsRendererComponent, this.contexts,
+            drawX, drawY);
     }
 
     renderEntity(entity: Entity): void {
-        if (this.scale === 0) {
+        if (this.renderer.scale === 0) {
             return;
         }
 
         const position = entity.getComponent(PositionComponent);
         const relativeX = Math.floor(position.x) - this.canvasX;
         const relativeY = Math.floor(position.y) - this.canvasY;
-        const drawX = relativeX * this.scale;
-        const drawY = relativeY * this.scale;
+        const drawX = relativeX * this.renderer.scale;
+        const drawY = relativeY * this.renderer.scale;
         this._renderEntity(entity, drawX, drawY);
     }
 
@@ -121,8 +131,11 @@ export class GameGraphicsService {
     processDirtyGraphics(): void {
         for (const component of this.registry.getComponents(DirtyGraphicsComponent)) {
             const entity = component.entity;
-            const renderer = entity.getComponent(GraphicsRendererComponent).renderer;
-            renderer.update(this.scale, true);
+            const graphicsRendererComponent = entity
+                .getComponent(GraphicsRendererComponent);
+            this.renderer.update(graphicsRendererComponent);
+
+            component.remove();
         }
     }
 
