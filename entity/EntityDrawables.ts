@@ -5,7 +5,7 @@ import { IsMovingComponent } from '@/components/IsMovingComponent';
 import { IsUnderBushComponent } from '@/components/IsUnderBushComponent';
 import { AnimatedImageDrawable } from '@/drawable/AnimatedImageDrawable';
 import { IDrawable, DrawableProcessingFunction, DrawableTestFunction } from '@/drawable/IDrawable';
-import { IImageDrawable } from '@/drawable/IImageDrawable';
+import { IImageDrawable, ImageDrawableProperties } from '@/drawable/IImageDrawable';
 import { ImageDrawable } from '@/drawable/ImageDrawable';
 import { TextDrawable, TextPositionReference } from '@/drawable/TextDrawable';
 import { Entity } from '@/ecs/Entity';
@@ -55,17 +55,28 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
         }),
     ],
     [EntityType.WATER]: [
-        new AnimatedImageDrawable([
-            new ImageDrawable('water_0.png'),
-            new ImageDrawable('water_1.png'),
-            new ImageDrawable('water_2.png'),
-        ], [
-            1000,
-            1000,
-            1000,
-        ], true, {
-            renderPass: RenderPass.GROUND,
-        }),
+        ...((): IDrawable[] => {
+            const drawables = [];
+
+            const properties = {
+                renderPass: RenderPass.GROUND,
+            };
+
+            drawables.push(
+                new AnimatedImageDrawable([
+                    new ImageDrawable('water_0.png', properties),
+                    new ImageDrawable('water_1.png', properties),
+                    new ImageDrawable('water_2.png', properties),
+                ], [
+                    1000,
+                    1000,
+                    1000,
+                ], true),
+            );
+
+            return drawables;
+        })(),
+
     ],
     [EntityType.BRICK_WALL]: [
         new ImageDrawable('brick_wall.png', {
@@ -234,9 +245,6 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                         ], true, {
                             tests: tankDrawableTests(tier, direction, true),
                             processor: tankColorProcessor,
-                            renderPass: RenderPass.WALL,
-                            scaleX: tankDrawableScale,
-                            scaleY: tankDrawableScale,
                         }),
                     );
                     drawables.push(
@@ -318,19 +326,29 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
         }),
     ],
     [EntityType.SMOKE]: [
-        new AnimatedImageDrawable([
-            new ImageDrawable('smoke_0.png'),
-            new ImageDrawable('smoke_1.png'),
-            new ImageDrawable('smoke_2.png'),
-        ], [
-            250,
-            250,
-            250,
-        ], false, {
-            renderPass: RenderPass.ABOVE_BUSH,
-            offsetX: -8,
-            offsetY: -8,
-        }),
+        ...((): IDrawable[] => {
+            const drawables = [];
+
+            const properties = {
+                renderPass: RenderPass.ABOVE_BUSH,
+                offsetX: -8,
+                offsetY: -8,
+            };
+
+            drawables.push(
+                new AnimatedImageDrawable([
+                    new ImageDrawable('smoke_0.png', properties),
+                    new ImageDrawable('smoke_1.png', properties),
+                    new ImageDrawable('smoke_2.png', properties),
+                ], [
+                    250,
+                    250,
+                    250,
+                ], false),
+            );
+
+            return drawables;
+        })(),
     ],
     [EntityType.BULLET]: [
         ...((): IDrawable[] => {
@@ -389,39 +407,53 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             const generateExplosionDrawableFrame = (
                 type: string,
                 frame: number,
-            ) => new ImageDrawable(`explosion_${type}_${frame}.png`);
+                properties: ImageDrawableProperties,
+            ) => new ImageDrawable(`explosion_${type}_${frame}.png`, properties);
+
+            const smallProperties = {
+                renderPass: RenderPass.ABOVE_BUSH,
+                offsetX: -8,
+                offsetY: -8,
+            };
 
             drawables.push(
                 new AnimatedImageDrawable([
-                    generateExplosionDrawableFrame(ExplosionType.SMALL, 0),
-                    generateExplosionDrawableFrame(ExplosionType.SMALL, 1),
-                    generateExplosionDrawableFrame(ExplosionType.SMALL, 2),
+                    generateExplosionDrawableFrame(ExplosionType.SMALL, 0,
+                        smallProperties),
+                    generateExplosionDrawableFrame(ExplosionType.SMALL, 1,
+                        smallProperties),
+                    generateExplosionDrawableFrame(ExplosionType.SMALL, 2,
+                        smallProperties),
                 ], [
                     80,
                     80,
                     80,
                 ], false, {
                     tests: generateExplosionDrawableTests(ExplosionType.SMALL),
-                    renderPass: RenderPass.ABOVE_BUSH,
-                    offsetX: -8,
-                    offsetY: -8,
                 }),
             );
 
+            const bigProperties = {
+                tests: generateExplosionDrawableTests(ExplosionType.BIG),
+                renderPass: RenderPass.ABOVE_BUSH,
+                offsetX: -16,
+                offsetY: -16,
+            };
+
             drawables.push(
                 new AnimatedImageDrawable([
-                    generateExplosionDrawableFrame(ExplosionType.BIG, 0),
-                    generateExplosionDrawableFrame(ExplosionType.BIG, 1),
-                    generateExplosionDrawableFrame(ExplosionType.BIG, 2),
+                    generateExplosionDrawableFrame(ExplosionType.BIG, 0,
+                        bigProperties),
+                    generateExplosionDrawableFrame(ExplosionType.BIG, 1,
+                        bigProperties),
+                    generateExplosionDrawableFrame(ExplosionType.BIG, 2,
+                        bigProperties),
                 ], [
                     80,
                     80,
                     80,
                 ], false, {
                     tests: generateExplosionDrawableTests(ExplosionType.BIG),
-                    renderPass: RenderPass.ABOVE_BUSH,
-                    offsetX: -16,
-                    offsetY: -16,
                 }),
             );
 
