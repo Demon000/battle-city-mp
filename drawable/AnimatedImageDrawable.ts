@@ -61,17 +61,16 @@ export class AnimatedImageDrawable extends BaseImageDrawable {
         }
     }
 
-    setInheritedProperties(properties: ImageDrawableProperties): void {
-        this.ownProperties = properties;
-        this.updateDrawablesInheritedProperties();
-    }
-
     isDrawableLoaded(drawable: IDrawable): boolean {
         return drawable.isLoaded();
     }
 
     isLoaded(): boolean {
         return this.drawables.every(this.isDrawableLoaded);
+    }
+
+    setInheritedProperties(_properties: ImageDrawableProperties): void {
+        assert(false, 'Cannot set inherited properties of animated image drawable');
     }
 
     getRenderPass(): number {
