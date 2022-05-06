@@ -24,11 +24,13 @@ export class GameClientSocket {
         this.socket.on('connect', () => {
             this.gameClient.setOwnPlayerId(this.socket.id);
             this.gameClient.ticker.start();
+            this.gameClient.renderTicker.start();
             console.log('Connected');
         });
 
         this.socket.on('disconnect', () => {
             this.gameClient.ticker.stop();
+            this.gameClient.renderTicker.stop();
         });
 
         this.gameClient.emitter.on(GameClientEvent.FLUSH_EVENTS, () => {

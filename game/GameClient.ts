@@ -109,6 +109,7 @@ export class GameClient {
     private timeService;
     emitter;
     ticker;
+    renderTicker;
 
     constructor(canvases: HTMLCanvasElement[]) {
         this.config = new Config();
@@ -133,7 +134,8 @@ export class GameClient {
             this.entityGraphicsRenderer, canvases);
         this.timeService = new TimeService(this.config);
         this.emitter = new EventEmitter<GameClientEvents>();
-        this.ticker = new Ticker();
+        this.ticker = new Ticker(60);
+        this.renderTicker = new Ticker();
 
         this.registry.emitter.on(RegistryComponentEvent.COMPONENT_CHANGED,
             (_event, component) => {
@@ -333,6 +335,7 @@ export class GameClient {
             });
 
         this.ticker.emitter.on(TickerEvent.TICK, this.onTick, this);
+        this.renderTicker.emitter.on(TickerEvent.TICK, this.onRenderTick, this);
     }
 
     onEntityRegistered(buildOptions: EntityBuildOptions): void {
@@ -417,7 +420,9 @@ export class GameClient {
         this.collisionService.processDirtyCollisions();
         this.gameGraphicsService.processDirtyGraphics();
         this.entityService.processDestroyed();
+    }
 
+    onRenderTick(): void {
         const ownPlayer = this.playerService.getOwnPlayer();
         if (ownPlayer === undefined) {
             return;
