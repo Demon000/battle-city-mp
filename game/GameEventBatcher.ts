@@ -2,8 +2,8 @@ import EventEmitter from 'eventemitter3';
 import { BroadcastBatchGameEvent, UnicastBatchGameEvent } from './GameEvent';
 
 export enum GameEventBatcherEvent {
-    PLAYER_BATCH = 'player-batch',
-    BROADCAST_BATCH = 'broadcast-batch',
+    PLAYER_BATCH = 'p',
+    BROADCAST_BATCH = 'b',
 }
 
 export interface GameEventBatcherEvents {

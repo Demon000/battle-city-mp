@@ -4,23 +4,23 @@ import { PartialPlayerOptions, PlayerOptions } from '@/player/Player';
 import { GameServerStatus } from './GameServerStatus';
 
 export enum GameEvent {
-    ENTITY_REGISTERED = 'entity-registered',
-    ENTITY_UNREGISTERED = 'entity-unregisterd',
+    ENTITY_REGISTERED = 'er',
+    ENTITY_UNREGISTERED = 'eu',
 
-    ENTITY_COMPONENT_ADDED = 'entity-component-added',
-    ENTITY_COMPONENT_UPDATED = 'entity-component-updated',
-    ENTITY_COMPONENT_REMOVED = 'entity-component-removed',
+    ENTITY_COMPONENT_ADDED = 'eca',
+    ENTITY_COMPONENT_UPDATED = 'ecu',
+    ENTITY_COMPONENT_REMOVED = 'ecr',
 
-    PLAYER_ADDED = 'player-added',
-    PLAYER_REMOVED = 'player-removed',
-    PLAYER_CHANGED = 'player-changed',
+    PLAYER_ADDED = 'pa',
+    PLAYER_REMOVED = 'pr',
+    PLAYER_CHANGED = 'pc',
 
-    TEAM_PLAYER_ADDED = 'team-player-added',
-    TEAM_PLAYER_REMOVED = 'team-player-removed',
+    TEAM_PLAYER_ADDED = 'tpa',
+    TEAM_PLAYER_REMOVED = 'tpr',
 
-    SERVER_STATUS = 'server-status',
+    SERVER_STATUS = 'ss',
 
-    ROUND_TIME_UPDATED = 'round-time-updated',
+    ROUND_TIME_UPDATED = 'rtu',
 }
 
 export type CommonBatchGameEvent =

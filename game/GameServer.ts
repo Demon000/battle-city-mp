@@ -60,8 +60,8 @@ import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 
 export enum GameServerEvent {
-    PLAYER_BATCH = 'player-batch',
-    BROADCAST_BATCH = 'broadcast-batch',
+    PLAYER_BATCH = 'p',
+    BROADCAST_BATCH = 'b',
 }
 
 export interface GameServerEvents {
