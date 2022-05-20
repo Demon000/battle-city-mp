@@ -101,7 +101,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
     ],
     [EntityType.FLAG_BASE]: [
         new ImageDrawable('flag_base.png', {
-            renderPass: RenderPass.GROUND,
+            renderPass: RenderPass.ABOVE_GROUND,
         }),
     ],
     [EntityType.FLAG]: [
