@@ -1,4 +1,5 @@
 import { HealthComponent } from '@/components/HealthComponent';
+import { PositionComponent } from '@/components/PositionComponent';
 import { Color } from '@/drawable/Color';
 import { Entity } from '@/ecs/Entity';
 import { EntityId } from '@/ecs/EntityId';
@@ -36,6 +37,17 @@ export class TankService {
                 ColorComponent: {
                     value: color,
                 },
+            },
+        });
+    }
+
+    createTankSpawnEffect(tank: Entity): Entity {
+        const position = tank.getComponent(PositionComponent);
+
+        return this.entityFactory.buildFromOptions({
+            type: EntityType.SPAWN_EFFECT,
+            components: {
+                PositionComponent: position,
             },
         });
     }

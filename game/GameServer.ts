@@ -353,7 +353,8 @@ export class GameServer {
                     }
 
                     const position = this.entityService.getRandomSpawnPosition(player.teamId);
-                    this.tankService.createTankForPlayer(player, position, tankColor);
+                    const tank = this.tankService.createTankForPlayer(player, position, tankColor);
+                    this.tankService.createTankSpawnEffect(tank);
                 } else if (status === PlayerSpawnStatus.DESPAWN && player.tankId !== null) {
                     const tank = this.registry.getEntityById(player.tankId);
                     this.entityService.markDestroyed(tank);
@@ -577,7 +578,9 @@ export class GameServer {
                 const tank = this.registry.getEntityById(tankId);
                 const teleporter = this.registry.getEntityById(teleporterId);
                 const target = teleporter.getComponent(TeleporterComponent).target;
+                this.tankService.createTankSpawnEffect(tank);
                 tank.upsertComponent(PositionComponent, target);
+                this.tankService.createTankSpawnEffect(tank);
             });
 
         /*

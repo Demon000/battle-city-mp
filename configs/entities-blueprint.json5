@@ -253,7 +253,29 @@
             'world-entity',
         ],
         localComponents: {
-            SizeComponent: {},
+            SizeComponent: {
+                width: 16,
+                height: 16,
+            },
+            SpawnTimeComponent: {},
+        },
+        serverComponents: {
+            AutomaticDestroyComponent: {
+                timeMs: 1500,
+            },
+        },
+    },
+    'spawn-effect': {
+        extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
+            'world-entity',
+        ],
+        localComponents: {
+            SizeComponent: {
+                width: 16,
+                height: 16,
+            },
             SpawnTimeComponent: {},
         },
         serverComponents: {

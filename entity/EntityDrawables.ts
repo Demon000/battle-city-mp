@@ -354,8 +354,6 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
 
             const properties = {
                 renderPass: RenderPass.ABOVE_BUSH,
-                offsetX: -8,
-                offsetY: -8,
             };
 
             drawables.push(
@@ -367,6 +365,41 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                     250,
                     250,
                     250,
+                ], false),
+            );
+
+            return drawables;
+        })(),
+    ],
+    [EntityType.SPAWN_EFFECT]: [
+        ...((): IDrawable[] => {
+            const drawables = [];
+
+            const properties = {
+                renderPass: RenderPass.ABOVE_BUSH,
+                scaleX: 0.5,
+                scaleY: 0.5,
+            };
+
+            drawables.push(
+                new AnimatedImageDrawable([
+                    new ImageDrawable('spawn_effect_0.png', properties),
+                    new ImageDrawable('spawn_effect_1.png', properties),
+                    new ImageDrawable('spawn_effect_2.png', properties),
+                    new ImageDrawable('spawn_effect_3.png', properties),
+                    new ImageDrawable('spawn_effect_0.png', properties),
+                    new ImageDrawable('spawn_effect_1.png', properties),
+                    new ImageDrawable('spawn_effect_2.png', properties),
+                    new ImageDrawable('spawn_effect_3.png', properties),
+                ], [
+                    150,
+                    150,
+                    150,
+                    150,
+                    150,
+                    150,
+                    150,
+                    150,
                 ], false),
             );
 
