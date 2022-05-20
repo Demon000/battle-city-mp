@@ -4,6 +4,7 @@
         sameTeamBulletHitMode: 'allow',
         ignoredEntityTypes: [
             'flag',
+            'flag-base',
         ],
     },
     'team-deathmatch': {
@@ -11,6 +12,7 @@
         sameTeamBulletHitMode: 'destroy',
         ignoredEntityTypes: [
             'flag',
+            'flag-base',
         ],
     },
     'capture-the-flag': {
