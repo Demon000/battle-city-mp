@@ -16,4 +16,5 @@ export enum EntityType {
     DIRT = 'dirt',
     FLAG = 'flag',
     FLAG_BASE = 'flag-base',
+    TELEPORTER = 'teleporter',
 }

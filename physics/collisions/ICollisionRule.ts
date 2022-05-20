@@ -15,6 +15,7 @@ export enum CollisionEvent {
     BULLET_HIT_LEVEL_BORDER = 'bullet-hit-level-border',
     TANK_COLLIDE_FLAG = 'tank-collide-flag',
     TANK_COLLIDE_FLAG_BASE = 'tank-collide-flag-base',
+    TANK_COLLIDE_TELEPORTER = 'tank-collide-teleporter',
 }
 
 type CollisionEventHandler = (
@@ -31,6 +32,7 @@ export interface CollisionEvents {
     [CollisionEvent.BULLET_HIT_LEVEL_BORDER]: CollisionEventHandler,
     [CollisionEvent.TANK_COLLIDE_FLAG]: CollisionEventHandler,
     [CollisionEvent.TANK_COLLIDE_FLAG_BASE]: CollisionEventHandler,
+    [CollisionEvent.TANK_COLLIDE_TELEPORTER]: CollisionEventHandler;
 }
 
 export type ICollisionResult = {

@@ -58,6 +58,7 @@ import { IsMovingTrackingComponent } from '@/components/IsMovingTrackingComponen
 import { DirtyCollisionType } from '@/components/DirtyCollisionsComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
+import { TeleporterComponent } from '@/components/TeleporterComponent';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'p',
@@ -569,6 +570,14 @@ export class GameServer {
                         EntityType.FLAG);
                 this.handleFlagInteraction(tank, undefined, carriedFlag,
                     flagBase);
+            });
+
+        this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_TELEPORTER,
+            (tankId: EntityId, teleporterId: EntityId) => {
+                const tank = this.registry.getEntityById(tankId);
+                const teleporter = this.registry.getEntityById(teleporterId);
+                const target = teleporter.getComponent(TeleporterComponent).target;
+                tank.upsertComponent(PositionComponent, target);
             });
 
         /*

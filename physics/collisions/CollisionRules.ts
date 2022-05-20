@@ -42,6 +42,18 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
+        movingTypes: [EntityType.TANK],
+        staticTypes: [
+            EntityType.TELEPORTER,
+        ],
+        result: [
+            {
+                type: CollisionResultEvent.NOTIFY,
+                name: CollisionEvent.TANK_COLLIDE_TELEPORTER,
+            },
+        ],
+    },
+    {
         movingTypes: [EntityType.BULLET],
         staticTypes: [EntityType.LEVEL_BORDER],
         result: [

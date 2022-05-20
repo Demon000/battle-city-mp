@@ -323,6 +323,23 @@
             },
         },
     },
+    'teleporter': {
+        extends: [
+            'positioned-entity',
+            'bounding-boxed-entity',
+            'world-entity',
+        ],
+        components: {
+            ColorComponent: {},
+            TeleporterComponent: {},
+        },
+        localComponents: {
+            SizeComponent: {
+                width: 8,
+                height: 8,
+            },
+        },
+    },
     'tank': {
         extends: [
             'positioned-entity',
