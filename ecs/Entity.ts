@@ -1,6 +1,5 @@
 import { assert } from '@/utils/assert';
 import { ClazzOrTag, Component, ComponentClassType, ComponentsInitialization } from './Component';
-import { ComponentRegistry } from './ComponentRegistry';
 import { EntityId } from './EntityId';
 import { Registry, RegistryOperationOptions } from './Registry';
 
