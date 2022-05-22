@@ -203,9 +203,9 @@ export class CollisionService {
             }
 
             for (const result of rule.result) {
+                const overlappingBoundingBox = overlappingEntity
+                    .getComponent(BoundingBoxComponent);
                 if (result.type === CollisionResultEvent.PREVENT_MOVEMENT) {
-                    const overlappingBoundingBox = overlappingEntity
-                        .getComponent(BoundingBoxComponent);
                     const isAlreadyInside = BoundingBoxUtils
                         .overlaps(originalBoundingBox, overlappingBoundingBox);
 
@@ -223,7 +223,18 @@ export class CollisionService {
                         movementPreventingEntity = overlappingEntity;
                     }
                 } else if (result.type === CollisionResultEvent.NOTIFY) {
-                    collidingEntityNotifications.push([result.name, overlappingEntity]);
+                    let coversMinimumArea = true;
+                    if (result.minimumVolume !== undefined) {
+                        const intersectionBoundingBox = BoundingBoxUtils
+                            .intersect(overlappingBoundingBox, movedBoundingBox);
+                        coversMinimumArea = BoundingBoxUtils
+                            .volume(intersectionBoundingBox) >= result.minimumVolume;
+                    }
+
+                    if (coversMinimumArea) {
+                        collidingEntityNotifications.push([result.name,
+                            overlappingEntity]);
+                    }
                 }
             }
         }

@@ -171,13 +171,9 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
     [EntityType.TELEPORTER]: [
         new ImageDrawable('teleporter_base.png', {
             renderPass: RenderPass.WALL,
-            offsetX: -4,
-            offsetY: -4,
         }),
         new ImageDrawable('teleporter_rings.png', {
             renderPass: RenderPass.ABOVE_WALL,
-            offsetX: -4,
-            offsetY: -4,
             processor: function (entity: Entity) {
                 const drawable = this as IImageDrawable;
                 const color = entity.getComponent(ColorComponent).value;

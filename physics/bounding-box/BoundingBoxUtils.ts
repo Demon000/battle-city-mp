@@ -58,6 +58,12 @@ export class BoundingBoxUtils {
         return { tl, br };
     }
 
+    static intersect(first: BoundingBox, second: BoundingBox): BoundingBox {
+        const tl = PointUtils.max(first.tl, second.tl);
+        const br = PointUtils.min(first.br, second.br);
+        return { tl, br };
+    }
+
     static overlaps(first: BoundingBox, second: BoundingBox): boolean {
         return first.tl.x < second.br.x && first.br.x > second.tl.x &&
                 first.tl.y < second.br.y && first.br.y > second.tl.y;

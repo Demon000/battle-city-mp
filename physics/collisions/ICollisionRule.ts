@@ -41,6 +41,7 @@ export type ICollisionResult = {
     type: CollisionResultEvent.TRACK;
 } | {
     type: CollisionResultEvent.NOTIFY;
+    minimumVolume?: number;
     name: CollisionEvent;
 };
 

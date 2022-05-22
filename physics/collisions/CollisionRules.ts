@@ -38,6 +38,7 @@ export const rules: ICollisionRule[] = [
             {
                 type: CollisionResultEvent.NOTIFY,
                 name: CollisionEvent.TANK_COLLIDE_FLAG,
+                minimumVolume: 16 * 16 * 0.75,
             },
         ],
     },
@@ -50,6 +51,7 @@ export const rules: ICollisionRule[] = [
             {
                 type: CollisionResultEvent.NOTIFY,
                 name: CollisionEvent.TANK_COLLIDE_TELEPORTER,
+                minimumVolume: 16 * 16 * 0.75,
             },
         ],
     },
