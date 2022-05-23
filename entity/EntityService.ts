@@ -33,11 +33,22 @@ import { PointUtils } from '../physics/point/PointUtils';
 import { EntityType } from './EntityType';
 import { UsedTeleporterComponent } from '@/components/UsedTeleporterComponent';
 import { DirtyUsedTeleporterComponent } from '@/components/DirtyUsedTeleporterComponent';
+import { EntityFactory } from './EntityFactory';
 
 export class EntityService {
     constructor(
+        private entityFactory: EntityFactory,
         private registry: Registry,
     ) {}
+
+    createSpawnEffect(position: Point): Entity {
+        return this.entityFactory.buildFromOptions({
+            type: EntityType.SPAWN_EFFECT,
+            components: {
+                PositionComponent: position,
+            },
+        });
+    }
 
     markDestroyed(entity: Entity): void {
         entity.upsertComponent(DestroyedComponent, undefined, {
@@ -158,6 +169,16 @@ export class EntityService {
 
         movement.update({
             speed: newMovementSpeed,
+        });
+    }
+
+    markRequestedPosition(entity: Entity, position: Point): void {
+        if (!entity.hasComponent(PositionComponent)) {
+            return;
+        }
+
+        entity.upsertComponent(RequestedPositionComponent, position, {
+            flags: ComponentFlags.LOCAL_ONLY,
         });
     }
 

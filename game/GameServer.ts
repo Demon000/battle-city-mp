@@ -119,7 +119,7 @@ export class GameServer {
             this.registry,
             this.collisionRules,
         );
-        this.entityService = new EntityService(this.registry);
+        this.entityService = new EntityService(this.entityFactory, this.registry);
         this.entitySpawnerService = new EntitySpawnerService(this.entityFactory, this.registry);
         this.tankService = new TankService(this.entityFactory, this.registry);
         this.flagService = new FlagService(this.config);
@@ -355,8 +355,8 @@ export class GameServer {
                     }
 
                     const position = this.entityService.getRandomSpawnPosition(player.teamId);
-                    const tank = this.tankService.createTankForPlayer(player, position, tankColor);
-                    this.tankService.createTankSpawnEffect(tank);
+                    this.tankService.createTankForPlayer(player, position, tankColor);
+                    this.entityService.createSpawnEffect(position);
                 } else if (status === PlayerSpawnStatus.DESPAWN && player.tankId !== null) {
                     const tank = this.registry.getEntityById(player.tankId);
                     this.entityService.markDestroyed(tank);
@@ -575,20 +575,31 @@ export class GameServer {
                     flagBase);
             });
 
-        this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_TELEPORTER,
-            (tankId: EntityId, teleporterId: EntityId) => {
-                const tank = this.registry.getEntityById(tankId);
-                if (tank.hasComponent(UsedTeleporterComponent)) {
+        this.collisionService.emitter.on(CollisionEvent.ENTITY_COLLIDE_TELEPORTER,
+            (entityId: EntityId, teleporterId: EntityId) => {
+                const entity = this.registry.getEntityById(entityId);
+                if (entity.hasComponent(UsedTeleporterComponent)) {
                     return;
                 }
+                const size = entity.getComponent(SizeComponent);
 
                 const teleporter = this.registry.getEntityById(teleporterId);
                 const target = teleporter.getComponent(TeleporterComponent).target;
+                const teleporterPosition = teleporter.getComponent(PositionComponent);
+                const teleporterSize = teleporter.getComponent(SizeComponent);
+                const targetPosition = {
+                    x: target.x - teleporterSize.width / 2,
+                    y: target.y - teleporterSize.height / 2,
+                };
+                const position = {
+                    x: target.x - size.width / 2,
+                    y: target.y - size.height / 2,
+                };
 
-                this.entityService.markUsedTeleporter(tank);
-                this.tankService.createTankSpawnEffect(teleporter);
-                tank.upsertComponent(PositionComponent, target);
-                this.tankService.createTankSpawnEffect(tank);
+                this.entityService.markUsedTeleporter(entity);
+                this.entityService.createSpawnEffect(teleporterPosition);
+                this.entityService.createSpawnEffect(targetPosition);
+                this.entityService.markRequestedPosition(entity, position);
             });
 
         /*

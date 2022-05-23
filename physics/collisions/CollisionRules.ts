@@ -50,7 +50,7 @@ export const rules: ICollisionRule[] = [
         result: [
             {
                 type: CollisionResultEvent.NOTIFY,
-                name: CollisionEvent.TANK_COLLIDE_TELEPORTER,
+                name: CollisionEvent.ENTITY_COLLIDE_TELEPORTER,
                 minimumVolume: 16 * 16 * 0.75,
             },
         ],
