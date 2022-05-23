@@ -8,6 +8,7 @@ export type ComponentsInitialization = Record<string, any>;
 
 export enum ComponentFlags {
     LOCAL_ONLY = 1 << 0,
+    SHARED = 1 << 1,
 }
 
 export class Component<C extends Component<C>> {
@@ -37,6 +38,8 @@ export class Component<C extends Component<C>> {
     static readonly TAG?: string;
 
     get entity(): Entity {
+        assert(!(this.flags & ComponentFlags.SHARED),
+            'Cannot access entity of shared component');
         assert(this._entity !== undefined);
 
         return this._entity;

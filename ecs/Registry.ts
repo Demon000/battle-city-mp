@@ -1,7 +1,7 @@
 import { ComponentRegistry } from './ComponentRegistry';
 import { assert } from '@/utils/assert';
 import EventEmitter from 'eventemitter3';
-import { ClazzOrTag, Component, ComponentClassType, ComponentsInitialization } from './Component';
+import { ClazzOrTag, Component, ComponentClassType, ComponentFlags, ComponentsInitialization } from './Component';
 import { Entity } from './Entity';
 import { EntityId } from './EntityId';
 import { RegistryIdGenerator } from './RegistryIdGenerator';
@@ -281,7 +281,10 @@ export class Registry {
         entity.addLocalComponent(component);
 
         const tagComponents = this.getOrCreateComponentTypeSet(component.clazz);
-        tagComponents.add(component);
+        if (options === undefined || options.flags === undefined
+            || !(options.flags & ComponentFlags.SHARED)) {
+            tagComponents.add(component);
+        }
 
         if (!options?.silent) {
             this.emit(RegistryComponentEvent.COMPONENT_INITIALIZED, component);
