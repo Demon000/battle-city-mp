@@ -41,12 +41,10 @@ export interface RegistryEvents {
 export interface RegistryComponentEvents<C extends Component<C> = any> {
     [RegistryComponentEvent.COMPONENT_INITIALIZED]: (
         component: C,
-        data?: any,
         options?: ComponentEmitOptions,
     ) => void;
     [RegistryComponentEvent.COMPONENT_ADDED]: (
         component: C,
-        data?: any,
         options?: ComponentEmitOptions,
     ) => void;
     [RegistryComponentEvent.COMPONENT_UPDATED]: (
@@ -61,7 +59,6 @@ export interface RegistryComponentEvents<C extends Component<C> = any> {
     [RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE]: (
         event: RegistryComponentEvent,
         component: C,
-        data?: any,
         options?: ComponentEmitOptions,
     ) => void;
     [RegistryComponentEvent.COMPONENT_CHANGED]: (
@@ -219,28 +216,31 @@ export class Registry {
     ): void {
         const componentEmitter = this.componentEmitter(component.clazz);
         if (componentEmitter !== undefined) {
-            if (event === RegistryComponentEvent.COMPONENT_BEFORE_REMOVE) {
-                componentEmitter.emit(event, component, options);
-            } else {
+            if (event === RegistryComponentEvent.COMPONENT_UPDATED) {
                 componentEmitter.emit(event, component, data, options);
+            } else {
+                componentEmitter.emit(event, component, options);
             }
+
             if (event !== RegistryComponentEvent.COMPONENT_INITIALIZED) {
                 componentEmitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
                     event, component, data, options);
             }
+
             if (event === RegistryComponentEvent.COMPONENT_ADDED
                 || event === RegistryComponentEvent.COMPONENT_UPDATED) {
                 componentEmitter.emit(
                     RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
-                    event, component, data, options);
+                    event, component, options);
             }
         }
 
-        if (event === RegistryComponentEvent.COMPONENT_BEFORE_REMOVE) {
-            this.emitter.emit(event, component, options);
-        } else {
+        if (event === RegistryComponentEvent.COMPONENT_UPDATED) {
             this.emitter.emit(event, component, data, options);
+        } else {
+            this.emitter.emit(event, component, options);
         }
+
         if (event !== RegistryComponentEvent.COMPONENT_INITIALIZED) {
             this.emitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
                 event, component, data, options);
@@ -253,8 +253,10 @@ export class Registry {
         components: Iterable<Component<any>>,
         options?: ComponentEmitOptions,
     ): void {
+        assert(event !== RegistryComponentEvent.COMPONENT_UPDATED);
+
         for (const component of components) {
-            this.emit(event, component, component.getData(), options);
+            this.emit(event, component, undefined, options);
         }
     }
 
@@ -266,6 +268,31 @@ export class Registry {
     ): void {
         for (const [clazzOrTag, data] of Object.entries(components)) {
             fn(entity, clazzOrTag, data, options);
+        }
+    }
+
+    addExistingComponent<
+        C extends Component<C>,
+    >(
+        entity: Entity,
+        component: C,
+        options?: RegistryOperationOptions,
+    ): void {
+        entity.addLocalComponent(component);
+
+        const tagComponents = this.getOrCreateComponentTypeSet(component.clazz);
+        tagComponents.add(component);
+
+        console.log('added component');
+
+        if (options !== undefined && options.flags !== undefined
+            && options.flags) {
+            component.flags = options.flags;
+        }
+
+        if (!options?.silent) {
+            this.emit(RegistryComponentEvent.COMPONENT_INITIALIZED, component);
+            this.emit(RegistryComponentEvent.COMPONENT_ADDED, component);
         }
     }
 
@@ -288,21 +315,13 @@ export class Registry {
             component.setData(data);
         }
 
-        entity.addLocalComponent(component);
-
-        const tagComponents = this.getOrCreateComponentTypeSet(clazz);
-        tagComponents.add(component);
-
-        if (options !== undefined && options.flags !== undefined
-            && options.flags) {
-            component.flags = options.flags;
-        }
+        this.addExistingComponent(entity, component, {
+            silent: true,
+        });
 
         if (!options?.silent) {
-            this.emit(RegistryComponentEvent.COMPONENT_INITIALIZED,
-                component, data);
-            this.emit(RegistryComponentEvent.COMPONENT_ADDED,
-                component, data);
+            this.emit(RegistryComponentEvent.COMPONENT_INITIALIZED, component);
+            this.emit(RegistryComponentEvent.COMPONENT_ADDED, component);
         }
 
         return component;

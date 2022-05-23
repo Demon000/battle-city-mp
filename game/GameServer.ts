@@ -698,24 +698,21 @@ export class GameServer {
                 component.entity.id,
                 component.clazz.tag,
             ]);
-        } else if (gameEvent === GameEvent.ENTITY_COMPONENT_ADDED
-            || gameEvent === GameEvent.ENTITY_COMPONENT_UPDATED) {
-            if (data === undefined) {
-                this.gameEventBatcher.addBroadcastEvent([
-                    gameEvent,
-                    component.entity.id,
-                    component.clazz.tag,
-                ]);
-            } else {
-                this.gameEventBatcher.addBroadcastEvent([
-                    gameEvent,
-                    component.entity.id,
-                    component.clazz.tag,
-                    data,
-                ]);
-            }
+        } else if (gameEvent === GameEvent.ENTITY_COMPONENT_ADDED) {
+            this.gameEventBatcher.addBroadcastEvent([
+                gameEvent,
+                component.entity.id,
+                component.clazz.tag,
+                component.getData(),
+            ]);
+        } else if (gameEvent === GameEvent.ENTITY_COMPONENT_UPDATED) {
+            this.gameEventBatcher.addBroadcastEvent([
+                gameEvent,
+                component.entity.id,
+                component.clazz.tag,
+                data,
+            ]);
         }
-
     }
 
     handleFlagPick(
