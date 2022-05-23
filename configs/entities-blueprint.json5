@@ -13,16 +13,18 @@
         serverComponents: {
             WorldEntityComponent: {},
         },
+    },
+    'uniquely-rendered-entity': {
         clientComponents: {
             DirtyGraphicsComponent: {},
             GraphicsRendererComponent: {},
         },
     },
     'dynamic-sized-entity': {
-        serverComponents: {
+        sharedServerComponents: {
             DynamicSizeComponent: {},
         },
-        clientComponents: {
+        sharedClientComponents: {
             PatternFillGraphicsComponent: {},
         },
     },
@@ -31,18 +33,19 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'uniquely-rendered-entity',
         ],
-        components: {
+        serverComponents: {
+            CenterPositionComponent: {},
+        },
+        sharedLocalComponents: {
             SizeComponent: {
                 width: 4,
                 height: 4,
             },
         },
-        clientComponents: {
+        sharedClientComponents: {
             PatternFillGraphicsComponent: {},
-        },
-        serverComponents: {
-            CenterPositionComponent: {},
         },
     },
     'steel-wall': {
@@ -50,15 +53,16 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'uniquely-rendered-entity',
         ],
-        localComponents: {
+        serverComponents: {
+            CenterPositionComponent: {},
+        },
+        sharedLocalComponents: {
             SizeComponent: {
                 width: 8,
                 height: 8,
             },
-        },
-        serverComponents: {
-            CenterPositionComponent: {},
         },
     },
     'bush': {
@@ -66,6 +70,7 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'uniquely-rendered-entity',
             'dynamic-sized-entity',
         ],
         components: {
@@ -80,6 +85,7 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'uniquely-rendered-entity',
             'dynamic-sized-entity',
         ],
         components: {
@@ -94,6 +100,7 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'uniquely-rendered-entity',
             'dynamic-sized-entity',
         ],
         components: {
@@ -108,6 +115,7 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'uniquely-rendered-entity',
             'dynamic-sized-entity',
         ],
         components: {
@@ -122,6 +130,7 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'uniquely-rendered-entity',
             'dynamic-sized-entity',
         ],
         components: {
@@ -140,14 +149,14 @@
         components: {
             TeamOwnedComponent: {},
         },
-        localComponents: {
+        serverComponents: {
+            SpawnComponent: {},
+        },
+        sharedLocalComponents: {
             SizeComponent: {
                 width: 16,
                 height: 16,
             },
-        },
-        serverComponents: {
-            SpawnComponent: {},
         },
     },
     'level-border': {
@@ -155,6 +164,7 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'uniquely-rendered-entity',
             'dynamic-sized-entity',
         ],
         components: {
@@ -169,6 +179,7 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'uniquely-rendered-entity',
         ],
         components: {
             DirectionComponent: {},
@@ -215,6 +226,7 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'uniquely-rendered-entity',
         ],
         components: {
             ExplosionComponent: {},
@@ -247,17 +259,20 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'uniquely-rendered-entity',
         ],
         localComponents: {
-            SizeComponent: {
-                width: 16,
-                height: 16,
-            },
             SpawnTimeComponent: {},
         },
         serverComponents: {
             AutomaticDestroyComponent: {
                 timeMs: 1500,
+            },
+        },
+        sharedLocalComponents: {
+            SizeComponent: {
+                width: 16,
+                height: 16,
             },
         },
     },
@@ -266,17 +281,20 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'uniquely-rendered-entity',
         ],
         localComponents: {
-            SizeComponent: {
-                width: 16,
-                height: 16,
-            },
             SpawnTimeComponent: {},
         },
         serverComponents: {
             AutomaticDestroyComponent: {
                 timeMs: 1000,
+            },
+        },
+        sharedLocalComponents: {
+            SizeComponent: {
+                width: 16,
+                height: 16,
             },
         },
     },
@@ -285,6 +303,7 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'uniquely-rendered-entity',
             'dynamic-sized-entity',
         ],
         components: {
@@ -302,11 +321,12 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'uniquely-rendered-entity',
         ],
         components: {
             TeamOwnedComponent: {},
         },
-        localComponents: {
+        sharedLocalComponents: {
             SizeComponent: {
                 width: 16,
                 height: 16,
@@ -318,6 +338,7 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'uniquely-rendered-entity',
         ],
         components: {
             PickupIgnoreComponent: {},
@@ -325,13 +346,13 @@
             TeamOwnedComponent: {},
             FlagComponent: {},
         },
-        localComponents: {
+        sharedLocalComponents: {
             SizeComponent: {
                 width: 16,
                 height: 16,
             },
         },
-        clientComponents: {
+        sharedClientComponents: {
             GraphicDependenciesComponent: {
                 components: {
                     RelativePositionComponent: true,
@@ -344,12 +365,13 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'uniquely-rendered-entity',
         ],
         components: {
             ColorComponent: {},
             TeleporterComponent: {},
         },
-        localComponents: {
+        sharedLocalComponents: {
             SizeComponent: {
                 width: 16,
                 height: 16,
@@ -361,6 +383,7 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'uniquely-rendered-entity',
         ],
         components: {
             RelativePositionChildrenComponent: {},
@@ -371,12 +394,7 @@
             ColorComponent: {},
         },
         localComponents: {
-            SizeComponent: {
-                width: 16,
-                height: 16,
-            },
             CenterPositionComponent: {},
-            IsMovingTrackingComponent: {},
         },
         serverComponents: {
             TankComponent: {},
@@ -392,6 +410,16 @@
             },
         },
         clientComponents: {
+            SpawnTimeComponent: {},
+        },
+        sharedLocalComponents: {
+            SizeComponent: {
+                width: 16,
+                height: 16,
+            },
+            IsMovingTrackingComponent: {},
+        },
+        sharedClientComponents: {
             IsUnderBushTrackingComponent: {},
             GraphicDependenciesComponent: {
                 components: {
@@ -400,7 +428,6 @@
                     'DirectionComponent': true,
                 },
             },
-            SpawnTimeComponent: {},
         },
     },
     'tank-normal': {
