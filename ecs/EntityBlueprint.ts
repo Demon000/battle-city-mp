@@ -1,14 +1,17 @@
 import { Config } from '@/config/Config';
 import { assert } from '@/utils/assert';
-import { ComponentFlags } from './Component';
+import { Component, ComponentFlags } from './Component';
 import { Entity } from './Entity';
-import { RegistryOperationOptions } from './Registry';
+import { Registry, RegistryOperationOptions } from './Registry';
 
 export interface BlueprintComponentsData {
     components?: Record<string, any>,
     localComponents?: Record<string, any>,
     clientComponents?: Record<string, any>,
     serverComponents?: Record<string, any>,
+    sharedLocalComponents?: Record<string, any>,
+    sharedClientComponents?: Record<string, any>,
+    sharedServerComponents?: Record<string, any>,
 }
 
 export interface BlueprintData extends BlueprintComponentsData {
@@ -28,19 +31,28 @@ export class EntityBlueprint {
     private blueprintComponentsKeys: BlueprintComponentsKeys[] = [
         'components',
         'localComponents',
+        'sharedLocalComponents',
     ];
     private ignoredKeys: BlueprintComponentsKeys[] = [];
+    private entitySharedLocalComponents: Record<string, Record<string, Component<any>>> = {};
+    private entitySharedClientComponents: Record<string, Record<string, Component<any>>> = {};
+    private entitySharedServerComponents: Record<string, Record<string, Component<any>>> = {};
 
     constructor(
+        private registry: Registry,
         private config: Config,
         private env: BlueprintEnv,
     ) {
         if (this.env === BlueprintEnv.CLIENT) {
             this.blueprintComponentsKeys.push('clientComponents');
+            this.blueprintComponentsKeys.push('sharedClientComponents');
             this.ignoredKeys.push('serverComponents');
+            this.ignoredKeys.push('sharedServerComponents');
         } else if (this.env === BlueprintEnv.SERVER) {
             this.blueprintComponentsKeys.push('serverComponents');
+            this.blueprintComponentsKeys.push('sharedServerComponents');
             this.ignoredKeys.push('clientComponents');
+            this.ignoredKeys.push('sharedClientComponents');
         }
     }
 
@@ -134,6 +146,50 @@ export class EntityBlueprint {
         return componentData;
     }
 
+    addLocalComponents(
+        entity: Entity,
+        components: Record<string, any> | undefined,
+        options?: RegistryOperationOptions,
+    ): void {
+        if (components === undefined) {
+            return;
+        }
+
+        entity.upsertComponents(components, {
+            ...options,
+            flags: ComponentFlags.LOCAL_ONLY,
+        });
+    }
+
+    addSharedComponents(
+        entity: Entity,
+        components: Record<string, any> | undefined,
+        options?: RegistryOperationOptions,
+    ): void {
+        if (components === undefined) {
+            return;
+        }
+
+        const createdComponents = this.entitySharedLocalComponents;
+
+        if (createdComponents[entity.type] === undefined) {
+            createdComponents[entity.type] = {};
+        }
+
+        for (const [tag, data] of Object.entries(components)) {
+            let component = createdComponents[entity.type][tag];
+            if (component === undefined) {
+                component = createdComponents[entity.type][tag] =
+                    this.registry.createDetachedComponent(tag, data, {
+                        ...options,
+                        flags: ComponentFlags.LOCAL_ONLY | ComponentFlags.SHARED,
+                    });
+            }
+
+            entity.attachComponent(component);
+        }
+    }
+
     addComponents(
         type: string,
         entity: Entity,
@@ -150,25 +206,19 @@ export class EntityBlueprint {
             entity.upsertComponents(blueprintData.components, options);
         }
 
-        if (blueprintData.localComponents !== undefined) {
-            entity.upsertComponents(blueprintData.localComponents, {
-                ...options,
-                flags: ComponentFlags.LOCAL_ONLY,
-            });
-        }
+        this.addLocalComponents(entity, blueprintData.localComponents, options);
+        this.addSharedComponents(entity, blueprintData.sharedLocalComponents);
 
-        let components;
         if (this.env === BlueprintEnv.CLIENT) {
-            components = blueprintData.clientComponents;
+            this.addLocalComponents(entity, blueprintData.clientComponents, options);
         } else if (this.env === BlueprintEnv.SERVER) {
-            components = blueprintData.serverComponents;
+            this.addLocalComponents(entity, blueprintData.serverComponents, options);
         }
 
-        if (components !== undefined) {
-            entity.upsertComponents(components, {
-                ...options,
-                flags: ComponentFlags.LOCAL_ONLY,
-            });
+        if (this.env === BlueprintEnv.CLIENT) {
+            this.addSharedComponents(entity, blueprintData.sharedClientComponents);
+        } else if (this.env === BlueprintEnv.SERVER) {
+            this.addSharedComponents(entity, blueprintData.sharedServerComponents);
         }
     }
 }

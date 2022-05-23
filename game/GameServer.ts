@@ -106,7 +106,7 @@ export class GameServer {
         this.componentRegistry = new ComponentRegistry();
         this.registryIdGenerator = new RegistryNumberIdGenerator();
         this.registry = new Registry(this.componentRegistry, this.registryIdGenerator);
-        this.entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.SERVER);
+        this.entityBlueprint = new EntityBlueprint(this.registry, this.config, BlueprintEnv.SERVER);
         this.entityBlueprint.reloadBlueprintData();
 
         this.entityFactory = new EntityFactory(this.registry, this.entityBlueprint);
