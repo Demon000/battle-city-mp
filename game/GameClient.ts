@@ -220,42 +220,34 @@ export class GameClient {
                 });
         this.registry.componentEmitter(HealthComponent, true)
             .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
-                (_event, component, data) => {
+                (_event, component) => {
                     const entity = component.entity;
                     if (entity.id === this.tankService.getOwnPlayerTankId()) {
-                        if ('value' in data) {
-                            this.emitter.emit(
-                                GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
-                                data.value,
-                            );
-                        }
+                        this.emitter.emit(
+                            GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
+                            component.value,
+                        );
 
-                        if ('max' in data) {
-                            this.emitter.emit(
-                                GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
-                                data.max,
-                            );
-                        }
+                        this.emitter.emit(
+                            GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
+                            component.max,
+                        );
                     }
                 });
         this.registry.componentEmitter(BulletSpawnerComponent, true)
             .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
-                (_event, component, data) => {
+                (_event, component) => {
                     const entity = component.entity;
                     if (entity.id === this.tankService.getOwnPlayerTankId()) {
-                        if ('count' in data) {
-                            this.emitter.emit(
-                                GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
-                                data.count,
-                            );
-                        }
+                        this.emitter.emit(
+                            GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
+                            component.count,
+                        );
 
-                        if ('maxCount' in data) {
-                            this.emitter.emit(
-                                GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
-                                data.maxCount,
-                            );
-                        }
+                        this.emitter.emit(
+                            GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
+                            component.maxCount,
+                        );
                     }
                 });
 
