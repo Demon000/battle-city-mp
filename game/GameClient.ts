@@ -212,6 +212,10 @@ export class GameClient {
         this.registry.componentEmitter(IsMovingTrackingComponent, true)
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
+                    if (component.flags & ComponentFlags.SHARED) {
+                        return;
+                    }
+
                     const entity = component.entity;
                     this.entityService.updateIsMoving(entity, true);
                 });
@@ -224,6 +228,10 @@ export class GameClient {
         this.registry.componentEmitter(IsUnderBushTrackingComponent, true)
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
+                    if (component.flags & ComponentFlags.SHARED) {
+                        return;
+                    }
+
                     const entity = component.entity;
                     this.collisionService.updateIsUnderBush(entity, true);
                 });
