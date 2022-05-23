@@ -283,22 +283,17 @@ export class Registry {
         const tagComponents = this.getOrCreateComponentTypeSet(component.clazz);
         tagComponents.add(component);
 
-        if (options !== undefined && options.flags !== undefined
-            && options.flags) {
-            component.flags = options.flags;
-        }
-
         if (!options?.silent) {
             this.emit(RegistryComponentEvent.COMPONENT_INITIALIZED, component);
             this.emit(RegistryComponentEvent.COMPONENT_ADDED, component);
         }
     }
 
-    addComponent<
+    createComponent<
         C extends Component<C>,
     >(
-        entity: Entity,
         clazzOrTag: ClazzOrTag<C>,
+        entity?: Entity,
         data?: any,
         options?: RegistryOperationOptions,
     ): C {
@@ -313,6 +308,23 @@ export class Registry {
             component.setData(data);
         }
 
+        if (options !== undefined && options.flags !== undefined
+            && options.flags) {
+            component.flags = options.flags;
+        }
+
+        return component;
+    }
+
+    addComponent<
+        C extends Component<C>,
+    >(
+        entity: Entity,
+        clazzOrTag: ClazzOrTag<C>,
+        data?: any,
+        options?: RegistryOperationOptions,
+    ): C {
+        const component = this.createComponent(clazzOrTag, entity, data, options);
         this.attachComponent(entity, component, options);
 
         return component;
