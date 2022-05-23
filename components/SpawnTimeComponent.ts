@@ -15,10 +15,10 @@ export class SpawnTimeComponent
 
     constructor(
         registry: Registry,
-        entity: Entity,
         clazz: ComponentClassType<SpawnTimeComponent>,
+        entity?: Entity,
     ) {
-        super(registry, entity, clazz);
+        super(registry, clazz, entity);
 
         this.value = Date.now();
     }

@@ -1,3 +1,4 @@
+import { assert } from '@/utils/assert';
 import { nonenumerable } from '@/utils/enumerable';
 import { Entity } from './Entity';
 import { Registry, RegistryOperationOptions } from './Registry';
@@ -14,7 +15,7 @@ export class Component<C extends Component<C>> {
     readonly registry: Registry;
 
     @nonenumerable
-    readonly entity: Entity;
+    readonly _entity?: Entity;
 
     @nonenumerable
     readonly clazz: ComponentClassType<C>;
@@ -24,16 +25,22 @@ export class Component<C extends Component<C>> {
 
     constructor(
         registry: Registry,
-        entity: Entity,
         clazz: ComponentClassType<C>,
+        entity?: Entity,
     ) {
         this.registry = registry;
-        this.entity = entity;
+        this._entity = entity;
         this.clazz = clazz;
     }
 
     @nonenumerable
     static readonly TAG?: string;
+
+    get entity(): Entity {
+        assert(this._entity !== undefined);
+
+        return this._entity;
+    }
 
     static get tag(): string {
         return this.TAG ?? this.name;
@@ -62,7 +69,7 @@ export type ComponentClassType<C = any> = {
 
     new (
         registry: Registry,
-        entity: Entity,
         clazz: ComponentClassType<C>,
+        entity?: Entity,
     ): C;
 };

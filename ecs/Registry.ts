@@ -309,7 +309,7 @@ export class Registry {
         }
 
         const clazz = this.validateComponentData(clazzOrTag, data);
-        const component = new clazz(this, entity, clazz);
+        const component = new clazz(this, clazz, entity);
 
         if (data !== undefined) {
             component.setData(data);
