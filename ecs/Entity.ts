@@ -57,6 +57,15 @@ export class Entity {
         return this.registry.addComponent(this, clazzOrTag, data, options);
     }
 
+    attachComponent<
+        C extends Component<C>,
+    >(
+        component: C,
+        options?: RegistryOperationOptions,
+    ): void {
+        return this.registry.attachComponent(this, component, options);
+    }
+
     updateComponent<
         C extends Component<C>,
     >(
