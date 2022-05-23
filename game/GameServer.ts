@@ -222,6 +222,10 @@ export class GameServer {
         this.registry.componentEmitter(SizeComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
                 (component) => {
+                    if (component.flags & ComponentFlags.SHARED) {
+                        return;
+                    }
+
                     const entity = component.entity;
                     this.collisionService.markDirtyBoundingBox(entity);
                     this.entityService.markDirtyCenterPosition(entity);

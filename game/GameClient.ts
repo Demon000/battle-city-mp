@@ -37,6 +37,7 @@ import { Entity } from '@/ecs/Entity';
 import { DirtyCollisionType } from '@/components/DirtyCollisionsComponent';
 import { ClientComponentRegistry } from '@/ecs/ClientComponentRegistry';
 import { EntityGraphicsRenderer } from '@/entity/EntityGraphicsRenderer';
+import { ComponentFlags } from '@/ecs/Component';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -137,6 +138,10 @@ export class GameClient {
 
         this.registry.emitter.on(RegistryComponentEvent.COMPONENT_CHANGED,
             (_event, component) => {
+                if (component.flags & ComponentFlags.SHARED) {
+                    return;
+                }
+
                 this.gameGraphicsService
                     .processGraphicsDependencies(component.entity.id,
                         component.clazz.tag);
@@ -165,6 +170,10 @@ export class GameClient {
         this.registry.componentEmitter(SizeComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
                 (component) => {
+                    if (component.flags & ComponentFlags.SHARED) {
+                        return;
+                    }
+
                     const entity = component.entity;
                     this.collisionService.markDirtyBoundingBox(entity);
                     this.entityService.markDirtyCenterPosition(entity);
