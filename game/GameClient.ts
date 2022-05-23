@@ -152,7 +152,7 @@ export class GameClient {
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
                     const entity = component.entity;
-                    this.entityService.updateCenterPosition(entity);
+                    this.entityService.updateCenterPosition(entity, true);
                 });
         this.registry.componentEmitter(PositionComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
@@ -204,7 +204,7 @@ export class GameClient {
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
                     const entity = component.entity;
-                    this.entityService.updateIsMoving(entity);
+                    this.entityService.updateIsMoving(entity, true);
                 });
         this.registry.componentEmitter(MovementComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
@@ -216,7 +216,7 @@ export class GameClient {
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
                     const entity = component.entity;
-                    this.collisionService.updateIsUnderBush(entity);
+                    this.collisionService.updateIsUnderBush(entity, true);
                 });
         this.registry.componentEmitter(HealthComponent, true)
             .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,

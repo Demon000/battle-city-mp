@@ -201,13 +201,13 @@ export class GameServer {
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
                     const entity = component.entity;
-                    this.entityService.updateCenterPosition(entity);
+                    this.entityService.updateCenterPosition(entity, true);
                 });
         this.registry.componentEmitter(RelativePositionComponent, true)
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
                     const entity = component.entity;
-                    this.entityService.updateRelativePosition(entity);
+                    this.entityService.updateRelativePosition(entity, true);
                 });
         this.registry.componentEmitter(PositionComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
@@ -261,7 +261,7 @@ export class GameServer {
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
                     const entity = component.entity;
-                    this.entityService.updateIsMoving(entity);
+                    this.entityService.updateIsMoving(entity, true);
                 });
         this.registry.componentEmitter(MovementComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,

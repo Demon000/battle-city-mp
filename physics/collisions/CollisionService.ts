@@ -387,7 +387,7 @@ export class CollisionService {
         return this.findOverlappingWithType(entity, type) !== undefined;
     }
 
-    updateIsUnderBush(entity: Entity): void {
+    updateIsUnderBush(entity: Entity, silent = false): void {
         if (!entity.hasComponent(IsUnderBushTrackingComponent)) {
             return;
         }
@@ -402,9 +402,12 @@ export class CollisionService {
         if (isUnderBush) {
             entity.addComponent(IsUnderBushComponent, undefined, {
                 flags: ComponentFlags.LOCAL_ONLY,
+                silent,
             });
         } else {
-            entity.removeComponent(IsUnderBushComponent);
+            entity.removeComponent(IsUnderBushComponent, {
+                silent,
+            });
         }
     }
 

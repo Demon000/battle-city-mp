@@ -234,7 +234,7 @@ export class EntityService {
         }
     }
 
-    updateIsMoving(entity: Entity): void {
+    updateIsMoving(entity: Entity, silent = false): void {
         if (!entity.hasComponent(IsMovingTrackingComponent)) {
             return;
         }
@@ -250,9 +250,12 @@ export class EntityService {
         if (isMoving) {
             entity.addComponent(IsMovingComponent, undefined, {
                 flags: ComponentFlags.LOCAL_ONLY,
+                silent,
             });
         } else {
-            entity.removeComponent(IsMovingComponent);
+            entity.removeComponent(IsMovingComponent, {
+                silent,
+            });
         }
     }
 
@@ -278,7 +281,7 @@ export class EntityService {
         });
     }
 
-    updateCenterPosition(entity: Entity): void {
+    updateCenterPosition(entity: Entity, silent = false): void {
         const centerPosition = entity.getComponent(CenterPositionComponent);
         const position = entity.getComponent(PositionComponent);
         const size = entity.getComponent(SizeComponent);
@@ -292,6 +295,8 @@ export class EntityService {
         centerPosition.update({
             x,
             y,
+        }, {
+            silent,
         });
     }
 
@@ -393,7 +398,7 @@ export class EntityService {
         }
     }
 
-    updateRelativePosition(entity: Entity): void {
+    updateRelativePosition(entity: Entity, silent = false): void {
         const relativePositionComponent = entity
             .findComponent(RelativePositionComponent);
         if (relativePositionComponent === undefined) {
@@ -407,6 +412,8 @@ export class EntityService {
         entity.updateComponent(PositionComponent, {
             x: parentPosition.x + relativePositionComponent.x,
             y: parentPosition.y + relativePositionComponent.y,
+        }, {
+            silent,
         });
     }
 
