@@ -412,7 +412,7 @@ export class Registry {
             this.upsertComponent, options);
     }
 
-    private removeEntityComponent<C extends Component<C>>(
+    detachEntityComponent<C extends Component<C>>(
         entity: Entity,
         clazz: ComponentClassType<C>,
         options?: RegistryOperationOptions,
@@ -433,6 +433,24 @@ export class Registry {
         }
         assert(component !== undefined);
 
+        return component;
+    }
+
+    removeEntityComponent<C extends Component<C>>(
+        entity: Entity,
+        clazz: ComponentClassType<C>,
+        options?: RegistryOperationOptions,
+    ): C | undefined {
+        const component = this.detachEntityComponent(entity, clazz, options);
+        if (options?.optional && component === undefined) {
+            return undefined;
+        }
+        assert(component !== undefined);
+
+        if (component.flags & ComponentFlags.SHARED) {
+            return;
+        }
+
         const tagComponents = this.tagsComponentsMap.get(clazz.tag);
         if (options?.optional && tagComponents === undefined) {
             return undefined;
@@ -449,13 +467,6 @@ export class Registry {
         assert(tagsHadComponent);
 
         return component;
-    }
-
-    removeComponent<C extends Component<C>>(
-        component: C,
-        options?: RegistryOperationOptions,
-    ): C | undefined {
-        return this.removeEntityComponent(component.entity, component.clazz, options);
     }
 
     removeComponentIfExists<C extends Component<C>>(

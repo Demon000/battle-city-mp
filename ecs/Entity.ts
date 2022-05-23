@@ -133,21 +133,12 @@ export class Entity {
         options?: RegistryOperationOptions,
     ): C | undefined {
         const component = this.getComponent(clazzOrTag);
-        return this.registry.removeComponent(component, options);
-    }
-
-    removeComponentIfExists<
-        C extends Component<C>,
-    >(
-        clazzOrTag: ClazzOrTag<C>,
-        options?: RegistryOperationOptions,
-    ): C | undefined {
-        return this.registry.removeComponentIfExists(this, clazzOrTag, options);
+        return this.registry.removeEntityComponent(this, component.clazz, options);
     }
 
     removeComponents(options?: RegistryOperationOptions): void {
         for (const component of this.tagComponentMap.values()) {
-            this.registry.removeComponent(component, options);
+            this.registry.removeEntityComponent(this, component.clazz, options);
         }
     }
 
