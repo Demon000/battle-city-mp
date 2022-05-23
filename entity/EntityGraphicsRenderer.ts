@@ -1,5 +1,5 @@
-import { DynamicSizeComponent } from '@/components/DynamicSizeComponent';
 import { GraphicsRendererComponent } from '@/components/GraphicsRendererComponent';
+import { PatternFillGraphicsComponent } from '@/components/PatternFillGraphicsComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
 import { SpawnTimeComponent } from '@/components/SpawnTimeComponent';
@@ -49,7 +49,7 @@ export class EntityGraphicsRenderer {
         return drawables;
     }
 
-    private processDynamicSizeDrawable(
+    private processPatternFillDrawable(
         entity: Entity,
         drawable: IDrawable,
     ): IDrawable | undefined {
@@ -58,8 +58,7 @@ export class EntityGraphicsRenderer {
             return drawable;
         }
 
-        const dynamicSize = entity.findComponent(DynamicSizeComponent);
-        if (dynamicSize === undefined) {
+        if (!entity.hasComponent(PatternFillGraphicsComponent)) {
             return drawable;
         }
 
@@ -96,7 +95,7 @@ export class EntityGraphicsRenderer {
             return drawable;
         }
 
-        drawable = this.processDynamicSizeDrawable(entity, drawable);
+        drawable = this.processPatternFillDrawable(entity, drawable);
 
         if (drawable === undefined) {
             return drawable;

@@ -49,6 +49,7 @@ import { ExplosionComponent, ExplosionComponentData } from '@/components/Explosi
 import { TeleporterComponent, TeleporterComponentData } from '@/components/TeleporterComponent';
 import { UsedTeleporterComponent, UsedTeleporterComponentData } from '@/components/UsedTeleporterComponent';
 import { DirtyUsedTeleporterComponent, DirtyUsedTeleporterComponentData } from '@/components/DirtyUsedTeleporterComponent';
+import { PatternFillGraphicsComponent, PatternFillGraphicsComponentData } from '@/components/PatternFillGraphicsComponent';
 
 export class ComponentRegistry {
     protected lookupAndValidate(
@@ -248,6 +249,10 @@ export class ComponentRegistry {
             case DirtyUsedTeleporterComponent.name:
                 assertEquals<Partial<DirtyUsedTeleporterComponentData>>(data);
                 return DirtyUsedTeleporterComponent;
+            case PatternFillGraphicsComponent.tag:
+            case PatternFillGraphicsComponent.name:
+                assertEquals<Partial<PatternFillGraphicsComponentData>>(data);
+                return PatternFillGraphicsComponent;
         }
     }
 

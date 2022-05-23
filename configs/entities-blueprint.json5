@@ -19,8 +19,11 @@
         },
     },
     'dynamic-sized-entity': {
-        localComponents: {
+        serverComponents: {
             DynamicSizeComponent: {},
+        },
+        clientComponents: {
+            PatternFillGraphicsComponent: {},
         },
     },
     'brick-wall': {
@@ -36,7 +39,7 @@
             },
         },
         clientComponents: {
-            DynamicSizeComponent: {},
+            PatternFillGraphicsComponent: {},
         },
         serverComponents: {
             CenterPositionComponent: {},
