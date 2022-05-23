@@ -9,7 +9,7 @@ export interface MovementTypeMultipliers {
 export interface MovementMultipliersComponentData {
     accelerationFactorMultiplier: number;
     decelerationFactorMultiplier: number;
-
+    maxSpeedMultiplier: number;
     typeMultipliersMap: Record<string, MovementTypeMultipliers>;
     typeMultipliersMarkedMap: Record<string, boolean>;
 }
