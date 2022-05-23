@@ -125,12 +125,10 @@ export class EntityService {
         const playerSpawnEntities = new Array<Entity>();
 
         for (const entity of entities) {
-            if (entity.type === EntityType.PLAYER_SPAWN) {
-                const playerSpawnTeamId = entity
-                    .getComponent(TeamOwnedComponent).teamId;
-                if (teamId === null || teamId === playerSpawnTeamId) {
-                    playerSpawnEntities.push(entity);
-                }
+            const playerSpawnTeamId = entity
+                .getComponent(TeamOwnedComponent).teamId;
+            if (teamId === null || teamId === playerSpawnTeamId) {
+                playerSpawnEntities.push(entity);
             }
         }
 
