@@ -18,6 +18,11 @@
             GraphicsRendererComponent: {},
         },
     },
+    'dynamic-sized-entity': {
+        localComponents: {
+            DynamicSizeComponent: {},
+        },
+    },
     'brick-wall': {
         extends: [
             'positioned-entity',
@@ -58,15 +63,13 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'dynamic-sized-entity',
         ],
         components: {
             SizeComponent: {
                 width: 8,
                 height: 8,
             },
-        },
-        localComponents: {
-            DynamicSizeComponent: {},
         },
     },
     ice: {
@@ -74,15 +77,13 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'dynamic-sized-entity',
         ],
         components: {
             SizeComponent: {
                 width: 8,
                 height: 8,
             },
-        },
-        localComponents: {
-            DynamicSizeComponent: {},
         },
     },
     sand: {
@@ -90,15 +91,13 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'dynamic-sized-entity',
         ],
         components: {
             SizeComponent: {
                 width: 8,
                 height: 8,
             },
-        },
-        localComponents: {
-            DynamicSizeComponent: {},
         },
     },
     'grass': {
@@ -106,15 +105,13 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'dynamic-sized-entity',
         ],
         components: {
             SizeComponent: {
                 width: 8,
                 height: 8,
             },
-        },
-        localComponents: {
-            DynamicSizeComponent: {},
         },
     },
     'dirt': {
@@ -122,15 +119,13 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'dynamic-sized-entity',
         ],
         components: {
             SizeComponent: {
                 width: 8,
                 height: 8,
             },
-        },
-        localComponents: {
-            DynamicSizeComponent: {},
         },
     },
     'player-spawn': {
@@ -157,15 +152,13 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'dynamic-sized-entity',
         ],
         components: {
             SizeComponent: {
                 width: 16,
                 height: 16,
             },
-        },
-        localComponents: {
-            DynamicSizeComponent: {},
         },
     },
     'bullet': {
@@ -289,15 +282,13 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
+            'dynamic-sized-entity',
         ],
         components: {
             SizeComponent: {
                 width: 8,
                 height: 8,
             },
-        },
-        localComponents: {
-            DynamicSizeComponent: {},
         },
         clientComponents: {
             SpawnTimeComponent: {},
