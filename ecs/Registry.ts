@@ -319,6 +319,16 @@ export class Registry {
         return component;
     }
 
+    createDetachedComponent<
+        C extends Component<C>,
+    >(
+        clazzOrTag: ClazzOrTag<C>,
+        data?: any,
+        options?: RegistryOperationOptions,
+    ): C {
+        return this.createComponent(clazzOrTag, undefined, data, options);
+    }
+
     addComponent<
         C extends Component<C>,
     >(
