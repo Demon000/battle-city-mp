@@ -47,6 +47,8 @@ import { DirtyCollisionsComponent, DirtyCollisionsComponentData } from '@/compon
 import { DynamicSizeComponent, DynamicSizeComponentData } from '@/components/DynamicSizeComponent';
 import { ExplosionComponent, ExplosionComponentData } from '@/components/ExplosionComponent';
 import { TeleporterComponent, TeleporterComponentData } from '@/components/TeleporterComponent';
+import { UsedTeleporterComponent, UsedTeleporterComponentData } from '@/components/UsedTeleporterComponent';
+import { DirtyUsedTeleporterComponent, DirtyUsedTeleporterComponentData } from '@/components/DirtyUsedTeleporterComponent';
 
 export class ComponentRegistry {
     protected lookupAndValidate(
@@ -238,7 +240,14 @@ export class ComponentRegistry {
             case TeleporterComponent.name:
                 assertEquals<Partial<TeleporterComponentData>>(data);
                 return TeleporterComponent;
-
+            case UsedTeleporterComponent.tag:
+            case UsedTeleporterComponent.name:
+                assertEquals<Partial<UsedTeleporterComponentData>>(data);
+                return UsedTeleporterComponent;
+            case DirtyUsedTeleporterComponent.tag:
+            case DirtyUsedTeleporterComponent.name:
+                assertEquals<Partial<DirtyUsedTeleporterComponentData>>(data);
+                return DirtyUsedTeleporterComponent;
         }
     }
 

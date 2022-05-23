@@ -28,6 +28,8 @@ import { DirtyCollisionsComponent, DirtyCollisionType } from '../../components/D
 import { ICollisionRule, CollisionEvent, CollisionEvents, CollisionResultEvent } from './ICollisionRule';
 import { EntityId } from '@/ecs/EntityId';
 import { IsUnderBushTrackingComponent } from '@/components/IsUnderBushTrackingComponent';
+import { UsedTeleporterComponent } from '@/components/UsedTeleporterComponent';
+import { DirtyUsedTeleporterComponent } from '@/components/DirtyUsedTeleporterComponent';
 
 export class CollisionService {
     private rulesMap?: Map<string, Map<string, ICollisionRule>>;
@@ -406,6 +408,17 @@ export class CollisionService {
         }
     }
 
+    updateDirtyUsedTeleporter(entity: Entity): void {
+        const isOnTeleporter = this
+            .isOverlappingWithType(entity, EntityType.TELEPORTER);
+
+        if (!isOnTeleporter) {
+            entity.removeComponent(UsedTeleporterComponent, {
+                optional: true,
+            });
+        }
+    }
+
     processDirtyIsUnderBush(): void {
         for (const component of
             this.registry.getComponents(DirtyIsUnderBushComponent)) {
@@ -415,6 +428,18 @@ export class CollisionService {
 
             const entity = component.entity;
             this.updateIsUnderBush(entity);
+        }
+    }
+
+    processDirtyUsedTeleporter(): void {
+        for (const component of
+            this.registry.getComponents(DirtyUsedTeleporterComponent)) {
+            component.remove({
+                silent: true,
+            });
+
+            const entity = component.entity;
+            this.updateDirtyUsedTeleporter(entity);
         }
     }
 

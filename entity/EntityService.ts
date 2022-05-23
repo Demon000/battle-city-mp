@@ -31,6 +31,8 @@ import { Direction } from '../physics/Direction';
 import { Point } from '../physics/point/Point';
 import { PointUtils } from '../physics/point/PointUtils';
 import { EntityType } from './EntityType';
+import { UsedTeleporterComponent } from '@/components/UsedTeleporterComponent';
+import { DirtyUsedTeleporterComponent } from '@/components/DirtyUsedTeleporterComponent';
 
 export class EntityService {
     constructor(
@@ -60,6 +62,24 @@ export class EntityService {
         }
 
         entity.upsertComponent(DirtyIsUnderBushComponent, undefined, {
+            flags: ComponentFlags.LOCAL_ONLY,
+            silent: true,
+        });
+    }
+
+    markDirtyUsedTeleporter(entity: Entity): void {
+        if (!entity.hasComponent(UsedTeleporterComponent)) {
+            return;
+        }
+
+        entity.upsertComponent(DirtyUsedTeleporterComponent, undefined, {
+            flags: ComponentFlags.LOCAL_ONLY,
+            silent: true,
+        });
+    }
+
+    markUsedTeleporter(entity: Entity): void {
+        entity.upsertComponent(UsedTeleporterComponent, undefined, {
             flags: ComponentFlags.LOCAL_ONLY,
             silent: true,
         });

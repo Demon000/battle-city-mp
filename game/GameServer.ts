@@ -59,6 +59,7 @@ import { DirtyCollisionType } from '@/components/DirtyCollisionsComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { TeleporterComponent } from '@/components/TeleporterComponent';
+import { UsedTeleporterComponent } from '@/components/UsedTeleporterComponent';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'p',
@@ -214,6 +215,7 @@ export class GameServer {
                     const entity = component.entity;
                     this.collisionService.markDirtyBoundingBox(entity);
                     this.entityService.markDirtyCenterPosition(entity);
+                    this.entityService.markDirtyUsedTeleporter(entity);
                     this.entityService
                         .markRelativeChildrenDirtyPosition(entity);
                 });
@@ -576,9 +578,15 @@ export class GameServer {
         this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_TELEPORTER,
             (tankId: EntityId, teleporterId: EntityId) => {
                 const tank = this.registry.getEntityById(tankId);
+                if (tank.hasComponent(UsedTeleporterComponent)) {
+                    return;
+                }
+
                 const teleporter = this.registry.getEntityById(teleporterId);
                 const target = teleporter.getComponent(TeleporterComponent).target;
-                this.tankService.createTankSpawnEffect(tank);
+
+                this.entityService.markUsedTeleporter(tank);
+                this.tankService.createTankSpawnEffect(teleporter);
                 tank.upsertComponent(PositionComponent, target);
                 this.tankService.createTankSpawnEffect(tank);
             });
@@ -630,6 +638,7 @@ export class GameServer {
                 this.collisionService.processDirtyBoundingBox();
                 this.entityService.processDirtyIsMoving();
                 this.entityService.processDirtyCenterPosition();
+                this.collisionService.processDirtyUsedTeleporter();
                 this.entityService.processAutomaticDestroy();
                 this.collisionService.processDirtyCollisions();
                 this.entityService.processDestroyed();
