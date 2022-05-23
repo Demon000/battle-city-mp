@@ -271,7 +271,7 @@ export class Registry {
         }
     }
 
-    addExistingComponent<
+    attachComponent<
         C extends Component<C>,
     >(
         entity: Entity,
@@ -282,8 +282,6 @@ export class Registry {
 
         const tagComponents = this.getOrCreateComponentTypeSet(component.clazz);
         tagComponents.add(component);
-
-        console.log('added component');
 
         if (options !== undefined && options.flags !== undefined
             && options.flags) {
@@ -315,14 +313,7 @@ export class Registry {
             component.setData(data);
         }
 
-        this.addExistingComponent(entity, component, {
-            silent: true,
-        });
-
-        if (!options?.silent) {
-            this.emit(RegistryComponentEvent.COMPONENT_INITIALIZED, component);
-            this.emit(RegistryComponentEvent.COMPONENT_ADDED, component);
-        }
+        this.attachComponent(entity, component, options);
 
         return component;
     }
