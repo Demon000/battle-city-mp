@@ -39,7 +39,7 @@ export class Component<C extends Component<C>> {
 
     get entity(): Entity {
         assert(!(this.flags & ComponentFlags.SHARED),
-            'Cannot access entity of shared component');
+            'Cannot access entity of shared component', this.clazz);
         assert(this._entity !== undefined);
 
         return this._entity;
