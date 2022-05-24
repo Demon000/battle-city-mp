@@ -16,7 +16,6 @@ import { DirectionComponent } from '@/components/DirectionComponent';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
-import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 
 export class EntitySpawnerService {
     constructor(
@@ -51,8 +50,7 @@ export class EntitySpawnerService {
             return;
         }
 
-        const spawnerComponent = ownerEntity
-            .findComponent(clazz);
+        const spawnerComponent = ownerEntity.findComponent(clazz);
         if (spawnerComponent === undefined) {
             return;
         }
