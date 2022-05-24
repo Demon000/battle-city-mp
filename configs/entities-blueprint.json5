@@ -395,6 +395,8 @@
             CollisionTrackingComponent: {
                 values: {
                     bush: false,
+                    sand: false,
+                    ice: false,
                 },
             },
         },

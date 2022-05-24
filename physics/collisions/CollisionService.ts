@@ -125,13 +125,16 @@ export class CollisionService {
         }
     }
 
-    private updateMovementModifiers(
-        movingEntity: Entity,
-        overlappingEntities: Iterable<Entity>,
-    ): void {
+    private updateMovementModifiers(entity: Entity): void {
         const movingMultipliers =
-            movingEntity.findComponent(MovementMultipliersComponent);
+            entity.findComponent(MovementMultipliersComponent);
         if (movingMultipliers === undefined) {
+            return;
+        }
+
+        const collisionTracking =
+            entity.findComponent(CollisionTrackingComponent);
+        if (collisionTracking === undefined) {
             return;
         }
 
@@ -140,18 +143,17 @@ export class CollisionService {
         movingMultipliers.maxSpeedMultiplier = 1;
         movingMultipliers.typeMultipliersMarkedMap = {};
 
-        for (const overlappingEntity of overlappingEntities) {
-            const typeMultipliers =
-                movingMultipliers.typeMultipliersMap[overlappingEntity.type];
-            if (typeMultipliers === undefined) {
+        for (const [type, value] of Object.entries(collisionTracking.values)) {
+            const typeMultipliers = movingMultipliers.typeMultipliersMap[type];
+            if (typeMultipliers === undefined || !value) {
                 continue;
             }
 
-            if (movingMultipliers.typeMultipliersMarkedMap[movingEntity.type]) {
+            if (movingMultipliers.typeMultipliersMarkedMap[type]) {
                 continue;
             }
 
-            movingMultipliers.typeMultipliersMarkedMap[movingEntity.type] = true;
+            movingMultipliers.typeMultipliersMarkedMap[type] = true;
 
             movingMultipliers.accelerationFactorMultiplier
                 *= typeMultipliers.accelerationFactor;
@@ -314,9 +316,9 @@ export class CollisionService {
                     values: newCollisionTrackingValues,
                 });
             }
-        }
 
-        this.updateMovementModifiers(movingEntity, overlappingEntities);
+            this.updateMovementModifiers(movingEntity);
+        }
     }
 
     processRequestedPosition(): void {
