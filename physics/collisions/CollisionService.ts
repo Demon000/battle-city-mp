@@ -23,7 +23,7 @@ import { RequestedDirectionComponent } from '@/components/RequestedDirectionComp
 import { SizeComponent } from '@/components/SizeComponent';
 import { DirectionUtils } from './DirectionUtils';
 import { DirtyCollisionsComponent, DirtyCollisionType } from '../../components/DirtyCollisionsComponent';
-import { ICollisionRule, CollisionEvent, CollisionEvents, CollisionResultEvent } from './ICollisionRule';
+import { CollisionRule, CollisionEvent, CollisionEvents, CollisionResultEvent } from './ICollisionRule';
 import { EntityId } from '@/ecs/EntityId';
 import { UsedTeleporterComponent } from '@/components/UsedTeleporterComponent';
 import { DirtyUsedTeleporterComponent } from '@/components/DirtyUsedTeleporterComponent';
@@ -31,22 +31,22 @@ import { LazyIterable } from '@/utils/LazyIterable';
 import { CollisionTrackingComponent } from '@/components/CollisionTrackingComponent';
 
 export class CollisionService {
-    private rulesMap?: Map<string, Map<string, ICollisionRule>>;
+    private rulesMap?: Map<string, Map<string, CollisionRule>>;
 
     emitter = new EventEmitter<CollisionEvents>();
 
     constructor(
         private boundingBoxRepository: BoundingBoxRepository<EntityId>,
         private registry: Registry,
-        rules?: ICollisionRule[],
+        rules?: CollisionRule[],
     ) {
         if (rules) {
-            this.rulesMap = new Map<string, Map<string, ICollisionRule>>();
+            this.rulesMap = new Map<string, Map<string, CollisionRule>>();
 
             for (const rule of rules) {
                 let movingMap = this.rulesMap.get(rule.movingType);
                 if (!movingMap) {
-                    movingMap = new Map<string, ICollisionRule>();
+                    movingMap = new Map<string, CollisionRule>();
                     this.rulesMap.set(rule.movingType, movingMap);
                 }
 
@@ -57,7 +57,7 @@ export class CollisionService {
         }
     }
 
-    private getRule(movingType: string, staticType: string): ICollisionRule | undefined {
+    private getRule(movingType: string, staticType: string): CollisionRule | undefined {
         assert(this.rulesMap !== undefined,
             'Cannot call getRule with no rules supplied');
 

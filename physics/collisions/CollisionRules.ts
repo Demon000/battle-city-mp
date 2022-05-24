@@ -1,7 +1,7 @@
 import { EntityType } from '@/entity/EntityType';
-import { ICollisionRule, CollisionEvent, CollisionResultEvent } from './ICollisionRule';
+import { CollisionRule, CollisionEvent, CollisionResultEvent } from './ICollisionRule';
 
-export const rules: ICollisionRule[] = [
+export const rules: CollisionRule[] = [
     {
         movingType: EntityType.TANK,
         staticTypes: [

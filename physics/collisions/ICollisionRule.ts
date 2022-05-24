@@ -34,7 +34,7 @@ export interface CollisionEvents {
     [CollisionEvent.ENTITY_COLLIDE_TELEPORTER]: CollisionEventHandler;
 }
 
-export type ICollisionResult = {
+export type CollisionResult = {
     type: CollisionResultEvent.PREVENT_MOVEMENT;
 } | {
     type: CollisionResultEvent.NOTIFY;
@@ -42,8 +42,8 @@ export type ICollisionResult = {
     name: CollisionEvent;
 };
 
-export interface ICollisionRule {
+export interface CollisionRule {
     movingType: string;
     staticTypes: string[];
-    result: ICollisionResult[];
+    result: CollisionResult[];
 }
