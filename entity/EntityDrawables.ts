@@ -170,7 +170,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
     ],
     [EntityType.TELEPORTER]: [
         new ImageDrawable('teleporter_base.png', {
-            renderPass: RenderPass.WALL,
+            renderPass: RenderPass.ABOVE_GROUND,
         }),
         new ImageDrawable('teleporter_rings.png', {
             renderPass: RenderPass.ABOVE_WALL,
