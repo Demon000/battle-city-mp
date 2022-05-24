@@ -40,12 +40,12 @@ export class CollisionService {
 
     private getRules(
         movingEntity: Entity,
-        staticEntity: Entity,
+        staticEntityType: string,
     ): CollisionRule[] | undefined {
         const collisionRulesComponent = movingEntity
             .findComponent(CollisionRulesComponent);
 
-        return collisionRulesComponent?.rules[staticEntity.type];
+        return collisionRulesComponent?.rules[staticEntityType];
     }
 
     getOverlappingEntities(box: BoundingBox): Iterable<EntityId> {
