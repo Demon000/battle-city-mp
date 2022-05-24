@@ -22,7 +22,7 @@ import { RequestedDirectionComponent } from '@/components/RequestedDirectionComp
 import { SizeComponent } from '@/components/SizeComponent';
 import { DirectionUtils } from './DirectionUtils';
 import { DirtyCollisionsComponent, DirtyCollisionType } from '../../components/DirtyCollisionsComponent';
-import { CollisionEvent, CollisionEvents, CollisionRule, CollisionResultEvent } from './CollisionRule';
+import { CollisionEvents, CollisionRule, CollisionRuleType } from './CollisionRule';
 import { EntityId } from '@/ecs/EntityId';
 import { UsedTeleporterComponent } from '@/components/UsedTeleporterComponent';
 import { DirtyUsedTeleporterComponent } from '@/components/DirtyUsedTeleporterComponent';
@@ -46,6 +46,25 @@ export class CollisionService {
             .findComponent(CollisionRulesComponent);
 
         return collisionRulesComponent?.rules[staticEntityType];
+    }
+
+    private getRuleWithType(
+        movingEntity: Entity,
+        staticEntityType: string,
+        type: CollisionRuleType,
+    ): CollisionRule | undefined {
+        const rules = this.getRules(movingEntity, staticEntityType);
+        if (rules === undefined) {
+            return undefined;
+        }
+
+        for (const rule of rules) {
+            if (rule.type === type) {
+                return rule;
+            }
+        }
+
+        return undefined;
     }
 
     getOverlappingEntities(box: BoundingBox): Iterable<EntityId> {
@@ -122,7 +141,7 @@ export class CollisionService {
 
         for (const [type, value] of Object.entries(collisionTracking.values)) {
             const typeMultipliers = movingMultipliers.typeMultipliersMap[type];
-            if (typeMultipliers === undefined || !value) {
+            if (typeMultipliers === undefined || value === false) {
                 continue;
             }
 
@@ -165,7 +184,7 @@ export class CollisionService {
         const collisionTracking = movingEntity
             .findComponent(CollisionTrackingComponent);
 
-        const newCollisionTrackingValues: Record<string, boolean> = {};
+        const newCollisionTrackingValues: Record<string, EntityId | false> = {};
         if (collisionTracking !== undefined) {
             for (const key of Object.keys(collisionTracking.values)) {
                 newCollisionTrackingValues[key] = false;
@@ -173,7 +192,6 @@ export class CollisionService {
         }
 
         let movementPreventingEntity;
-        const collidingEntityNotifications = new Array<[CollisionEvent, Entity]>();
         for (const overlappingEntity of overlappingEntities) {
             if (movingEntity.id === overlappingEntity.id) {
                 continue;
@@ -183,7 +201,7 @@ export class CollisionService {
                 continue;
             }
 
-            const rules = this.getRules(movingEntity, overlappingEntity);
+            const rules = this.getRules(movingEntity, overlappingEntity.type);
             if (rules === undefined) {
                 continue;
             }
@@ -193,8 +211,7 @@ export class CollisionService {
                     .getComponent(BoundingBoxComponent);
                 let coversMinimumVolume = true;
 
-                if ((rule.type === CollisionResultEvent.NOTIFY
-                        || rule.type === CollisionResultEvent.TRACK)
+                if (rule.type === CollisionRuleType.TRACK
                     && rule.minimumVolume !== undefined) {
                     const intersectionBoundingBox = BoundingBoxUtils
                         .intersect(overlappingBoundingBox, movedBoundingBox);
@@ -202,7 +219,7 @@ export class CollisionService {
                         .volume(intersectionBoundingBox) >= rule.minimumVolume;
                 }
 
-                if (rule.type === CollisionResultEvent.PREVENT_MOVEMENT) {
+                if (rule.type === CollisionRuleType.PREVENT_MOVEMENT) {
                     const isAlreadyInside = BoundingBoxUtils
                         .overlaps(originalBoundingBox, overlappingBoundingBox);
 
@@ -219,15 +236,22 @@ export class CollisionService {
                     if (!isAlreadyInside && isCloser) {
                         movementPreventingEntity = overlappingEntity;
                     }
-                } else if (rule.type === CollisionResultEvent.NOTIFY
-                    && coversMinimumVolume) {
-                    collidingEntityNotifications.push([rule.name,
-                        overlappingEntity]);
-                } else if (rule.type === CollisionResultEvent.TRACK
+                } else if (rule.type === CollisionRuleType.TRACK
                     && collisionTracking !== undefined
+                    /*
+                     * If already covering minimum volume, do not disable until
+                     * exiting.
+                     */
                     && (coversMinimumVolume
-                        || collisionTracking.values[overlappingEntity.type])) {
-                    newCollisionTrackingValues[overlappingEntity.type] = true;
+                        || collisionTracking.values[overlappingEntity.type]
+                            !== false)
+                    /*
+                     * Keep the first colliding entity.
+                     */
+                    && newCollisionTrackingValues[overlappingEntity.type]
+                        === false) {
+                    newCollisionTrackingValues[overlappingEntity.type]
+                        = overlappingEntity.id;
                 }
             }
         }
@@ -256,9 +280,6 @@ export class CollisionService {
             return;
         }
 
-        const preventedBoundingBox = BoundingBoxUtils
-            .reposition(originalBoundingBox, originalPosition, position);
-
         if (position.x === originalPosition.x
             && position.y === originalPosition.y) {
             return;
@@ -266,30 +287,46 @@ export class CollisionService {
 
         movingEntity.updateComponent(PositionComponent, position);
 
-        for (const [name, overlappingEntity] of collidingEntityNotifications) {
-            const overlappingBoundingBox = overlappingEntity
-                .getComponent(BoundingBoxComponent);
-            if (BoundingBoxUtils.overlapsEqual(preventedBoundingBox,
-                overlappingBoundingBox)) {
-                this.emitter.emit(name, movingEntity.id, overlappingEntity.id);
+        if (collisionTracking === undefined)
+            return;
+
+        let collisionTrackingChanged = false;
+
+        for (const type of Object.keys(collisionTracking.values)) {
+            if (collisionTracking.values[type]
+                === newCollisionTrackingValues[type]) {
+                continue;
+            }
+
+            collisionTrackingChanged = true;
+
+            if ((collisionTracking.values[type] === false
+                    && newCollisionTrackingValues[type] === false)
+                || (collisionTracking.values[type] !== false
+                    && newCollisionTrackingValues[type] !== false)) {
+                continue;
+            }
+
+            const rule = this.getRuleWithType(movingEntity, type,
+                CollisionRuleType.TRACK);
+            assert(rule !== undefined
+                && rule.type === CollisionRuleType.TRACK);
+
+            if (newCollisionTrackingValues[type] !== false
+                && rule.entryEvent !== undefined) {
+                this.emitter.emit(rule.entryEvent, movingEntity.id,
+                    newCollisionTrackingValues[type] as EntityId);
+            } else if (newCollisionTrackingValues[type] === false
+                && rule.exitEvent !== undefined) {
+                this.emitter.emit(rule.exitEvent, movingEntity.id,
+                    collisionTracking.values[type] as EntityId);
             }
         }
 
-        if (collisionTracking !== undefined) {
-            let changed = false;
-
-            for (const type of Object.keys(collisionTracking.values)) {
-                if (collisionTracking.values[type]
-                    !== newCollisionTrackingValues[type]) {
-                    changed = true;
-                }
-            }
-
-            if (changed) {
-                collisionTracking.update({
-                    values: newCollisionTrackingValues,
-                });
-            }
+        if (collisionTrackingChanged) {
+            collisionTracking.update({
+                values: newCollisionTrackingValues,
+            });
 
             this.updateMovementModifiers(movingEntity);
         }

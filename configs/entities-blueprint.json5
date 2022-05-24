@@ -191,6 +191,15 @@
         serverComponents: {
             PlayerOwnedComponent: {},
             EntityOwnedComponent: {},
+            CollisionTrackingComponent: {
+                values: {
+                    'level-border': false,
+                    'brick-wall': false,
+                    'steel-wall': false,
+                    'tank': false,
+                    'bullet': false,
+                },
+            },
         },
         sharedLocalComponents: {
             SizeComponent: {
@@ -202,24 +211,24 @@
             CollisionRulesComponent: {
                 rules: {
                     'level-border': [{
-                        type: 'notify',
-                        name: 'bullet-hit-level-border',
+                        type: 'track',
+                        entryEvent: 'bullet-hit-level-border',
                     }],
                     'brick-wall': [{
-                        type: 'notify',
-                        name: 'bullet-hit-brick-wall',
+                        type: 'track',
+                        entryEvent: 'bullet-hit-brick-wall',
                     }],
                     'steel-wall': [{
-                        type: 'notify',
-                        name: 'bullet-hit-steel-wall',
+                        type: 'track',
+                        entryEvent: 'bullet-hit-steel-wall',
                     }],
                     'tank': [{
-                        type: 'notify',
-                        name: 'bullet-hit-tank',
+                        type: 'track',
+                        entryEvent: 'bullet-hit-tank',
                     }],
                     'bullet': [{
-                        type: 'notify',
-                        name: 'bullet-hit-bullet',
+                        type: 'track',
+                        entryEvent: 'bullet-hit-bullet',
                     }],
                 },
             },
@@ -420,9 +429,12 @@
             ColorComponent: {},
             CollisionTrackingComponent: {
                 values: {
-                    bush: false,
-                    sand: false,
-                    ice: false,
+                    'bush': false,
+                    'sand': false,
+                    'ice': false,
+                    'flag-base': false,
+                    'flag': false,
+                    'teleporter': false,
                 },
             },
         },
@@ -479,17 +491,17 @@
                         type: 'prevent-movement',
                     }],
                     'flag-base': [{
-                        type: 'notify',
-                        name: 'tank-collide-flag-base',
+                        type: 'track',
+                        entryEvent: 'tank-collide-flag-base',
                     }],
                     'flag': [{
-                        type: 'notify',
-                        name: 'tank-collide-flag',
+                        type: 'track',
+                        entryEvent: 'tank-collide-flag',
                         minimumVolume: 192,
                     }],
                     'teleporter': [{
-                        type: 'notify',
-                        name: 'entity-collide-teleporter',
+                        type: 'track',
+                        entryEvent: 'entity-collide-teleporter',
                         minimumVolume: 192,
                     }],
                     'bush': [{

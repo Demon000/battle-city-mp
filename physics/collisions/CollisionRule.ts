@@ -1,8 +1,7 @@
 import { EntityId } from '@/ecs/EntityId';
 
-export enum CollisionResultEvent {
+export enum CollisionRuleType {
     PREVENT_MOVEMENT = 'prevent-movement',
-    NOTIFY = 'notify',
     TRACK = 'track',
 }
 
@@ -34,12 +33,10 @@ export interface CollisionEvents {
 }
 
 export type CollisionRule = {
-    type: CollisionResultEvent.PREVENT_MOVEMENT;
+    type: CollisionRuleType.PREVENT_MOVEMENT;
 } | {
-    type: CollisionResultEvent.NOTIFY;
-    minimumVolume?: number;
-    name: CollisionEvent;
-} | {
-    type: CollisionResultEvent.TRACK;
+    type: CollisionRuleType.TRACK;
+    entryEvent?: CollisionEvent;
+    exitEvent?: CollisionEvent;
     minimumVolume?: number;
 };

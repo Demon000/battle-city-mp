@@ -69,11 +69,6 @@ export class BoundingBoxUtils {
                 first.tl.y < second.br.y && first.br.y > second.tl.y;
     }
 
-    static overlapsEqual(first: BoundingBox, second: BoundingBox): boolean {
-        return first.tl.x <= second.br.x && first.br.x >= second.tl.x &&
-                first.tl.y <= second.br.y && first.br.y >= second.tl.y;
-    }
-
     static contains(big: BoundingBox, small: BoundingBox): boolean {
         return big.tl.x <= small.tl.x && big.tl.y <= small.tl.y &&
                 big.br.x >= small.br.x && big.br.y >= small.br.y;

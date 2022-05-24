@@ -290,7 +290,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                     const collisionTracking = entity
                         .getComponent(CollisionTrackingComponent);
 
-                    return !collisionTracking.values[EntityType.BUSH];
+                    return collisionTracking.values[EntityType.BUSH] === false;
                 },
             ],
             processor(this: IDrawable, entity: Entity): IDrawable | undefined {
