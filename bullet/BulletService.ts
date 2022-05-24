@@ -8,7 +8,7 @@ import { Direction } from '@/physics/Direction';
 import { DirectionComponent } from '@/components/DirectionComponent';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
-import { BulletPower } from './BulletPower';
+import { BulletPower } from '../subtypes/BulletPower';
 import { EntityId } from '@/ecs/EntityId';
 
 export class BulletService {

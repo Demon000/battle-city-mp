@@ -116,7 +116,7 @@
 import { Color } from '@/drawable/Color';
 import { ColorUtils } from '@/utils/ColorUtils';
 import { WebpackUtils } from '@/client/utils/WebpackUtils';
-import { TankTier } from '@/tank/TankTier';
+import { TankTier } from '@/subtypes/TankTier';
 import { Vue, Prop, Watch, Options } from 'vue-property-decorator';
 import { Team } from '@/team/Team';
 import { PlayerSpawnStatus } from '@/player/Player';

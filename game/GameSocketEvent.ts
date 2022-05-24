@@ -1,6 +1,6 @@
 import { ActionOptions } from '@/actions/Action';
 import { Color } from '@/drawable/Color';
-import { TankTier } from '@/tank/TankTier';
+import { TankTier } from '@/subtypes/TankTier';
 import { BatchGameEvent } from './GameEvent';
 
 export enum GameSocketEvent {

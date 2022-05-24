@@ -1,13 +1,13 @@
-import { BulletPower } from '@/bullet/BulletPower';
+import { BulletPower } from '@/subtypes/BulletPower';
 import { BulletService } from '@/bullet/BulletService';
 import { Color } from '@/drawable/Color';
-import { ExplosionType } from '@/explosion/ExplosionType';
+import { ExplosionType } from '@/subtypes/ExplosionType';
 import { SameTeamBulletHitMode } from '@/game-mode/IGameModeProperties';
 import { EntityFactory, EntityBuildOptions } from '@/entity/EntityFactory';
 import { EntityType } from '@/entity/EntityType';
 import { Direction } from '@/physics/Direction';
 import { TankService } from '@/tank/TankService';
-import { TankTier } from '@/tank/TankTier';
+import { TankTier } from '@/subtypes/TankTier';
 import { Team } from '@/team/Team';
 import { TeamService, TeamServiceEvent } from '@/team/TeamService';
 import { LazyIterable } from '@/utils/LazyIterable';

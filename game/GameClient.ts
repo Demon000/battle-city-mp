@@ -15,7 +15,7 @@ import { TeamService, TeamServiceEvent } from '@/team/TeamService';
 import { PlayerStats } from '@/player/PlayerStats';
 import { TankService } from '@/tank/TankService';
 import { LazyIterable } from '@/utils/LazyIterable';
-import { TankTier } from '@/tank/TankTier';
+import { TankTier } from '@/subtypes/TankTier';
 import { Color } from '@/drawable/Color';
 import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';

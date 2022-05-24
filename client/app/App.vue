@@ -193,7 +193,7 @@ import { GameSocketEvents } from '@/game/GameSocketEvent';
 import { RenderPass } from '@/entity/RenderPass';
 import { Player, PlayerSpawnStatus } from '@/player/Player';
 import { PlayerStats } from '@/player/PlayerStats';
-import { TankTier } from '@/tank/TankTier';
+import { TankTier } from '@/subtypes/TankTier';
 import { Team } from '@/team/Team';
 import screenfull from 'screenfull';
 import { io, Socket } from 'socket.io-client';

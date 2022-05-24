@@ -1,7 +1,7 @@
 import { Color } from '@/drawable/Color';
 import { EntityId } from '@/ecs/EntityId';
 import { Direction } from '@/physics/Direction';
-import { TankTier } from '@/tank/TankTier';
+import { TankTier } from '@/subtypes/TankTier';
 import { ButtonPressAction, ButtonType } from '../actions/ButtonPressAction';
 
 export interface PlayerOptions {

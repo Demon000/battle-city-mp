@@ -1,7 +1,7 @@
 import { Config } from '@/config/Config';
 import { Color } from '@/drawable/Color';
 import { EntityId } from '@/ecs/EntityId';
-import { TankTier } from '@/tank/TankTier';
+import { TankTier } from '@/subtypes/TankTier';
 import { assert } from '@/utils/assert';
 import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';

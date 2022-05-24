@@ -1,4 +1,4 @@
-import { BulletPower } from '@/bullet/BulletPower';
+import { BulletPower } from '@/subtypes/BulletPower';
 import { BulletComponent } from '@/components/BulletComponent';
 import { ColorComponent } from '@/components/ColorComponent';
 import { IsMovingComponent } from '@/components/IsMovingComponent';
@@ -8,13 +8,13 @@ import { IImageDrawable, ImageDrawableProperties } from '@/drawable/IImageDrawab
 import { ImageDrawable } from '@/drawable/ImageDrawable';
 import { TextDrawable, TextPositionReference } from '@/drawable/TextDrawable';
 import { Entity } from '@/ecs/Entity';
-import { ExplosionType } from '@/explosion/ExplosionType';
+import { ExplosionType } from '@/subtypes/ExplosionType';
 import { Direction } from '@/physics/Direction';
 import { DirectionComponent } from '@/components/DirectionComponent';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
-import { TankTier } from '@/tank/TankTier';
+import { TankTier } from '@/subtypes/TankTier';
 import { EntityType } from './EntityType';
 import { RenderPass } from './RenderPass';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';

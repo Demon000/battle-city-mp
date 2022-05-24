@@ -1,4 +1,4 @@
-import { BulletPower } from '@/bullet/BulletPower';
+import { BulletPower } from '@/subtypes/BulletPower';
 import { Component } from '@/ecs/Component';
 
 export interface BulletComponentData {
