@@ -208,7 +208,7 @@ export class GameServer {
                 (component) => {
                     const entity = component.entity;
                     this.entityService.updateCenterPosition(entity);
-                    this.collisionService.markDirtyBoundingBox(entity);
+                    this.collisionService.updateBoundingBox(entity);
                     this.entityService.markDirtyUsedTeleporter(entity);
                     this.entityService
                         .markRelativeChildrenDirtyPosition(entity);
@@ -630,7 +630,6 @@ export class GameServer {
                 this.entityService.processMovement(deltaSeconds);
                 this.collisionService.processRequestedPosition();
                 this.entityService.processDirtyRelativePosition();
-                this.collisionService.processDirtyBoundingBox();
                 this.collisionService.processDirtyUsedTeleporter();
                 this.entityService.processAutomaticDestroy();
                 this.collisionService.processDirtyCollisions();

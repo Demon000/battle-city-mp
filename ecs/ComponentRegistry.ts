@@ -11,7 +11,6 @@ import { IsMovingComponent, IsMovingComponentData } from '@/components/IsMovingC
 import { DirectionAxisSnappingComponent, DirectionAxisSnappingComponentData } from '@/components/DirectionAxisSnappingComponent';
 import { SpawnTimeComponent, SpawnTimeComponentData } from '@/components/SpawnTimeComponent';
 import { CenterPositionComponent, CenterPositionComponentData } from '@/components/CenterPositionComponent';
-import { DirtyBoundingBoxComponent, DirtyBoundingBoxComponentData } from '@/components/DirtyBoundingBoxComponent';
 import { RequestedPositionComponent, RequestedPositionComponentData } from '@/components/RequestedPositionComponent';
 import { DirectionComponent, DirectionComponentData } from '@/components/DirectionComponent';
 import { RequestedDirectionComponent, RequestedDirectionComponentData } from '@/components/RequestedDirectionComponent';
@@ -93,10 +92,6 @@ export class ComponentRegistry {
             case CenterPositionComponent.name:
                 assertEquals<Partial<CenterPositionComponentData>>(data);
                 return CenterPositionComponent;
-            case DirtyBoundingBoxComponent.tag:
-            case DirtyBoundingBoxComponent.name:
-                assertEquals<Partial<DirtyBoundingBoxComponentData>>(data);
-                return DirtyBoundingBoxComponent;
             case RequestedPositionComponent.tag:
             case RequestedPositionComponent.name:
                 assertEquals<Partial<RequestedPositionComponentData>>(data);

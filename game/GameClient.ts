@@ -161,7 +161,7 @@ export class GameClient {
                 (component) => {
                     const entity = component.entity;
                     this.entityService.updateCenterPosition(entity);
-                    this.collisionService.markDirtyBoundingBox(entity);
+                    this.collisionService.updateBoundingBox(entity);
                 });
         this.registry.componentEmitter(BoundingBoxComponent, true)
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
@@ -384,7 +384,6 @@ export class GameClient {
     onTick(): void {
         this.emitter.emit(GameClientEvent.FLUSH_EVENTS);
 
-        this.collisionService.processDirtyBoundingBox();
         this.collisionService.processDirtyCollisions();
         this.gameGraphicsService.processDirtyGraphics();
         this.entityService.processDestroyed();

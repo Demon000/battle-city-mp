@@ -11,7 +11,6 @@ import { BoundingBox } from '../bounding-box/BoundingBox';
 import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
 import { BoundingBoxRepository } from '../bounding-box/BoundingBoxRepository';
 import { BoundingBoxUtils } from '../bounding-box/BoundingBoxUtils';
-import { DirtyBoundingBoxComponent } from '../../components/DirtyBoundingBoxComponent';
 import { Direction } from '../Direction';
 import { DirectionComponent } from '@/components/DirectionComponent';
 import { Point } from '../point/Point';
@@ -423,17 +422,6 @@ export class CollisionService {
         }
     }
 
-    markDirtyBoundingBox(entity: Entity): void {
-        if (!entity.hasComponent(BoundingBoxComponent)) {
-            return;
-        }
-
-        entity.upsertComponent(DirtyBoundingBoxComponent, undefined, {
-            flags: ComponentFlags.LOCAL_ONLY,
-            silent: true,
-        });
-    }
-
     updateBoundingBox(entity: Entity, silent = false): void {
         const size = entity.getComponent(SizeComponent);
         const position = entity.getComponent(PositionComponent);
@@ -459,18 +447,6 @@ export class CollisionService {
         }, {
             silent,
         });
-    }
-
-    processDirtyBoundingBox(): void {
-        for (const component of
-            this.registry.getComponents(DirtyBoundingBoxComponent)) {
-            component.remove({
-                silent: true,
-            });
-
-            const entity = component.entity;
-            this.updateBoundingBox(entity);
-        }
     }
 
     markDirtyCollisions(entity: Entity, type: DirtyCollisionType): void {
