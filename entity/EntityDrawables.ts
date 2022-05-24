@@ -2,7 +2,6 @@ import { BulletPower } from '@/bullet/BulletPower';
 import { BulletComponent } from '@/components/BulletComponent';
 import { ColorComponent } from '@/components/ColorComponent';
 import { IsMovingComponent } from '@/components/IsMovingComponent';
-import { IsUnderBushComponent } from '@/components/IsUnderBushComponent';
 import { AnimatedImageDrawable } from '@/drawable/AnimatedImageDrawable';
 import { IDrawable, DrawableProcessingFunction, DrawableTestFunction } from '@/drawable/IDrawable';
 import { IImageDrawable, ImageDrawableProperties } from '@/drawable/IImageDrawable';
@@ -20,6 +19,7 @@ import { EntityType } from './EntityType';
 import { RenderPass } from './RenderPass';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { RelativePositionComponent } from '@/components/RelativePositionComponent';
+import { CollisionTrackingComponent } from '@/components/CollisionTrackingComponent';
 
 const directionTest = (targetDirection: Direction): DrawableTestFunction => {
     return (entity: Entity): boolean => {
@@ -287,14 +287,10 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             positionXReference: 'center',
             tests: [
                 (entity: Entity): boolean => {
-                    const isUnderBush = entity
-                        .hasComponent(IsUnderBushComponent);
+                    const collisionTracking = entity
+                        .getComponent(CollisionTrackingComponent);
 
-                    if (isUnderBush) {
-                        return false;
-                    }
-
-                    return true;
+                    return !collisionTracking.values[EntityType.BUSH];
                 },
             ],
             processor(this: IDrawable, entity: Entity): IDrawable | undefined {

@@ -31,7 +31,6 @@ import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
-import { IsUnderBushTrackingComponent } from '@/components/IsUnderBushTrackingComponent';
 import { Entity } from '@/ecs/Entity';
 import { DirtyCollisionType } from '@/components/DirtyCollisionsComponent';
 import { ClientComponentRegistry } from '@/ecs/ClientComponentRegistry';
@@ -164,7 +163,6 @@ export class GameClient {
                     const entity = component.entity;
                     this.collisionService.markDirtyBoundingBox(entity);
                     this.entityService.markDirtyCenterPosition(entity);
-                    this.entityService.markDirtyIsUnderBush(entity);
                 });
         this.registry.componentEmitter(SizeComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
@@ -213,16 +211,6 @@ export class GameClient {
                 (component) => {
                     const entity = component.entity;
                     this.entityService.updateIsMoving(entity);
-                });
-        this.registry.componentEmitter(IsUnderBushTrackingComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
-                (component) => {
-                    if (component.flags & ComponentFlags.SHARED) {
-                        return;
-                    }
-
-                    const entity = component.entity;
-                    this.collisionService.updateIsUnderBush(entity, true);
                 });
         this.registry.componentEmitter(HealthComponent, true)
             .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
@@ -410,7 +398,6 @@ export class GameClient {
 
         this.collisionService.processDirtyBoundingBox();
         this.entityService.processDirtyCenterPosition();
-        this.collisionService.processDirtyIsUnderBush();
         this.collisionService.processDirtyCollisions();
         this.gameGraphicsService.processDirtyGraphics();
         this.entityService.processDestroyed();

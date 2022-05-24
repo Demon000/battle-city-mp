@@ -392,6 +392,11 @@
             DirectionComponent: {},
             MovementComponent: {},
             ColorComponent: {},
+            CollisionTrackingComponent: {
+                values: {
+                    bush: false,
+                },
+            },
         },
         localComponents: {
             CenterPositionComponent: {},
@@ -419,11 +424,10 @@
             },
         },
         sharedClientComponents: {
-            IsUnderBushTrackingComponent: {},
             GraphicDependenciesComponent: {
                 components: {
+                    'CollisionTrackingComponent': true,
                     'IsMovingComponent': true,
-                    'IsUnderBushComponent': true,
                     'DirectionComponent': true,
                 },
             },

@@ -10,7 +10,6 @@ import { GraphicDependenciesComponent, GraphicDependenciesComponentData } from '
 import { IsMovingComponent, IsMovingComponentData } from '@/components/IsMovingComponent';
 import { DirectionAxisSnappingComponent, DirectionAxisSnappingComponentData } from '@/components/DirectionAxisSnappingComponent';
 import { SpawnTimeComponent, SpawnTimeComponentData } from '@/components/SpawnTimeComponent';
-import { IsUnderBushComponent, IsUnderBushComponentData } from '@/components/IsUnderBushComponent';
 import { CenterPositionComponent, CenterPositionComponentData } from '@/components/CenterPositionComponent';
 import { DirtyBoundingBoxComponent, DirtyBoundingBoxComponentData } from '@/components/DirtyBoundingBoxComponent';
 import { RequestedPositionComponent, RequestedPositionComponentData } from '@/components/RequestedPositionComponent';
@@ -34,8 +33,6 @@ import { SmokeSpawnerComponent, SmokeSpawnerComponentData } from '@/components/S
 import HealthBasedSmokeSpawnerComponentData, { HealthBasedSmokeSpawnerComponent } from '@/components/HealthBasedSmokeSpawnerComponent';
 import { TeamOwnedComponent, TeamOwnedComponentData } from '@/components/TeamOwnedComponent';
 import { FlagComponent, FlagComponentData } from '@/components/FlagComponent';
-import { IsUnderBushTrackingComponent, IsUnderBushTrackingComponentData } from '@/components/IsUnderBushTrackingComponent';
-import { DirtyIsUnderBushComponent, DirtyIsUnderBushComponentData } from '@/components/DirtyIsUnderBushComponent';
 import { DirtyGraphicsComponent, DirtyGraphicsComponentData } from '@/components/DirtyGraphicsComponent';
 import { RelativePositionChildrenComponent, RelativePositionChildrenComponentData } from '@/components/RelativePositionChildrenComponent';
 import { RelativePositionComponent, RelativePositionComponentData } from '@/components/RelativePositionComponent';
@@ -48,6 +45,7 @@ import { TeleporterComponent, TeleporterComponentData } from '@/components/Telep
 import { UsedTeleporterComponent, UsedTeleporterComponentData } from '@/components/UsedTeleporterComponent';
 import { DirtyUsedTeleporterComponent, DirtyUsedTeleporterComponentData } from '@/components/DirtyUsedTeleporterComponent';
 import { PatternFillGraphicsComponent, PatternFillGraphicsComponentData } from '@/components/PatternFillGraphicsComponent';
+import { CollisionTrackingComponent, CollisionTrackingComponentData } from '@/components/CollisionTrackingComponent';
 
 export class ComponentRegistry {
     protected lookupAndValidate(
@@ -91,10 +89,6 @@ export class ComponentRegistry {
             case SpawnTimeComponent.name:
                 assertEquals<Partial<SpawnTimeComponentData>>(data);
                 return SpawnTimeComponent;
-            case IsUnderBushComponent.tag:
-            case IsUnderBushComponent.name:
-                assertEquals<Partial<IsUnderBushComponentData>>(data);
-                return IsUnderBushComponent;
             case CenterPositionComponent.tag:
             case CenterPositionComponent.name:
                 assertEquals<Partial<CenterPositionComponentData>>(data);
@@ -187,14 +181,6 @@ export class ComponentRegistry {
             case FlagComponent.name:
                 assertEquals<Partial<FlagComponentData>>(data);
                 return FlagComponent;
-            case IsUnderBushTrackingComponent.tag:
-            case IsUnderBushTrackingComponent.name:
-                assertEquals<Partial<IsUnderBushTrackingComponentData>>(data);
-                return IsUnderBushTrackingComponent;
-            case DirtyIsUnderBushComponent.tag:
-            case DirtyIsUnderBushComponent.name:
-                assertEquals<Partial<DirtyIsUnderBushComponentData>>(data);
-                return DirtyIsUnderBushComponent;
             case DirtyGraphicsComponent.tag:
             case DirtyGraphicsComponent.name:
                 assertEquals<Partial<DirtyGraphicsComponentData>>(data);
@@ -243,6 +229,10 @@ export class ComponentRegistry {
             case PatternFillGraphicsComponent.name:
                 assertEquals<Partial<PatternFillGraphicsComponentData>>(data);
                 return PatternFillGraphicsComponent;
+            case CollisionTrackingComponent.tag:
+            case CollisionTrackingComponent.name:
+                assertEquals<Partial<CollisionTrackingComponentData>>(data);
+                return CollisionTrackingComponent;
         }
     }
 

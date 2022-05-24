@@ -1,8 +1,6 @@
 import { AutomaticDestroyComponent } from '@/components/AutomaticDestroyComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
-import { DirtyIsUnderBushComponent } from '@/components/DirtyIsUnderBushComponent';
 import { IsMovingComponent } from '@/components/IsMovingComponent';
-import { IsUnderBushTrackingComponent } from '@/components/IsUnderBushTrackingComponent';
 import { MovementComponent } from '@/components/MovementComponent';
 import { MovementMultipliersComponent } from '@/components/MovementMultipliersComponent';
 import { SpawnComponent } from '@/components/SpawnComponent';
@@ -51,17 +49,6 @@ export class EntityService {
     markDestroyed(entity: Entity): void {
         entity.upsertComponent(DestroyedComponent, undefined, {
             flags: ComponentFlags.LOCAL_ONLY,
-        });
-    }
-
-    markDirtyIsUnderBush(entity: Entity): void {
-        if (!entity.hasComponent(IsUnderBushTrackingComponent)) {
-            return;
-        }
-
-        entity.upsertComponent(DirtyIsUnderBushComponent, undefined, {
-            flags: ComponentFlags.LOCAL_ONLY,
-            silent: true,
         });
     }
 
