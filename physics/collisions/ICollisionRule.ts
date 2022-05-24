@@ -43,7 +43,7 @@ export type ICollisionResult = {
 };
 
 export interface ICollisionRule {
-    movingTypes: string[];
+    movingType: string;
     staticTypes: string[];
     result: ICollisionResult[];
 }

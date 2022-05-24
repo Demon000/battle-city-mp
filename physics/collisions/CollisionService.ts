@@ -44,16 +44,14 @@ export class CollisionService {
             this.rulesMap = new Map<string, Map<string, ICollisionRule>>();
 
             for (const rule of rules) {
-                for (const movingType of rule.movingTypes) {
-                    let movingMap = this.rulesMap.get(movingType);
-                    if (!movingMap) {
-                        movingMap = new Map<string, ICollisionRule>();
-                        this.rulesMap.set(movingType, movingMap);
-                    }
+                let movingMap = this.rulesMap.get(rule.movingType);
+                if (!movingMap) {
+                    movingMap = new Map<string, ICollisionRule>();
+                    this.rulesMap.set(rule.movingType, movingMap);
+                }
 
-                    for (const staticType of rule.staticTypes) {
-                        movingMap.set(staticType, rule);
-                    }
+                for (const staticType of rule.staticTypes) {
+                    movingMap.set(staticType, rule);
                 }
             }
         }

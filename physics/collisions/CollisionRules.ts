@@ -3,7 +3,7 @@ import { ICollisionRule, CollisionEvent, CollisionResultEvent } from './ICollisi
 
 export const rules: ICollisionRule[] = [
     {
-        movingTypes: [EntityType.TANK],
+        movingType: EntityType.TANK,
         staticTypes: [
             EntityType.BRICK_WALL,
             EntityType.STEEL_WALL,
@@ -18,7 +18,7 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
-        movingTypes: [EntityType.TANK],
+        movingType: EntityType.TANK,
         staticTypes: [
             EntityType.FLAG_BASE,
         ],
@@ -30,7 +30,7 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
-        movingTypes: [EntityType.TANK],
+        movingType: EntityType.TANK,
         staticTypes: [
             EntityType.FLAG,
         ],
@@ -43,7 +43,7 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
-        movingTypes: [EntityType.TANK],
+        movingType: EntityType.TANK,
         staticTypes: [
             EntityType.TELEPORTER,
         ],
@@ -56,7 +56,7 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
-        movingTypes: [EntityType.BULLET],
+        movingType: EntityType.BULLET,
         staticTypes: [EntityType.LEVEL_BORDER],
         result: [
             {
@@ -69,7 +69,7 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
-        movingTypes: [EntityType.BULLET],
+        movingType: EntityType.BULLET,
         staticTypes: [EntityType.BRICK_WALL],
         result: [
             {
@@ -82,7 +82,7 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
-        movingTypes: [EntityType.BULLET],
+        movingType: EntityType.BULLET,
         staticTypes: [EntityType.STEEL_WALL],
         result: [
             {
@@ -95,7 +95,7 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
-        movingTypes: [EntityType.BULLET],
+        movingType: EntityType.BULLET,
         staticTypes: [EntityType.TANK],
         result: [
             {
@@ -105,7 +105,7 @@ export const rules: ICollisionRule[] = [
         ],
     },
     {
-        movingTypes: [EntityType.BULLET],
+        movingType: EntityType.BULLET,
         staticTypes: [EntityType.BULLET],
         result: [
             {
