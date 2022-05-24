@@ -454,12 +454,12 @@ export class GameServer {
                 const destroyBox = this.bulletService.getBulletBrickWallDestroyBox(bulletId, brickWallId);
                 const destroyBoxCenter = BoundingBoxUtils.center(destroyBox);
                 const entityIds = this.collisionService.getOverlappingEntities(destroyBox);
-                const entity = this.registry.getMultipleEntitiesById(entityIds);
+                const entities = this.registry.getMultipleEntitiesById(entityIds);
                 const bullet = this.registry.getEntityById(bulletId);
                 spawnExplosion(destroyBoxCenter, ExplosionType.SMALL);
                 this.entityService.markDestroyed(bullet);
 
-                LazyIterable.from(entity)
+                LazyIterable.from(entities)
                     .filter(o => o.type === EntityType.BRICK_WALL)
                     .forEach(brickWall => {
                         this.entityService.markDestroyed(brickWall);
