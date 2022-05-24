@@ -83,7 +83,11 @@ export class GameGraphicsService {
 
     _renderEntity(entity: Entity, drawX: number, drawY: number): void {
         const graphicsRendererComponent = entity
-            .getComponent(GraphicsRendererComponent);
+            .findComponent(GraphicsRendererComponent);
+        if (graphicsRendererComponent === undefined) {
+            return;
+        }
+
         this.renderer.render(graphicsRendererComponent, this.contexts,
             drawX, drawY);
     }
