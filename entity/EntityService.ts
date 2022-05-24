@@ -1,6 +1,5 @@
 import { AutomaticDestroyComponent } from '@/components/AutomaticDestroyComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
-import { DirtyIsMovingComponent } from '@/components/DirtyIsMovingComponent';
 import { DirtyIsUnderBushComponent } from '@/components/DirtyIsUnderBushComponent';
 import { IsMovingComponent } from '@/components/IsMovingComponent';
 import { IsMovingTrackingComponent } from '@/components/IsMovingTrackingComponent';
@@ -53,17 +52,6 @@ export class EntityService {
     markDestroyed(entity: Entity): void {
         entity.upsertComponent(DestroyedComponent, undefined, {
             flags: ComponentFlags.LOCAL_ONLY,
-        });
-    }
-
-    markDirtyIsMoving(entity: Entity): void {
-        if (!entity.hasComponent(IsMovingTrackingComponent)) {
-            return;
-        }
-
-        entity.upsertComponent(DirtyIsMovingComponent, undefined, {
-            flags: ComponentFlags.LOCAL_ONLY,
-            silent: true,
         });
     }
 
@@ -254,17 +242,6 @@ export class EntityService {
             entity.removeComponent(IsMovingComponent, {
                 silent,
             });
-        }
-    }
-
-    processDirtyIsMoving(): void {
-        for (const component of this.registry.getComponents(DirtyIsMovingComponent)) {
-            component.remove({
-                silent: true,
-            });
-
-            const entity = component.entity;
-            this.updateIsMoving(entity);
         }
     }
 

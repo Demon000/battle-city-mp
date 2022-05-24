@@ -223,7 +223,7 @@ export class GameClient {
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
                 (component) => {
                     const entity = component.entity;
-                    this.entityService.markDirtyIsMoving(entity);
+                    this.entityService.updateIsMoving(entity);
                 });
         this.registry.componentEmitter(IsUnderBushTrackingComponent, true)
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
@@ -420,7 +420,6 @@ export class GameClient {
         this.emitter.emit(GameClientEvent.FLUSH_EVENTS);
 
         this.collisionService.processDirtyBoundingBox();
-        this.entityService.processDirtyIsMoving();
         this.entityService.processDirtyCenterPosition();
         this.collisionService.processDirtyIsUnderBush();
         this.collisionService.processDirtyCollisions();

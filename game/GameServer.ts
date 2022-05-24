@@ -275,7 +275,7 @@ export class GameServer {
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
                 (component) => {
                     const entity = component.entity;
-                    this.entityService.markDirtyIsMoving(entity);
+                    this.entityService.updateIsMoving(entity);
                 });
         this.registry.componentEmitter(HealthComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
@@ -658,7 +658,6 @@ export class GameServer {
                 this.collisionService.processRequestedPosition();
                 this.entityService.processDirtyRelativePosition();
                 this.collisionService.processDirtyBoundingBox();
-                this.entityService.processDirtyIsMoving();
                 this.entityService.processDirtyCenterPosition();
                 this.collisionService.processDirtyUsedTeleporter();
                 this.entityService.processAutomaticDestroy();

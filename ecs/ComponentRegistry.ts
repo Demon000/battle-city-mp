@@ -38,7 +38,6 @@ import { FlagComponent, FlagComponentData } from '@/components/FlagComponent';
 import { IsUnderBushTrackingComponent, IsUnderBushTrackingComponentData } from '@/components/IsUnderBushTrackingComponent';
 import { DirtyIsUnderBushComponent, DirtyIsUnderBushComponentData } from '@/components/DirtyIsUnderBushComponent';
 import { DirtyGraphicsComponent, DirtyGraphicsComponentData } from '@/components/DirtyGraphicsComponent';
-import { DirtyIsMovingComponent, DirtyIsMovingComponentData } from '@/components/DirtyIsMovingComponent';
 import { RelativePositionChildrenComponent, RelativePositionChildrenComponentData } from '@/components/RelativePositionChildrenComponent';
 import { RelativePositionComponent, RelativePositionComponentData } from '@/components/RelativePositionComponent';
 import { DirtyPositionComponent, DirtyPositionComponentData } from '@/components/DirtyPositionComponent';
@@ -205,10 +204,6 @@ export class ComponentRegistry {
             case DirtyGraphicsComponent.name:
                 assertEquals<Partial<DirtyGraphicsComponentData>>(data);
                 return DirtyGraphicsComponent;
-            case DirtyIsMovingComponent.tag:
-            case DirtyIsMovingComponent.name:
-                assertEquals<Partial<DirtyIsMovingComponentData>>(data);
-                return DirtyIsMovingComponent;
             case RelativePositionChildrenComponent.tag:
             case RelativePositionChildrenComponent.name:
                 assertEquals<Partial<RelativePositionChildrenComponentData>>(data);
