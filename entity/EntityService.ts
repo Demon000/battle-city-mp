@@ -2,7 +2,6 @@ import { AutomaticDestroyComponent } from '@/components/AutomaticDestroyComponen
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { DirtyIsUnderBushComponent } from '@/components/DirtyIsUnderBushComponent';
 import { IsMovingComponent } from '@/components/IsMovingComponent';
-import { IsMovingTrackingComponent } from '@/components/IsMovingTrackingComponent';
 import { IsUnderBushTrackingComponent } from '@/components/IsUnderBushTrackingComponent';
 import { MovementComponent } from '@/components/MovementComponent';
 import { MovementMultipliersComponent } from '@/components/MovementMultipliersComponent';
@@ -221,10 +220,6 @@ export class EntityService {
     }
 
     updateIsMoving(entity: Entity, silent = false): void {
-        if (!entity.hasComponent(IsMovingTrackingComponent)) {
-            return;
-        }
-
         const hasIsMovingComponent = entity.hasComponent(IsMovingComponent);
         const movement = entity.getComponent(MovementComponent);
         const isMoving = movement.speed > 0 || movement.direction !== null;

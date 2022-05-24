@@ -54,7 +54,6 @@ import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { FlagComponent } from '@/components/FlagComponent';
 import { EntityId } from '@/ecs/EntityId';
 import { RelativePositionComponent } from '@/components/RelativePositionComponent';
-import { IsMovingTrackingComponent } from '@/components/IsMovingTrackingComponent';
 import { DirtyCollisionType } from '@/components/DirtyCollisionsComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
@@ -261,19 +260,9 @@ export class GameServer {
                     this.collisionService.markDirtyCollisions(entity,
                         DirtyCollisionType.REMOVE);
                 });
-        this.registry.componentEmitter(IsMovingTrackingComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
-                (component) => {
-                    if (component.flags & ComponentFlags.SHARED) {
-                        return;
-                    }
-
-                    const entity = component.entity;
-                    this.entityService.updateIsMoving(entity, true);
-                });
         this.registry.componentEmitter(MovementComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_UPDATED,
-                (component) => {
+            .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
+                (_event, component) => {
                     const entity = component.entity;
                     this.entityService.updateIsMoving(entity);
                 });

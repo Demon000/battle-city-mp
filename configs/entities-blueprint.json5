@@ -187,16 +187,16 @@
         },
         localComponents: {
             CenterPositionComponent: {},
-            SizeComponent: {
-                width: 2,
-                height: 2,
-            },
-            IsMovingComponent: {},
-            IsMovingTrackingComponent: {},
         },
         serverComponents: {
             PlayerOwnedComponent: {},
             EntityOwnedComponent: {},
+        },
+        sharedLocalComponents: {
+            SizeComponent: {
+                width: 2,
+                height: 2,
+            },
         },
     },
     'bullet-light': {
@@ -417,7 +417,6 @@
                 width: 16,
                 height: 16,
             },
-            IsMovingTrackingComponent: {},
         },
         sharedClientComponents: {
             IsUnderBushTrackingComponent: {},

@@ -19,7 +19,6 @@ import { DirectionComponent, DirectionComponentData } from '@/components/Directi
 import { RequestedDirectionComponent, RequestedDirectionComponentData } from '@/components/RequestedDirectionComponent';
 import { TankComponent, TankComponentData } from '@/components/TankComponent';
 import { SpawnComponent, SpawnComponentData } from '@/components/SpawnComponent';
-import { IsMovingTrackingComponent, IsMovingTrackingComponentData } from '@/components/IsMovingTrackingComponent';
 import { PlayerOwnedComponent, PlayerOwnedComponentData } from '@/components/PlayerOwnedComponent';
 import { EntityOwnedComponent, EntityOwnedComponentData } from '@/components/EntityOwnedComponent';
 import { BulletComponent, BulletComponentData } from '@/components/BulletComponent';
@@ -128,10 +127,6 @@ export class ComponentRegistry {
             case SpawnComponent.name:
                 assertEquals<Partial<SpawnComponentData>>(data);
                 return SpawnComponent;
-            case IsMovingTrackingComponent.tag:
-            case IsMovingTrackingComponent.name:
-                assertEquals<Partial<IsMovingTrackingComponentData>>(data);
-                return IsMovingTrackingComponent;
             case PlayerOwnedComponent.tag:
             case PlayerOwnedComponent.name:
                 assertEquals<Partial<PlayerOwnedComponentData>>(data);
