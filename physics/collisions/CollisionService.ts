@@ -30,6 +30,7 @@ import { EntityId } from '@/ecs/EntityId';
 import { IsUnderBushTrackingComponent } from '@/components/IsUnderBushTrackingComponent';
 import { UsedTeleporterComponent } from '@/components/UsedTeleporterComponent';
 import { DirtyUsedTeleporterComponent } from '@/components/DirtyUsedTeleporterComponent';
+import { LazyIterable } from '@/utils/LazyIterable';
 
 export class CollisionService {
     private rulesMap?: Map<string, Map<string, ICollisionRule>>;
@@ -365,26 +366,30 @@ export class CollisionService {
         return undefined;
     }
 
-    findOverlappingWithType(
-        entity: Entity,
+    findMultipleOverlappingWithType(
+        boundingBox: BoundingBox,
         type: string,
-    ): Entity | undefined {
-        const boundingBox = entity.getComponent(BoundingBoxComponent);
-        const overlappingEntityIds = this.getOverlappingEntities(boundingBox);
-        const overlappingEntities = this.registry
-            .getMultipleEntitiesById(overlappingEntityIds);
+    ): Entity[] {
+        const entityIds = this.getOverlappingEntities(boundingBox);
+        const entities = this.registry.getMultipleEntitiesById(entityIds);
 
-        for (const overlappingEntity of overlappingEntities) {
-            if (overlappingEntity.type === type) {
-                return overlappingEntity;
-            }
-        }
-
-        return undefined;
+        return LazyIterable.from(entities)
+            .filter(o => o.type === type)
+            .toArray();
     }
 
-    private isOverlappingWithType(entity: Entity, type: string): boolean {
-        return this.findOverlappingWithType(entity, type) !== undefined;
+    findOverlappingWithType(
+        boundingBox: BoundingBox,
+        type: string,
+    ): Entity | undefined {
+        return this.findMultipleOverlappingWithType(boundingBox, type)[0];
+    }
+
+    private isOverlappingWithType(
+        boundingBox: BoundingBox,
+        type: string,
+    ): boolean {
+        return this.findOverlappingWithType(boundingBox, type) !== undefined;
     }
 
     updateIsUnderBush(entity: Entity, silent = false): void {
@@ -392,8 +397,11 @@ export class CollisionService {
             return;
         }
 
-        const hasIsUnderBushComponent = entity.hasComponent(IsUnderBushComponent);
-        const isUnderBush = this.isOverlappingWithType(entity, EntityType.BUSH);
+        const boundingBox = entity.getComponent(BoundingBoxComponent);
+        const hasIsUnderBushComponent = entity
+            .hasComponent(IsUnderBushComponent);
+        const isUnderBush = this
+            .isOverlappingWithType(boundingBox, EntityType.BUSH);
 
         if (isUnderBush === hasIsUnderBushComponent) {
             return;
@@ -412,8 +420,9 @@ export class CollisionService {
     }
 
     updateDirtyUsedTeleporter(entity: Entity): void {
+        const boundingBox = entity.getComponent(BoundingBoxComponent);
         const isOnTeleporter = this
-            .isOverlappingWithType(entity, EntityType.TELEPORTER);
+            .isOverlappingWithType(boundingBox, EntityType.TELEPORTER);
 
         if (!isOnTeleporter) {
             entity.removeComponent(UsedTeleporterComponent, {

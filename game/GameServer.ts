@@ -451,19 +451,20 @@ export class GameServer {
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BRICK_WALL,
             (bulletId: EntityId, brickWallId: EntityId, _position: Point) => {
-                const destroyBox = this.bulletService.getBulletBrickWallDestroyBox(bulletId, brickWallId);
-                const destroyBoxCenter = BoundingBoxUtils.center(destroyBox);
-                const entityIds = this.collisionService.getOverlappingEntities(destroyBox);
-                const entities = this.registry.getMultipleEntitiesById(entityIds);
+                const destroyBox = this.bulletService
+                    .getBulletBrickWallDestroyBox(bulletId, brickWallId);
                 const bullet = this.registry.getEntityById(bulletId);
-                spawnExplosion(destroyBoxCenter, ExplosionType.SMALL);
                 this.entityService.markDestroyed(bullet);
 
-                LazyIterable.from(entities)
-                    .filter(o => o.type === EntityType.BRICK_WALL)
-                    .forEach(brickWall => {
-                        this.entityService.markDestroyed(brickWall);
-                    });
+                const destroyedBullets = this.collisionService
+                    .findMultipleOverlappingWithType(destroyBox,
+                        EntityType.BRICK_WALL);
+                for (const bullet of destroyedBullets) {
+                    this.entityService.markDestroyed(bullet);
+                }
+
+                const destroyBoxCenter = BoundingBoxUtils.center(destroyBox);
+                spawnExplosion(destroyBoxCenter, ExplosionType.SMALL);
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_TANK,
@@ -565,8 +566,10 @@ export class GameServer {
                 const carriedFlag = this.collisionService
                     .findRelativePositionEntityWithType(tank,
                         EntityType.FLAG);
+
+                const boundingBox = flag.getComponent(BoundingBoxComponent);
                 const flagBase = this.collisionService
-                    .findOverlappingWithType(flag, EntityType.FLAG_BASE);
+                    .findOverlappingWithType(boundingBox, EntityType.FLAG_BASE);
                 if (flag !== carriedFlag) {
                     this.handleFlagInteraction(tank, flag, carriedFlag, flagBase);
                 }
