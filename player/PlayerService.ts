@@ -7,8 +7,8 @@ import { MapRepository } from '@/utils/MapRepository';
 import EventEmitter from 'eventemitter3';
 import { ButtonPressAction, MOVE_BUTTON_TYPES, ButtonState, BUTTON_TYPE_DIRECTION, ButtonType } from '../actions/ButtonPressAction';
 import { Direction } from '../physics/Direction';
-import { Player, PartialPlayerOptions, PlayerSpawnStatus } from './Player';
-import { PlayerPoints, PlayerPointsEvent } from './PlayerPoints';
+import { Player, PartialPlayerOptions, PlayerSpawnStatus } from '@/player/Player';
+import { PlayerPoints, PlayerPointsEvent } from '@/player/PlayerPoints';
 
 export enum PlayerServiceEvent {
     PLAYER_ADDED = 'player-added',
