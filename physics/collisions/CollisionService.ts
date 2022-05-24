@@ -302,9 +302,9 @@ export class CollisionService {
         if (collisionTracking !== undefined) {
             let changed = false;
 
-            for (const key of Object.keys(collisionTracking.values)) {
-                if (collisionTracking.values[key]
-                    !== newCollisionTrackingValues[key]) {
+            for (const type of Object.keys(collisionTracking.values)) {
+                if (collisionTracking.values[type]
+                    !== newCollisionTrackingValues[type]) {
                     changed = true;
                 }
             }
