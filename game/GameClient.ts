@@ -24,7 +24,6 @@ import { Registry, RegistryComponentEvent } from '@/ecs/Registry';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
-import { SizeComponent } from '@/components/SizeComponent';
 import { EntityId } from '@/ecs/EntityId';
 import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
 import { MovementComponent } from '@/components/MovementComponent';
@@ -160,17 +159,6 @@ export class GameClient {
         this.registry.componentEmitter(PositionComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
                 (component) => {
-                    const entity = component.entity;
-                    this.collisionService.markDirtyBoundingBox(entity);
-                    this.entityService.markDirtyCenterPosition(entity);
-                });
-        this.registry.componentEmitter(SizeComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_UPDATED,
-                (component) => {
-                    if (component.flags & ComponentFlags.SHARED) {
-                        return;
-                    }
-
                     const entity = component.entity;
                     this.collisionService.markDirtyBoundingBox(entity);
                     this.entityService.markDirtyCenterPosition(entity);

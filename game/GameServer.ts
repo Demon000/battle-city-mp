@@ -213,17 +213,6 @@ export class GameServer {
                     this.entityService
                         .markRelativeChildrenDirtyPosition(entity);
                 });
-        this.registry.componentEmitter(SizeComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_UPDATED,
-                (component) => {
-                    if (component.flags & ComponentFlags.SHARED) {
-                        return;
-                    }
-
-                    const entity = component.entity;
-                    this.collisionService.markDirtyBoundingBox(entity);
-                    this.entityService.markDirtyCenterPosition(entity);
-                });
         this.registry.componentEmitter(BoundingBoxComponent, true)
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
