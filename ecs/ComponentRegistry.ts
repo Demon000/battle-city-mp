@@ -13,7 +13,6 @@ import { SpawnTimeComponent, SpawnTimeComponentData } from '@/components/SpawnTi
 import { CenterPositionComponent, CenterPositionComponentData } from '@/components/CenterPositionComponent';
 import { DirtyBoundingBoxComponent, DirtyBoundingBoxComponentData } from '@/components/DirtyBoundingBoxComponent';
 import { RequestedPositionComponent, RequestedPositionComponentData } from '@/components/RequestedPositionComponent';
-import { DirtyCenterPositionComponent, DirtyCenterPositionComponentData } from '@/components/DirtyCenterPositionComponent';
 import { DirectionComponent, DirectionComponentData } from '@/components/DirectionComponent';
 import { RequestedDirectionComponent, RequestedDirectionComponentData } from '@/components/RequestedDirectionComponent';
 import { TankComponent, TankComponentData } from '@/components/TankComponent';
@@ -102,10 +101,6 @@ export class ComponentRegistry {
             case RequestedPositionComponent.name:
                 assertEquals<Partial<RequestedPositionComponentData>>(data);
                 return RequestedPositionComponent;
-            case DirtyCenterPositionComponent.tag:
-            case DirtyCenterPositionComponent.name:
-                assertEquals<Partial<DirtyCenterPositionComponentData>>(data);
-                return DirtyCenterPositionComponent;
             case DirectionComponent.tag:
             case DirectionComponent.name:
                 assertEquals<Partial<DirectionComponentData>>(data);

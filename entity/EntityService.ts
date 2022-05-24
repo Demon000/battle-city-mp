@@ -13,7 +13,6 @@ import { EntityId } from '@/ecs/EntityId';
 import { Registry } from '@/ecs/Registry';
 import { DirectionComponent } from '@/components/DirectionComponent';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
-import { DirtyCenterPositionComponent } from '@/components/DirtyCenterPositionComponent';
 import { DirtyPositionComponent } from '@/components/DirtyPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { RelativePositionChildrenComponent } from '@/components/RelativePositionChildrenComponent';
@@ -227,17 +226,6 @@ export class EntityService {
         }
     }
 
-    markDirtyCenterPosition(entity: Entity): void {
-        if (!entity.hasComponent(CenterPositionComponent)) {
-            return;
-        }
-
-        entity.upsertComponent(DirtyCenterPositionComponent, undefined, {
-            flags: ComponentFlags.LOCAL_ONLY,
-            silent: true,
-        });
-    }
-
     updateCenterPosition(entity: Entity, silent = false): void {
         const centerPosition = entity.getComponent(CenterPositionComponent);
         const position = entity.getComponent(PositionComponent);
@@ -255,18 +243,6 @@ export class EntityService {
         }, {
             silent,
         });
-    }
-
-    processDirtyCenterPosition(): void {
-        for (const component of
-            this.registry.getComponents(DirtyCenterPositionComponent)) {
-            component.remove({
-                silent: true,
-            });
-
-            const entity = component.entity;
-            this.updateCenterPosition(entity);
-        }
     }
 
     markDirtyPosition(entity: Entity): void {
