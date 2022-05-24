@@ -271,8 +271,7 @@ export class CollisionService {
                 .getComponent(BoundingBoxComponent);
             if (BoundingBoxUtils.overlapsEqual(preventedBoundingBox,
                 overlappingBoundingBox)) {
-                this.emitter.emit(name, movingEntity.id, overlappingEntity.id,
-                    position);
+                this.emitter.emit(name, movingEntity.id, overlappingEntity.id);
             }
         }
 

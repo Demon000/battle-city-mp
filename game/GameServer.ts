@@ -402,14 +402,14 @@ export class GameServer {
         };
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_LEVEL_BORDER,
-            (bulletId: EntityId, _staticEntityId: EntityId, _position: Point) => {
+            (bulletId: EntityId, _staticEntityId: EntityId) => {
                 const bullet = this.registry.getEntityById(bulletId);
                 spawnExplosion(bullet, ExplosionType.SMALL, EntityType.NONE);
                 this.entityService.markDestroyed(bullet);
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_STEEL_WALL,
-            (bulletId: EntityId, steelWallId: EntityId, _position: Point) => {
+            (bulletId: EntityId, steelWallId: EntityId) => {
                 const bullet = this.registry.getEntityById(bulletId);
                 const steelWall = this.registry.getEntityById(steelWallId);
                 this.entityService.markDestroyed(bullet);
@@ -423,7 +423,7 @@ export class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BRICK_WALL,
-            (bulletId: EntityId, brickWallId: EntityId, _position: Point) => {
+            (bulletId: EntityId, brickWallId: EntityId) => {
                 const destroyBox = this.bulletService
                     .getBulletBrickWallDestroyBox(bulletId, brickWallId);
                 const bullet = this.registry.getEntityById(bulletId);
@@ -441,7 +441,7 @@ export class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_TANK,
-            (bulletId: EntityId, tankId: EntityId, _position: Point) => {
+            (bulletId: EntityId, tankId: EntityId) => {
                 const bullet = this.registry.getEntityById(bulletId);
 
                 const bulletOwnerEntityId =
@@ -512,11 +512,7 @@ export class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BULLET,
-            (
-                movingBulletId: EntityId,
-                staticBulletId: EntityId,
-                _position: Point
-            ) => {
+            (movingBulletId: EntityId, staticBulletId: EntityId) => {
                 const movingBullet = this.registry.getEntityById(movingBulletId);
                 const staticBullet = this.registry.getEntityById(staticBulletId);
                 const movingBulletOwnerEntityId =

@@ -1,5 +1,4 @@
 import { EntityId } from '@/ecs/EntityId';
-import { Point } from '../point/Point';
 
 export enum CollisionResultEvent {
     PREVENT_MOVEMENT = 'prevent-movement',
@@ -21,7 +20,6 @@ export enum CollisionEvent {
 type CollisionEventHandler = (
     movingEntityId: EntityId,
     staticEntityId: EntityId,
-    position: Point,
 ) => void;
 
 export interface CollisionEvents {
