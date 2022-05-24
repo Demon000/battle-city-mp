@@ -40,8 +40,6 @@ import { DirtyCollisionsComponent, DirtyCollisionsComponentData } from '@/compon
 import { DynamicSizeComponent, DynamicSizeComponentData } from '@/components/DynamicSizeComponent';
 import { ExplosionComponent, ExplosionComponentData } from '@/components/ExplosionComponent';
 import { TeleporterComponent, TeleporterComponentData } from '@/components/TeleporterComponent';
-import { UsedTeleporterComponent, UsedTeleporterComponentData } from '@/components/UsedTeleporterComponent';
-import { DirtyUsedTeleporterComponent, DirtyUsedTeleporterComponentData } from '@/components/DirtyUsedTeleporterComponent';
 import { PatternFillGraphicsComponent, PatternFillGraphicsComponentData } from '@/components/PatternFillGraphicsComponent';
 import { CollisionTrackingComponent, CollisionTrackingComponentData } from '@/components/CollisionTrackingComponent';
 import { CollisionRulesComponent, CollisionRulesComponentData } from '@/components/CollisionRulesComponent';
@@ -208,14 +206,6 @@ export class ComponentRegistry {
             case TeleporterComponent.name:
                 assertEquals<Partial<TeleporterComponentData>>(data);
                 return TeleporterComponent;
-            case UsedTeleporterComponent.tag:
-            case UsedTeleporterComponent.name:
-                assertEquals<Partial<UsedTeleporterComponentData>>(data);
-                return UsedTeleporterComponent;
-            case DirtyUsedTeleporterComponent.tag:
-            case DirtyUsedTeleporterComponent.name:
-                assertEquals<Partial<DirtyUsedTeleporterComponentData>>(data);
-                return DirtyUsedTeleporterComponent;
             case PatternFillGraphicsComponent.tag:
             case PatternFillGraphicsComponent.name:
                 assertEquals<Partial<PatternFillGraphicsComponentData>>(data);

@@ -26,8 +26,6 @@ import { Direction } from '../physics/Direction';
 import { Point } from '../physics/point/Point';
 import { PointUtils } from '../physics/point/PointUtils';
 import { EntityType } from './EntityType';
-import { UsedTeleporterComponent } from '@/components/UsedTeleporterComponent';
-import { DirtyUsedTeleporterComponent } from '@/components/DirtyUsedTeleporterComponent';
 import { EntityFactory } from './EntityFactory';
 
 export class EntityService {
@@ -48,24 +46,6 @@ export class EntityService {
     markDestroyed(entity: Entity): void {
         entity.upsertComponent(DestroyedComponent, undefined, {
             flags: ComponentFlags.LOCAL_ONLY,
-        });
-    }
-
-    markDirtyUsedTeleporter(entity: Entity): void {
-        if (!entity.hasComponent(UsedTeleporterComponent)) {
-            return;
-        }
-
-        entity.upsertComponent(DirtyUsedTeleporterComponent, undefined, {
-            flags: ComponentFlags.LOCAL_ONLY,
-            silent: true,
-        });
-    }
-
-    markUsedTeleporter(entity: Entity): void {
-        entity.upsertComponent(UsedTeleporterComponent, undefined, {
-            flags: ComponentFlags.LOCAL_ONLY,
-            silent: true,
         });
     }
 

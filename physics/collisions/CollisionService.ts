@@ -4,7 +4,6 @@ import { MovementMultipliersComponent } from '@/components/MovementMultipliersCo
 import { ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
-import { EntityType } from '@/entity/EntityType';
 import { assert } from '@/utils/assert';
 import EventEmitter from 'eventemitter3';
 import { BoundingBox } from '../bounding-box/BoundingBox';
@@ -24,8 +23,6 @@ import { DirectionUtils } from './DirectionUtils';
 import { DirtyCollisionsComponent, DirtyCollisionType } from '../../components/DirtyCollisionsComponent';
 import { CollisionEvents, CollisionRule, CollisionRuleType } from './CollisionRule';
 import { EntityId } from '@/ecs/EntityId';
-import { UsedTeleporterComponent } from '@/components/UsedTeleporterComponent';
-import { DirtyUsedTeleporterComponent } from '@/components/DirtyUsedTeleporterComponent';
 import { LazyIterable } from '@/utils/LazyIterable';
 import { CollisionTrackingComponent } from '@/components/CollisionTrackingComponent';
 import { CollisionRulesComponent } from '@/components/CollisionRulesComponent';
@@ -433,30 +430,6 @@ export class CollisionService {
         type: string,
     ): boolean {
         return this.findOverlappingWithType(boundingBox, type) !== undefined;
-    }
-
-    updateDirtyUsedTeleporter(entity: Entity): void {
-        const boundingBox = entity.getComponent(BoundingBoxComponent);
-        const isOnTeleporter = this
-            .isOverlappingWithType(boundingBox, EntityType.TELEPORTER);
-
-        if (!isOnTeleporter) {
-            entity.removeComponent(UsedTeleporterComponent, {
-                optional: true,
-            });
-        }
-    }
-
-    processDirtyUsedTeleporter(): void {
-        for (const component of
-            this.registry.getComponents(DirtyUsedTeleporterComponent)) {
-            component.remove({
-                silent: true,
-            });
-
-            const entity = component.entity;
-            this.updateDirtyUsedTeleporter(entity);
-        }
     }
 
     updateBoundingBox(entity: Entity, silent = false): void {

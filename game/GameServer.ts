@@ -56,7 +56,6 @@ import { DirtyCollisionType } from '@/components/DirtyCollisionsComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { TeleporterComponent } from '@/components/TeleporterComponent';
-import { UsedTeleporterComponent } from '@/components/UsedTeleporterComponent';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'p',
@@ -209,7 +208,6 @@ export class GameServer {
                     const entity = component.entity;
                     this.entityService.updateCenterPosition(entity);
                     this.collisionService.updateBoundingBox(entity);
-                    this.entityService.markDirtyUsedTeleporter(entity);
                     this.entityService
                         .markRelativeChildrenDirtyPosition(entity);
                 });
@@ -558,15 +556,13 @@ export class GameServer {
         this.collisionService.emitter.on(CollisionEvent.ENTITY_COLLIDE_TELEPORTER,
             (entityId: EntityId, teleporterId: EntityId) => {
                 const entity = this.registry.getEntityById(entityId);
-                if (entity.hasComponent(UsedTeleporterComponent)) {
-                    return;
-                }
                 const size = entity.getComponent(SizeComponent);
 
                 const teleporter = this.registry.getEntityById(teleporterId);
                 const target = teleporter.getComponent(TeleporterComponent).target;
                 const teleporterPosition = teleporter.getComponent(PositionComponent);
                 const teleporterSize = teleporter.getComponent(SizeComponent);
+
                 const targetPosition = {
                     x: target.x - teleporterSize.width / 2,
                     y: target.y - teleporterSize.height / 2,
@@ -576,7 +572,6 @@ export class GameServer {
                     y: target.y - size.height / 2,
                 };
 
-                this.entityService.markUsedTeleporter(entity);
                 this.entityService.createSpawnEffect(teleporterPosition);
                 this.entityService.createSpawnEffect(targetPosition);
                 this.entityService.markRequestedPosition(entity, position);
@@ -626,7 +621,6 @@ export class GameServer {
                 this.entityService.processMovement(deltaSeconds);
                 this.collisionService.processRequestedPosition();
                 this.entityService.processDirtyRelativePosition();
-                this.collisionService.processDirtyUsedTeleporter();
                 this.entityService.processAutomaticDestroy();
                 this.collisionService.processDirtyCollisions();
                 this.entityService.processDestroyed();
