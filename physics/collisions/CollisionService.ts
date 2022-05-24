@@ -23,7 +23,7 @@ import { RequestedDirectionComponent } from '@/components/RequestedDirectionComp
 import { SizeComponent } from '@/components/SizeComponent';
 import { DirectionUtils } from './DirectionUtils';
 import { DirtyCollisionsComponent, DirtyCollisionType } from '../../components/DirtyCollisionsComponent';
-import { CollisionRule, CollisionEvent, CollisionEvents, CollisionResultEvent } from './ICollisionRule';
+import { CollisionRule, CollisionEvent, CollisionEvents, CollisionResultEvent } from './CollisionRule';
 import { EntityId } from '@/ecs/EntityId';
 import { UsedTeleporterComponent } from '@/components/UsedTeleporterComponent';
 import { DirtyUsedTeleporterComponent } from '@/components/DirtyUsedTeleporterComponent';
