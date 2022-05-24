@@ -198,6 +198,32 @@
                 height: 2,
             },
         },
+        sharedServerComponents: {
+            CollisionRulesComponent: {
+                rules: {
+                    'level-border': [{
+                        type: 'notify',
+                        name: 'bullet-hit-level-border',
+                    }],
+                    'brick-wall': [{
+                        type: 'notify',
+                        name: 'bullet-hit-brick-wall',
+                    }],
+                    'steel-wall': [{
+                        type: 'notify',
+                        name: 'bullet-hit-steel-wall',
+                    }],
+                    'tank': [{
+                        type: 'notify',
+                        name: 'bullet-hit-tank',
+                    }],
+                    'bullet': [{
+                        type: 'notify',
+                        name: 'bullet-hit-bullet',
+                    }],
+                },
+            },
+        },
     },
     'bullet-light': {
         extends: [
@@ -431,6 +457,41 @@
                     'CollisionTrackingComponent': true,
                     'IsMovingComponent': true,
                     'DirectionComponent': true,
+                },
+            },
+        },
+        sharedServerComponents: {
+            CollisionRulesComponent: {
+                rules: {
+                    'brick-wall': [{
+                        type: 'prevent-movement',
+                    }],
+                    'steel-wall': [{
+                        type: 'prevent-movement',
+                    }],
+                    'level-border': [{
+                        type: 'prevent-movement',
+                    }],
+                    'tank': [{
+                        type: 'prevent-movement',
+                    }],
+                    'water': [{
+                        type: 'prevent-movement',
+                    }],
+                    'flag-base': [{
+                        type: 'notify',
+                        name: 'tank-collide-flag-base',
+                    }],
+                    'flag': [{
+                        type: 'notify',
+                        name: 'tank-collide-flag',
+                        minimumVolume: 192,
+                    }],
+                    'teleporter': [{
+                        type: 'notify',
+                        name: 'entity-collide-teleporter',
+                        minimumVolume: 192,
+                    }],
                 },
             },
         },

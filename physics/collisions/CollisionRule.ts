@@ -34,15 +34,10 @@ export interface CollisionEvents {
     [CollisionEvent.ENTITY_COLLIDE_TELEPORTER]: CollisionEventHandler;
 }
 
-export type CollisionResult = {
+export type CollisionRule = {
     type: CollisionResultEvent.PREVENT_MOVEMENT;
 } | {
     type: CollisionResultEvent.NOTIFY;
     minimumVolume?: number;
     name: CollisionEvent;
 };
-
-export interface CollisionRule {
-    staticTypes: string[];
-    result: CollisionResult[];
-}

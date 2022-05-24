@@ -23,50 +23,30 @@ import { RequestedDirectionComponent } from '@/components/RequestedDirectionComp
 import { SizeComponent } from '@/components/SizeComponent';
 import { DirectionUtils } from './DirectionUtils';
 import { DirtyCollisionsComponent, DirtyCollisionType } from '../../components/DirtyCollisionsComponent';
-import { CollisionRule, CollisionEvent, CollisionEvents, CollisionResultEvent } from './CollisionRule';
+import { CollisionEvent, CollisionEvents, CollisionRule, CollisionResultEvent } from './CollisionRule';
 import { EntityId } from '@/ecs/EntityId';
 import { UsedTeleporterComponent } from '@/components/UsedTeleporterComponent';
 import { DirtyUsedTeleporterComponent } from '@/components/DirtyUsedTeleporterComponent';
 import { LazyIterable } from '@/utils/LazyIterable';
 import { CollisionTrackingComponent } from '@/components/CollisionTrackingComponent';
+import { CollisionRulesComponent } from '@/components/CollisionRulesComponent';
 
 export class CollisionService {
-    private rulesMap?: Map<string, Map<string, CollisionRule>>;
-
     emitter = new EventEmitter<CollisionEvents>();
 
     constructor(
         private boundingBoxRepository: BoundingBoxRepository<EntityId>,
         private registry: Registry,
-        rules?: CollisionRule[],
-    ) {
-        if (rules) {
-            this.rulesMap = new Map<string, Map<string, CollisionRule>>();
+    ) {}
 
-            for (const rule of rules) {
-                let movingMap = this.rulesMap.get(rule.movingType);
-                if (!movingMap) {
-                    movingMap = new Map<string, CollisionRule>();
-                    this.rulesMap.set(rule.movingType, movingMap);
-                }
+    private getRules(
+        movingEntity: Entity,
+        staticEntity: Entity,
+    ): CollisionRule[] | undefined {
+        const collisionRulesComponent = movingEntity
+            .findComponent(CollisionRulesComponent);
 
-                for (const staticType of rule.staticTypes) {
-                    movingMap.set(staticType, rule);
-                }
-            }
-        }
-    }
-
-    private getRule(movingType: string, staticType: string): CollisionRule | undefined {
-        assert(this.rulesMap !== undefined,
-            'Cannot call getRule with no rules supplied');
-
-        const movingMap = this.rulesMap.get(movingType);
-        if (movingMap === undefined) {
-            return undefined;
-        }
-
-        return movingMap.get(staticType);
+        return collisionRulesComponent?.rules[staticEntity.type];
     }
 
     getOverlappingEntities(box: BoundingBox): Iterable<EntityId> {
@@ -168,9 +148,6 @@ export class CollisionService {
         direction?: Direction,
         trySnapping = true,
     ): void {
-        assert(this.rulesMap !== undefined,
-            'Cannot call validate entity movement with no rules supplied');
-
         const movingEntityDirection =
             movingEntity.getComponent(DirectionComponent).value;
         const movingDirection = direction ?? movingEntityDirection;
@@ -213,15 +190,15 @@ export class CollisionService {
                 }
             }
 
-            const rule = this.getRule(movingEntity.type, overlappingEntity.type);
-            if (rule === undefined) {
+            const rules = this.getRules(movingEntity, overlappingEntity);
+            if (rules === undefined) {
                 continue;
             }
 
-            for (const result of rule.result) {
+            for (const rule of rules) {
                 const overlappingBoundingBox = overlappingEntity
                     .getComponent(BoundingBoxComponent);
-                if (result.type === CollisionResultEvent.PREVENT_MOVEMENT) {
+                if (rule.type === CollisionResultEvent.PREVENT_MOVEMENT) {
                     const isAlreadyInside = BoundingBoxUtils
                         .overlaps(originalBoundingBox, overlappingBoundingBox);
 
@@ -238,17 +215,17 @@ export class CollisionService {
                     if (!isAlreadyInside && isCloser) {
                         movementPreventingEntity = overlappingEntity;
                     }
-                } else if (result.type === CollisionResultEvent.NOTIFY) {
+                } else if (rule.type === CollisionResultEvent.NOTIFY) {
                     let coversMinimumArea = true;
-                    if (result.minimumVolume !== undefined) {
+                    if (rule.minimumVolume !== undefined) {
                         const intersectionBoundingBox = BoundingBoxUtils
                             .intersect(overlappingBoundingBox, movedBoundingBox);
                         coversMinimumArea = BoundingBoxUtils
-                            .volume(intersectionBoundingBox) >= result.minimumVolume;
+                            .volume(intersectionBoundingBox) >= rule.minimumVolume;
                     }
 
                     if (coversMinimumArea) {
-                        collidingEntityNotifications.push([result.name,
+                        collidingEntityNotifications.push([rule.name,
                             overlappingEntity]);
                     }
                 }

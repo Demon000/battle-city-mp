@@ -46,6 +46,7 @@ import { UsedTeleporterComponent, UsedTeleporterComponentData } from '@/componen
 import { DirtyUsedTeleporterComponent, DirtyUsedTeleporterComponentData } from '@/components/DirtyUsedTeleporterComponent';
 import { PatternFillGraphicsComponent, PatternFillGraphicsComponentData } from '@/components/PatternFillGraphicsComponent';
 import { CollisionTrackingComponent, CollisionTrackingComponentData } from '@/components/CollisionTrackingComponent';
+import { CollisionRulesComponent, CollisionRulesComponentData } from '@/components/CollisionRulesComponent';
 
 export class ComponentRegistry {
     protected lookupAndValidate(
@@ -233,6 +234,10 @@ export class ComponentRegistry {
             case CollisionTrackingComponent.name:
                 assertEquals<Partial<CollisionTrackingComponentData>>(data);
                 return CollisionTrackingComponent;
+            case CollisionRulesComponent.tag:
+            case CollisionRulesComponent.name:
+                assertEquals<Partial<CollisionRulesComponentData>>(data);
+                return CollisionRulesComponent;
         }
     }
 

@@ -19,7 +19,6 @@ import { ButtonPressAction } from '../actions/ButtonPressAction';
 import { GameMapService } from '../maps/GameMapService';
 import { EntityService } from '../entity/EntityService';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
-import { rules } from '../physics/collisions/CollisionRules';
 import { CollisionService } from '../physics/collisions/CollisionService';
 import { CollisionEvent } from '../physics/collisions/CollisionRule';
 import { Point } from '../physics/point/Point';
@@ -88,7 +87,6 @@ export class GameServer {
     private flagService;
     private bulletService;
     private boundingBoxRepository;
-    private collisionRules;
     private collisionService;
     private gameEventBatcher;
     private teamRepository;
@@ -112,11 +110,9 @@ export class GameServer {
 
         this.gameModeService = new GameModeService(this.config);
         this.boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
-        this.collisionRules = rules;
         this.collisionService = new CollisionService(
             this.boundingBoxRepository,
             this.registry,
-            this.collisionRules,
         );
         this.entityService = new EntityService(this.entityFactory, this.registry);
         this.entitySpawnerService = new EntitySpawnerService(this.entityFactory, this.registry);
