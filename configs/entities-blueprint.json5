@@ -492,6 +492,18 @@
                         name: 'entity-collide-teleporter',
                         minimumVolume: 192,
                     }],
+                    'bush': [{
+                        type: 'track',
+                        minimumVolume: 48,
+                    }],
+                    'ice': [{
+                        type: 'track',
+                        minimumVolume: 48,
+                    }],
+                    'sand': [{
+                        type: 'track',
+                        minimumVolume: 48,
+                    }],
                 },
             },
         },

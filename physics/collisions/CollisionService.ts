@@ -183,12 +183,6 @@ export class CollisionService {
                 continue;
             }
 
-            if (collisionTracking !== undefined) {
-                if (overlappingEntity.type in newCollisionTrackingValues) {
-                    newCollisionTrackingValues[overlappingEntity.type] = true;
-                }
-            }
-
             const rules = this.getRules(movingEntity, overlappingEntity);
             if (rules === undefined) {
                 continue;
@@ -197,6 +191,17 @@ export class CollisionService {
             for (const rule of rules) {
                 const overlappingBoundingBox = overlappingEntity
                     .getComponent(BoundingBoxComponent);
+                let coversMinimumVolume = true;
+
+                if ((rule.type === CollisionResultEvent.NOTIFY
+                        || rule.type === CollisionResultEvent.TRACK)
+                    && rule.minimumVolume !== undefined) {
+                    const intersectionBoundingBox = BoundingBoxUtils
+                        .intersect(overlappingBoundingBox, movedBoundingBox);
+                    coversMinimumVolume = BoundingBoxUtils
+                        .volume(intersectionBoundingBox) >= rule.minimumVolume;
+                }
+
                 if (rule.type === CollisionResultEvent.PREVENT_MOVEMENT) {
                     const isAlreadyInside = BoundingBoxUtils
                         .overlaps(originalBoundingBox, overlappingBoundingBox);
@@ -214,19 +219,15 @@ export class CollisionService {
                     if (!isAlreadyInside && isCloser) {
                         movementPreventingEntity = overlappingEntity;
                     }
-                } else if (rule.type === CollisionResultEvent.NOTIFY) {
-                    let coversMinimumArea = true;
-                    if (rule.minimumVolume !== undefined) {
-                        const intersectionBoundingBox = BoundingBoxUtils
-                            .intersect(overlappingBoundingBox, movedBoundingBox);
-                        coversMinimumArea = BoundingBoxUtils
-                            .volume(intersectionBoundingBox) >= rule.minimumVolume;
-                    }
-
-                    if (coversMinimumArea) {
-                        collidingEntityNotifications.push([rule.name,
-                            overlappingEntity]);
-                    }
+                } else if (rule.type === CollisionResultEvent.NOTIFY
+                    && coversMinimumVolume) {
+                    collidingEntityNotifications.push([rule.name,
+                        overlappingEntity]);
+                } else if (rule.type === CollisionResultEvent.TRACK
+                    && collisionTracking !== undefined
+                    && (coversMinimumVolume
+                        || collisionTracking.values[overlappingEntity.type])) {
+                    newCollisionTrackingValues[overlappingEntity.type] = true;
                 }
             }
         }

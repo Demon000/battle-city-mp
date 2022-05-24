@@ -4,6 +4,7 @@ import { Point } from '../point/Point';
 export enum CollisionResultEvent {
     PREVENT_MOVEMENT = 'prevent-movement',
     NOTIFY = 'notify',
+    TRACK = 'track',
 }
 
 export enum CollisionEvent {
@@ -40,4 +41,7 @@ export type CollisionRule = {
     type: CollisionResultEvent.NOTIFY;
     minimumVolume?: number;
     name: CollisionEvent;
+} | {
+    type: CollisionResultEvent.TRACK;
+    minimumVolume?: number;
 };
