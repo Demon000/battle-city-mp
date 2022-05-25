@@ -311,7 +311,7 @@ export class Registry {
         this._addSharedComponent(componentsMap, component);
     }
 
-    _findSharedComponent<
+    private _findSharedComponent<
         C extends Component<C>,
     >(
         componentsMap: Map<ComponentClassType<any>, Component<any>>,
