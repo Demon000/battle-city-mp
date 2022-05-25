@@ -56,5 +56,9 @@ module.exports = {
 
         'vue/no-unused-components': ['warn'],
         'vue/comment-directive': 'off',
+
+        'no-constant-condition': ['error', {
+            'checkLoops': false,
+        }],
     }
 };
