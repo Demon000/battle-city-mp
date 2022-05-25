@@ -1,7 +1,6 @@
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { DirectionAxisSnappingComponent } from '@/components/DirectionAxisSnappingComponent';
 import { MovementMultipliersComponent } from '@/components/MovementMultipliersComponent';
-import { ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 import { assert } from '@/utils/assert';
@@ -20,12 +19,20 @@ import { RequestedPositionComponent } from '@/components/RequestedPositionCompon
 import { RequestedDirectionComponent } from '@/components/RequestedDirectionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
 import { DirectionUtils } from './DirectionUtils';
-import { DirtyCollisionsComponent, DirtyCollisionType } from '../../components/DirtyCollisionsComponent';
 import { CollisionEvents, CollisionRule, CollisionRuleType } from './CollisionRule';
 import { EntityId } from '@/ecs/EntityId';
 import { LazyIterable } from '@/utils/LazyIterable';
 import { CollisionTrackingComponent } from '@/components/CollisionTrackingComponent';
 import { CollisionRulesComponent } from '@/components/CollisionRulesComponent';
+import { DirtyCollisionsAddComponent } from '@/components/DirtyCollisionsAddComponent';
+import { DirtyCollisionsUpdateComponent } from '@/components/DirtyCollisionsUpdateComponent';
+import { DirtyCollisionsRemoveComponent } from '@/components/DirtyCollisionsRemoveComponent';
+
+export enum DirtyCollisionType {
+    ADD,
+    UPDATE,
+    REMOVE,
+}
 
 export class CollisionService {
     emitter = new EventEmitter<CollisionEvents>();
@@ -464,60 +471,50 @@ export class CollisionService {
     }
 
     markDirtyCollisions(entity: Entity, type: DirtyCollisionType): void {
-        const dirtyCollisionsComponent = entity
-            .findComponent(DirtyCollisionsComponent);
+        let clazz;
 
-        if (dirtyCollisionsComponent !== undefined) {
-            if (dirtyCollisionsComponent.type === DirtyCollisionType.ADD
-                && type === DirtyCollisionType.UPDATE) {
-                return;
-            }
-
-            if (dirtyCollisionsComponent.type === DirtyCollisionType.REMOVE) {
-                return;
-            }
-
-            if (dirtyCollisionsComponent.type === type) {
-                return;
-            }
+        switch (type) {
+            case DirtyCollisionType.ADD:
+                clazz = DirtyCollisionsAddComponent;
+                break;
+            case DirtyCollisionType.UPDATE:
+                clazz = DirtyCollisionsUpdateComponent;
+                break;
+            case DirtyCollisionType.REMOVE:
+                clazz = DirtyCollisionsRemoveComponent;
+                break;
         }
 
-        entity.upsertComponent(DirtyCollisionsComponent, {
-            type,
-        }, {
-            flags: ComponentFlags.LOCAL_ONLY,
+        entity.upsertSharedComponent(clazz, {
             silent: true,
         });
     }
 
-    processEntityDirtyCollision(component: DirtyCollisionsComponent): void {
-        const entity = component.entity;
-        const boundingBox = entity.findComponent(BoundingBoxComponent);
-        const hasNode = this.boundingBoxRepository.hasNode(entity.id);
-
-        if (component.type === DirtyCollisionType.ADD
-            || (component.type === DirtyCollisionType.UPDATE && !hasNode)) {
-            assert(boundingBox !== undefined);
-            this.boundingBoxRepository.addBoxValue(entity.id,
-                boundingBox);
-        } else if (component.type === DirtyCollisionType.UPDATE) {
-            assert(boundingBox !== undefined);
-            this.boundingBoxRepository.updateBoxValue(entity.id,
-                boundingBox);
-        } else if (component.type === DirtyCollisionType.REMOVE && hasNode) {
-            this.boundingBoxRepository.removeValue(entity.id);
-        }
-    }
-
     processDirtyCollisions(): void {
-        for (const component of
-            this.registry.getComponents(DirtyCollisionsComponent)) {
+        for (const entity of
+            this.registry.getEntitiesWithComponent(DirtyCollisionsAddComponent)) {
 
-            this.processEntityDirtyCollision(component);
+            const boundingBox = entity.getComponent(BoundingBoxComponent);
+            this.boundingBoxRepository.addBoxValue(entity.id, boundingBox);
 
-            component.remove({
-                silent: true,
-            });
+            entity.removeComponent(DirtyCollisionsAddComponent);
+        }
+
+        for (const entity of
+            this.registry.getEntitiesWithComponent(DirtyCollisionsUpdateComponent)) {
+
+            const boundingBox = entity.getComponent(BoundingBoxComponent);
+            this.boundingBoxRepository.updateBoxValue(entity.id, boundingBox);
+
+            entity.removeComponent(DirtyCollisionsUpdateComponent);
+        }
+
+        for (const entity of
+            this.registry.getEntitiesWithComponent(DirtyCollisionsRemoveComponent)) {
+
+            this.boundingBoxRepository.removeValue(entity.id);
+
+            entity.removeComponent(DirtyCollisionsRemoveComponent);
         }
     }
 

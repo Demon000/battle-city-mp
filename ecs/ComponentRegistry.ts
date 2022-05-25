@@ -36,13 +36,15 @@ import { RelativePositionChildrenComponent, RelativePositionChildrenComponentDat
 import { RelativePositionComponent, RelativePositionComponentData } from '@/components/RelativePositionComponent';
 import { DirtyPositionComponent, DirtyPositionComponentData } from '@/components/DirtyPositionComponent';
 import { PickupIgnoreComponent, PickupIgnoreComponentData } from '@/components/PickupIgnoreComponent';
-import { DirtyCollisionsComponent, DirtyCollisionsComponentData } from '@/components/DirtyCollisionsComponent';
 import { DynamicSizeComponent, DynamicSizeComponentData } from '@/components/DynamicSizeComponent';
 import { ExplosionComponent, ExplosionComponentData } from '@/components/ExplosionComponent';
 import { TeleporterComponent, TeleporterComponentData } from '@/components/TeleporterComponent';
 import { PatternFillGraphicsComponent, PatternFillGraphicsComponentData } from '@/components/PatternFillGraphicsComponent';
 import { CollisionTrackingComponent, CollisionTrackingComponentData } from '@/components/CollisionTrackingComponent';
 import { CollisionRulesComponent, CollisionRulesComponentData } from '@/components/CollisionRulesComponent';
+import { DirtyCollisionsAddComponent, DirtyCollisionsAddComponentData } from '@/components/DirtyCollisionsAddComponent';
+import { DirtyCollisionsUpdateComponent, DirtyCollisionsUpdateComponentData } from '@/components/DirtyCollisionsUpdateComponent';
+import { DirtyCollisionsRemoveComponent, DirtyCollisionsRemoveComponentData } from '@/components/DirtyCollisionsRemoveComponent';
 
 export class ComponentRegistry {
     protected lookupAndValidate(
@@ -190,10 +192,6 @@ export class ComponentRegistry {
             case PickupIgnoreComponent.name:
                 assertEquals<Partial<PickupIgnoreComponentData>>(data);
                 return PickupIgnoreComponent;
-            case DirtyCollisionsComponent.tag:
-            case DirtyCollisionsComponent.name:
-                assertEquals<Partial<DirtyCollisionsComponentData>>(data);
-                return DirtyCollisionsComponent;
             case DynamicSizeComponent.tag:
             case DynamicSizeComponent.name:
                 assertEquals<Partial<DynamicSizeComponentData>>(data);
@@ -218,6 +216,18 @@ export class ComponentRegistry {
             case CollisionRulesComponent.name:
                 assertEquals<Partial<CollisionRulesComponentData>>(data);
                 return CollisionRulesComponent;
+            case DirtyCollisionsAddComponent.tag:
+            case DirtyCollisionsAddComponent.name:
+                assertEquals<Partial<DirtyCollisionsAddComponentData>>(data);
+                return DirtyCollisionsAddComponent;
+            case DirtyCollisionsUpdateComponent.tag:
+            case DirtyCollisionsUpdateComponent.name:
+                assertEquals<Partial<DirtyCollisionsUpdateComponentData>>(data);
+                return DirtyCollisionsUpdateComponent;
+            case DirtyCollisionsRemoveComponent.tag:
+            case DirtyCollisionsRemoveComponent.name:
+                assertEquals<Partial<DirtyCollisionsRemoveComponentData>>(data);
+                return DirtyCollisionsRemoveComponent;
         }
     }
 

@@ -4,7 +4,7 @@ import { MapRepository } from '@/utils/MapRepository';
 import { Ticker, TickerEvent } from '@/utils/Ticker';
 import { EntityService } from '../entity/EntityService';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
-import { CollisionService } from '../physics/collisions/CollisionService';
+import { CollisionService, DirtyCollisionType } from '../physics/collisions/CollisionService';
 import { Player, PartialPlayerOptions, PlayerOptions, PlayerSpawnStatus } from '../player/Player';
 import { PlayerService, PlayerServiceEvent } from '@/player/PlayerService';
 import { GameServerStatus } from './GameServerStatus';
@@ -31,7 +31,6 @@ import { HealthComponent } from '@/components/HealthComponent';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { Entity } from '@/ecs/Entity';
-import { DirtyCollisionType } from '@/components/DirtyCollisionsComponent';
 import { ClientComponentRegistry } from '@/ecs/ClientComponentRegistry';
 import { EntityGraphicsRenderer } from '@/entity/EntityGraphicsRenderer';
 
