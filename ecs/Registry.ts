@@ -7,7 +7,6 @@ import { EntityId } from './EntityId';
 import { RegistryIdGenerator } from './RegistryIdGenerator';
 import { LazyIterable } from '@/utils/LazyIterable';
 import { nonenumerable } from '@/utils/enumerable';
-import { EntityType } from '@/entity/EntityType';
 
 export enum RegistryEvent {
     ENTITY_REGISTERED = 'entity-registered',
@@ -88,7 +87,7 @@ export class Registry {
     private sharedComponents: Map<ComponentClassType<any>, Component<any>> = new Map();
 
     @nonenumerable
-    private sharedByTypeComponents: Map<EntityType, Map<ComponentClassType<any>, Component<any>>> = new Map();
+    private sharedByTypeComponents: Map<string, Map<ComponentClassType<any>, Component<any>>> = new Map();
 
     @nonenumerable
     private idsEntityMap = new Map<EntityId, Entity>();
@@ -295,7 +294,7 @@ export class Registry {
     addSharedByTypeComponent<
         C extends Component<C>,
     >(
-        type: EntityType,
+        type: string,
         component: C,
     ): void {
         if (!(component.flags & ComponentFlags.SHARED_BY_TYPE)) {
@@ -333,7 +332,7 @@ export class Registry {
     findSharedByTypeComponent<
         C extends Component<C>,
     >(
-        type: EntityType,
+        type: string,
         clazzOrTag: ClazzOrTag<C>,
     ): C | undefined {
         const componentsMap = this.sharedByTypeComponents.get(type);
