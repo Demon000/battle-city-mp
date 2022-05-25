@@ -1,5 +1,4 @@
 import { Component, ComponentClassType } from '@/ecs/Component';
-import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 
 export interface SpawnTimeComponentData {
@@ -16,9 +15,8 @@ export class SpawnTimeComponent
     constructor(
         registry: Registry,
         clazz: ComponentClassType<SpawnTimeComponent>,
-        entity?: Entity,
     ) {
-        super(registry, clazz, entity);
+        super(registry, clazz);
 
         this.value = Date.now();
     }

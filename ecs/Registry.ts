@@ -281,10 +281,9 @@ export class Registry {
         entity.addLocalComponent(component);
 
         const tagComponents = this.getOrCreateComponentTypeSet(component.clazz);
-        if (options === undefined || options.flags === undefined
-            || !(options.flags & ComponentFlags.SHARED)) {
-            tagComponents.add(component);
-        }
+        tagComponents.add(component);
+
+        component.attachToEntity(entity);
 
         if (!options?.silent) {
             this.emit(RegistryComponentEvent.COMPONENT_INITIALIZED, component);
@@ -296,7 +295,6 @@ export class Registry {
         C extends Component<C>,
     >(
         clazzOrTag: ClazzOrTag<C>,
-        entity?: Entity,
         data?: any,
         options?: RegistryOperationOptions,
     ): C {
@@ -305,7 +303,7 @@ export class Registry {
         }
 
         const clazz = this.validateComponentData(clazzOrTag, data);
-        const component = new clazz(this, clazz, entity);
+        const component = new clazz(this, clazz);
 
         if (data !== undefined) {
             component.setData(data);
@@ -326,7 +324,7 @@ export class Registry {
         data?: any,
         options?: RegistryOperationOptions,
     ): C {
-        return this.createComponent(clazzOrTag, undefined, data, options);
+        return this.createComponent(clazzOrTag, data, options);
     }
 
     addComponent<
@@ -337,7 +335,7 @@ export class Registry {
         data?: any,
         options?: RegistryOperationOptions,
     ): C {
-        const component = this.createComponent(clazzOrTag, entity, data, options);
+        const component = this.createComponent(clazzOrTag, data, options);
         this.attachComponent(entity, component, options);
 
         return component;
@@ -427,6 +425,8 @@ export class Registry {
             this.emit(RegistryComponentEvent.COMPONENT_BEFORE_REMOVE, component);
         }
 
+        component.detachFromEntity(entity);
+
         component = entity.removeLocalComponent(clazz);
         if (options?.optional && component === undefined) {
             return undefined;
@@ -448,7 +448,7 @@ export class Registry {
         assert(component !== undefined);
 
         if (component.flags & ComponentFlags.SHARED) {
-            return;
+            return component;
         }
 
         const tagComponents = this.tagsComponentsMap.get(clazz.tag);

@@ -16,7 +16,7 @@ export class Component<C extends Component<C>> {
     readonly registry: Registry;
 
     @nonenumerable
-    readonly _entity?: Entity;
+    readonly entities: Set<Entity> = new Set();
 
     @nonenumerable
     readonly clazz: ComponentClassType<C>;
@@ -27,10 +27,8 @@ export class Component<C extends Component<C>> {
     constructor(
         registry: Registry,
         clazz: ComponentClassType<C>,
-        entity?: Entity,
     ) {
         this.registry = registry;
-        this._entity = entity;
         this.clazz = clazz;
     }
 
@@ -40,13 +38,20 @@ export class Component<C extends Component<C>> {
     get entity(): Entity {
         assert(!(this.flags & ComponentFlags.SHARED),
             'Cannot access entity of shared component', this.clazz);
-        assert(this._entity !== undefined);
 
-        return this._entity;
+        return this.entities.values().next().value;
     }
 
     static get tag(): string {
         return this.TAG ?? this.name;
+    }
+
+    attachToEntity(entity: Entity): void {
+        this.entities.add(entity);
+    }
+
+    detachFromEntity(entity: Entity): void {
+        this.entities.delete(entity);
     }
 
     getData(): Partial<this> {
@@ -73,6 +78,5 @@ export type ComponentClassType<C = any> = {
     new (
         registry: Registry,
         clazz: ComponentClassType<C>,
-        entity?: Entity,
     ): C;
 };
