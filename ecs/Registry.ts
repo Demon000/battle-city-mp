@@ -512,7 +512,8 @@ export class Registry {
     ): Iterable<Entity> {
         const components = this.getComponents(clazz);
         return LazyIterable.from(components)
-            .map(component => component.entity);
+            .map(component => component.entities)
+            .flatten();
     }
 
     lookup(clazzOrTag: ClazzOrTag, data?: any): ComponentClassType<any> {
