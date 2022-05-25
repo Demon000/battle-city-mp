@@ -33,7 +33,7 @@ export class LazyIterableIterator<T> {
                     result = operation.fn(result);
                 }
 
-                if (isFilteredOut === true) {
+                if (isFilteredOut) {
                     break;
                 }
             }

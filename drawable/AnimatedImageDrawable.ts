@@ -34,7 +34,7 @@ export class AnimatedImageDrawable extends BaseImageDrawable {
 
     getCurrentDrawable(referenceTime: number): IImageDrawable | undefined {
         let currentAnimationTime = (Date.now() - referenceTime);
-        if (this.loop === true) {
+        if (this.loop) {
             currentAnimationTime %= this.totalDuration;
         }
 
