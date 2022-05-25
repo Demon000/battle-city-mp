@@ -204,15 +204,6 @@ export class Registry {
         return tagComponents;
     }
 
-    validateComponentData<
-        C extends Component<C>,
-    >(
-        clazzOrTag: ClazzOrTag<C>,
-        data?: any,
-    ): ComponentClassType<C> {
-        return this.componentRegistry.lookup(clazzOrTag, data);
-    }
-
     emit<
         C extends Component<C>,
     >(
@@ -326,7 +317,7 @@ export class Registry {
         componentsMap: Map<ComponentClassType<any>, Component<any>>,
         clazzOrTag: ClazzOrTag<C>,
     ): C | undefined {
-        const clazz = this.validateComponentData(clazzOrTag);
+        const clazz = this.lookup(clazzOrTag);
 
         return componentsMap.get(clazz) as C;
     }
@@ -384,7 +375,7 @@ export class Registry {
             data = {};
         }
 
-        const clazz = this.validateComponentData(clazzOrTag, data);
+        const clazz = this.lookup(clazzOrTag, data);
         const component = new clazz(this, clazz);
 
         if (data !== undefined) {
@@ -444,7 +435,7 @@ export class Registry {
             data = {};
         }
 
-        const clazz = this.validateComponentData(clazzOrTag, data);
+        const clazz = this.lookup(clazzOrTag, data);
         const component = entity.getComponent(clazz);
 
         if (data !== undefined) {
