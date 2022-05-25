@@ -574,7 +574,7 @@ export class GameServer {
 
                 this.entityService.createSpawnEffect(teleporterPosition);
                 this.entityService.createSpawnEffect(targetPosition);
-                this.entityService.markRequestedPosition(entity, position);
+                this.collisionService.setPosition(entity, position);
             });
 
         /*

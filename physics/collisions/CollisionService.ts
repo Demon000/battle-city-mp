@@ -282,7 +282,7 @@ export class CollisionService {
             return;
         }
 
-        movingEntity.updateComponent(PositionComponent, position);
+        this.setPosition(movingEntity, position);
 
         if (collisionTracking === undefined)
             return;
@@ -327,6 +327,10 @@ export class CollisionService {
 
             this.updateMovementModifiers(movingEntity);
         }
+    }
+
+    setPosition(entity: Entity, position: Point): void {
+        entity.updateComponent(PositionComponent, position);
     }
 
     processRequestedPosition(): void {
