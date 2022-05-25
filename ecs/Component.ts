@@ -8,7 +8,8 @@ export type ComponentsInitialization = Record<string, any>;
 
 export enum ComponentFlags {
     LOCAL_ONLY = 1 << 0,
-    SHARED = 1 << 1,
+    SHARED_BY_TYPE = 1 << 1,
+    SHARED = 1 << 2,
 }
 
 export class Component<C extends Component<C>> {

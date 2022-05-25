@@ -182,7 +182,7 @@ export class EntityBlueprint {
                 component = createdComponents[entity.type][tag] =
                     this.registry.createDetachedComponent(tag, data, {
                         ...options,
-                        flags: ComponentFlags.LOCAL_ONLY | ComponentFlags.SHARED,
+                        flags: ComponentFlags.LOCAL_ONLY | ComponentFlags.SHARED_BY_TYPE,
                     });
             }
 

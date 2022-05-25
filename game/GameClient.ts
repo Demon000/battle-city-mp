@@ -34,7 +34,6 @@ import { Entity } from '@/ecs/Entity';
 import { DirtyCollisionType } from '@/components/DirtyCollisionsComponent';
 import { ClientComponentRegistry } from '@/ecs/ClientComponentRegistry';
 import { EntityGraphicsRenderer } from '@/entity/EntityGraphicsRenderer';
-import { ComponentFlags } from '@/ecs/Component';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -135,7 +134,7 @@ export class GameClient {
 
         this.registry.emitter.on(RegistryComponentEvent.COMPONENT_CHANGED,
             (_event, component) => {
-                if (component.flags & ComponentFlags.SHARED) {
+                if (component.entities.size !== 1) {
                     return;
                 }
 

@@ -7,6 +7,7 @@ import { EntityId } from './EntityId';
 import { RegistryIdGenerator } from './RegistryIdGenerator';
 import { LazyIterable } from '@/utils/LazyIterable';
 import { nonenumerable } from '@/utils/enumerable';
+import { EntityType } from '@/entity/EntityType';
 
 export enum RegistryEvent {
     ENTITY_REGISTERED = 'entity-registered',
@@ -82,6 +83,12 @@ export class Registry {
 
     @nonenumerable
     private componentsEmitterMap = new Map<string, EventEmitter<RegistryComponentEvents>>();
+
+    @nonenumerable
+    private sharedComponents: Map<ComponentClassType<any>, Component<any>> = new Map();
+
+    @nonenumerable
+    private sharedByTypeComponents: Map<EntityType, Map<ComponentClassType<any>, Component<any>>> = new Map();
 
     @nonenumerable
     private idsEntityMap = new Map<EntityId, Entity>();
@@ -201,7 +208,7 @@ export class Registry {
         C extends Component<C>,
     >(
         clazzOrTag: ClazzOrTag<C>,
-        data: any,
+        data?: any,
     ): ComponentClassType<C> {
         return this.componentRegistry.lookup(clazzOrTag, data);
     }
@@ -269,6 +276,81 @@ export class Registry {
         for (const [clazzOrTag, data] of Object.entries(components)) {
             fn(entity, clazzOrTag, data, options);
         }
+    }
+
+    private _addSharedComponent<
+        C extends Component<C>,
+    >(
+        componentsMap: Map<ComponentClassType<any>, Component<any>>,
+        component: C,
+    ): void {
+        assert(!componentsMap.has(component.clazz));
+
+        componentsMap.set(component.clazz, component);
+    }
+
+    addSharedComponent<
+        C extends Component<C>,
+    >(
+        component: C,
+    ): void {
+        if (!(component.flags & ComponentFlags.SHARED)) {
+            return;
+        }
+
+        this._addSharedComponent(this.sharedComponents, component);
+    }
+
+    addSharedByTypeComponent<
+        C extends Component<C>,
+    >(
+        type: EntityType,
+        component: C,
+    ): void {
+        if (!(component.flags & ComponentFlags.SHARED_BY_TYPE)) {
+            return;
+        }
+
+        let componentsMap = this.sharedByTypeComponents.get(type);
+        if (componentsMap === undefined) {
+            componentsMap = new Map();
+            this.sharedByTypeComponents.set(type, componentsMap);
+        }
+
+        this._addSharedComponent(componentsMap, component);
+    }
+
+    _findSharedComponent<
+        C extends Component<C>,
+    >(
+        componentsMap: Map<ComponentClassType<any>, Component<any>>,
+        clazzOrTag: ClazzOrTag<C>,
+    ): C | undefined {
+        const clazz = this.validateComponentData(clazzOrTag);
+
+        return componentsMap.get(clazz) as C;
+    }
+
+    findSharedComponent<
+        C extends Component<C>,
+    >(
+        clazzOrTag: ClazzOrTag<C>,
+    ): C | undefined {
+        return this._findSharedComponent(this.sharedComponents, clazzOrTag);
+    }
+
+    findSharedByTypeComponent<
+        C extends Component<C>,
+    >(
+        type: EntityType,
+        clazzOrTag: ClazzOrTag<C>,
+    ): C | undefined {
+        const componentsMap = this.sharedByTypeComponents.get(type);
+        if (componentsMap === undefined) {
+            return undefined;
+        }
+
+        return this._findSharedComponent(componentsMap, clazzOrTag);
     }
 
     attachComponent<
@@ -447,7 +529,7 @@ export class Registry {
         }
         assert(component !== undefined);
 
-        if (component.flags & ComponentFlags.SHARED) {
+        if (component.flags & ComponentFlags.SHARED_BY_TYPE) {
             return component;
         }
 
