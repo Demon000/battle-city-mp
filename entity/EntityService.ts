@@ -225,7 +225,7 @@ export class EntityService {
         });
     }
 
-    markDirtyPosition(entity: Entity): void {
+    markDirtyRelativePosition(entity: Entity): void {
         if (!entity.hasComponent(RelativePositionComponent)) {
             return;
         }
@@ -307,7 +307,7 @@ export class EntityService {
         for (const childId of
             Object.keys(relativePositionChildrenComponent.ids)) {
             const child = this.registry.getEntityById(+childId);
-            this.markDirtyPosition(child);
+            this.markDirtyRelativePosition(child);
         }
     }
 
