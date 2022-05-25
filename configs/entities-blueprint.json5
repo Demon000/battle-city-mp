@@ -10,7 +10,7 @@
         },
     },
     'world-entity': {
-        serverComponents: {
+        sharedServerComponents: {
             WorldEntityComponent: {},
         },
     },
@@ -267,13 +267,15 @@
             ExplosionComponent: {},
         },
         localComponents: {
-            SizeComponent: {},
             SpawnTimeComponent: {},
         },
         clientComponents: {
             CenterPositionComponent: {},
         },
-        serverComponents: {
+        sharedLocalComponents: {
+            SizeComponent: {},
+        },
+        sharedServerComponents: {
             AutomaticDestroyComponent: {
                 timeMs: 240,
             },
@@ -299,15 +301,15 @@
         localComponents: {
             SpawnTimeComponent: {},
         },
-        serverComponents: {
-            AutomaticDestroyComponent: {
-                timeMs: 1500,
-            },
-        },
         sharedLocalComponents: {
             SizeComponent: {
                 width: 16,
                 height: 16,
+            },
+        },
+        sharedServerComponents: {
+            AutomaticDestroyComponent: {
+                timeMs: 1500,
             },
         },
     },
@@ -321,15 +323,15 @@
         localComponents: {
             SpawnTimeComponent: {},
         },
-        serverComponents: {
-            AutomaticDestroyComponent: {
-                timeMs: 1000,
-            },
-        },
         sharedLocalComponents: {
             SizeComponent: {
                 width: 16,
                 height: 16,
+            },
+        },
+        sharedServerComponents: {
+            AutomaticDestroyComponent: {
+                timeMs: 1000,
             },
         },
     },
@@ -443,16 +445,7 @@
         },
         serverComponents: {
             TankComponent: {},
-            DirectionAxisSnappingComponent: {
-                value: 4,
-            },
             SmokeSpawnerComponent: {},
-            HealthBasedSmokeSpawnerComponent: {
-                map: {
-                    '1': 500,
-                    '2': 1000,
-                },
-            },
         },
         clientComponents: {
             SpawnTimeComponent: {},
@@ -517,6 +510,15 @@
                         minimumVolume: 48,
                     }],
                 },
+            },
+            HealthBasedSmokeSpawnerComponent: {
+                map: {
+                    '1': 500,
+                    '2': 1000,
+                },
+            },
+            DirectionAxisSnappingComponent: {
+                value: 4,
             },
         },
     },

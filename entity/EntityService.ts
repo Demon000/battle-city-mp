@@ -173,8 +173,7 @@ export class EntityService {
     }
 
     processAutomaticDestroy(): void {
-        for (const component of this.registry.getComponents(AutomaticDestroyComponent)) {
-            const entity = component.entity;
+        for (const entity of this.registry.getEntitiesWithComponent(AutomaticDestroyComponent)) {
             const automaticDestroyTimeMs =
                 entity.getComponent(AutomaticDestroyComponent).timeMs;
             const spawnTime =
