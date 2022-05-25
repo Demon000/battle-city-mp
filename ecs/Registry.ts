@@ -393,7 +393,7 @@ export class Registry {
 
         if (options !== undefined && options.flags !== undefined
             && options.flags) {
-            component.flags = options.flags;
+            component.flags |= options.flags;
         }
 
         return component;
