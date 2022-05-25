@@ -5,8 +5,8 @@ import { ClazzOrTag, Component, ComponentClassType, ComponentFlags, ComponentsIn
 import { Entity } from './Entity';
 import { EntityId } from './EntityId';
 import { RegistryIdGenerator } from './RegistryIdGenerator';
-import { LazyIterable } from '@/utils/LazyIterable';
 import { nonenumerable } from '@/utils/enumerable';
+import { ArrayUtils } from '@/utils/ArrayUtils';
 
 export enum RegistryEvent {
     ENTITY_REGISTERED = 'entity-registered',
@@ -493,7 +493,7 @@ export class Registry {
     }
 
     getMultipleEntitiesById(ids: Iterable<EntityId>): Iterable<Entity> {
-        return LazyIterable.from(ids)
+        return ArrayUtils.from(ids)
             .map(id => this.getEntityById(id));
     }
 
@@ -511,7 +511,7 @@ export class Registry {
         clazz: ComponentClassType<C>,
     ): Iterable<Entity> {
         const components = this.getComponents(clazz);
-        return LazyIterable.from(components)
+        return ArrayUtils.from(components)
             .map(component => component.entity);
     }
 

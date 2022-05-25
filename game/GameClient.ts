@@ -14,7 +14,6 @@ import { Team } from '@/team/Team';
 import { TeamService, TeamServiceEvent } from '@/team/TeamService';
 import { PlayerStats } from '@/player/PlayerStats';
 import { TankService } from '@/services/TankService';
-import { LazyIterable } from '@/utils/LazyIterable';
 import { TankTier } from '@/subtypes/TankTier';
 import { Color } from '@/drawable/Color';
 import { Config } from '@/config/Config';
@@ -35,6 +34,7 @@ import { DirtyCollisionType } from '@/components/DirtyCollisionsComponent';
 import { ClientComponentRegistry } from '@/ecs/ClientComponentRegistry';
 import { EntityGraphicsRenderer } from '@/entity/EntityGraphicsRenderer';
 import { ComponentFlags } from '@/ecs/Component';
+import { ArrayUtils } from '@/utils/ArrayUtils';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -362,18 +362,18 @@ export class GameClient {
 
         this.playerService.clear();
         const players =
-            LazyIterable.from(serverStatus.playersOptions)
+            ArrayUtils.from(serverStatus.playersOptions)
                 .map(o => new Player(o));
         this.playerService.addPlayers(players);
 
         if (serverStatus.teamsOptions !== undefined) {
             const teams =
-            LazyIterable.from(serverStatus.teamsOptions)
+            ArrayUtils.from(serverStatus.teamsOptions)
                 .map(o => new Team(o));
             this.teamService.addTeams(teams);
         }
 
-        LazyIterable.from(serverStatus.entitiesOptions)
+        ArrayUtils.from(serverStatus.entitiesOptions)
             .forEach(o => this.entityFactory.buildFromOptions(o));
 
         const maxVisibleGameSize = this.config.get<number>('game-client',

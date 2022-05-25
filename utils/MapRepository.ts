@@ -1,5 +1,4 @@
 import { assert } from './assert';
-import { LazyIterable } from './LazyIterable';
 
 export class MapRepository<K, V> {
     private map = new Map<K, V>();
@@ -19,7 +18,7 @@ export class MapRepository<K, V> {
     }
 
     getMultiple(ids: Iterable<K>): Iterable<V> {
-        return LazyIterable.from(ids)
+        return Array.from(ids)
             .map(id => this.get(id));
     }
 

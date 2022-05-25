@@ -23,7 +23,6 @@ import { DirectionUtils } from './DirectionUtils';
 import { DirtyCollisionsComponent, DirtyCollisionType } from '../../components/DirtyCollisionsComponent';
 import { CollisionEvents, CollisionRule, CollisionRuleType } from './CollisionRule';
 import { EntityId } from '@/ecs/EntityId';
-import { LazyIterable } from '@/utils/LazyIterable';
 import { CollisionTrackingComponent } from '@/components/CollisionTrackingComponent';
 import { CollisionRulesComponent } from '@/components/CollisionRulesComponent';
 
@@ -417,9 +416,8 @@ export class CollisionService {
         const entityIds = this.getOverlappingEntities(boundingBox);
         const entities = this.registry.getMultipleEntitiesById(entityIds);
 
-        return LazyIterable.from(entities)
-            .filter(o => o.type === type)
-            .toArray();
+        return Array.from(entities)
+            .filter(o => o.type === type);
     }
 
     findOverlappingWithType(
