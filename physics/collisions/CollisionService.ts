@@ -335,10 +335,10 @@ export class CollisionService {
 
     processRequestedPosition(): void {
         for (const component of this.registry.getComponents(RequestedPositionComponent)) {
-            component.remove();
-
             const entity = component.entity;
             this._validateEntityMovement(entity, component, undefined, true);
+
+            component.remove();
         }
     }
 
@@ -383,9 +383,9 @@ export class CollisionService {
 
     processRequestedDirection(): void {
         for (const component of this.registry.getComponents(RequestedDirectionComponent)) {
-            component.remove();
-
             this.validateDirection(component.entity, component.value);
+
+            component.remove();
         }
     }
 
