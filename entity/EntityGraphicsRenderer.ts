@@ -122,9 +122,7 @@ export class EntityGraphicsRenderer {
             .filter(this.filterOutMissingDrawable, this) as IDrawable[];
     }
 
-    update(component: GraphicsRendererComponent): void {
-        const entity = component.entity;
-
+    update(entity: Entity, component: GraphicsRendererComponent): void {
         if (component.drawables === undefined) {
             return;
         }
@@ -164,6 +162,7 @@ export class EntityGraphicsRenderer {
     }
 
     render(
+        entity: Entity,
         component: GraphicsRendererComponent,
         layersContext: Context2D[],
         drawX: number,
@@ -175,7 +174,6 @@ export class EntityGraphicsRenderer {
             return;
         }
 
-        const entity = component.entity;
         for (const drawable of component.drawables) {
             this.renderDrawable(entity, drawable, layersContext, drawX, drawY);
         }

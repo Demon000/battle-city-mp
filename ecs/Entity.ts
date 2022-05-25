@@ -141,7 +141,12 @@ export class Entity {
         clazzOrTag: ClazzOrTag<C>,
         options?: RegistryOperationOptions,
     ): C | undefined {
-        const component = this.getComponent(clazzOrTag);
+        const component = this.findComponent(clazzOrTag);
+        if (options?.optional && component === undefined) {
+            return undefined;
+        }
+        assert(component !== undefined);
+
         return this.registry.removeEntityComponent(this, component.clazz, options);
     }
 

@@ -44,6 +44,10 @@ export class Component<C extends Component<C>> {
             'Cannot access entity of component attached to multiple',
             this.clazz);
 
+        return this.firstEntity!;
+    }
+
+    get firstEntity(): Entity | undefined {
         return this.entities.values().next().value;
     }
 

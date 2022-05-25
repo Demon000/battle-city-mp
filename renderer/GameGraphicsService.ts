@@ -88,7 +88,7 @@ export class GameGraphicsService {
             return;
         }
 
-        this.renderer.render(graphicsRendererComponent, this.contexts,
+        this.renderer.render(entity, graphicsRendererComponent, this.contexts,
             drawX, drawY);
     }
 
@@ -136,11 +136,15 @@ export class GameGraphicsService {
         for (const entity of this.registry.getEntitiesWithComponent(DirtyGraphicsComponent)) {
             const graphicsRendererComponent = entity
                 .getComponent(GraphicsRendererComponent);
-            this.renderer.update(graphicsRendererComponent);
 
-            entity.removeComponent(DirtyGraphicsComponent, {
-                silent: true,
-            });
+            this.renderer.update(entity, graphicsRendererComponent);
+
+            for (const rendererEntity of graphicsRendererComponent.entities) {
+                rendererEntity.removeComponent(DirtyGraphicsComponent, {
+                    silent: true,
+                    optional: true,
+                });
+            }
         }
     }
 

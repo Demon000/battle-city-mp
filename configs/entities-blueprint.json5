@@ -22,6 +22,12 @@
             GraphicsRendererComponent: {},
         },
     },
+    'shared-rendered-entity': {
+        sharedClientComponents: {
+            DirtyGraphicsComponent: {},
+            GraphicsRendererComponent: {},
+        },
+    },
     'dynamic-sized-entity': {
         sharedServerComponents: {
             DynamicSizeComponent: {},
@@ -55,7 +61,7 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
-            'uniquely-rendered-entity',
+            'shared-rendered-entity',
         ],
         serverComponents: {
             CenterPositionComponent: {},
@@ -298,7 +304,7 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
-            'uniquely-rendered-entity',
+            'shared-rendered-entity',
         ],
         localComponents: {
             SpawnTimeComponent: {},
@@ -320,7 +326,7 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
-            'uniquely-rendered-entity',
+            'shared-rendered-entity',
         ],
         localComponents: {
             SpawnTimeComponent: {},
@@ -360,7 +366,7 @@
             'positioned-entity',
             'bounding-boxed-entity',
             'world-entity',
-            'uniquely-rendered-entity',
+            'shared-rendered-entity',
         ],
         components: {
             TeamOwnedComponent: {},
