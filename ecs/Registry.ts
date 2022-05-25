@@ -343,6 +343,23 @@ export class Registry {
         return this._findSharedComponent(componentsMap, clazzOrTag);
     }
 
+    findOrCreateSharedComponent<
+        C extends Component<C>,
+    >(
+        clazzOrTag: ClazzOrTag<C>,
+        options?: RegistryOperationOptions,
+    ): C {
+        let component = this._findSharedComponent(this.sharedComponents,
+            clazzOrTag);
+
+        if (component === undefined) {
+            component = this.createComponent(clazzOrTag, undefined, options);
+            this.addSharedComponent(component);
+        }
+
+        return component;
+    }
+
     attachComponent<
         C extends Component<C>,
     >(
@@ -473,6 +490,24 @@ export class Registry {
         }
     }
 
+    upsertSharedComponent<
+        C extends Component<C>,
+    >(
+        entity: Entity,
+        clazzOrTag: ClazzOrTag<C>,
+        options?: RegistryOperationOptions,
+    ): C {
+        const existingComponent = entity.findComponent(clazzOrTag);
+        if (existingComponent !== undefined) {
+            return existingComponent;
+        }
+
+        const component = this.findOrCreateSharedComponent(clazzOrTag, options);
+        this.attachComponent(entity, component, options);
+
+        return component;
+    }
+
     upsertComponents(
         entity: Entity,
         components: ComponentsInitialization,
@@ -519,7 +554,8 @@ export class Registry {
         }
         assert(component !== undefined);
 
-        if (component.flags & ComponentFlags.SHARED_BY_TYPE) {
+        if (component.flags & (ComponentFlags.SHARED
+                | ComponentFlags.SHARED_BY_TYPE)) {
             return component;
         }
 

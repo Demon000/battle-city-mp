@@ -31,7 +31,10 @@ export class Component<C extends Component<C>> {
     ) {
         this.registry = registry;
         this.clazz = clazz;
+        this.flags = (this.constructor as ComponentClassType<any>).BASE_FLAGS;
     }
+
+    static readonly BASE_FLAGS: number = 0;
 
     @nonenumerable
     static readonly TAG?: string;
@@ -75,6 +78,7 @@ export class Component<C extends Component<C>> {
 
 export type ComponentClassType<C = any> = {
     readonly TAG?: string;
+    readonly BASE_FLAGS: number;
     readonly tag: string;
 
     new (

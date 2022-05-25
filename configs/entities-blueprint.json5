@@ -15,8 +15,10 @@
         },
     },
     'uniquely-rendered-entity': {
-        clientComponents: {
+        sharedClientComponents: {
             DirtyGraphicsComponent: {},
+        },
+        clientComponents: {
             GraphicsRendererComponent: {},
         },
     },

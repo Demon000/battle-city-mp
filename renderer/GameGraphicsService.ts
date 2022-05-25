@@ -72,7 +72,7 @@ export class GameGraphicsService {
 
         for (const entity of
             this.registry.getEntitiesWithComponent(GraphicsRendererComponent)) {
-            entity.upsertComponent(DirtyGraphicsComponent, undefined, {
+            entity.upsertSharedComponent(DirtyGraphicsComponent, {
                 silent: true,
             });
         }
@@ -133,13 +133,14 @@ export class GameGraphicsService {
     }
 
     processDirtyGraphics(): void {
-        for (const component of this.registry.getComponents(DirtyGraphicsComponent)) {
-            const entity = component.entity;
+        for (const entity of this.registry.getEntitiesWithComponent(DirtyGraphicsComponent)) {
             const graphicsRendererComponent = entity
                 .getComponent(GraphicsRendererComponent);
             this.renderer.update(graphicsRendererComponent);
 
-            component.remove();
+            entity.removeComponent(DirtyGraphicsComponent, {
+                silent: true,
+            });
         }
     }
 
@@ -159,7 +160,7 @@ export class GameGraphicsService {
             return;
         }
 
-        entity.upsertComponent(DirtyGraphicsComponent, undefined, {
+        entity.upsertSharedComponent(DirtyGraphicsComponent, {
             silent: true,
         });
     }

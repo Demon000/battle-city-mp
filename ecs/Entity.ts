@@ -86,6 +86,15 @@ export class Entity {
         return this.registry.upsertComponent(this, clazzOrTag, data, options);
     }
 
+    upsertSharedComponent<
+        C extends Component<C>,
+    >(
+        clazzOrTag: ClazzOrTag<C>,
+        options?: RegistryOperationOptions,
+    ): C {
+        return this.registry.upsertSharedComponent(this, clazzOrTag, options);
+    }
+
     addComponents(
         components: ComponentsInitialization,
         options?: RegistryOperationOptions,

@@ -34,9 +34,6 @@ export class EntityBlueprint {
         'sharedLocalComponents',
     ];
     private ignoredKeys: BlueprintComponentsKeys[] = [];
-    private entitySharedLocalComponents: Record<string, Record<string, Component<any>>> = {};
-    private entitySharedClientComponents: Record<string, Record<string, Component<any>>> = {};
-    private entitySharedServerComponents: Record<string, Record<string, Component<any>>> = {};
 
     constructor(
         private registry: Registry,
@@ -170,20 +167,32 @@ export class EntityBlueprint {
             return;
         }
 
-        const createdComponents = this.entitySharedLocalComponents;
-
-        if (createdComponents[entity.type] === undefined) {
-            createdComponents[entity.type] = {};
-        }
-
         for (const [tag, data] of Object.entries(components)) {
-            let component = createdComponents[entity.type][tag];
-            if (component === undefined) {
-                component = createdComponents[entity.type][tag] =
-                    this.registry.createDetachedComponent(tag, data, {
-                        ...options,
-                        flags: ComponentFlags.LOCAL_ONLY | ComponentFlags.SHARED_BY_TYPE,
-                    });
+            const clazz = this.registry.lookup(tag);
+            let component: Component<any>;
+
+            if (clazz.BASE_FLAGS & ComponentFlags.SHARED) {
+                component = this.registry.findSharedComponent(clazz);
+                if (component === undefined) {
+                    component = this.registry
+                        .createDetachedComponent(tag, undefined, {
+                            ...options,
+                            flags: ComponentFlags.LOCAL_ONLY,
+                        });
+                    this.registry.addSharedComponent(component);
+                }
+            } else {
+                component = this.registry.findSharedByTypeComponent(entity.type,
+                    clazz);
+                if (component === undefined) {
+                    component = this.registry
+                        .createDetachedComponent(tag, data, {
+                            ...options,
+                            flags: ComponentFlags.LOCAL_ONLY
+                                | ComponentFlags.SHARED_BY_TYPE,
+                        });
+                    this.registry.addSharedByTypeComponent(entity.type, component);
+                }
             }
 
             entity.attachComponent(component, options);
