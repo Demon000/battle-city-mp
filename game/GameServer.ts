@@ -9,6 +9,7 @@ import { TankService } from '@/services/TankService';
 import { TankTier } from '@/subtypes/TankTier';
 import { Team } from '@/team/Team';
 import { TeamService, TeamServiceEvent } from '@/team/TeamService';
+import { LazyIterable } from '@/utils/LazyIterable';
 import { MapRepository } from '@/utils/MapRepository';
 import { Ticker, TickerEvent } from '@/utils/Ticker';
 import EventEmitter from 'eventemitter3';
@@ -55,7 +56,6 @@ import { DirtyCollisionType } from '@/components/DirtyCollisionsComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { TeleporterComponent } from '@/components/TeleporterComponent';
-import { ArrayUtils } from '@/utils/ArrayUtils';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'p',
@@ -764,9 +764,9 @@ export class GameServer {
     }
 
     sendRequestedServerStatus(playerId?: string): void {
-        const entities = this.registry.getEntities();
+        const entities = this.registry.getEntities() as Iterable<Entity>;
         const entitiesOptions =
-            ArrayUtils.from(entities)
+            LazyIterable.from(entities)
                 .map(entity => {
                     return {
                         id: entity.id,
@@ -776,19 +776,22 @@ export class GameServer {
                             withoutFlags: ComponentFlags.LOCAL_ONLY,
                         }),
                     };
-                });
+                })
+                .toArray() as Iterable<EntityBuildOptions>;
 
         const players = this.playerService.getPlayers();
         const playersOptions =
-            ArrayUtils.from(players)
-                .map(player => player.toOptions());
+            LazyIterable.from(players)
+                .map(player => player.toOptions())
+                .toArray();
 
         const teams = this.teamService.getTeams();
         let teamsOptions;
         if (teams !== undefined) {
             teamsOptions =
-                ArrayUtils.from(teams)
-                    .map(team => team.toOptions());
+                LazyIterable.from(teams)
+                    .map(team => team.toOptions())
+                    .toArray();
         }
 
         const configsData = this.config.getDataMultiple([
