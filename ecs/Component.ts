@@ -36,8 +36,9 @@ export class Component<C extends Component<C>> {
     static readonly TAG?: string;
 
     get entity(): Entity {
-        assert(!(this.flags & ComponentFlags.SHARED),
-            'Cannot access entity of shared component', this.clazz);
+        assert(this.entities.size === 1,
+            'Cannot access entity of component attached to multiple',
+            this.clazz);
 
         return this.entities.values().next().value;
     }
