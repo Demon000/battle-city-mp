@@ -186,7 +186,7 @@ export class EntityBlueprint {
                     });
             }
 
-            entity.attachComponent(component);
+            entity.attachComponent(component, options);
         }
     }
 
@@ -207,7 +207,7 @@ export class EntityBlueprint {
         }
 
         this.addLocalComponents(entity, blueprintData.localComponents, options);
-        this.addSharedComponents(entity, blueprintData.sharedLocalComponents);
+        this.addSharedComponents(entity, blueprintData.sharedLocalComponents, options);
 
         if (this.env === BlueprintEnv.CLIENT) {
             this.addLocalComponents(entity, blueprintData.clientComponents, options);
@@ -216,9 +216,9 @@ export class EntityBlueprint {
         }
 
         if (this.env === BlueprintEnv.CLIENT) {
-            this.addSharedComponents(entity, blueprintData.sharedClientComponents);
+            this.addSharedComponents(entity, blueprintData.sharedClientComponents, options);
         } else if (this.env === BlueprintEnv.SERVER) {
-            this.addSharedComponents(entity, blueprintData.sharedServerComponents);
+            this.addSharedComponents(entity, blueprintData.sharedServerComponents, options);
         }
     }
 }
