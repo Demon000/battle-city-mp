@@ -468,8 +468,8 @@
             GraphicDependenciesComponent: {
                 components: {
                     'CollisionTrackingComponent': true,
-                    'IsMovingComponent': true,
                     'DirectionComponent': true,
+                    'MovementComponent': true,
                 },
             },
         },

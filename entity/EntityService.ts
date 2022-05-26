@@ -1,6 +1,5 @@
 import { AutomaticDestroyComponent } from '@/components/AutomaticDestroyComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
-import { IsMovingComponent } from '@/components/IsMovingComponent';
 import { MovementComponent } from '@/components/MovementComponent';
 import { MovementMultipliersComponent } from '@/components/MovementMultipliersComponent';
 import { SpawnComponent } from '@/components/SpawnComponent';
@@ -52,26 +51,30 @@ export class EntityService {
 
     setMovementDirection(entityId: EntityId, direction: Direction | null): void {
         const entity = this.registry.getEntityById(entityId);
-        const movement = entity.getComponent(MovementComponent);
-        if (movement.direction === direction) {
-            return;
-        }
+        const movement = entity.findComponent(MovementComponent);
 
-        movement.update({
-            direction,
-        });
+        if (direction === null && movement !== undefined
+            && movement.speed === 0) {
+            movement.remove();
+        } else if (direction !== null) {
+            entity.upsertComponent(MovementComponent, {
+                direction,
+            });
+        }
     }
 
     processEntityDirection(entity: Entity): void {
         const movement = entity.getComponent(MovementComponent);
         const direction = entity.getComponent(DirectionComponent).value;
-        if (movement.direction !== null && direction !== movement.direction) {
-            entity.upsertComponent(RequestedDirectionComponent, {
-                value: movement.direction,
-            }, {
-                flags: ComponentFlags.LOCAL_ONLY,
-            });
+        if (movement.direction === null || direction === movement.direction) {
+            return;
         }
+
+        entity.upsertComponent(RequestedDirectionComponent, {
+            value: movement.direction,
+        }, {
+            flags: ComponentFlags.LOCAL_ONLY,
+        });
     }
 
     getRandomSpawnPosition(teamId: string | null): Point {
@@ -107,22 +110,26 @@ export class EntityService {
             maxSpeed *= multipliers.maxSpeedMultiplier;
         }
 
-        let newMovementSpeed = movement.speed;
-        if (movement.direction === null || maxSpeed < newMovementSpeed) {
-            newMovementSpeed -= maxSpeed * decelerationFactor * delta;
-            newMovementSpeed = Math.max(0, newMovementSpeed);
-        } else if (newMovementSpeed < maxSpeed) {
-            newMovementSpeed += maxSpeed * accelerationFactor * delta;
-            newMovementSpeed = Math.min(newMovementSpeed, maxSpeed);
+        let speed = movement.speed;
+        if (movement.direction === null || maxSpeed < speed) {
+            speed -= maxSpeed * decelerationFactor * delta;
+            speed = Math.max(0, speed);
+        } else if (speed < maxSpeed) {
+            speed += maxSpeed * accelerationFactor * delta;
+            speed = Math.min(speed, maxSpeed);
         }
 
-        if (newMovementSpeed === movement.speed) {
+        if (speed === movement.speed) {
             return;
         }
 
-        movement.update({
-            speed: newMovementSpeed,
-        });
+        if (speed === 0 && movement.direction === null) {
+            movement.remove();
+        } else {
+            movement.update({
+                speed,
+            });
+        }
     }
 
     markRequestedPosition(entity: Entity, position: Point): void {
@@ -183,27 +190,6 @@ export class EntityService {
             if (Date.now() - spawnTime > automaticDestroyTimeMs) {
                 this.markDestroyed(entity);
             }
-        }
-    }
-
-    updateIsMoving(entity: Entity, silent = false): void {
-        const hasIsMovingComponent = entity.hasComponent(IsMovingComponent);
-        const movement = entity.getComponent(MovementComponent);
-        const isMoving = movement.speed > 0 || movement.direction !== null;
-
-        if (isMoving === hasIsMovingComponent) {
-            return;
-        }
-
-        if (isMoving) {
-            entity.addComponent(IsMovingComponent, undefined, {
-                flags: ComponentFlags.LOCAL_ONLY,
-                silent,
-            });
-        } else {
-            entity.removeComponent(IsMovingComponent, {
-                silent,
-            });
         }
     }
 
@@ -344,14 +330,9 @@ export class EntityService {
         }
     }
 
-    processDirection(): void {
-        for (const entity of this.registry.getEntitiesWithComponent(IsMovingComponent)) {
-            this.processEntityDirection(entity);
-        }
-    }
-
     processMovement(delta: number): void {
-        for (const entity of this.registry.getEntitiesWithComponent(IsMovingComponent)) {
+        for (const entity of this.registry.getEntitiesWithComponent(MovementComponent)) {
+            this.processEntityDirection(entity);
             this.processEntityMovement(entity, delta);
         }
     }
