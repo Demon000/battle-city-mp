@@ -27,6 +27,7 @@ import { Point } from '../physics/point/Point';
 import { PointUtils } from '../physics/point/PointUtils';
 import { EntityType } from './EntityType';
 import { EntityFactory } from './EntityFactory';
+import { MovementConfigComponent } from '@/components/MovementConfigComponent';
 
 export class EntityService {
     constructor(
@@ -94,11 +95,12 @@ export class EntityService {
 
     private processMovementSpeed(entity: Entity, delta: number): void {
         const movement = entity.getComponent(MovementComponent);
+        const movementConfig = entity.findComponent(MovementConfigComponent);
         const multipliers = entity.findComponent(MovementMultipliersComponent);
 
-        let accelerationFactor = movement.accelerationFactor;
-        let decelerationFactor = movement.decelerationFactor;
-        let maxSpeed = movement.maxSpeed;
+        let accelerationFactor = movementConfig?.accelerationFactor ?? 0;
+        let decelerationFactor = movementConfig?.decelerationFactor ?? 0;
+        let maxSpeed = movementConfig?.maxSpeed ?? 0;
         if (multipliers !== undefined) {
             accelerationFactor *= multipliers.accelerationFactorMultiplier;
             decelerationFactor *= multipliers.decelerationFactorMultiplier;

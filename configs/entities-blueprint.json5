@@ -562,14 +562,16 @@
                     },
                 },
             },
-            MovementComponent: {
-                maxSpeed: 114,
-                accelerationFactor: 3,
-                decelerationFactor: 3,
-            },
             HealthComponent: {
                 max: 2,
                 value: 2,
+            },
+        },
+        sharedServerComponents: {
+            MovementConfigComponent: {
+                maxSpeed: 114,
+                accelerationFactor: 3,
+                decelerationFactor: 3,
             },
         },
     },
@@ -605,14 +607,16 @@
                     },
                 },
             },
-            MovementComponent: {
-                maxSpeed: 128,
-                accelerationFactor: 2,
-                decelerationFactor: 2,
-            },
             HealthComponent: {
                 max: 1,
                 value: 1,
+            },
+        },
+        sharedServerComponents: {
+            MovementConfigComponent: {
+                maxSpeed: 128,
+                accelerationFactor: 2,
+                decelerationFactor: 2,
             },
         },
     },
@@ -648,14 +652,16 @@
                     },
                 },
             },
-            MovementComponent: {
-                maxSpeed: 96,
-                accelerationFactor: 1,
-                decelerationFactor: 1,
-            },
             HealthComponent: {
                 max: 3,
                 value: 3,
+            },
+        },
+        sharedServerComponents: {
+            MovementConfigComponent: {
+                maxSpeed: 96,
+                accelerationFactor: 1,
+                decelerationFactor: 1,
             },
         },
     },

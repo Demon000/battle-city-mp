@@ -45,6 +45,7 @@ import { CollisionRulesComponent, CollisionRulesComponentData } from '@/componen
 import { DirtyCollisionsAddComponent, DirtyCollisionsAddComponentData } from '@/components/DirtyCollisionsAddComponent';
 import { DirtyCollisionsUpdateComponent, DirtyCollisionsUpdateComponentData } from '@/components/DirtyCollisionsUpdateComponent';
 import { DirtyCollisionsRemoveComponent, DirtyCollisionsRemoveComponentData } from '@/components/DirtyCollisionsRemoveComponent';
+import { MovementConfigComponent, MovementConfigComponentData } from '@/components/MovementConfigComponent';
 
 export class ComponentRegistry {
     protected lookupAndValidate(
@@ -228,6 +229,10 @@ export class ComponentRegistry {
             case DirtyCollisionsRemoveComponent.name:
                 assertEquals<Partial<DirtyCollisionsRemoveComponentData>>(data);
                 return DirtyCollisionsRemoveComponent;
+            case MovementConfigComponent.tag:
+            case MovementConfigComponent.name:
+                assertEquals<Partial<MovementConfigComponentData>>(data);
+                return MovementConfigComponent;
         }
     }
 
