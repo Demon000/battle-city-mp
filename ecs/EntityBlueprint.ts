@@ -175,10 +175,7 @@ export class EntityBlueprint {
                 component = this.registry.findSharedComponent(clazz);
                 if (component === undefined) {
                     component = this.registry
-                        .createDetachedComponent(tag, undefined, {
-                            ...options,
-                            flags: ComponentFlags.LOCAL_ONLY,
-                        });
+                        .createDetachedComponent(tag, undefined, options);
                     this.registry.addSharedComponent(component);
                 }
             } else {
