@@ -1,6 +1,7 @@
 import { BulletPower } from '@/subtypes/BulletPower';
 import { BulletComponent } from '@/components/BulletComponent';
 import { ColorComponent } from '@/components/ColorComponent';
+import { IsMovingComponent } from '@/components/IsMovingComponent';
 import { AnimatedImageDrawable } from '@/drawable/AnimatedImageDrawable';
 import { IDrawable, DrawableProcessingFunction, DrawableTestFunction } from '@/drawable/IDrawable';
 import { IImageDrawable, ImageDrawableProperties } from '@/drawable/IImageDrawable';
@@ -19,7 +20,6 @@ import { RenderPass } from './RenderPass';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { RelativePositionComponent } from '@/components/RelativePositionComponent';
 import { CollisionTrackingComponent } from '@/components/CollisionTrackingComponent';
-import { MovementComponent } from '@/components/MovementComponent';
 
 const directionTest = (targetDirection: Direction): DrawableTestFunction => {
     return (entity: Entity): boolean => {
@@ -199,23 +199,17 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                 return [
                     directionTest(direction),
                     (entity: Entity): boolean => {
+                        const isMoving = entity.hasComponent(IsMovingComponent);
+
+                        if (isMoving !== targetIsMoving) {
+                            return false;
+                        }
+
                         if (entity.subtypes[0] !== tier) {
                             return false;
                         }
 
-                        const movement = entity.findComponent(MovementComponent);
-
-                        if ((movement === undefined || movement.speed === 0)
-                            && !targetIsMoving) {
-                            return true;
-                        }
-
-                        if (movement !== undefined && movement.speed > 0
-                            && targetIsMoving) {
-                            return true;
-                        }
-
-                        return false;
+                        return true;
                     },
                 ];
             };

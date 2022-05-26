@@ -26,6 +26,7 @@ import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { EntityId } from '@/ecs/EntityId';
 import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
+import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
@@ -190,6 +191,12 @@ export class GameClient {
                     const entity = component.entity;
                     this.collisionService.markDirtyCollisions(entity,
                         DirtyCollisionType.REMOVE);
+                });
+        this.registry.componentEmitter(MovementComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_UPDATED,
+                (component) => {
+                    const entity = component.entity;
+                    this.entityService.updateIsMoving(entity);
                 });
         this.registry.componentEmitter(HealthComponent, true)
             .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,

@@ -45,6 +45,7 @@ import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
 import { SizeComponent } from '@/components/SizeComponent';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
+import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
 import { EntitySpawnerService } from '@/services/EntitySpawnerService';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
@@ -239,6 +240,12 @@ export class GameServer {
                     const entity = component.entity;
                     this.collisionService.markDirtyCollisions(entity,
                         DirtyCollisionType.REMOVE);
+                });
+        this.registry.componentEmitter(MovementComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
+                (_event, component) => {
+                    const entity = component.entity;
+                    this.entityService.updateIsMoving(entity);
                 });
         this.registry.componentEmitter(HealthComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
@@ -608,6 +615,7 @@ export class GameServer {
 
                 this.playerService.processPlayersStatus(deltaSeconds);
                 this.entitySpawnerService.processActiveEntitySpawners();
+                this.entityService.processDirection();
                 this.collisionService.processRequestedDirection();
                 this.entityService.processMovement(deltaSeconds);
                 this.collisionService.processRequestedPosition();

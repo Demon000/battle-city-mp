@@ -7,6 +7,7 @@ import { assert } from '@/utils/assert';
 import { assertEquals } from 'typescript-is';
 import { DestroyedComponent, DestroyedComponentData } from '@/components/DestroyedComponent';
 import { GraphicDependenciesComponent, GraphicDependenciesComponentData } from '@/components/GraphicDependenciesComponent';
+import { IsMovingComponent, IsMovingComponentData } from '@/components/IsMovingComponent';
 import { DirectionAxisSnappingComponent, DirectionAxisSnappingComponentData } from '@/components/DirectionAxisSnappingComponent';
 import { SpawnTimeComponent, SpawnTimeComponentData } from '@/components/SpawnTimeComponent';
 import { CenterPositionComponent, CenterPositionComponentData } from '@/components/CenterPositionComponent';
@@ -76,6 +77,10 @@ export class ComponentRegistry {
             case GraphicDependenciesComponent.name:
                 assertEquals<Partial<GraphicDependenciesComponentData>>(data);
                 return GraphicDependenciesComponent;
+            case IsMovingComponent.tag:
+            case IsMovingComponent.name:
+                assertEquals<Partial<IsMovingComponentData>>(data);
+                return IsMovingComponent;
             case DirectionAxisSnappingComponent.tag:
             case DirectionAxisSnappingComponent.name:
                 assertEquals<Partial<DirectionAxisSnappingComponentData>>(data);
