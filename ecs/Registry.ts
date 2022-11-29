@@ -112,8 +112,6 @@ export class Registry {
         this.upsertComponent = this.upsertComponent.bind(this);
 
         this.componentRegistry = componentRegistry;
-
-        console.log(this);
     }
 
     componentEmitter<C extends Component<C>>(
