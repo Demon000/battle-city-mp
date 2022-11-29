@@ -273,48 +273,4 @@
             },
         },
     },
-    {
-        type: 'teleporter',
-        position: {
-            x: 240,
-            y: 208,
-        },
-        components: {
-            ColorComponent: {
-                value: [
-                    253,
-                    106,
-                    2,
-                ],
-            },
-            TeleporterComponent: {
-                target: {
-                    x: 248,
-                    y: 248,
-                },
-            },
-        },
-    },
-    {
-        type: 'teleporter',
-        position: {
-            x: 240,
-            y: 240,
-        },
-        components: {
-            ColorComponent: {
-                value: [
-                    253,
-                    106,
-                    2,
-                ],
-            },
-            TeleporterComponent: {
-                target: {
-                    x: 248,
-                    y: 216,
-                },
-            },
-        },
-    },
 ]
