@@ -12,7 +12,6 @@ import { ClazzOrTag } from '@/ecs/Component';
 import { GraphicsRendererComponent } from '@/components/GraphicsRendererComponent';
 import { Entity } from '@/ecs/Entity';
 import { EntityGraphicsRenderer } from '@/entity/EntityGraphicsRenderer';
-import { RenderPass } from '@/entity/RenderPass';
 
 export class GameGraphicsService {
     private gameWidth = 0;
@@ -119,11 +118,6 @@ export class GameGraphicsService {
                 context.fillRect(0, 0, context.canvas.width, context.canvas.height);
             } else {
                 context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-            }
-
-            if (renderPass === RenderPass.NIGHT) {
-                context.fillStyle = 'rgba(0, 0, 0, 0.90)';
-                context.fillRect(0, 0, context.canvas.width, context.canvas.height);
             }
         }
 

@@ -6,6 +6,5 @@ export enum RenderPass {
     BELOW_BUSH,
     BUSHES,
     ABOVE_BUSH,
-    NIGHT,
     MAX,
 }
