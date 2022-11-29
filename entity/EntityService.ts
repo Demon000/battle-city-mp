@@ -332,13 +332,12 @@ export class EntityService {
     }
 
     processDirtyRelativePosition(): void {
-        for (const component of this.registry
-            .getComponents(DirtyPositionComponent)) {
+        for (const entity of this.registry
+            .getEntitiesWithComponent(DirtyPositionComponent)) {
 
-            const entity = component.entity;
             this.updateRelativePosition(entity);
 
-            component.remove({
+            entity.removeComponent(DirtyPositionComponent, {
                 silent: true,
             });
         }
