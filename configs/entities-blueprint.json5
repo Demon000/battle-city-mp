@@ -391,6 +391,9 @@
             TeamOwnedComponent: {},
             FlagComponent: {},
         },
+        localComponents: {
+            CenterPositionComponent: {},
+        },
         sharedLocalComponents: {
             SizeComponent: {
                 width: 16,
