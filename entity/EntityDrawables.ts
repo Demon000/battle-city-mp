@@ -272,6 +272,15 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
                 }
             }
 
+            drawables.push(
+                new ImageDrawable('tank_light.png', {
+                    offsetX: -56,
+                    offsetY: -56,
+                    renderPass: RenderPass.NIGHT,
+                    compositionType: 'destination-out',
+                }),
+            );
+
             return drawables;
         })(),
         new TextDrawable('', {
