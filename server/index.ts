@@ -35,7 +35,7 @@ const argv = yargs(process.argv.slice(2))
         default: 5000,
         description: 'specify port',
     })
-    .argv;
+    .parseSync();
 
 const app = Express();
 const http = new Http.Server(app);
