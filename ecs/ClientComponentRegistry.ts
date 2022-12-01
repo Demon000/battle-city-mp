@@ -1,5 +1,5 @@
 import { GraphicsRendererComponent, GraphicsRendererComponentData } from '@/components/GraphicsRendererComponent';
-import { assertEquals } from 'typescript-is';
+import { assert as assertEquals } from 'typescript-json';
 import { ComponentClassType } from './Component';
 import { ComponentRegistry } from './ComponentRegistry';
 

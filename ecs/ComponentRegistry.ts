@@ -4,7 +4,7 @@ import { PositionComponent, PositionComponentData } from '@/components/PositionC
 import { SizeComponent, SizeComponentData } from '@/components/SizeComponent';
 import { AutomaticDestroyComponent, AutomaticDestroyComponentData } from '../components/AutomaticDestroyComponent';
 import { assert } from '@/utils/assert';
-import { assertEquals } from 'typescript-is';
+import { assert as assertEquals } from 'typescript-json';
 import { DestroyedComponent, DestroyedComponentData } from '@/components/DestroyedComponent';
 import { GraphicDependenciesComponent, GraphicDependenciesComponentData } from '@/components/GraphicDependenciesComponent';
 import { IsMovingComponent, IsMovingComponentData } from '@/components/IsMovingComponent';
