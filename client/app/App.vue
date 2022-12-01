@@ -198,17 +198,18 @@ import { Team } from '@/team/Team';
 import screenfull from 'screenfull';
 import { io, Socket } from 'socket.io-client';
 import { markRaw } from 'vue';
-import { Options } from 'vue-class-component';
 import { CLIENT_CONFIG_SOCKET_BASE_URL, CLIENT_SPRITES_RELATIVE_URL } from '../../config';
 import { DirectionalJoystickWrapper, DirectionalJoystickEvent } from '../DirectionalJoystickWrapper';
 import { GamepadWrapper, GamepadWrapperEvent, GamepadWrapperEventData } from '../GamepadWrapper';
 import { ColorUtils } from '@/utils/ColorUtils';
-import { Vue, Watch } from 'vue-property-decorator';
 import { EntityId } from '@/ecs/EntityId';
+import { Component, Vue, Watch } from 'vue-facing-decorator';
 
-@Options({
-    components: {
-        'settings': Settings,
+@Component({
+    options: {
+        components: {
+            'settings': Settings,
+        },
     },
 })
 export default class App extends Vue {
@@ -433,7 +434,7 @@ export default class App extends Vue {
     onSettingsShown(): void {
         this.isUserShowingScoreboard = false;
         this.$nextTick(() => {
-            const settingsElement = (this.$refs.settingsElement as Vue).$el as HTMLElement;
+            const settingsElement = (this.$refs.settingsElement as any).$el as HTMLElement;
             settingsElement.focus();
         });
     }

@@ -116,19 +116,21 @@
 import { Color } from '@/drawable/Color';
 import { ColorUtils } from '@/utils/ColorUtils';
 import { TankTier } from '@/subtypes/TankTier';
-import { Vue, Prop, Watch, Options } from 'vue-property-decorator';
+import { Vue, Prop, Watch, Component } from 'vue-facing-decorator';
 import { Team } from '@/team/Team';
 import { PlayerSpawnStatus } from '@/player/Player';
 
-@Options({
-    emits: [
-        'tank-tier-change',
-        'tank-color-change',
-        'player-name-change',
-        'player-team-change',
-        'spawn-click',
-        'escape-keyup',
-    ],
+@Component({
+    options: {
+        emits: [
+            'tank-tier-change',
+            'tank-color-change',
+            'player-name-change',
+            'player-team-change',
+            'spawn-click',
+            'escape-keyup',
+        ],
+    },
 })
 export default class Settings extends Vue {
     TankTier = TankTier;
