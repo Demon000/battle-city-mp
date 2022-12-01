@@ -2,7 +2,7 @@
     <div class="settings">
         <div class="content-container">
             <div class="logo-container">
-                <img src="../assets/images/logo.png" alt="" class="logo">
+                <img src="/assets/images/logo.png" alt="" class="logo">
             </div>
 
             <div class="inputs-container inline">
@@ -44,7 +44,7 @@
                     >
                         <img
                             class="tier-image"
-                            :src="WebpackUtils.getImageUrl(`tank_${tier}`)"
+                            :src="`/assets/images/tank_${tier}.png`"
                         >
                         <span>{{ tier }}</span>
                     </div>
@@ -115,7 +115,6 @@
 <script lang="ts">
 import { Color } from '@/drawable/Color';
 import { ColorUtils } from '@/utils/ColorUtils';
-import { WebpackUtils } from '@/client/utils/WebpackUtils';
 import { TankTier } from '@/subtypes/TankTier';
 import { Vue, Prop, Watch, Options } from 'vue-property-decorator';
 import { Team } from '@/team/Team';
@@ -134,7 +133,6 @@ import { PlayerSpawnStatus } from '@/player/Player';
 export default class Settings extends Vue {
     TankTier = TankTier;
     ColorUtils = ColorUtils;
-    WebpackUtils = WebpackUtils;
 
     @Prop()
     hasTankDiedOnce = false;

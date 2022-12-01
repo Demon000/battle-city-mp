@@ -16,7 +16,7 @@
                 <div id="fullscreen-controls" class="controls">
                     <img
                         class="image-button"
-                        :src="WebpackUtils.getImageUrl('fullscreen_button')"
+                        src="/assets/images/fullscreen_button.png"
                         alt="Enter fullscreen"
                         v-if="!isFullscreen"
                         @click="onFullscreenButtonClick"
@@ -24,7 +24,7 @@
 
                     <img
                         class="image-button"
-                        :src="WebpackUtils.getImageUrl('fullscreen_exit_button')"
+                        src="/assets/images/fullscreen_exit_button.png"
                         alt="Exit fullscreen"
                         v-if="isFullscreen"
                         @click="onFullscreenButtonClick"
@@ -48,13 +48,13 @@
                                 class="tank-stats-icon"
                                 v-for="i in tankHealth"
                                 :key="i"
-                                :src="WebpackUtils.getImageUrl('heart_full')"
+                                src="/assets/images/heart_full.png"
                             >
                             <img
                                 class="tank-stats-icon"
                                 v-for="i in tankMissingHearts"
                                 :key="i"
-                                :src="WebpackUtils.getImageUrl('heart_empty')"
+                                src="/assets/images/heart_empty.png"
                             >
                         </div>
                     </div>
@@ -75,13 +75,13 @@
                                     class="tank-stats-icon"
                                     v-for="i in tankMissingBullets"
                                     :key="i"
-                                    :src="WebpackUtils.getImageUrl('bullet_full')"
+                                    src="/assets/images/bullet_full.png"
                                 >
                                 <img
                                     class="tank-stats-icon"
                                     v-for="i in tankBullets"
                                     :key="i"
-                                    :src="WebpackUtils.getImageUrl('bullet_empty')"
+                                    src="/assets/images/bullet_empty.png"
                                 >
                             </template>
                         </div>
@@ -204,7 +204,6 @@ import { DirectionalJoystickWrapper, DirectionalJoystickEvent } from '../Directi
 import { GamepadWrapper, GamepadWrapperEvent, GamepadWrapperEventData } from '../GamepadWrapper';
 import { ColorUtils } from '@/utils/ColorUtils';
 import { Vue, Watch } from 'vue-property-decorator';
-import { WebpackUtils } from '../utils/WebpackUtils';
 import { EntityId } from '@/ecs/EntityId';
 
 @Options({
@@ -213,7 +212,6 @@ import { EntityId } from '@/ecs/EntityId';
     },
 })
 export default class App extends Vue {
-    WebpackUtils = WebpackUtils;
     socket?: Socket<GameSocketEvents>;
 
     gameClient?: GameClient;
