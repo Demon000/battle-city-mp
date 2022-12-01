@@ -10,7 +10,7 @@ export interface FillOptions {
 }
 
 export interface ImageDrawableProperties extends DrawableProperties {
-    compositionType?: string;
+    compositionType?: GlobalCompositeOperation;
     maskColor?: Color;
     overlays?: IImageDrawable[];
     fillRepeatWidth?: number;
