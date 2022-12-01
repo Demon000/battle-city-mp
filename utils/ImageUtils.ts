@@ -96,7 +96,7 @@ export class ImageUtils {
         const offsetCanvas = CanvasUtils.create(offsetWidth, offsetHeight);
         const offsetContext = CanvasUtils.getContext(offsetCanvas);
 
-        const pattern = offsetContext.createPattern(source, 'repeat');
+        const pattern = offsetContext.createPattern(source as CanvasImageSource, 'repeat');
         assert(pattern !== null, 'Failed to create canvas pattern');
         offsetContext.fillStyle = pattern;
 
