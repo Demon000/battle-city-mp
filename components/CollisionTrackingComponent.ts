@@ -1,8 +1,10 @@
 import { Component } from '@/ecs/Component';
 import { EntityId } from '@/ecs/EntityId';
 
+export type CollisionTrackingData = Record<string, Record<EntityId, boolean>>;
+
 export interface CollisionTrackingComponentData {
-    values: Record<string, EntityId | false>;
+    values: CollisionTrackingData;
 }
 
 export class CollisionTrackingComponent
@@ -10,5 +12,5 @@ export class CollisionTrackingComponent
     implements CollisionTrackingComponentData {
     static TAG = 'CT';
 
-    values: Record<string, EntityId | false> = {};
+    values: CollisionTrackingData = {};
 }

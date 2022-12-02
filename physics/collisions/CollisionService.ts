@@ -22,11 +22,12 @@ import { DirectionUtils } from './DirectionUtils';
 import { CollisionEvents, CollisionRule, CollisionRuleType } from './CollisionRule';
 import { EntityId } from '@/ecs/EntityId';
 import { LazyIterable } from '@/utils/LazyIterable';
-import { CollisionTrackingComponent } from '@/components/CollisionTrackingComponent';
+import { CollisionTrackingComponent, CollisionTrackingData } from '@/components/CollisionTrackingComponent';
 import { CollisionRulesComponent } from '@/components/CollisionRulesComponent';
 import { DirtyCollisionsAddComponent } from '@/components/DirtyCollisionsAddComponent';
 import { DirtyCollisionsUpdateComponent } from '@/components/DirtyCollisionsUpdateComponent';
 import { DirtyCollisionsRemoveComponent } from '@/components/DirtyCollisionsRemoveComponent';
+import { IterableUtils } from '@/utils/IterableUtils';
 
 export enum DirtyCollisionType {
     ADD,
@@ -125,6 +126,50 @@ export class CollisionService {
         }
     }
 
+    private getCollisionTrackingEntities(
+        data: CollisionTrackingData,
+        type: string,
+    ): Iterable<EntityId> {
+        return Object.keys(data[type]);
+    }
+
+    private getCollisionTrackingTypeValue(
+        data: CollisionTrackingData,
+        type: string,
+    ): boolean {
+        for (const value of this.getCollisionTrackingEntities(data, type)) {
+            if (value) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private copyCollisionTrackingTypes(
+        sourceData: CollisionTrackingData,
+        targetData: CollisionTrackingData,
+    ): void {
+        for (const key of Object.keys(sourceData)) {
+            targetData[key] = {};
+        }
+    }
+
+    private addCollisionTrackingEntity(
+        data: CollisionTrackingData,
+        entity: Entity,
+    ): void {
+        assert(data[entity.type] !== undefined);
+        data[entity.type][entity.id] = true;
+    }
+
+    private hasCollisionTrackingEntity(
+        data: CollisionTrackingData,
+        entity: Entity,
+    ): boolean {
+        return data[entity.type][entity.id] !== undefined;
+    }
+
     private updateMovementModifiers(entity: Entity): void {
         const movingMultipliers =
             entity.findComponent(MovementMultipliersComponent);
@@ -143,9 +188,10 @@ export class CollisionService {
         movingMultipliers.maxSpeedMultiplier = 1;
         movingMultipliers.typeMultipliersMarkedMap = {};
 
-        for (const [type, value] of Object.entries(collisionTracking.values)) {
+        for (const type of Object.keys(collisionTracking.values)) {
             const typeMultipliers = movingMultipliers.typeMultipliersMap[type];
-            if (typeMultipliers === undefined || value === false) {
+            if (typeMultipliers === undefined ||
+                !this.getCollisionTrackingTypeValue(collisionTracking.values, type)) {
                 continue;
             }
 
@@ -188,11 +234,10 @@ export class CollisionService {
         const collisionTracking = movingEntity
             .findComponent(CollisionTrackingComponent);
 
-        const newCollisionTrackingValues: Record<string, EntityId | false> = {};
+        const newCollisionTrackingValues: CollisionTrackingData = {};
         if (collisionTracking !== undefined) {
-            for (const key of Object.keys(collisionTracking.values)) {
-                newCollisionTrackingValues[key] = false;
-            }
+            this.copyCollisionTrackingTypes(collisionTracking.values,
+                newCollisionTrackingValues);
         }
 
         let movementPreventingEntity;
@@ -247,15 +292,11 @@ export class CollisionService {
                      * exiting.
                      */
                     && (coversMinimumVolume
-                        || collisionTracking.values[overlappingEntity.type]
-                            !== false)
-                    /*
-                     * Keep the first colliding entity.
-                     */
-                    && newCollisionTrackingValues[overlappingEntity.type]
-                        === false) {
-                    newCollisionTrackingValues[overlappingEntity.type]
-                        = overlappingEntity.id;
+                        || this.hasCollisionTrackingEntity(
+                            collisionTracking.values, overlappingEntity))
+                    ) {
+                    this.addCollisionTrackingEntity(newCollisionTrackingValues,
+                        overlappingEntity);
                 }
             }
         }
@@ -297,33 +338,40 @@ export class CollisionService {
         let collisionTrackingChanged = false;
 
         for (const type of Object.keys(collisionTracking.values)) {
-            if (collisionTracking.values[type]
-                === newCollisionTrackingValues[type]) {
+            const oldEntityIds = this.getCollisionTrackingEntities(collisionTracking.values, type);
+            const newEntityIds = this.getCollisionTrackingEntities(newCollisionTrackingValues, type);
+
+            if (IterableUtils.equals(oldEntityIds, newEntityIds)) {
                 continue;
             }
 
             collisionTrackingChanged = true;
-
-            if ((collisionTracking.values[type] === false
-                    && newCollisionTrackingValues[type] === false)
-                || (collisionTracking.values[type] !== false
-                    && newCollisionTrackingValues[type] !== false)) {
-                continue;
-            }
 
             const rule = this.getRuleWithType(movingEntity, type,
                 CollisionRuleType.TRACK);
             assert(rule !== undefined
                 && rule.type === CollisionRuleType.TRACK);
 
-            if (newCollisionTrackingValues[type] !== false
-                && rule.entryEvent !== undefined) {
-                this.emitter.emit(rule.entryEvent, movingEntity.id,
-                    newCollisionTrackingValues[type] as EntityId);
-            } else if (newCollisionTrackingValues[type] === false
-                && rule.exitEvent !== undefined) {
-                this.emitter.emit(rule.exitEvent, movingEntity.id,
-                    collisionTracking.values[type] as EntityId);
+            if (rule.entryEvent !== undefined) {
+                for (const entityId of newEntityIds) {
+                    if (entityId in oldEntityIds) {
+                        continue;
+                    }
+
+                    this.emitter.emit(rule.entryEvent, movingEntity.id,
+                        +entityId);
+                }
+            }
+
+            if (rule.exitEvent !== undefined) {
+                for (const entityId of oldEntityIds) {
+                    if (entityId in newEntityIds) {
+                        continue;
+                    }
+
+                    this.emitter.emit(rule.exitEvent, movingEntity.id,
+                        +entityId);
+                }
             }
         }
 

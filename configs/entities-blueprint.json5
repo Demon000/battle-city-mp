@@ -201,11 +201,11 @@
             EntityOwnedComponent: {},
             CollisionTrackingComponent: {
                 values: {
-                    'level-border': false,
-                    'brick-wall': false,
-                    'steel-wall': false,
-                    'tank': false,
-                    'bullet': false,
+                    'level-border': {},
+                    'brick-wall': {},
+                    'steel-wall': {},
+                    'tank': {},
+                    'bullet': {},
                 },
             },
         },
@@ -449,11 +449,11 @@
             SmokeSpawnerComponent: {},
             CollisionTrackingComponent: {
                 values: {
-                    'sand': false,
-                    'ice': false,
-                    'flag-base': false,
-                    'flag': false,
-                    'teleporter': false,
+                    'sand': {},
+                    'ice': {},
+                    'flag-base': {},
+                    'flag': {},
+                    'teleporter': {},
                 },
             },
         },
@@ -461,7 +461,7 @@
             SpawnTimeComponent: {},
             CollisionTrackingComponent: {
                 values: {
-                    'bush': false,
+                    'bush': {},
                 },
             },
         },
