@@ -1,21 +1,28 @@
 {
   "compilerOptions": {
     "outDir": "build",
-    "target": "es2018",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "target": "ESNext",
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "strict": true,
     "importHelpers": true,
     "experimentalDecorators": true,
     "allowJs": true,
     "skipLibCheck": true,
+    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
+    "noEmit": true,
+    "sourceMap": false,
     "baseUrl": ".",
     "types": [
       "node",
-      "webpack-env"
+      "webpack-env",
+      "offscreencanvas",
+      "vite/client"
     ],
     "paths": {
       "@/*": [
@@ -23,25 +30,29 @@
       ],
     },
     "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable",
-      "scripthost"
+      "ESNext",
+      "DOM"
     ],
     "plugins": [
       {
         "transform": "typescript-transform-paths"
       },
       {
-        "transform": "typescript-is/lib/transform-inline/transformer"
+        "transform": "typescript-json/lib/transform",
       }
     ]
   },
   "include": [
     "**/*.ts",
+    "**/*.d.ts",
+    "**/*.tsx",
     "**/*.vue"
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
+  "ts-node": {
+    "esm": true,
+    "compiler": "ttypescript",
+  }
 }
