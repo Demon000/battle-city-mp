@@ -1,5 +1,4 @@
 import { assert } from '@/utils/assert';
-import { nonenumerable } from '@/utils/enumerable';
 import { Entity } from './Entity';
 import { Registry, RegistryOperationOptions } from './Registry';
 
@@ -12,17 +11,21 @@ export enum ComponentFlags {
     SHARED = 1 << 2,
 }
 
+const ComponentNonEnumerableKeys: Set<string> = new Set([
+    'registry',
+    'entities',
+    'clazz',
+    'flags',
+    'TAG',
+]);
+
 export class Component<C extends Component<C>> {
-    @nonenumerable
     readonly registry: Registry;
 
-    @nonenumerable
     readonly entities: Set<Entity> = new Set();
 
-    @nonenumerable
     readonly clazz: ComponentClassType<C>;
 
-    @nonenumerable
     flags = 0;
 
     constructor(
@@ -36,7 +39,6 @@ export class Component<C extends Component<C>> {
 
     static readonly BASE_FLAGS: number = 0;
 
-    @nonenumerable
     static readonly TAG?: string;
 
     get entity(): Entity {
@@ -63,8 +65,22 @@ export class Component<C extends Component<C>> {
         this.entities.delete(entity);
     }
 
-    getData(): Partial<this> {
-        return {...this};
+    protected getNonEnumerableKeys(): Set<string> {
+        return ComponentNonEnumerableKeys;
+    }
+
+    getData(): Record<string, any> {
+        const nonEnumerableKeys = this.getNonEnumerableKeys();
+        const data: Record<string, any> = {};
+
+        for (const key of Object.keys(this)) {
+            if (nonEnumerableKeys.has(key))
+                continue;
+
+            data[key] = this[key as keyof this];
+        }
+
+        return data;
     }
 
     setData(encoding: any): void {
