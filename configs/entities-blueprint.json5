@@ -440,9 +440,15 @@
             DirectionComponent: {},
             MovementComponent: {},
             ColorComponent: {},
+        },
+        localComponents: {
+            CenterPositionComponent: {},
+        },
+        serverComponents: {
+            TankComponent: {},
+            SmokeSpawnerComponent: {},
             CollisionTrackingComponent: {
                 values: {
-                    'bush': false,
                     'sand': false,
                     'ice': false,
                     'flag-base': false,
@@ -451,15 +457,13 @@
                 },
             },
         },
-        localComponents: {
-            CenterPositionComponent: {},
-        },
-        serverComponents: {
-            TankComponent: {},
-            SmokeSpawnerComponent: {},
-        },
         clientComponents: {
             SpawnTimeComponent: {},
+            CollisionTrackingComponent: {
+                values: {
+                    'bush': false,
+                },
+            },
         },
         sharedLocalComponents: {
             SizeComponent: {
@@ -473,6 +477,14 @@
                     'CollisionTrackingComponent': true,
                     'IsMovingComponent': true,
                     'DirectionComponent': true,
+                },
+            },
+            CollisionRulesComponent: {
+                rules: {
+                    'bush': [{
+                        type: 'track',
+                        minimumVolume: 48,
+                    }],
                 },
             },
         },
@@ -507,10 +519,6 @@
                         type: 'track',
                         entryEvent: 'entity-collide-teleporter',
                         minimumVolume: 192,
-                    }],
-                    'bush': [{
-                        type: 'track',
-                        minimumVolume: 48,
                     }],
                     'ice': [{
                         type: 'track',
