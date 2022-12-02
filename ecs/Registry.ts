@@ -6,6 +6,7 @@ import { Entity } from './Entity';
 import { EntityId } from './EntityId';
 import { RegistryIdGenerator } from './RegistryIdGenerator';
 import { LazyIterable } from '@/utils/LazyIterable';
+import { nonenumerable } from '@/utils/enumerable';
 
 export enum RegistryEvent {
     ENTITY_REGISTERED = 'entity-registered',
@@ -76,18 +77,28 @@ export type DataHandlingFn = <C extends Component<C>>(
 ) => C;
 
 export class Registry {
+    @nonenumerable
     private tagsComponentsMap = new Map<string, Set<Component<any>>>();
 
+    @nonenumerable
     private componentsEmitterMap = new Map<string, EventEmitter<RegistryComponentEvents>>();
 
+    @nonenumerable
     private sharedComponents: Map<ComponentClassType<any>, Component<any>> = new Map();
 
+    @nonenumerable
     private sharedByTypeComponents: Map<string, Map<ComponentClassType<any>, Component<any>>> = new Map();
 
+    @nonenumerable
     private idsEntityMap = new Map<EntityId, Entity>();
 
+    @nonenumerable
     private componentRegistry;
 
+    @nonenumerable
+    private componentCount = 0;
+
+    @nonenumerable
     private componentTypeCountMap = new Map<ComponentClassType<any>, number>();
 
     emitter = new EventEmitter<RegistryEvents & RegistryComponentEvents>();
@@ -398,6 +409,7 @@ export class Registry {
             component.flags |= options.flags;
         }
 
+        this.componentCount++;
         let count = this.componentTypeCountMap.get(clazz);
         if (count === undefined) {
             count = 0;
