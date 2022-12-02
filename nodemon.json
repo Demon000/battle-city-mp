@@ -1,0 +1,10 @@
+{
+    "restartable": "rs",
+    "ignore": [
+        "node_modules"
+    ],
+    "execMap": {
+        "ts": "node --loader ts-node/esm --experimental-specifier-resolution=node"
+    },
+    "ext": "ts,json,json5"
+}
