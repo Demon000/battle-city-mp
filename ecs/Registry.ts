@@ -96,9 +96,6 @@ export class Registry {
     private componentRegistry;
 
     @nonenumerable
-    private componentCount = 0;
-
-    @nonenumerable
     private componentTypeCountMap = new Map<ComponentClassType<any>, number>();
 
     emitter = new EventEmitter<RegistryEvents & RegistryComponentEvents>();
@@ -441,15 +438,6 @@ export class Registry {
             && options.flags) {
             component.flags |= options.flags;
         }
-
-        this.componentCount++;
-        let count = this.componentTypeCountMap.get(clazz);
-        if (count === undefined) {
-            count = 0;
-
-        }
-        count++;
-        this.componentTypeCountMap.set(clazz, count);
 
         return component;
     }
