@@ -51,10 +51,6 @@ export class GameServerSocket {
             this.gameServer.onPlayerRequestSpawnStatus(socket.id, PlayerSpawnStatus.SPAWN);
         });
 
-        socket.on(GameSocketEvent.PLAYER_REQUEST_TANK_DESPAWN, () => {
-            this.gameServer.onPlayerRequestSpawnStatus(socket.id, PlayerSpawnStatus.DESPAWN);
-        });
-
         socket.on(GameSocketEvent.PLAYER_REQUEST_TANK_COLOR, (color: Color) => {
             this.gameServer.onPlayerRequestTankColor(socket.id, color);
         });

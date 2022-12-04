@@ -548,10 +548,6 @@ export default class App extends Vue {
         this.gameClientSocket?.requestPlayerTankSpawn();
     }
 
-    onDespawnButtonClick(): void {
-        this.gameClientSocket?.requestPlayerTankDespawn();
-    }
-
     onTankColorChanged(color: Color): void {
         this.gameClientSocket?.requestPlayerTankColor(color);
     }

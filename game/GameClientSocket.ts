@@ -101,10 +101,6 @@ export class GameClientSocket {
         this.socket.emit(GameSocketEvent.PLAYER_REQUEST_TANK_COLOR, color);
     }
 
-    requestPlayerTankDespawn(): void {
-        this.socket.emit(GameSocketEvent.PLAYER_REQUEST_TANK_DESPAWN);
-    }
-
     requestPlayerTankTier(tier: TankTier): void {
         this.socket.emit(GameSocketEvent.PLAYER_REQUEST_TANK_TIER, tier);
     }
