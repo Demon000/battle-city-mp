@@ -9,25 +9,29 @@ export class Config {
 
     constructor(dirPath?: string) {
         if (dirPath !== undefined) {
-            this.loadAll(dirPath);
+            this.loadDir(dirPath);
         }
     }
 
-    loadAll(dirPath: string): void {
+    loadFile(dirPath: string, fileName: string): void {
+        const filePath = path.join(dirPath, fileName);
+        const fileStats = fs.lstatSync(filePath);
+        if (fileStats.isDirectory()) {
+            return;
+        }
+
+        const rawData = fs.readFileSync(filePath, 'utf8');
+        const data = JSON5.parse(rawData);
+
+        const fileExtension = path.extname(fileName);
+        const fileBaseName = path.basename(fileName, fileExtension);
+        this.nameToData[fileBaseName] = data;
+    }
+
+    loadDir(dirPath: string): void {
         const files = fs.readdirSync(dirPath);
         for (const fileName of files) {
-            const filePath = path.join(dirPath, fileName);
-            const fileStats = fs.lstatSync(filePath);
-            if (fileStats.isDirectory()) {
-                continue;
-            }
-
-            const rawData = fs.readFileSync(filePath, 'utf8');
-            const data = JSON5.parse(rawData);
-
-            const fileExtension = path.extname(fileName);
-            const fileBaseName = path.basename(fileName, fileExtension);
-            this.nameToData[fileBaseName] = data;
+            this.loadFile(dirPath, fileName);
         }
     }
 
