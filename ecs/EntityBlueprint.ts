@@ -161,39 +161,13 @@ export class EntityBlueprint {
     addSharedComponents(
         entity: Entity,
         components: Record<string, any> | undefined,
-        options?: RegistryOperationOptions,
-    ): void {
+        options: RegistryOperationOptions | undefined,
+    ) {
         if (components === undefined) {
             return;
         }
 
-        for (const [tag, data] of Object.entries(components)) {
-            const clazz = this.registry.lookup(tag);
-            let component: Component<any>;
-
-            if (clazz.BASE_FLAGS & ComponentFlags.SHARED) {
-                component = this.registry.findSharedComponent(clazz);
-                if (component === undefined) {
-                    component = this.registry
-                        .createDetachedComponent(tag, undefined, options);
-                    this.registry.addSharedComponent(component);
-                }
-            } else {
-                component = this.registry.findSharedByTypeComponent(entity.type,
-                    clazz);
-                if (component === undefined) {
-                    component = this.registry
-                        .createDetachedComponent(tag, data, {
-                            ...options,
-                            flags: ComponentFlags.LOCAL_ONLY
-                                | ComponentFlags.SHARED_BY_TYPE,
-                        });
-                    this.registry.addSharedByTypeComponent(entity.type, component);
-                }
-            }
-
-            entity.attachComponent(component, options);
-        }
+        this.registry.addSharedComponents(entity, components, options);
     }
 
     addComponents(

@@ -316,6 +316,39 @@ export class Registry {
         this._addSharedComponent(componentsMap, component);
     }
 
+    addSharedComponents(
+        entity: Entity,
+        components: ComponentsInitialization,
+        options?: RegistryOperationOptions,
+    ): void {
+        for (const [tag, data] of Object.entries(components)) {
+            const clazz = this.lookup(tag);
+            let component: Component<any>;
+
+            if (clazz.BASE_FLAGS & ComponentFlags.SHARED) {
+                component = this.findSharedComponent(clazz);
+                if (component === undefined) {
+                    component = this
+                        .createDetachedComponent(tag, undefined, options);
+                    this.addSharedComponent(component);
+                }
+            } else {
+                component = this.findSharedByTypeComponent(entity.type,
+                    clazz);
+                if (component === undefined) {
+                    component = this.createDetachedComponent(tag, data, {
+                            ...options,
+                            flags: ComponentFlags.LOCAL_ONLY
+                                | ComponentFlags.SHARED_BY_TYPE,
+                        });
+                    this.addSharedByTypeComponent(entity.type, component);
+                }
+            }
+
+            entity.attachComponent(component, options);
+        }
+    }
+
     private _findSharedComponent<
         C extends Component<C>,
     >(
