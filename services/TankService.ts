@@ -40,7 +40,8 @@ export class TankService {
         });
     }
 
-    setOwnPlayerTankId(tankId: EntityId | null): void {
+    setOwnPlayerTank(tank: Entity | null): void {
+        const tankId = tank === null ? null : tank.id;
         this.ownPlayerTankId = tankId;
     }
 
@@ -48,8 +49,7 @@ export class TankService {
         return this.ownPlayerTankId;
     }
 
-    decreaseTankHealth(tankId: EntityId, value: number): void {
-        const tank = this.registry.getEntityById(tankId);
+    decreaseTankHealth(tank: Entity, value: number): void {
         const health = tank.getComponent(HealthComponent);
         health.update({
             value: health.value - value,

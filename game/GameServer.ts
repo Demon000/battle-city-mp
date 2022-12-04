@@ -141,7 +141,7 @@ export class GameServer {
                     case EntityType.TANK: {
                         const playerId = entity
                             .getComponent(PlayerOwnedComponent).playerId;
-                        this.playerService.setPlayerTankId(playerId, entity.id);
+                        this.playerService.setPlayerTank(playerId, entity);
                         break;
                     }
                 }
@@ -154,7 +154,7 @@ export class GameServer {
                     case EntityType.TANK: {
                         const playerId = entity
                             .getComponent(PlayerOwnedComponent).playerId;
-                        this.playerService.setPlayerTankId(playerId, null);
+                        this.playerService.setPlayerTank(playerId, null);
                         break;
                     }
                 }
@@ -299,11 +299,9 @@ export class GameServer {
                     return;
                 }
 
-                if (direction === undefined) {
-                    this.entityService.setMovementDirection(player.tankId, null);
-                } else {
-                    this.entityService.setMovementDirection(player.tankId, direction);
-                }
+                const tank = this.registry.getEntityById(player.tankId);
+                this.entityService.setMovementDirection(tank,
+                    direction === undefined ? null : direction);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_SPAWN_STATUS,
@@ -474,7 +472,7 @@ export class GameServer {
                 if (!ignoreBulletDamage) {
                     const oldTankHealth = tankHealth.value;
 
-                    this.tankService.decreaseTankHealth(tankId, bulletDamage);
+                    this.tankService.decreaseTankHealth(tank, bulletDamage);
                     bulletDamage -= oldTankHealth;
 
                     bulletComponent.update({

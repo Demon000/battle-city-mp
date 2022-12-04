@@ -149,10 +149,9 @@ export class GameGraphicsService {
     }
 
     processGraphicsDependencies(
-        entityId: EntityId,
+        entity: Entity,
         clazzOrTag: ClazzOrTag,
     ): void {
-        const entity = this.registry.getEntityById(entityId);
         const component = entity.findComponent(GraphicDependenciesComponent);
         if (component === undefined) {
             return;

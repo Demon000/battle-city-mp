@@ -138,7 +138,7 @@ export class GameClient {
                 }
 
                 this.gameGraphicsService
-                    .processGraphicsDependencies(component.entity.id,
+                    .processGraphicsDependencies(component.entity,
                         component.clazz.tag);
             });
         this.registry.componentEmitter(DestroyedComponent, true)
@@ -237,28 +237,36 @@ export class GameClient {
         this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_CHANGED_TANK_ID,
             (tankId: EntityId | null) => {
                 this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID, tankId);
-                this.tankService.setOwnPlayerTankId(tankId);
+
+                let tank = null;
                 if (tankId !== null) {
-                    const tank = this.registry.getEntityById(tankId);
-                    const health = tank.getComponent(HealthComponent);
-                    const bulletSpawner = tank.getComponent(BulletSpawnerComponent);
-                    this.emitter.emit(
-                        GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
-                        health.value,
-                    );
-                    this.emitter.emit(
-                        GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
-                        health.max,
-                    );
-                    this.emitter.emit(
-                        GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
-                        bulletSpawner.count,
-                    );
-                    this.emitter.emit(
-                        GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
-                        bulletSpawner.maxCount,
-                    );
+                    tank = this.registry.getEntityById(tankId);
                 }
+
+                this.tankService.setOwnPlayerTank(tank);
+
+                if (tank === null) {
+                    return;
+                }
+
+                const health = tank.getComponent(HealthComponent);
+                const bulletSpawner = tank.getComponent(BulletSpawnerComponent);
+                this.emitter.emit(
+                    GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
+                    health.value,
+                );
+                this.emitter.emit(
+                    GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
+                    health.max,
+                );
+                this.emitter.emit(
+                    GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS,
+                    bulletSpawner.count,
+                );
+                this.emitter.emit(
+                    GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS,
+                    bulletSpawner.maxCount,
+                );
             });
         this.playerService.emitter.on(PlayerServiceEvent.OWN_PLAYER_CHANGED_TEAM_ID,
             (teamId: string | null) => {

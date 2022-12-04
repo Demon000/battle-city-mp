@@ -9,6 +9,7 @@ import { ButtonPressAction, MOVE_BUTTON_TYPES, ButtonState, BUTTON_TYPE_DIRECTIO
 import { Direction } from '../physics/Direction';
 import { Player, PartialPlayerOptions, PlayerSpawnStatus } from '@/player/Player';
 import { PlayerPoints, PlayerPointsEvent } from '@/player/PlayerPoints';
+import { Entity } from '@/ecs/Entity';
 
 export enum PlayerServiceEvent {
     PLAYER_ADDED = 'player-added',
@@ -123,12 +124,13 @@ export class PlayerService {
         });
     }
 
-    setPlayerTankId(playerId: string, tankId: EntityId | null): void {
+    setPlayerTank(playerId: string, tank: Entity | null): void {
         const player = this.repository.find(playerId);
         if (player === undefined) {
             return;
         }
 
+        const tankId = tank === null ? null : tank.id;
         if (player.tankId === tankId) {
             return;
         }

@@ -50,8 +50,7 @@ export class EntityService {
         });
     }
 
-    setMovementDirection(entityId: EntityId, direction: Direction | null): void {
-        const entity = this.registry.getEntityById(entityId);
+    setMovementDirection(entity: Entity, direction: Direction | null): void {
         const movement = entity.getComponent(MovementComponent);
         if (movement.direction === direction) {
             return;
