@@ -3,7 +3,7 @@ import { Color } from './Color';
 import { DrawableType } from './DrawableType';
 import { DrawableProperties } from './IDrawable';
 import { ImageUtils, Source } from '../utils/ImageUtils';
-import { CLIENT_FONTS_RELATIVE_URL } from '@/config';
+import { CLIENT_FONTS_RELATIVE_URL } from '@/client/config';
 import { CanvasUtils, Canvas } from '@/utils/CanvasUtils';
 
 export interface FontFaceProperties {

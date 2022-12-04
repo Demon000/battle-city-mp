@@ -1,4 +1,4 @@
-import { CLIENT_SPRITES_RELATIVE_URL } from '@/config';
+import { CLIENT_SPRITES_RELATIVE_URL } from '@/client/config';
 import { BaseImageDrawable } from './BaseImageDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';

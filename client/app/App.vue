@@ -198,7 +198,7 @@ import { Team } from '@/team/Team';
 import screenfull from 'screenfull';
 import { io, Socket } from 'socket.io-client';
 import { markRaw } from 'vue';
-import { CLIENT_CONFIG_SOCKET_BASE_URL, CLIENT_SPRITES_RELATIVE_URL } from '../../config';
+import { CLIENT_CONFIG_SOCKET_BASE_URL, CLIENT_SPRITES_RELATIVE_URL } from '../config';
 import { DirectionalJoystickWrapper, DirectionalJoystickEvent } from '../DirectionalJoystickWrapper';
 import { GamepadWrapper, GamepadWrapperEvent, GamepadWrapperEventData } from '../GamepadWrapper';
 import { ColorUtils } from '@/utils/ColorUtils';
