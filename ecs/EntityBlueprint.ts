@@ -167,7 +167,7 @@ export class EntityBlueprint {
             return;
         }
 
-        this.registry.addSharedComponents(entity, components, options);
+        entity.addSharedComponents(components, options);
     }
 
     addComponents(

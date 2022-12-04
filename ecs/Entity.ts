@@ -116,6 +116,13 @@ export class Entity {
         this.registry.upsertComponents(this, components, options);
     }
 
+    addSharedComponents(
+        components: ComponentsInitialization,
+        options?: RegistryOperationOptions,
+    ): void {
+        this.registry.addSharedComponents(this, components, options);
+    }
+
     getComponentsData(options?: EntityComponentsOptions): ComponentsInitialization {
         const componentsInitialization: ComponentsInitialization = {};
         for (const [tag, component] of this.tagComponentMap) {
