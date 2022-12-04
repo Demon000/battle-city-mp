@@ -406,7 +406,7 @@ export class Registry {
         component: C,
         options?: RegistryOperationOptions,
     ): void {
-        entity.addLocalComponent(component);
+        entity.setTagComponent(component);
 
         const tagComponents = this.getOrCreateComponentTypeSet(component.clazz);
         tagComponents.add(component);

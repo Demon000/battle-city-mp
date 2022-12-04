@@ -18,7 +18,7 @@ export class Entity {
         public subtypes: string[] = [],
     ) {}
 
-    addLocalComponent<C extends Component<C>>(
+    setTagComponent<C extends Component<C>>(
         component: C,
     ): void {
         const existingComponent = this.findComponent(component.clazz);
