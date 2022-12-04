@@ -3,9 +3,20 @@ import path from 'path';
 import jp from 'jsonpath';
 import JSON5 from 'json5';
 import { assert } from '@/utils/assert';
+import EventEmitter from 'eventemitter3';
+
+export enum ConfigEvent {
+    CONFIG_SET,
+}
+
+export interface ConfigEvents {
+    [ConfigEvent.CONFIG_SET]: () => void;
+}
 
 export class Config {
     private nameToData = {} as Record<string, any>;
+
+    emitter = new EventEmitter<ConfigEvents>();
 
     constructor(dirPath?: string) {
         if (dirPath !== undefined) {
@@ -46,6 +57,7 @@ export class Config {
 
     setMultiple(multipleNameToData: Record<string, any>): void {
         Object.assign(this.nameToData, multipleNameToData);
+        this.emitter.emit(ConfigEvent.CONFIG_SET);
     }
 
     getDataMultiple(names: Array<string>): Record<string, any> {
