@@ -52,4 +52,4 @@ http.listen(argv.port, argv.host, () => {
 });
 
 app.use(Cors());
-app.use(Express.static('./assets'));
+app.use('/assets', Express.static('./assets'));
