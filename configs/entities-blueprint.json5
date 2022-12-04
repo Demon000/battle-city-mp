@@ -390,14 +390,14 @@
         ],
         components: {
             ColorComponent: {},
-            TeamOwnedComponent: {},
-            FlagComponent: {},
         },
         localComponents: {
             CenterPositionComponent: {},
         },
         serverComponents: {
             PickupIgnoreComponent: {},
+            TeamOwnedComponent: {},
+            FlagComponent: {},
         },
         sharedLocalComponents: {
             SizeComponent: {
@@ -427,6 +427,8 @@
         ],
         components: {
             ColorComponent: {},
+        },
+        serverComponents: {
             TeleporterComponent: {},
         },
         sharedLocalComponents: {
@@ -444,8 +446,6 @@
             'uniquely-rendered-entity',
         ],
         components: {
-            RelativePositionChildrenComponent: {},
-            TeamOwnedComponent: {},
             PlayerOwnedComponent: {},
             DirectionComponent: {},
             MovementComponent: {},
@@ -456,6 +456,8 @@
         },
         serverComponents: {
             TankComponent: {},
+            TeamOwnedComponent: {},
+            RelativePositionChildrenComponent: {},
             SmokeSpawnerComponent: {},
             CollisionTrackingComponent: {
                 values: {
