@@ -12,6 +12,7 @@ import { assert } from '@/utils/assert';
 import { ComponentsInitialization } from '@/ecs/Component';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { PNGUtils } from '@/utils/PNGUtils';
+import { FileUtils } from '@/utils/FileUtils';
 
 export interface GameMapOptions {
     name: string;
@@ -71,8 +72,7 @@ export class GameMap {
         }
 
         const filePath = this.getMapFilePath(this.options.entitiesFromOptionsFile);
-        const fileData = fs.readFileSync(filePath, 'utf8');
-        const data = JSON5.parse(fileData).map(
+        const data = FileUtils.readJSON5(filePath).map(
             (options: LegacyEntityOptions) => {
                 const components: ComponentsInitialization = {
                     PositionComponent: options.position,

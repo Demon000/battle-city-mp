@@ -4,6 +4,7 @@ import jp from 'jsonpath';
 import JSON5 from 'json5';
 import { assert } from '@/utils/assert';
 import EventEmitter from 'eventemitter3';
+import { FileUtils } from '@/utils/FileUtils';
 
 export enum ConfigEvent {
     CONFIG_SET,
@@ -31,9 +32,7 @@ export class Config {
             return;
         }
 
-        const rawData = fs.readFileSync(filePath, 'utf8');
-        const data = JSON5.parse(rawData);
-
+        const data = FileUtils.readJSON5(filePath);
         const fileExtension = path.extname(fileName);
         const fileBaseName = path.basename(fileName, fileExtension);
         this.nameToData[fileBaseName] = data;
