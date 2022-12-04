@@ -1,4 +1,5 @@
 import { PickupIgnoreComponent } from '@/components/PickupIgnoreComponent';
+import { PickupIgnoreTimeComponent } from '@/components/PickupIgnoreTimeComponent';
 import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { Config } from '@/config/Config';
 import { Entity } from '@/ecs/Entity';
@@ -72,8 +73,8 @@ export class FlagService {
             }
 
             if (interaction !== undefined) {
-                const pickupIgnoreTime = this.config
-                    .get<number>('flag', 'pickupIgnoreTime');
+                const pickupIgnoreTime = flag
+                    .getComponent(PickupIgnoreTimeComponent).value;
                 const pickupIgnoreComponent = flag
                     .getComponent(PickupIgnoreComponent);
                 if (pickupIgnoreComponent.entityId === tank.id

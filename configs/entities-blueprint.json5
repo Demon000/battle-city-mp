@@ -389,13 +389,15 @@
             'uniquely-rendered-entity',
         ],
         components: {
-            PickupIgnoreComponent: {},
             ColorComponent: {},
             TeamOwnedComponent: {},
             FlagComponent: {},
         },
         localComponents: {
             CenterPositionComponent: {},
+        },
+        serverComponents: {
+            PickupIgnoreComponent: {},
         },
         sharedLocalComponents: {
             SizeComponent: {
@@ -408,6 +410,11 @@
                 components: {
                     RelativePositionComponent: true,
                 },
+            },
+        },
+        sharedServerComponents: {
+            PickupIgnoreTimeComponent: {
+                value: 1000,
             },
         },
     },
