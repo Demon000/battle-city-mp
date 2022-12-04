@@ -111,9 +111,9 @@ export class PlayerService {
     }
 
     private setPlayerRespawnTimeout(player: Player, respawnTimeout: number): void {
-        const oldRespawnTimeout = Math.floor(player.respawnTimeout);
+        const oldRespawnTimeout = Math.ceil(player.respawnTimeout);
         player.respawnTimeout = respawnTimeout;
-        const newRespawnTimeout = Math.floor(respawnTimeout);
+        const newRespawnTimeout = Math.ceil(respawnTimeout);
         if (oldRespawnTimeout === newRespawnTimeout) {
             return;
         }

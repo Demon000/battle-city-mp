@@ -242,10 +242,14 @@ export default class Settings extends Vue {
         }
 
         if (this.playerRequestedSpawnStatus === PlayerSpawnStatus.SPAWN) {
-            str += `ing in ${this.playerRespawnTimeout} seconds`;
-        } else {
-            if (this.playerRespawnTimeout !== null && this.playerRespawnTimeout > 0) {
-                str += ` in ${this.playerRespawnTimeout} seconds`;
+            str += 'ing ';
+        }
+
+        if (this.playerRespawnTimeout !== null) {
+            if (this.playerRespawnTimeout === 0) {
+                str += 'now';
+            } else {
+                str += `in ${this.playerRespawnTimeout} seconds`;
             }
         }
 
