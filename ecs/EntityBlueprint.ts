@@ -36,7 +36,6 @@ export class EntityBlueprint {
     private ignoredKeys: BlueprintComponentsKeys[] = [];
 
     constructor(
-        private registry: Registry,
         private config: Config,
         private env: BlueprintEnv,
     ) {
