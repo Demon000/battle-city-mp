@@ -1,8 +1,8 @@
 import { Config } from '@/config/Config';
 import { assert } from '@/utils/assert';
-import { Component, ComponentFlags } from './Component';
+import { ComponentFlags } from './Component';
 import { Entity } from './Entity';
-import { Registry, RegistryOperationOptions } from './Registry';
+import { RegistryOperationOptions } from './Registry';
 
 export interface BlueprintComponentsData {
     components?: Record<string, any>,
