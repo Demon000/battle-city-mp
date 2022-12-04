@@ -390,16 +390,13 @@ export class GameServer {
         };
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_LEVEL_BORDER,
-            (bulletId: EntityId, _staticEntityId: EntityId) => {
-                const bullet = this.registry.getEntityById(bulletId);
+            (bullet: Entity, _staticEntity: Entity) => {
                 spawnExplosion(bullet, ExplosionType.SMALL, EntityType.NONE);
                 this.entityService.markDestroyed(bullet);
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_STEEL_WALL,
-            (bulletId: EntityId, steelWallId: EntityId) => {
-                const bullet = this.registry.getEntityById(bulletId);
-                const steelWall = this.registry.getEntityById(steelWallId);
+            (bullet: Entity, steelWall: Entity) => {
                 this.entityService.markDestroyed(bullet);
                 const bulletPower = bullet.getComponent(BulletComponent).power;
                 if (bulletPower === BulletPower.HEAVY) {
@@ -411,9 +408,7 @@ export class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BRICK_WALL,
-            (bulletId: EntityId, brickWallId: EntityId) => {
-                const bullet = this.registry.getEntityById(bulletId);
-                const brickWall = this.registry.getEntityById(brickWallId);
+            (bullet: Entity, brickWall: Entity) => {
                 const destroyBox = getBulletBrickWallDestroyBox(bullet, brickWall);
                 this.entityService.markDestroyed(bullet);
 
@@ -429,16 +424,13 @@ export class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_TANK,
-            (bulletId: EntityId, tankId: EntityId) => {
-                const bullet = this.registry.getEntityById(bulletId);
-
+            (bullet: Entity, tank: Entity) => {
                 const bulletOwnerEntityId =
                     bullet.getComponent(EntityOwnedComponent).id;
-                if (bulletOwnerEntityId === tankId) {
+                if (bulletOwnerEntityId === tank.id) {
                     return;
                 }
 
-                const tank = this.registry.getEntityById(tankId);
                 const tankHealth = tank.getComponent(HealthComponent);
                 const bulletOwnerPlayerId =
                     bullet.getComponent(PlayerOwnedComponent).playerId;
@@ -500,9 +492,7 @@ export class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BULLET,
-            (movingBulletId: EntityId, staticBulletId: EntityId) => {
-                const movingBullet = this.registry.getEntityById(movingBulletId);
-                const staticBullet = this.registry.getEntityById(staticBulletId);
+            (movingBullet: Entity, staticBullet: Entity) => {
                 const movingBulletOwnerEntityId =
                     staticBullet.getComponent(EntityOwnedComponent).id;
                 const staticBulletOwnerEntityId =
@@ -517,9 +507,7 @@ export class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_FLAG,
-            (tankId: EntityId, flagId: EntityId) => {
-                const tank = this.registry.getEntityById(tankId);
-                const flag = this.registry.getEntityById(flagId);
+            (tank: Entity, flag: Entity) => {
                 const carriedFlag = this.collisionService
                     .findRelativePositionEntityWithType(tank,
                         EntityType.FLAG);
@@ -533,9 +521,7 @@ export class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_FLAG_BASE,
-            (tankId: EntityId, flagBaseId: EntityId) => {
-                const tank = this.registry.getEntityById(tankId);
-                const flagBase = this.registry.getEntityById(flagBaseId);
+            (tank: Entity, flagBase: Entity) => {
                 const carriedFlag = this.collisionService
                     .findRelativePositionEntityWithType(tank,
                         EntityType.FLAG);
@@ -544,11 +530,8 @@ export class GameServer {
             });
 
         this.collisionService.emitter.on(CollisionEvent.ENTITY_COLLIDE_TELEPORTER,
-            (entityId: EntityId, teleporterId: EntityId) => {
-                const entity = this.registry.getEntityById(entityId);
+            (entity: Entity, teleporter: Entity) => {
                 const size = entity.getComponent(SizeComponent);
-
-                const teleporter = this.registry.getEntityById(teleporterId);
                 const target = teleporter.getComponent(TeleporterComponent).target;
                 const teleporterPosition = teleporter.getComponent(PositionComponent);
                 const teleporterSize = teleporter.getComponent(SizeComponent);

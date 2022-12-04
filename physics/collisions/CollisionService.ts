@@ -358,8 +358,8 @@ export class CollisionService {
                         continue;
                     }
 
-                    this.emitter.emit(rule.entryEvent, movingEntity.id,
-                        +entityId);
+                    const staticEntity = this.registry.getEntityById(+entityId);
+                    this.emitter.emit(rule.entryEvent, movingEntity, staticEntity);
                 }
             }
 
@@ -369,8 +369,8 @@ export class CollisionService {
                         continue;
                     }
 
-                    this.emitter.emit(rule.exitEvent, movingEntity.id,
-                        +entityId);
+                    const staticEntity = this.registry.getEntityById(+entityId);
+                    this.emitter.emit(rule.exitEvent, movingEntity, staticEntity);
                 }
             }
         }

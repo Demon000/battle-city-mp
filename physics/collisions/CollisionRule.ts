@@ -1,4 +1,4 @@
-import { EntityId } from '@/ecs/EntityId';
+import { Entity } from '@/ecs/Entity';
 
 export enum CollisionRuleType {
     PREVENT_MOVEMENT = 'prevent-movement',
@@ -17,8 +17,8 @@ export enum CollisionEvent {
 }
 
 type CollisionEventHandler = (
-    movingEntityId: EntityId,
-    staticEntityId: EntityId,
+    movingEntity: Entity,
+    staticEntity: Entity,
 ) => void;
 
 export interface CollisionEvents {
