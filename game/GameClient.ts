@@ -419,7 +419,7 @@ export class GameClient {
         const viewableEntityIds = this.collisionService
             .getOverlappingEntities(box);
         const viewableEntities = this.registry
-            .getMultipleEntitiesById(viewableEntityIds) as Iterable<Entity>;
+            .getEntitiesById(viewableEntityIds) as Iterable<Entity>;
         this.gameGraphicsService.initializeRender(position);
         this.gameGraphicsService.renderEntites(viewableEntities);
 

@@ -636,7 +636,7 @@ export class Registry {
         return entity;
     }
 
-    getMultipleEntitiesById(ids: Iterable<EntityId>): Iterable<Entity> {
+    getEntitiesById(ids: Iterable<EntityId>): Iterable<Entity> {
         return LazyIterable.from(ids)
             .map(id => this.getEntityById(id));
     }

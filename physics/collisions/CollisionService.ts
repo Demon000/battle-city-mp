@@ -230,7 +230,7 @@ export class CollisionService {
         const overlappingEntityIds = this
             .getOverlappingEntities(mergedBoundingBox);
         const overlappingEntities = this.registry
-            .getMultipleEntitiesById(overlappingEntityIds);
+            .getEntitiesById(overlappingEntityIds);
         const collisionTracking = movingEntity
             .findComponent(CollisionTrackingComponent);
 
@@ -470,7 +470,7 @@ export class CollisionService {
         type: string,
     ): Entity[] {
         const entityIds = this.getOverlappingEntities(boundingBox);
-        const entities = this.registry.getMultipleEntitiesById(entityIds);
+        const entities = this.registry.getEntitiesById(entityIds);
 
         return LazyIterable.from(entities)
             .filter(o => o.type === type)
