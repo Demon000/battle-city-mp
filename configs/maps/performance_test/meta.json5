@@ -1,0 +1,13 @@
+{
+    name: 'Performance Test',
+    resolution: 16,
+    layerFiles: [
+        'performance_test_walls.png',
+        'performance_test_player_spawns.png',
+    ],
+    colorsEntityTypesMap: {
+        'brick-wall': [156, 74, 0],
+        'level-border': [99, 99, 99],
+        'player-spawn': [89, 13, 121],
+    },
+}

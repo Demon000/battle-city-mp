@@ -1,0 +1,12 @@
+{
+    name: 'Square',
+    resolution: 16,
+    layerFiles: [
+        'square.png',
+    ],
+    colorsEntityTypesMap: {
+        'brick-wall': [156, 74, 0],
+        'level-border': [99, 99, 99],
+        'player-spawn': [89, 13, 121],
+    },
+}

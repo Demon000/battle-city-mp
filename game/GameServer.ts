@@ -108,7 +108,7 @@ export class GameServer {
         this.entitySpawnerService = new EntitySpawnerService(this.entityFactory, this.registry);
         this.tankService = new TankService(this.entityFactory, this.registry);
         this.flagService = new FlagService(this.config);
-        this.gameMapService = new GameMapService(this.config, entityBlueprint);
+        this.gameMapService = new GameMapService(entityBlueprint);
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.config, this.playerRepository);
         this.teamRepository = new MapRepository<string, Team>();

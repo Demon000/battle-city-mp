@@ -6,12 +6,11 @@ export class GameMapService {
     private map?: GameMap;
 
     constructor(
-        private config: Config,
         private entityBlueprint: EntityBlueprint,
     ) {}
 
     loadByName(name: string): GameMap {
-        return this.map = new GameMap(name, this.config, this.entityBlueprint);
+        return this.map = new GameMap(name, this.entityBlueprint);
     }
 
     getLoadedMap(): GameMap | undefined {

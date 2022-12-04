@@ -1,0 +1,46 @@
+{
+    name: 'Lingor Islands Small',
+    resolution: 16,
+    entitiesFromOptionsFile: 'lingor_small_entities_options.json5',
+    layerFiles: [
+        'lingor_small_ground.png',
+        'lingor_small_walls.png',
+        'lingor_small_bushes.png',
+    ],
+    colorsEntityTypesMap: {
+        'grass': [70, 106, 32],
+        'brick-wall': [156, 74, 0],
+        'steel-wall': [255, 255, 255],
+        'level-border': [99, 99, 99],
+        'water': [66, 66, 255],
+        'bush': [140, 214, 0],
+        'sand': [252, 216, 132],
+        'dirt': [152, 128, 72],
+    },
+    teamsOptions: [
+        {
+            id: 'Red',
+            color: [
+                220,
+                20,
+                60,
+            ],
+        },
+        {
+            id: 'Blue',
+            color: [
+                65,
+                105,
+                255,
+            ],
+        },
+        {
+            id: 'Yellow',
+            color: [
+                249,
+                166,
+                2,
+            ],
+        }
+    ],
+}

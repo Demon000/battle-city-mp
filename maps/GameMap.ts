@@ -34,11 +34,12 @@ export class GameMap {
 
     constructor(
         private name: string,
-        private config: Config,
         private entityBlueprint: EntityBlueprint,
     ) {
         this.name = name;
-        this.options = this.config.get('maps', name);
+
+        const metaPath = this.getMapFilePath('meta.json5');
+        this.options = FileUtils.readJSON5(metaPath);
 
         if (this.options.colorsEntityTypesMap !== undefined) {
             this.options.entityTypesColorsMap = new Map();

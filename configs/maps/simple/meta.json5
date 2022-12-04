@@ -1,0 +1,23 @@
+{
+    name: 'Simple',
+    resolution: 16,
+    entitiesFromOptionsFile: 'simple_entities_options.json',
+    teamsOptions: [
+        {
+            id: "Red",
+            color: [
+                220,
+                20,
+                60
+            ]
+        },
+        {
+            id: "Blue",
+            color: [
+                65,
+                105,
+                255
+            ]
+        },
+    ],
+}
