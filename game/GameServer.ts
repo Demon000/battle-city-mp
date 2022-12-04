@@ -1,5 +1,4 @@
 import { BulletPower } from '@/subtypes/BulletPower';
-import { BulletService } from '@/services/BulletService';
 import { Color } from '@/drawable/Color';
 import { ExplosionType } from '@/subtypes/ExplosionType';
 import { EntityFactory, EntityBuildOptions } from '@/entity/EntityFactory';
@@ -55,6 +54,7 @@ import { RelativePositionComponent } from '@/components/RelativePositionComponen
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { TeleporterComponent } from '@/components/TeleporterComponent';
+import getBulletBrickWallDestroyBox from '@/logic/bulletBrickWallDestroyBox';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'p',
@@ -79,7 +79,6 @@ export class GameServer {
     private entitySpawnerService;
     private tankService;
     private flagService;
-    private bulletService;
     private collisionService;
     private gameEventBatcher;
     private teamRepository;
@@ -110,7 +109,6 @@ export class GameServer {
         this.entitySpawnerService = new EntitySpawnerService(this.entityFactory, this.registry);
         this.tankService = new TankService(this.entityFactory, this.registry);
         this.flagService = new FlagService(this.config);
-        this.bulletService = new BulletService(this.registry);
         this.gameMapService = new GameMapService(this.config, entityBlueprint);
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.config, this.playerRepository);
@@ -416,9 +414,9 @@ export class GameServer {
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BRICK_WALL,
             (bulletId: EntityId, brickWallId: EntityId) => {
-                const destroyBox = this.bulletService
-                    .getBulletBrickWallDestroyBox(bulletId, brickWallId);
                 const bullet = this.registry.getEntityById(bulletId);
+                const brickWall = this.registry.getEntityById(brickWallId);
+                const destroyBox = getBulletBrickWallDestroyBox(bullet, brickWall);
                 this.entityService.markDestroyed(bullet);
 
                 const destroyedBullets = this.collisionService
