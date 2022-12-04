@@ -49,7 +49,6 @@ import { HealthComponent } from '@/components/HealthComponent';
 import { EntitySpawnerService } from '@/services/EntitySpawnerService';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { FlagComponent } from '@/components/FlagComponent';
-import { EntityId } from '@/ecs/EntityId';
 import { RelativePositionComponent } from '@/components/RelativePositionComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
