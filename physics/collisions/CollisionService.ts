@@ -28,6 +28,7 @@ import { DirtyCollisionsAddComponent } from '@/components/DirtyCollisionsAddComp
 import { DirtyCollisionsUpdateComponent } from '@/components/DirtyCollisionsUpdateComponent';
 import { DirtyCollisionsRemoveComponent } from '@/components/DirtyCollisionsRemoveComponent';
 import { IterableUtils } from '@/utils/IterableUtils';
+import { FatBoundingBoxComponent } from '@/components/FatBoundingBoxComponent';
 
 export enum DirtyCollisionType {
     ADD,
@@ -543,7 +544,8 @@ export class CollisionService {
             this.registry.getEntitiesWithComponent(DirtyCollisionsAddComponent)) {
 
             const boundingBox = entity.getComponent(BoundingBoxComponent);
-            this.boundingBoxRepository.addBoxValue(entity.id, boundingBox);
+            const fatGrowFactor = entity.findComponent(FatBoundingBoxComponent)?.factor;
+            this.boundingBoxRepository.addBoxValue(entity.id, boundingBox, fatGrowFactor);
 
             entity.removeComponent(DirtyCollisionsAddComponent);
         }

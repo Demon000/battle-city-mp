@@ -214,6 +214,9 @@
                 width: 2,
                 height: 2,
             },
+            FatBoundingBoxComponent: {
+                factor: 8,
+            },
         },
         sharedServerComponents: {
             CollisionRulesComponent: {
@@ -469,6 +472,9 @@
             SizeComponent: {
                 width: 16,
                 height: 16,
+            },
+            FatBoundingBoxComponent: {
+                factor: 1,
             },
         },
         sharedClientComponents: {

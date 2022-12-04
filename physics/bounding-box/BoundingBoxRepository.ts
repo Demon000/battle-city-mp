@@ -35,13 +35,13 @@ export class BoundingBoxRepository<V> {
         this.map.set(value, node);
     }
 
-    addBoxValue(value: V, box: BoundingBox): void {
+    addBoxValue(value: V, realBox: BoundingBox, fatGrowFactor = 0): void {
         assert(!this.map.has(value),
             `Node already exists with value '${value}'`);
 
         const node = new BoundingBoxNode<V>({
-            fatGrowFactor: this.config.get('bounding-box', 'fatGrowFactor'),
-            realBox: box,
+            realBox,
+            fatGrowFactor,
             value,
         });
         this.addNode(value, node);

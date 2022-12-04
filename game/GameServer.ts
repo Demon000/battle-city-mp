@@ -767,7 +767,6 @@ export class GameServer {
         }
 
         const configsData = this.config.getDataMultiple([
-            'bounding-box',
             'entities-blueprint',
             'game-client',
             'time',
