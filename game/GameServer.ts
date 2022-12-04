@@ -67,10 +67,7 @@ export interface GameServerEvents {
 }
 
 export class GameServer {
-    private componentRegistry;
-    private registryIdGenerator;
     private registry;
-    private entityBlueprint;
 
     private config;
     private gameModeService;
@@ -83,7 +80,6 @@ export class GameServer {
     private tankService;
     private flagService;
     private bulletService;
-    private boundingBoxRepository;
     private collisionService;
     private gameEventBatcher;
     private teamRepository;
@@ -95,28 +91,27 @@ export class GameServer {
 
     constructor(mapName: string, gameMode: string) {
         this.config = new Config();
-        this.config.loadAll('./configs');
+        this.config.loadDir('./configs');
 
-        this.componentRegistry = new ComponentRegistry();
-        this.registryIdGenerator = new RegistryNumberIdGenerator();
-        this.registry = new Registry(this.componentRegistry, this.registryIdGenerator);
-        this.entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.SERVER);
-        this.entityBlueprint.reloadBlueprintData();
+        const componentRegistry = new ComponentRegistry();
+        const registryIdGenerator = new RegistryNumberIdGenerator();
+        const entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.SERVER);
 
-        this.entityFactory = new EntityFactory(this.registry, this.entityBlueprint);
+        this.registry = new Registry(componentRegistry, registryIdGenerator);
+        this.entityFactory = new EntityFactory(this.registry, entityBlueprint);
+
+        entityBlueprint.reloadBlueprintData();
+
+        const boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
 
         this.gameModeService = new GameModeService(this.config);
-        this.boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
-        this.collisionService = new CollisionService(
-            this.boundingBoxRepository,
-            this.registry,
-        );
+        this.collisionService = new CollisionService(boundingBoxRepository, this.registry);
         this.entityService = new EntityService(this.entityFactory, this.registry);
         this.entitySpawnerService = new EntitySpawnerService(this.entityFactory, this.registry);
         this.tankService = new TankService(this.entityFactory, this.registry);
         this.flagService = new FlagService(this.config);
         this.bulletService = new BulletService(this.registry);
-        this.gameMapService = new GameMapService(this.config, this.entityBlueprint);
+        this.gameMapService = new GameMapService(this.config, entityBlueprint);
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.config, this.playerRepository);
         this.teamRepository = new MapRepository<string, Team>();

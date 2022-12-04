@@ -17,7 +17,7 @@ import { TankService } from '@/services/TankService';
 import { LazyIterable } from '@/utils/LazyIterable';
 import { TankTier } from '@/subtypes/TankTier';
 import { Color } from '@/drawable/Color';
-import { Config } from '@/config/Config';
+import { Config, ConfigEvent } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { Registry, RegistryComponentEvent } from '@/ecs/Registry';
@@ -85,10 +85,7 @@ export interface GameClientEvents {
 export class GameClient {
     private config;
 
-    private componentRegistry;
-    private registryIdGenerator;
     private registry;
-    private entityBlueprint;
 
     private entityFactory;
     private playerRepository;
@@ -97,10 +94,8 @@ export class GameClient {
     private teamService;
     private entityService;
     private tankService;
-    private boundingBoxRepository;
     private collisionService;
     private gameCamera;
-    private entityGraphicsRenderer;
     private gameGraphicsService;
     private timeService;
     emitter;
@@ -109,14 +104,16 @@ export class GameClient {
     constructor(canvases: HTMLCanvasElement[]) {
         this.config = new Config();
 
-        this.componentRegistry = new ClientComponentRegistry();
-        this.registryIdGenerator = new RegistryNumberIdGenerator();
-        this.registry = new Registry(this.componentRegistry, this.registryIdGenerator);
-        this.entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.CLIENT);
-        this.entityFactory = new EntityFactory(this.registry, this.entityBlueprint);
+        const componentRegistry = new ClientComponentRegistry();
+        const registryIdGenerator = new RegistryNumberIdGenerator();
+        const entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.CLIENT);
+        this.registry = new Registry(componentRegistry, registryIdGenerator);
+        this.entityFactory = new EntityFactory(this.registry, entityBlueprint);
 
-        this.boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
-        this.collisionService = new CollisionService(this.boundingBoxRepository, this.registry);
+        const boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
+        const entityGraphicsRenderer = new EntityGraphicsRenderer();
+
+        this.collisionService = new CollisionService(boundingBoxRepository, this.registry);
         this.entityService = new EntityService(this.entityFactory, this.registry);
         this.tankService = new TankService(this.entityFactory, this.registry);
         this.playerRepository = new MapRepository<string, Player>();
@@ -124,13 +121,16 @@ export class GameClient {
         this.teamRepository = new MapRepository<string, Team>();
         this.teamService = new TeamService(this.teamRepository);
         this.gameCamera = new GameCamera();
-        this.entityGraphicsRenderer = new EntityGraphicsRenderer();
         this.gameGraphicsService = new GameGraphicsService(this.registry,
-            this.entityGraphicsRenderer, canvases);
+            entityGraphicsRenderer, canvases);
         this.timeService = new TimeService(this.config);
         this.emitter = new EventEmitter<GameClientEvents>();
         this.ticker = new Ticker();
 
+        this.config.emitter.on(ConfigEvent.CONFIG_SET,
+            () => {
+                entityBlueprint.reloadBlueprintData();
+            });
         this.registry.emitter.on(RegistryComponentEvent.COMPONENT_CHANGED,
             (_event, component) => {
                 if (component.entities.size !== 1) {
@@ -356,7 +356,6 @@ export class GameClient {
         this.config.clear();
         const configsData = serverStatus.configsData;
         this.config.setMultiple(configsData);
-        this.entityBlueprint.reloadBlueprintData();
 
         this.playerService.clear();
         const players =
