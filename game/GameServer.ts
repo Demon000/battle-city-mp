@@ -53,7 +53,7 @@ import { RelativePositionComponent } from '@/components/RelativePositionComponen
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { TeleporterComponent } from '@/components/TeleporterComponent';
-import getBulletBrickWallDestroyBox from '@/logic/bulletBrickWallDestroyBox';
+import { getBrickWallDestroyBox } from '@/logic/brickWall';
 import { createSpawnEffect } from '@/logic/spawnEffect';
 import { createTankForPlayer, decreaseTankHealth } from '@/logic/tank';
 import { createExplosion } from '@/logic/explosion';
@@ -390,7 +390,7 @@ export class GameServer {
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BRICK_WALL,
             (bullet: Entity, brickWall: Entity) => {
-                const destroyBox = getBulletBrickWallDestroyBox(bullet, brickWall);
+                const destroyBox = getBrickWallDestroyBox(brickWall, bullet);
                 this.entityService.markDestroyed(bullet);
 
                 const destroyedBullets = this.collisionService

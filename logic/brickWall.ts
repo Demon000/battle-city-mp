@@ -10,9 +10,9 @@ import { SizeComponent } from '@/components/SizeComponent';
 import { BulletPower } from '../subtypes/BulletPower';
 import { Entity } from '@/ecs/Entity';
 
-export default function getBulletBrickWallDestroyBox(
-    bullet: Entity,
+export function getBrickWallDestroyBox(
     brickWall: Entity,
+    bullet: Entity,
 ): BoundingBox {
     const brickWallBoundingBox = BoundingBoxUtils.clone(
         brickWall.getComponent(BoundingBoxComponent),
