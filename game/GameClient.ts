@@ -114,7 +114,7 @@ export class GameClient {
         const entityGraphicsRenderer = new EntityGraphicsRenderer();
 
         this.collisionService = new CollisionService(boundingBoxRepository, this.registry);
-        this.entityService = new EntityService(this.entityFactory, this.registry);
+        this.entityService = new EntityService(this.registry);
         this.tankService = new TankService(this.entityFactory, this.registry);
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.config, this.playerRepository);

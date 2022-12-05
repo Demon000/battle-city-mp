@@ -9,7 +9,6 @@ import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { WorldEntityComponent } from '@/components/WorldEntityComponent';
 import { ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
-import { EntityId } from '@/ecs/EntityId';
 import { Registry } from '@/ecs/Registry';
 import { DirectionComponent } from '@/components/DirectionComponent';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
@@ -25,24 +24,12 @@ import { Random } from '@/utils/Random';
 import { Direction } from '../physics/Direction';
 import { Point } from '../physics/point/Point';
 import { PointUtils } from '../physics/point/PointUtils';
-import { EntityType } from './EntityType';
-import { EntityFactory } from './EntityFactory';
 import { MovementConfigComponent } from '@/components/MovementConfigComponent';
 
 export class EntityService {
     constructor(
-        private entityFactory: EntityFactory,
         private registry: Registry,
     ) {}
-
-    createSpawnEffect(position: Point): Entity {
-        return this.entityFactory.buildFromOptions({
-            type: EntityType.SPAWN_EFFECT,
-            components: {
-                PositionComponent: position,
-            },
-        });
-    }
 
     markDestroyed(entity: Entity): void {
         entity.upsertComponent(DestroyedComponent, undefined, {

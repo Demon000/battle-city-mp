@@ -54,6 +54,7 @@ import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { TeleporterComponent } from '@/components/TeleporterComponent';
 import getBulletBrickWallDestroyBox from '@/logic/bulletBrickWallDestroyBox';
+import { createSpawnEffect } from '@/logic/spawnEffect';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'p',
@@ -104,7 +105,7 @@ export class GameServer {
 
         this.gameModeService = new GameModeService(this.config);
         this.collisionService = new CollisionService(boundingBoxRepository, this.registry);
-        this.entityService = new EntityService(this.entityFactory, this.registry);
+        this.entityService = new EntityService(this.registry);
         this.entitySpawnerService = new EntitySpawnerService(this.entityFactory, this.registry);
         this.tankService = new TankService(this.entityFactory, this.registry);
         this.flagService = new FlagService(this.config);
@@ -324,7 +325,7 @@ export class GameServer {
 
                     const position = this.entityService.getRandomSpawnPosition(player.teamId);
                     this.tankService.createTankForPlayer(player, position, tankColor);
-                    this.entityService.createSpawnEffect(position);
+                    createSpawnEffect(this.entityFactory, position);
                 } else if (status === PlayerSpawnStatus.DESPAWN && player.tankId !== null) {
                     const tank = this.registry.getEntityById(player.tankId);
                     this.entityService.markDestroyed(tank);
@@ -544,8 +545,8 @@ export class GameServer {
                     y: target.y - size.height / 2,
                 };
 
-                this.entityService.createSpawnEffect(teleporterPosition);
-                this.entityService.createSpawnEffect(targetPosition);
+                createSpawnEffect(this.entityFactory, teleporterPosition);
+                createSpawnEffect(this.entityFactory, targetPosition);
                 this.collisionService.setPosition(entity, position);
             });
 
