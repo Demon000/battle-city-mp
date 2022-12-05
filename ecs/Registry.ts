@@ -95,9 +95,6 @@ export class Registry {
     @nonenumerable
     private componentRegistry;
 
-    @nonenumerable
-    private componentTypeCountMap = new Map<ComponentClassType<any>, number>();
-
     emitter = new EventEmitter<RegistryEvents & RegistryComponentEvents>();
 
     constructor(
