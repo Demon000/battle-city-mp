@@ -55,6 +55,7 @@ import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { TeleporterComponent } from '@/components/TeleporterComponent';
 import getBulletBrickWallDestroyBox from '@/logic/bulletBrickWallDestroyBox';
 import { createSpawnEffect } from '@/logic/spawnEffect';
+import { createTankForPlayer, decreaseTankHealth } from '@/logic/tank';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'p',
@@ -107,7 +108,7 @@ export class GameServer {
         this.collisionService = new CollisionService(boundingBoxRepository, this.registry);
         this.entityService = new EntityService(this.registry);
         this.entitySpawnerService = new EntitySpawnerService(this.entityFactory, this.registry);
-        this.tankService = new TankService(this.entityFactory, this.registry);
+        this.tankService = new TankService();
         this.flagService = new FlagService(this.config);
         this.gameMapService = new GameMapService(entityBlueprint);
         this.playerRepository = new MapRepository<string, Player>();
@@ -324,7 +325,7 @@ export class GameServer {
                     }
 
                     const position = this.entityService.getRandomSpawnPosition(player.teamId);
-                    this.tankService.createTankForPlayer(player, position, tankColor);
+                    createTankForPlayer(this.entityFactory, player, position, tankColor);
                     createSpawnEffect(this.entityFactory, position);
                 } else if (status === PlayerSpawnStatus.DESPAWN && player.tankId !== null) {
                     const tank = this.registry.getEntityById(player.tankId);
@@ -464,7 +465,7 @@ export class GameServer {
                 if (!ignoreBulletDamage) {
                     const oldTankHealth = tankHealth.value;
 
-                    this.tankService.decreaseTankHealth(tank, bulletDamage);
+                    decreaseTankHealth(tank, bulletDamage);
                     bulletDamage -= oldTankHealth;
 
                     bulletComponent.update({

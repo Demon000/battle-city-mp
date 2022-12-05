@@ -115,7 +115,7 @@ export class GameClient {
 
         this.collisionService = new CollisionService(boundingBoxRepository, this.registry);
         this.entityService = new EntityService(this.registry);
-        this.tankService = new TankService(this.entityFactory, this.registry);
+        this.tankService = new TankService();
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.config, this.playerRepository);
         this.teamRepository = new MapRepository<string, Team>();
