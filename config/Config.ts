@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import jp from 'jsonpath';
-import JSON5 from 'json5';
 import { assert } from '@/utils/assert';
 import EventEmitter from 'eventemitter3';
 import { FileUtils } from '@/utils/FileUtils';

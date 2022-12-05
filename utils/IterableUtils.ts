@@ -18,4 +18,12 @@ export class IterableUtils {
 
         return true;
     }
+
+    static isEmpty<T>(iterable: Iterable<T>): boolean {
+        for (const _ of iterable) {
+            return false;
+        }
+
+        return true;
+    }
 }

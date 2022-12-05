@@ -1,9 +1,7 @@
 import fs from 'fs';
 import { Team, TeamOptions } from '@/team/Team';
-import { Config } from '@/config/Config';
 import { Color } from '@/drawable/Color';
 import { PNG } from 'pngjs';
-import JSON5 from 'json5';
 import { EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { SizeComponent } from '@/components/SizeComponent';
 import { EntityBuildOptions } from '@/entity/EntityFactory';

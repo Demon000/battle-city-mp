@@ -137,31 +137,31 @@ export default class Settings extends Vue {
     ColorUtils = ColorUtils;
 
     @Prop()
-    hasTankDiedOnce = false;
+        hasTankDiedOnce = false;
 
     @Prop()
-    isPlayerDead = false;
+        isPlayerDead = false;
 
     @Prop()
-    tankTier: TankTier | null = null;
+        tankTier: TankTier | null = null;
 
     @Prop()
-    tankColor: Color | null = null;
+        tankColor: Color | null = null;
 
     @Prop()
-    teams: Team[] | null = [];
+        teams: Team[] | null = [];
 
     @Prop()
-    hasTeams = false;
+        hasTeams = false;
 
     @Prop()
-    playerTeamId: string | null = null;
+        playerTeamId: string | null = null;
 
     @Prop()
-    playerRequestedSpawnStatus: PlayerSpawnStatus | null = null;
+        playerRequestedSpawnStatus: PlayerSpawnStatus | null = null;
 
     @Prop()
-    playerRespawnTimeout: number | null = null;
+        playerRespawnTimeout: number | null = null;
 
     playerName: string | null = null;
 

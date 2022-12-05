@@ -1,6 +1,5 @@
 import { DirtyGraphicsComponent } from '@/components/DirtyGraphicsComponent';
 import { GraphicDependenciesComponent } from '@/components/GraphicDependenciesComponent';
-import { EntityId } from '@/ecs/EntityId';
 import { Registry } from '@/ecs/Registry';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';

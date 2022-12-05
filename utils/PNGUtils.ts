@@ -1,7 +1,7 @@
-import { Color } from "@/drawable/Color";
-import { BoundingBox } from "@/physics/bounding-box/BoundingBox";
-import { PNGWithMetadata } from "pngjs";
-import { ColorUtils } from "./ColorUtils";
+import { Color } from '@/drawable/Color';
+import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
+import { PNGWithMetadata } from 'pngjs';
+import { ColorUtils } from './ColorUtils';
 
 export class PNGUtils {
     static getPixelId(png: PNGWithMetadata, x: number, y: number): number {

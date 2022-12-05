@@ -1,4 +1,3 @@
-import { Config } from '@/config/Config';
 import { EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { GameMap } from './GameMap';
 

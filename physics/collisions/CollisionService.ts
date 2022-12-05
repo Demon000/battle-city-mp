@@ -138,13 +138,8 @@ export class CollisionService {
         data: CollisionTrackingData,
         type: string,
     ): boolean {
-        for (const value of this.getCollisionTrackingEntities(data, type)) {
-            if (value) {
-                return true;
-            }
-        }
-
-        return false;
+        const entities = this.getCollisionTrackingEntities(data, type);
+        return !IterableUtils.isEmpty(entities);
     }
 
     private copyCollisionTrackingTypes(
@@ -295,7 +290,7 @@ export class CollisionService {
                     && (coversMinimumVolume
                         || this.hasCollisionTrackingEntity(
                             collisionTracking.values, overlappingEntity))
-                    ) {
+                ) {
                     this.addCollisionTrackingEntity(newCollisionTrackingValues,
                         overlappingEntity);
                 }

@@ -334,10 +334,10 @@ export class Registry {
                     clazz);
                 if (component === undefined) {
                     component = this.createDetachedComponent(tag, data, {
-                            ...options,
-                            flags: ComponentFlags.LOCAL_ONLY
+                        ...options,
+                        flags: ComponentFlags.LOCAL_ONLY
                                 | ComponentFlags.SHARED_BY_TYPE,
-                        });
+                    });
                     this.addSharedByTypeComponent(entity.type, component);
                 }
             }
