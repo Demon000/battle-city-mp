@@ -46,11 +46,11 @@ import { RelativePositionComponent } from '@/components/RelativePositionComponen
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { TeleporterComponent } from '@/components/TeleporterComponent';
-import { getBrickWallDestroyBox } from '@/logic/brickWall';
-import { createSpawnEffect } from '@/logic/spawnEffect';
+import { getBrickWallDestroyBox } from '@/logic/brick-wall';
+import { createSpawnEffect } from '@/logic/spawn-effect';
 import { createTankForPlayer, decreaseTankHealth } from '@/logic/tank';
 import { createExplosion } from '@/logic/explosion';
-import { handleSpawnedEntityDestroyed, handleSpawnedEntityRegistered, processActiveEntitySpawners, setEntitySpawnerStatus, updateHealthBasedSmokeSpawner } from '@/logic/entitySpawner';
+import { handleSpawnedEntityDestroyed, handleSpawnedEntityRegistered, processActiveEntitySpawners, setEntitySpawnerStatus, updateHealthBasedSmokeSpawner } from '@/logic/entity-spawner';
 import { FlagTankInteraction, handleFlagDrop, handleFlagInteraction } from '@/logic/flag';
 import { processDirection, processMovement, setMovementDirection, updateIsMoving } from '@/logic/entity-movement';
 import { pickRandomSpawnPosition } from '@/logic/spawn';
