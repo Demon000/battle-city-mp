@@ -78,7 +78,6 @@ export class GameServer {
     private playerService;
     private entityService;
     private entitySpawnerService;
-    private tankService;
     private flagService;
     private collisionService;
     private gameEventBatcher;
@@ -108,7 +107,6 @@ export class GameServer {
         this.collisionService = new CollisionService(boundingBoxRepository, this.registry);
         this.entityService = new EntityService(this.registry);
         this.entitySpawnerService = new EntitySpawnerService(this.entityFactory, this.registry);
-        this.tankService = new TankService();
         this.flagService = new FlagService(this.config);
         this.gameMapService = new GameMapService(entityBlueprint);
         this.playerRepository = new MapRepository<string, Player>();
