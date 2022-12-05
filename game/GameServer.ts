@@ -45,7 +45,6 @@ import { SizeComponent } from '@/components/SizeComponent';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
-import { EntitySpawnerService } from '@/services/EntitySpawnerService';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { FlagComponent } from '@/components/FlagComponent';
 import { RelativePositionComponent } from '@/components/RelativePositionComponent';
@@ -56,6 +55,7 @@ import { getBrickWallDestroyBox } from '@/logic/brickWall';
 import { createSpawnEffect } from '@/logic/spawnEffect';
 import { createTankForPlayer, decreaseTankHealth } from '@/logic/tank';
 import { createExplosion } from '@/logic/explosion';
+import { handleSpawnedEntityDestroyed, handleSpawnedEntityRegistered, processActiveEntitySpawners, setEntitySpawnerStatus, updateHealthBasedSmokeSpawner } from '@/logic/entitySpawner';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'p',
@@ -77,7 +77,6 @@ export class GameServer {
     private playerRepository;
     private playerService;
     private entityService;
-    private entitySpawnerService;
     private flagService;
     private collisionService;
     private gameEventBatcher;
@@ -106,7 +105,6 @@ export class GameServer {
         this.gameModeService = new GameModeService(this.config);
         this.collisionService = new CollisionService(boundingBoxRepository, this.registry);
         this.entityService = new EntityService(this.registry);
-        this.entitySpawnerService = new EntitySpawnerService();
         this.flagService = new FlagService(this.config);
         this.gameMapService = new GameMapService(entityBlueprint);
         this.playerRepository = new MapRepository<string, Player>();
@@ -145,7 +143,7 @@ export class GameServer {
                     }
                 }
 
-                this.entitySpawnerService.handleEntityRegistered(this.registry, entity);
+                handleSpawnedEntityRegistered(this.registry, entity);
             });
         this.registry.emitter.on(RegistryEvent.ENTITY_BEFORE_DESTROY,
             (entity: Entity) => {
@@ -158,7 +156,7 @@ export class GameServer {
                     }
                 }
 
-                this.entitySpawnerService.handleEntityDestroyed(this.registry, entity);
+                handleSpawnedEntityDestroyed(this.registry, entity);
                 this.entityService.unattachRelativeEntities(entity);
                 this.entityService.unattachRelativeEntity(entity);
 
@@ -243,7 +241,7 @@ export class GameServer {
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
                 (component) => {
                     const entity = component.entity;
-                    this.entitySpawnerService.updateHealthBasedSmokeSpawner(entity);
+                    updateHealthBasedSmokeSpawner(entity);
                 });
 
         /**
@@ -287,8 +285,7 @@ export class GameServer {
                 }
 
                 const tank = this.registry.getEntityById(player.tankId);
-                this.entitySpawnerService.setEntitySpawnerStatus(
-                    tank, BulletSpawnerComponent, isShooting);
+                setEntitySpawnerStatus(tank, BulletSpawnerComponent, isShooting);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_MOVE,
@@ -571,8 +568,7 @@ export class GameServer {
                 }
 
                 this.playerService.processPlayersStatus(deltaSeconds);
-                this.entitySpawnerService.processActiveEntitySpawners(
-                    this.registry, this.entityFactory);
+                processActiveEntitySpawners(this.registry, this.entityFactory);
                 this.entityService.processDirection();
                 this.collisionService.processRequestedDirection();
                 this.entityService.processMovement(deltaSeconds);
