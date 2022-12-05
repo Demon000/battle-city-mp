@@ -19,7 +19,6 @@ import { EntityService } from '../entity/EntityService';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
 import { CollisionService, DirtyCollisionType } from '../physics/collisions/CollisionService';
 import { CollisionEvent } from '../physics/collisions/CollisionRule';
-import { Point } from '../physics/point/Point';
 import { Player, PartialPlayerOptions, PlayerSpawnStatus } from '../player/Player';
 import { PlayerService, PlayerServiceEvent } from '@/player/PlayerService';
 import { BroadcastBatchGameEvent, CommonBatchGameEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
