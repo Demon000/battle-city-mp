@@ -9,7 +9,8 @@ import { Registry } from '@/ecs/Registry';
 import { PlayerPointsEvent } from '@/player/PlayerPoints';
 import { PlayerService } from '@/player/PlayerService';
 import { assert } from '@/utils/assert';
-import { attachRelativeEntity, isAttachedRelativeEntity, setEntityPosition, unattachRelativeEntity } from './entity';
+import { setEntityPosition } from './entity-position';
+import { attachRelativeEntity, isAttachedRelativeEntity, unattachRelativeEntity } from './entity-relative-position';
 
 export enum FlagTankInteraction {
     PICK,

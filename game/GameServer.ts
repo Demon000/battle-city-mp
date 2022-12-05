@@ -48,7 +48,7 @@ import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { TeleporterComponent } from '@/components/TeleporterComponent';
 import { getBrickWallDestroyBox } from '@/logic/brick-wall';
 import { createSpawnEffect } from '@/logic/spawn-effect';
-import { createTankForPlayer, decreaseTankHealth } from '@/logic/tank';
+import { createTankForPlayer, decreaseTankHealth, onTankCollideFlag, onTankCollideFlagBase } from '@/logic/tank';
 import { createExplosion } from '@/logic/explosion';
 import { handleSpawnedEntityDestroyed, handleSpawnedEntityRegistered, processActiveEntitySpawners, setEntitySpawnerStatus, updateHealthBasedSmokeSpawner } from '@/logic/entity-spawner';
 import { FlagTankInteraction, handleFlagDrop, handleFlagInteraction } from '@/logic/flag';
@@ -58,6 +58,9 @@ import { SpawnComponent } from '@/components/SpawnComponent';
 import { markAllWorldEntitiesDestroyed, markDestroyed, processAutomaticDestroy, processDestroyed } from '@/logic/entity-destroy';
 import { unattachRelativeEntities, unattachRelativeEntity, updateRelativePosition, markRelativeChildrenDirtyPosition, processDirtyRelativePosition } from '@/logic/entity-relative-position';
 import { updateCenterPosition } from '@/logic/entity-position';
+import { onBulletHitBrickWall, onBulletHitBullet, onBulletHitLevelBorder, onBulletHitSteelWall, onBulletHitTank } from '@/logic/bullet';
+import { PluginContext } from '@/logic/plugin';
+import { onEntityCollideTeleporter } from '@/logic/entity-teleporter';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'p',
@@ -83,6 +86,7 @@ export class GameServer {
     private teamRepository;
     private teamService;
     private timeService;
+    private pluginContext;
     ticker;
 
     emitter = new EventEmitter<GameServerEvents>();
@@ -114,6 +118,16 @@ export class GameServer {
 
         const ticksPerSecond = this.config.get<number>('game-server', 'ticksPerSecond');
         this.ticker = new Ticker(ticksPerSecond);
+
+        this.pluginContext = {
+            registry: this.registry,
+            entityFactory: this.entityFactory,
+            collisionService: this.collisionService,
+            gameModeService: this.gameModeService,
+            playerService: this.playerService,
+        };
+
+        const bindContext = (fn: Function) => fn.bind(this.pluginContext);
 
         /**
          * Registry event handlers
@@ -360,174 +374,28 @@ export class GameServer {
          * CollisionService event handlers
          */
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_LEVEL_BORDER,
-            (bullet: Entity, _staticEntity: Entity) => {
-                createExplosion(this.entityFactory, bullet,
-                    ExplosionType.SMALL, EntityType.NONE);
-                markDestroyed(bullet);
-            });
+            bindContext(onBulletHitLevelBorder));
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_STEEL_WALL,
-            (bullet: Entity, steelWall: Entity) => {
-                markDestroyed(bullet);
-                const bulletPower = bullet.getComponent(BulletComponent).power;
-                if (bulletPower === BulletPower.HEAVY) {
-                    createExplosion(this.entityFactory, bullet,
-                        ExplosionType.SMALL);
-                    markDestroyed(steelWall);
-                } else {
-                    createExplosion(this.entityFactory, bullet,
-                        ExplosionType.SMALL, EntityType.NONE);
-                }
-            });
+            bindContext(onBulletHitSteelWall));
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BRICK_WALL,
-            (bullet: Entity, brickWall: Entity) => {
-                const destroyBox = getBrickWallDestroyBox(brickWall, bullet);
-                markDestroyed(bullet);
-
-                const destroyedBullets = this.collisionService
-                    .findMultipleOverlappingWithType(destroyBox,
-                        EntityType.BRICK_WALL);
-                for (const bullet of destroyedBullets) {
-                    markDestroyed(bullet);
-                }
-
-                const destroyBoxCenter = BoundingBoxUtils.center(destroyBox);
-                createExplosion(this.entityFactory, destroyBoxCenter,
-                    ExplosionType.SMALL);
-            });
+            bindContext(onBulletHitBrickWall));
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_TANK,
-            (bullet: Entity, tank: Entity) => {
-                const bulletOwnerEntityId =
-                    bullet.getComponent(EntityOwnedComponent).id;
-                if (bulletOwnerEntityId === tank.id) {
-                    return;
-                }
-
-                const tankHealth = tank.getComponent(HealthComponent);
-                const bulletOwnerPlayerId =
-                    bullet.getComponent(PlayerOwnedComponent).playerId;
-                const tankOwnerPlayerId =
-                    tank.getComponent(PlayerOwnedComponent).playerId;
-                const tankPlayer = this.playerService.findPlayer(tankOwnerPlayerId);
-                const bulletPlayer = this.playerService.findPlayer(bulletOwnerPlayerId);
-                const isSameTeamShot = tankPlayer?.teamId === bulletPlayer?.teamId;
-
-                const gameModeProperties = this.gameModeService.getGameModeProperties();
-                let destroyBullet = false;
-                let ignoreBulletDamage = false;
-
-                if (isSameTeamShot
-                    && gameModeProperties.sameTeamBulletHitMode
-                        === SameTeamBulletHitMode.DESTROY) {
-                    destroyBullet = true;
-                    ignoreBulletDamage = true;
-                } else if (isSameTeamShot
-                    && gameModeProperties.sameTeamBulletHitMode
-                        === SameTeamBulletHitMode.PASS) {
-                    ignoreBulletDamage = true;
-                } else if (!isSameTeamShot ||
-                    gameModeProperties.sameTeamBulletHitMode
-                        === SameTeamBulletHitMode.ALLOW) {
-                    destroyBullet = true;
-                }
-
-                const bulletComponent = bullet.getComponent(BulletComponent);
-                let bulletDamage = bulletComponent.damage;
-                if (!ignoreBulletDamage) {
-                    const oldTankHealth = tankHealth.value;
-
-                    decreaseTankHealth(tank, bulletDamage);
-                    bulletDamage -= oldTankHealth;
-
-                    bulletComponent.update({
-                        damage: bulletDamage,
-                    });
-                }
-
-                if (tankHealth.value <= 0) {
-                    const playerId =
-                        tank.getComponent(PlayerOwnedComponent).playerId;
-                    createExplosion(this.entityFactory, tank,
-                        ExplosionType.BIG, EntityType.TANK);
-                    this.playerService.setPlayerRequestedSpawnStatus(playerId, PlayerSpawnStatus.DESPAWN);
-                    this.playerService.addPlayerDeath(playerId);
-                    if (bulletPlayer !== undefined) {
-                        this.playerService.addPlayerKill(bulletPlayer.id);
-                    }
-                } else {
-                    createExplosion(this.entityFactory, bullet,
-                        ExplosionType.SMALL, EntityType.NONE);
-                }
-
-                if (destroyBullet || bulletDamage <= 0) {
-                    createExplosion(this.entityFactory, bullet,
-                        ExplosionType.SMALL);
-                    markDestroyed(bullet);
-                }
-            });
+            bindContext(onBulletHitTank));
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BULLET,
-            (movingBullet: Entity, staticBullet: Entity) => {
-                const movingBulletOwnerEntityId =
-                    staticBullet.getComponent(EntityOwnedComponent).id;
-                const staticBulletOwnerEntityId =
-                    staticBullet.getComponent(EntityOwnedComponent).id;
-                if (movingBulletOwnerEntityId === staticBulletOwnerEntityId) {
-                    return;
-                }
-
-                createExplosion(this.entityFactory, movingBullet,
-                    ExplosionType.SMALL);
-                markDestroyed(movingBullet);
-                markDestroyed(staticBullet);
-            });
+            bindContext(onBulletHitBullet));
 
         this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_FLAG,
-            (tank: Entity, flag: Entity) => {
-                const carriedFlag = this.collisionService
-                    .findRelativePositionEntityWithType(tank,
-                        EntityType.FLAG);
-
-                const boundingBox = flag.getComponent(BoundingBoxComponent);
-                const flagBase = this.collisionService
-                    .findOverlappingWithType(boundingBox, EntityType.FLAG_BASE);
-                if (flag !== carriedFlag) {
-                    handleFlagInteraction(this.registry, this.playerService,
-                        tank, flag, carriedFlag, flagBase);
-                }
-            });
+            bindContext(onTankCollideFlag));
 
         this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_FLAG_BASE,
-            (tank: Entity, flagBase: Entity) => {
-                const carriedFlag = this.collisionService
-                    .findRelativePositionEntityWithType(tank,
-                        EntityType.FLAG);
-                handleFlagInteraction(this.registry, this.playerService,
-                    tank, undefined, carriedFlag, flagBase);
-            });
+            bindContext(onTankCollideFlagBase));
 
         this.collisionService.emitter.on(CollisionEvent.ENTITY_COLLIDE_TELEPORTER,
-            (entity: Entity, teleporter: Entity) => {
-                const size = entity.getComponent(SizeComponent);
-                const target = teleporter.getComponent(TeleporterComponent).target;
-                const teleporterPosition = teleporter.getComponent(PositionComponent);
-                const teleporterSize = teleporter.getComponent(SizeComponent);
-
-                const targetPosition = {
-                    x: target.x - teleporterSize.width / 2,
-                    y: target.y - teleporterSize.height / 2,
-                };
-                const position = {
-                    x: target.x - size.width / 2,
-                    y: target.y - size.height / 2,
-                };
-
-                createSpawnEffect(this.entityFactory, teleporterPosition);
-                createSpawnEffect(this.entityFactory, targetPosition);
-                this.collisionService.setPosition(entity, position);
-            });
+            bindContext(onEntityCollideTeleporter));
 
         /*
          * Time Service event handlers
