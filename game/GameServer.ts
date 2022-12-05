@@ -27,8 +27,6 @@ import { GameModeService, SameTeamBulletHitMode } from '@/services/GameModeServi
 import { ComponentEmitOptions, Registry, RegistryComponentEvent, RegistryEvent } from '@/ecs/Registry';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
-import { FlagService, FlagTankInteraction } from '@/services/FlagService';
-import { PlayerPointsEvent } from '@/player/PlayerPoints';
 import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { GameMap } from '@/maps/GameMap';
@@ -56,6 +54,8 @@ import { createSpawnEffect } from '@/logic/spawnEffect';
 import { createTankForPlayer, decreaseTankHealth } from '@/logic/tank';
 import { createExplosion } from '@/logic/explosion';
 import { handleSpawnedEntityDestroyed, handleSpawnedEntityRegistered, processActiveEntitySpawners, setEntitySpawnerStatus, updateHealthBasedSmokeSpawner } from '@/logic/entitySpawner';
+import { FlagTankInteraction, handleFlagDrop, handleFlagInteraction } from '@/logic/flag';
+import { unattachRelativeEntities, unattachRelativeEntity } from '@/logic/entity';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'p',
@@ -77,7 +77,6 @@ export class GameServer {
     private playerRepository;
     private playerService;
     private entityService;
-    private flagService;
     private collisionService;
     private gameEventBatcher;
     private teamRepository;
@@ -105,7 +104,6 @@ export class GameServer {
         this.gameModeService = new GameModeService(this.config);
         this.collisionService = new CollisionService(boundingBoxRepository, this.registry);
         this.entityService = new EntityService(this.registry);
-        this.flagService = new FlagService(this.config);
         this.gameMapService = new GameMapService(entityBlueprint);
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.config, this.playerRepository);
@@ -157,8 +155,8 @@ export class GameServer {
                 }
 
                 handleSpawnedEntityDestroyed(this.registry, entity);
-                this.entityService.unattachRelativeEntities(entity);
-                this.entityService.unattachRelativeEntity(entity);
+                unattachRelativeEntities(this.registry, entity);
+                unattachRelativeEntity(this.registry, entity);
 
                 this.gameEventBatcher.addBroadcastEvent([GameEvent.ENTITY_UNREGISTERED, entity.id]);
             });
@@ -340,8 +338,9 @@ export class GameServer {
                     .findRelativePositionEntityWithType(tank,
                         EntityType.FLAG);
                 if (carriedFlag !== undefined) {
-                    this.handleFlagDrop(tank, undefined, carriedFlag,
-                        undefined, FlagTankInteraction.DROP);
+                    handleFlagDrop(this.registry, this.playerService,
+                        tank, undefined, carriedFlag, undefined,
+                        FlagTankInteraction.DROP);
                 }
             });
 
@@ -496,7 +495,8 @@ export class GameServer {
                 const flagBase = this.collisionService
                     .findOverlappingWithType(boundingBox, EntityType.FLAG_BASE);
                 if (flag !== carriedFlag) {
-                    this.handleFlagInteraction(tank, flag, carriedFlag, flagBase);
+                    handleFlagInteraction(this.registry, this.playerService,
+                        tank, flag, carriedFlag, flagBase);
                 }
             });
 
@@ -505,8 +505,8 @@ export class GameServer {
                 const carriedFlag = this.collisionService
                     .findRelativePositionEntityWithType(tank,
                         EntityType.FLAG);
-                this.handleFlagInteraction(tank, undefined, carriedFlag,
-                    flagBase);
+                handleFlagInteraction(this.registry, this.playerService,
+                    tank, undefined, carriedFlag, flagBase);
             });
 
         this.collisionService.emitter.on(CollisionEvent.ENTITY_COLLIDE_TELEPORTER,
@@ -636,83 +636,6 @@ export class GameServer {
                 component.clazz.tag,
                 data,
             ]);
-        }
-    }
-
-    handleFlagPick(
-        tank: Entity,
-        flag: Entity,
-        flagBase: Entity | undefined,
-    ): void {
-        if (this.entityService.isAttachedRelativeEntity(flag)) {
-            return;
-        }
-
-        this.entityService.attachRelativeEntity(tank, flag);
-        this.flagService.setFlagSource(flag, flagBase);
-    }
-
-    handleFlagDrop(
-        tank: Entity,
-        flag: Entity | undefined,
-        carriedFlag: Entity,
-        flagBase: Entity | undefined,
-        interaction: FlagTankInteraction,
-    ): void {
-        const playerId = tank.getComponent(PlayerOwnedComponent).playerId;
-        let position;
-
-        if (interaction === FlagTankInteraction.DROP) {
-            position = tank.getComponent(PositionComponent);
-        } else if (interaction === FlagTankInteraction.RETURN) {
-            assert(flagBase !== undefined);
-
-            position = flagBase.getComponent(PositionComponent);
-        } else if (interaction === FlagTankInteraction.CAPTURE) {
-            assert(flag !== undefined);
-            assert(carriedFlag !== undefined);
-
-            const flagComponent = carriedFlag.getComponent(FlagComponent);
-            const carriedFlagBase = this.registry
-                .getEntityById(flagComponent.sourceId);
-            position = carriedFlagBase.getComponent(PositionComponent);
-        } else {
-            assert(false);
-        }
-
-        this.entityService.unattachRelativeEntity(carriedFlag);
-        this.entityService.setEntityPosition(carriedFlag, position);
-        this.flagService.setFlagDropper(carriedFlag, tank);
-
-        if (interaction === FlagTankInteraction.RETURN) {
-            this.playerService.addPlayerPoints(playerId,
-                PlayerPointsEvent.RETURN_FLAG);
-        } else if (interaction === FlagTankInteraction.CAPTURE) {
-            this.playerService.addPlayerPoints(playerId,
-                PlayerPointsEvent.CAPTURE_FLAG);
-        }
-    }
-
-    handleFlagInteraction(
-        tank: Entity,
-        flag: Entity | undefined,
-        carriedFlag: Entity | undefined,
-        flagBase: Entity | undefined,
-    ): void {
-        const interaction = this.flagService
-            .findFlagTankInteractionType(tank, flag, carriedFlag, flagBase);
-        if (interaction === undefined) {
-            return;
-        }
-
-        if (interaction === FlagTankInteraction.PICK) {
-            assert(flag !== undefined);
-            this.handleFlagPick(tank, flag, flagBase);
-        } else if (interaction === FlagTankInteraction.DROP
-            || interaction === FlagTankInteraction.RETURN
-            || interaction === FlagTankInteraction.CAPTURE) {
-            assert(carriedFlag !== undefined);
-            this.handleFlagDrop(tank, flag, carriedFlag, flagBase, interaction);
         }
     }
 

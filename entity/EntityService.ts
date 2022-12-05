@@ -223,67 +223,6 @@ export class EntityService {
         });
     }
 
-    isAttachedRelativeEntity(entity: Entity): boolean {
-        return entity.hasComponent(RelativePositionComponent);
-    }
-
-    attachRelativeEntity(parent: Entity, child: Entity): void {
-        const relativePositionComponent = child
-            .findComponent(RelativePositionComponent);
-        if (relativePositionComponent !== undefined) {
-            this.unattachRelativeEntity(child);
-        }
-
-        child.upsertComponent(RelativePositionComponent, {
-            entityId: parent.id,
-        });
-
-        const relativePositionChildrenComponent = parent
-            .getComponent(RelativePositionChildrenComponent);
-        relativePositionChildrenComponent.ids[child.id] = true;
-        relativePositionChildrenComponent.update({
-            ids: relativePositionChildrenComponent.ids,
-        });
-    }
-
-    unattachRelativeEntity(child: Entity): void {
-        const relativePositionComponent = child
-            .findComponent(RelativePositionComponent);
-        if (relativePositionComponent === undefined) {
-            return;
-        }
-
-        const parentId = relativePositionComponent.entityId;
-        const parent = this.registry.getEntityById(parentId);
-
-        const relativePositionChildrenComponent = parent
-            .getComponent(RelativePositionChildrenComponent);
-        delete relativePositionChildrenComponent.ids[child.id];
-        relativePositionChildrenComponent.update({
-            ids: relativePositionChildrenComponent.ids,
-        });
-
-        relativePositionComponent.remove();
-    }
-
-    unattachRelativeEntities(entity: Entity): void {
-        const relativePositionChildrenComponent = entity
-            .findComponent(RelativePositionChildrenComponent);
-        if (relativePositionChildrenComponent === undefined) {
-            return;
-        }
-
-        for (const childId of
-            Object.keys(relativePositionChildrenComponent.ids)) {
-            const child = this.registry.getEntityById(+childId);
-            this.unattachRelativeEntity(child);
-        }
-    }
-
-    setEntityPosition(entity: Entity, position: Point): void {
-        entity.upsertComponent(PositionComponent, position);
-    }
-
     markRelativeChildrenDirtyPosition(entity: Entity): void {
         const relativePositionChildrenComponent = entity
             .findComponent(RelativePositionChildrenComponent);
