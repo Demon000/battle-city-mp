@@ -56,6 +56,7 @@ import { TeleporterComponent } from '@/components/TeleporterComponent';
 import getBulletBrickWallDestroyBox from '@/logic/bulletBrickWallDestroyBox';
 import { createSpawnEffect } from '@/logic/spawnEffect';
 import { createTankForPlayer, decreaseTankHealth } from '@/logic/tank';
+import { createExplosion } from '@/logic/explosion';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'p',
@@ -366,33 +367,10 @@ export class GameServer {
         /**
          * CollisionService event handlers
          */
-        const spawnExplosion = (
-            sourceOrPosition: Entity | Point,
-            type: ExplosionType,
-            destroyedType?: string,
-        ) => {
-            let position;
-            if (sourceOrPosition instanceof Entity) {
-                position = sourceOrPosition.getComponent(CenterPositionComponent);
-            } else {
-                position = sourceOrPosition;
-            }
-
-            this.entityFactory.buildFromOptions({
-                type: EntityType.EXPLOSION,
-                subtypes: [type],
-                components: {
-                    PositionComponent: position,
-                    ExplosionComponent: {
-                        destroyedType,
-                    },
-                },
-            });
-        };
-
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_LEVEL_BORDER,
             (bullet: Entity, _staticEntity: Entity) => {
-                spawnExplosion(bullet, ExplosionType.SMALL, EntityType.NONE);
+                createExplosion(this.entityFactory, bullet,
+                    ExplosionType.SMALL, EntityType.NONE);
                 this.entityService.markDestroyed(bullet);
             });
 
@@ -401,10 +379,12 @@ export class GameServer {
                 this.entityService.markDestroyed(bullet);
                 const bulletPower = bullet.getComponent(BulletComponent).power;
                 if (bulletPower === BulletPower.HEAVY) {
-                    spawnExplosion(bullet, ExplosionType.SMALL);
+                    createExplosion(this.entityFactory, bullet,
+                        ExplosionType.SMALL);
                     this.entityService.markDestroyed(steelWall);
                 } else {
-                    spawnExplosion(bullet, ExplosionType.SMALL, EntityType.NONE);
+                    createExplosion(this.entityFactory, bullet,
+                        ExplosionType.SMALL, EntityType.NONE);
                 }
             });
 
@@ -421,7 +401,8 @@ export class GameServer {
                 }
 
                 const destroyBoxCenter = BoundingBoxUtils.center(destroyBox);
-                spawnExplosion(destroyBoxCenter, ExplosionType.SMALL);
+                createExplosion(this.entityFactory, destroyBoxCenter,
+                    ExplosionType.SMALL);
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_TANK,
@@ -476,18 +457,21 @@ export class GameServer {
                 if (tankHealth.value <= 0) {
                     const playerId =
                         tank.getComponent(PlayerOwnedComponent).playerId;
-                    spawnExplosion(tank, ExplosionType.BIG, EntityType.TANK);
+                    createExplosion(this.entityFactory, tank,
+                        ExplosionType.BIG, EntityType.TANK);
                     this.playerService.setPlayerRequestedSpawnStatus(playerId, PlayerSpawnStatus.DESPAWN);
                     this.playerService.addPlayerDeath(playerId);
                     if (bulletPlayer !== undefined) {
                         this.playerService.addPlayerKill(bulletPlayer.id);
                     }
                 } else {
-                    spawnExplosion(bullet, ExplosionType.SMALL, EntityType.NONE);
+                    createExplosion(this.entityFactory, bullet,
+                        ExplosionType.SMALL, EntityType.NONE);
                 }
 
                 if (destroyBullet || bulletDamage <= 0) {
-                    spawnExplosion(bullet, ExplosionType.SMALL);
+                    createExplosion(this.entityFactory, bullet,
+                        ExplosionType.SMALL);
                     this.entityService.markDestroyed(bullet);
                 }
             });
@@ -502,7 +486,8 @@ export class GameServer {
                     return;
                 }
 
-                spawnExplosion(movingBullet, ExplosionType.SMALL);
+                createExplosion(this.entityFactory, movingBullet,
+                    ExplosionType.SMALL);
                 this.entityService.markDestroyed(movingBullet);
                 this.entityService.markDestroyed(staticBullet);
             });
