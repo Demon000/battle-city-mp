@@ -7,7 +7,6 @@ import { HealthComponent } from '@/components/HealthComponent';
 import { MovementComponent } from '@/components/MovementComponent';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { SmokeSpawnerComponent } from '@/components/SmokeSpawnerComponent';
-import { ClazzOrTag } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 import { EntityFactory } from '@/entity/EntityFactory';
@@ -16,14 +15,11 @@ import { DirectionComponent } from '@/components/DirectionComponent';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
+import { ComponentClassType } from '@/ecs/Component';
 
 export class EntitySpawnerService {
-    constructor(
-        private entityFactory: EntityFactory,
-        private registry: Registry,
-    ) {}
-
     private handleEntityRegisteredDestroyed(
+        registry: Registry,
         entity: Entity,
         registered: boolean,
     ): void {
@@ -33,8 +29,7 @@ export class EntitySpawnerService {
             return;
         }
 
-        const ownerEntity = this.registry
-            .findEntityById(entityOwnedComponent.id);
+        const ownerEntity = registry.findEntityById(entityOwnedComponent.id);
         if (ownerEntity === undefined) {
             return;
         }
@@ -69,17 +64,17 @@ export class EntitySpawnerService {
         });
     }
 
-    handleEntityRegistered(entity: Entity): void {
-        this.handleEntityRegisteredDestroyed(entity, true);
+    handleEntityRegistered(registry: Registry, entity: Entity): void {
+        this.handleEntityRegisteredDestroyed(registry, entity, true);
     }
 
-    handleEntityDestroyed(entity: Entity): void {
-        this.handleEntityRegisteredDestroyed(entity, false);
+    handleEntityDestroyed(registry: Registry, entity: Entity): void {
+        this.handleEntityRegisteredDestroyed(registry, entity, false);
     }
 
-    setEntitySpawnerStatus(
+    setEntitySpawnerStatus<C>(
         entity: Entity,
-        clazzOrTag: ClazzOrTag, 
+        clazz: ComponentClassType<C>,
         status: boolean,
     ): void {
         let entitySpawnerActiveComponent =
@@ -97,7 +92,7 @@ export class EntitySpawnerService {
         const activeSpawnerTags =
             entitySpawnerActiveComponent.tags;
 
-        const tag = this.registry.lookup(clazzOrTag).tag;
+        const tag = clazz.tag;
 
         if (status) {
             activeSpawnerTags[tag] = true;
@@ -122,7 +117,10 @@ export class EntitySpawnerService {
         return true;
     }
 
-    private spawnEntity(spawner: EntitySpawnerComponent): void {
+    private createEntity(
+        entityFactory: EntityFactory,
+        spawner: EntitySpawnerComponent,
+    ): Entity {
         const entity = spawner.entity;
         const centerPosition = entity.getComponent(CenterPositionComponent);
 
@@ -137,7 +135,7 @@ export class EntitySpawnerService {
             ...options,
         };
 
-        const spawnedEntity = this.entityFactory.buildFromOptions(buildOptions);
+        const spawnedEntity = entityFactory.buildFromOptions(buildOptions);
 
         const playerOwnedComponent = entity.findComponent(PlayerOwnedComponent);
         const spawnedPlayerOwnedComponent = spawnedEntity
@@ -193,7 +191,15 @@ export class EntitySpawnerService {
             y: centerPosition.y - size.height / 2,
         }, options);
 
-        this.registry.registerEntity(spawnedEntity);
+        return spawnedEntity;
+    }
+
+    private spawnEntity(
+        registry: Registry,
+        spawner: EntitySpawnerComponent,
+        spawnedEntity: Entity,
+    ): void {
+        registry.registerEntity(spawnedEntity);
 
         spawner.lastSpawnTime = Date.now();
     }
@@ -228,8 +234,13 @@ export class EntitySpawnerService {
         this.setEntitySpawnerStatus(entity, SmokeSpawnerComponent, true);
     }
 
-    processActiveEntitySpawner(component: EntitySpawnerActiveComponent) {
+    processActiveEntitySpawner(
+        registry: Registry,
+        entityFactory: EntityFactory,
+        component: EntitySpawnerActiveComponent,
+    ) {
         const entity = component.entity;
+
         for (const tag of Object.keys(component.tags)) {
             const entitySpawnerComponent = entity.getComponent(tag) as
                 EntitySpawnerComponent;
@@ -237,15 +248,20 @@ export class EntitySpawnerService {
                 continue;
             }
 
-            this.spawnEntity(entitySpawnerComponent);
+            const spawnedEntity = this.createEntity(entityFactory,
+                entitySpawnerComponent);
+            this.spawnEntity(registry, entitySpawnerComponent, spawnedEntity);
         }
     }
 
-    processActiveEntitySpawners(): void {
-        const components = this.registry
+    processActiveEntitySpawners(
+        registry: Registry,
+        entityFactory: EntityFactory,
+    ): void {
+        const components = registry
             .getComponents(EntitySpawnerActiveComponent);
         for (const component of components) {
-            this.processActiveEntitySpawner(component);
+            this.processActiveEntitySpawner(registry, entityFactory, component);
         }
     }
 }

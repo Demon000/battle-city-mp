@@ -106,7 +106,7 @@ export class GameServer {
         this.gameModeService = new GameModeService(this.config);
         this.collisionService = new CollisionService(boundingBoxRepository, this.registry);
         this.entityService = new EntityService(this.registry);
-        this.entitySpawnerService = new EntitySpawnerService(this.entityFactory, this.registry);
+        this.entitySpawnerService = new EntitySpawnerService();
         this.flagService = new FlagService(this.config);
         this.gameMapService = new GameMapService(entityBlueprint);
         this.playerRepository = new MapRepository<string, Player>();
@@ -145,7 +145,7 @@ export class GameServer {
                     }
                 }
 
-                this.entitySpawnerService.handleEntityRegistered(entity);
+                this.entitySpawnerService.handleEntityRegistered(this.registry, entity);
             });
         this.registry.emitter.on(RegistryEvent.ENTITY_BEFORE_DESTROY,
             (entity: Entity) => {
@@ -158,7 +158,7 @@ export class GameServer {
                     }
                 }
 
-                this.entitySpawnerService.handleEntityDestroyed(entity);
+                this.entitySpawnerService.handleEntityDestroyed(this.registry, entity);
                 this.entityService.unattachRelativeEntities(entity);
                 this.entityService.unattachRelativeEntity(entity);
 
@@ -287,8 +287,8 @@ export class GameServer {
                 }
 
                 const tank = this.registry.getEntityById(player.tankId);
-                this.entitySpawnerService.setEntitySpawnerStatus(tank,
-                    BulletSpawnerComponent, isShooting);
+                this.entitySpawnerService.setEntitySpawnerStatus(
+                    tank, BulletSpawnerComponent, isShooting);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_MOVE,
@@ -571,7 +571,8 @@ export class GameServer {
                 }
 
                 this.playerService.processPlayersStatus(deltaSeconds);
-                this.entitySpawnerService.processActiveEntitySpawners();
+                this.entitySpawnerService.processActiveEntitySpawners(
+                    this.registry, this.entityFactory);
                 this.entityService.processDirection();
                 this.collisionService.processRequestedDirection();
                 this.entityService.processMovement(deltaSeconds);
