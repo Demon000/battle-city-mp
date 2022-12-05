@@ -234,7 +234,7 @@ export class EntitySpawnerService {
         this.setEntitySpawnerStatus(entity, SmokeSpawnerComponent, true);
     }
 
-    processActiveEntitySpawner(
+    private processActiveEntitySpawner(
         registry: Registry,
         entityFactory: EntityFactory,
         component: EntitySpawnerActiveComponent,
