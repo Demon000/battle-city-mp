@@ -4,7 +4,6 @@ import { ExplosionType } from '@/subtypes/ExplosionType';
 import { EntityFactory, EntityBuildOptions } from '@/entity/EntityFactory';
 import { EntityType } from '@/entity/EntityType';
 import { Direction } from '@/physics/Direction';
-import { TankService } from '@/services/TankService';
 import { TankTier } from '@/subtypes/TankTier';
 import { Team } from '@/team/Team';
 import { TeamService, TeamServiceEvent } from '@/team/TeamService';
@@ -15,7 +14,6 @@ import EventEmitter from 'eventemitter3';
 import { Action, ActionType } from '../actions/Action';
 import { ButtonPressAction } from '../actions/ButtonPressAction';
 import { GameMapService } from '../maps/GameMapService';
-import { EntityService } from '../entity/EntityService';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
 import { CollisionService, DirtyCollisionType } from '../physics/collisions/CollisionService';
 import { CollisionEvent } from '../physics/collisions/CollisionRule';
@@ -44,7 +42,6 @@ import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
-import { FlagComponent } from '@/components/FlagComponent';
 import { RelativePositionComponent } from '@/components/RelativePositionComponent';
 import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
@@ -55,7 +52,12 @@ import { createTankForPlayer, decreaseTankHealth } from '@/logic/tank';
 import { createExplosion } from '@/logic/explosion';
 import { handleSpawnedEntityDestroyed, handleSpawnedEntityRegistered, processActiveEntitySpawners, setEntitySpawnerStatus, updateHealthBasedSmokeSpawner } from '@/logic/entitySpawner';
 import { FlagTankInteraction, handleFlagDrop, handleFlagInteraction } from '@/logic/flag';
-import { unattachRelativeEntities, unattachRelativeEntity } from '@/logic/entity';
+import { processDirection, processMovement, setMovementDirection, updateIsMoving } from '@/logic/entity-movement';
+import { pickRandomSpawnPosition } from '@/logic/spawn';
+import { SpawnComponent } from '@/components/SpawnComponent';
+import { markAllWorldEntitiesDestroyed, markDestroyed, processAutomaticDestroy, processDestroyed } from '@/logic/entity-destroy';
+import { unattachRelativeEntities, unattachRelativeEntity, updateRelativePosition, markRelativeChildrenDirtyPosition, processDirtyRelativePosition } from '@/logic/entity-relative-position';
+import { updateCenterPosition } from '@/logic/entity-position';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'p',
@@ -76,7 +78,6 @@ export class GameServer {
     private gameMapService;
     private playerRepository;
     private playerService;
-    private entityService;
     private collisionService;
     private gameEventBatcher;
     private teamRepository;
@@ -103,7 +104,6 @@ export class GameServer {
 
         this.gameModeService = new GameModeService(this.config);
         this.collisionService = new CollisionService(boundingBoxRepository, this.registry);
-        this.entityService = new EntityService(this.registry);
         this.gameMapService = new GameMapService(entityBlueprint);
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.config, this.playerRepository);
@@ -181,22 +181,21 @@ export class GameServer {
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
                     const entity = component.entity;
-                    this.entityService.updateCenterPosition(entity, true);
+                    updateCenterPosition(entity, true);
                 });
         this.registry.componentEmitter(RelativePositionComponent, true)
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
                     const entity = component.entity;
-                    this.entityService.updateRelativePosition(entity, true);
+                    updateRelativePosition(this.registry, entity, true);
                 });
         this.registry.componentEmitter(PositionComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
                 (component) => {
                     const entity = component.entity;
-                    this.entityService.updateCenterPosition(entity);
+                    updateCenterPosition(entity);
                     this.collisionService.updateBoundingBox(entity);
-                    this.entityService
-                        .markRelativeChildrenDirtyPosition(entity);
+                    markRelativeChildrenDirtyPosition(this.registry, entity);
                 });
         this.registry.componentEmitter(BoundingBoxComponent, true)
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
@@ -233,7 +232,7 @@ export class GameServer {
             .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
                 (_event, component) => {
                     const entity = component.entity;
-                    this.entityService.updateIsMoving(entity);
+                    updateIsMoving(entity);
                 });
         this.registry.componentEmitter(HealthComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
@@ -294,8 +293,7 @@ export class GameServer {
                 }
 
                 const tank = this.registry.getEntityById(player.tankId);
-                this.entityService.setMovementDirection(tank,
-                    direction === undefined ? null : direction);
+                setMovementDirection(tank, direction);
             });
 
         this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_SPAWN_STATUS,
@@ -317,12 +315,13 @@ export class GameServer {
                         tankColor = player.requestedTankColor;
                     }
 
-                    const position = this.entityService.getRandomSpawnPosition(player.teamId);
+                    const entities = this.registry.getEntitiesWithComponent(SpawnComponent);
+                    const position = pickRandomSpawnPosition(entities, player.teamId);
                     createTankForPlayer(this.entityFactory, player, position, tankColor);
                     createSpawnEffect(this.entityFactory, position);
                 } else if (status === PlayerSpawnStatus.DESPAWN && player.tankId !== null) {
                     const tank = this.registry.getEntityById(player.tankId);
-                    this.entityService.markDestroyed(tank);
+                    markDestroyed(tank);
                 }
             });
 
@@ -364,17 +363,17 @@ export class GameServer {
             (bullet: Entity, _staticEntity: Entity) => {
                 createExplosion(this.entityFactory, bullet,
                     ExplosionType.SMALL, EntityType.NONE);
-                this.entityService.markDestroyed(bullet);
+                markDestroyed(bullet);
             });
 
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_STEEL_WALL,
             (bullet: Entity, steelWall: Entity) => {
-                this.entityService.markDestroyed(bullet);
+                markDestroyed(bullet);
                 const bulletPower = bullet.getComponent(BulletComponent).power;
                 if (bulletPower === BulletPower.HEAVY) {
                     createExplosion(this.entityFactory, bullet,
                         ExplosionType.SMALL);
-                    this.entityService.markDestroyed(steelWall);
+                    markDestroyed(steelWall);
                 } else {
                     createExplosion(this.entityFactory, bullet,
                         ExplosionType.SMALL, EntityType.NONE);
@@ -384,13 +383,13 @@ export class GameServer {
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BRICK_WALL,
             (bullet: Entity, brickWall: Entity) => {
                 const destroyBox = getBrickWallDestroyBox(brickWall, bullet);
-                this.entityService.markDestroyed(bullet);
+                markDestroyed(bullet);
 
                 const destroyedBullets = this.collisionService
                     .findMultipleOverlappingWithType(destroyBox,
                         EntityType.BRICK_WALL);
                 for (const bullet of destroyedBullets) {
-                    this.entityService.markDestroyed(bullet);
+                    markDestroyed(bullet);
                 }
 
                 const destroyBoxCenter = BoundingBoxUtils.center(destroyBox);
@@ -465,7 +464,7 @@ export class GameServer {
                 if (destroyBullet || bulletDamage <= 0) {
                     createExplosion(this.entityFactory, bullet,
                         ExplosionType.SMALL);
-                    this.entityService.markDestroyed(bullet);
+                    markDestroyed(bullet);
                 }
             });
 
@@ -481,8 +480,8 @@ export class GameServer {
 
                 createExplosion(this.entityFactory, movingBullet,
                     ExplosionType.SMALL);
-                this.entityService.markDestroyed(movingBullet);
-                this.entityService.markDestroyed(staticBullet);
+                markDestroyed(movingBullet);
+                markDestroyed(staticBullet);
             });
 
         this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_FLAG,
@@ -569,14 +568,14 @@ export class GameServer {
 
                 this.playerService.processPlayersStatus(deltaSeconds);
                 processActiveEntitySpawners(this.registry, this.entityFactory);
-                this.entityService.processDirection();
+                processDirection(this.registry);
                 this.collisionService.processRequestedDirection();
-                this.entityService.processMovement(deltaSeconds);
+                processMovement(this.registry, deltaSeconds);
                 this.collisionService.processRequestedPosition();
-                this.entityService.processDirtyRelativePosition();
-                this.entityService.processAutomaticDestroy();
+                processDirtyRelativePosition(this.registry);
+                processAutomaticDestroy(this.registry);
                 this.collisionService.processDirtyCollisions();
-                this.entityService.processDestroyed();
+                processDestroyed(this.registry);
                 this.gameEventBatcher.flush();
             });
 
@@ -795,9 +794,9 @@ export class GameServer {
     reload(): void {
         this.ticker.stop();
 
-        this.entityService.markAllWorldEntitiesDestroyed();
+        markAllWorldEntitiesDestroyed(this.registry);
         this.collisionService.processDirtyCollisions();
-        this.entityService.processDestroyed();
+        processDestroyed(this.registry);
         this.playerService.resetFields();
         this.gameEventBatcher.flush();
 

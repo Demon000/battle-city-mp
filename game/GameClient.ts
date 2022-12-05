@@ -2,7 +2,6 @@ import { GameCamera } from '@/renderer/GameCamera';
 import { GameGraphicsService } from '@/renderer/GameGraphicsService';
 import { MapRepository } from '@/utils/MapRepository';
 import { Ticker, TickerEvent } from '@/utils/Ticker';
-import { EntityService } from '../entity/EntityService';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
 import { CollisionService, DirtyCollisionType } from '../physics/collisions/CollisionService';
 import { Player, PartialPlayerOptions, PlayerOptions, PlayerSpawnStatus } from '../player/Player';
@@ -33,6 +32,9 @@ import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { Entity } from '@/ecs/Entity';
 import { ClientComponentRegistry } from '@/ecs/ClientComponentRegistry';
 import { EntityGraphicsRenderer } from '@/entity/EntityGraphicsRenderer';
+import { updateIsMoving } from '@/logic/entity-movement';
+import { markDestroyed, processDestroyed } from '@/logic/entity-destroy';
+import { updateCenterPosition } from '@/logic/entity-position';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -92,7 +94,6 @@ export class GameClient {
     private playerService;
     private teamRepository;
     private teamService;
-    private entityService;
     private tankService;
     private collisionService;
     private gameCamera;
@@ -114,7 +115,6 @@ export class GameClient {
         const entityGraphicsRenderer = new EntityGraphicsRenderer();
 
         this.collisionService = new CollisionService(boundingBoxRepository, this.registry);
-        this.entityService = new EntityService(this.registry);
         this.tankService = new TankService();
         this.playerRepository = new MapRepository<string, Player>();
         this.playerService = new PlayerService(this.config, this.playerRepository);
@@ -152,13 +152,13 @@ export class GameClient {
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
                     const entity = component.entity;
-                    this.entityService.updateCenterPosition(entity, true);
+                    updateCenterPosition(entity, true);
                 });
         this.registry.componentEmitter(PositionComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
                 (component) => {
                     const entity = component.entity;
-                    this.entityService.updateCenterPosition(entity);
+                    updateCenterPosition(entity);
                     this.collisionService.updateBoundingBox(entity);
                 });
         this.registry.componentEmitter(BoundingBoxComponent, true)
@@ -196,7 +196,7 @@ export class GameClient {
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
                 (component) => {
                     const entity = component.entity;
-                    this.entityService.updateIsMoving(entity);
+                    updateIsMoving(entity);
                 });
         this.registry.componentEmitter(HealthComponent, true)
             .on(RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
@@ -321,7 +321,7 @@ export class GameClient {
 
     onEntityUnregistered(entityId: EntityId): void {
         const entity = this.registry.getEntityById(entityId);
-        this.entityService.markDestroyed(entity);
+        markDestroyed(entity);
     }
 
     onEntityComponentAdded(entityId: EntityId, tag: string, data: any): void {
@@ -391,7 +391,7 @@ export class GameClient {
 
         this.collisionService.processDirtyCollisions();
         this.gameGraphicsService.processDirtyGraphics();
-        this.entityService.processDestroyed();
+        processDestroyed(this.registry);
 
         const ownPlayer = this.playerService.getOwnPlayer();
         if (ownPlayer === undefined) {
