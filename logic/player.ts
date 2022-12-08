@@ -193,6 +193,24 @@ export function addPlayerButtonPressAction(
     }
 }
 
+function isPlayerValidTeamSwitch(
+    registry: Registry,
+    player: Entity,
+    teamId: EntityId,
+): boolean {
+    const team = registry.getEntityById(teamId);
+
+    let existingTeam;
+    const playerTeamId = getPlayerTeamId(player);
+    if (playerTeamId === null) {
+        existingTeam = getTeamWithLeastPlayers(registry);
+    } else {
+        existingTeam = registry.getEntityById(playerTeamId);
+    }
+
+    return isTeamSwitchingAllowed(existingTeam, team);
+}
+
 export function onPlayerRequestedTeam(
     this: PluginContext,
     player: Entity,
@@ -203,23 +221,9 @@ export function onPlayerRequestedTeam(
         return;
     }
 
-    if (teamId !== null) {
-        const team = this.registry.getEntityById(teamId);
-        if (team === undefined) {
-            return;
-        }
-
-        let existingTeam;
-        const playerTeamId = getPlayerTeamId(player);
-        if (playerTeamId === null) {
-            existingTeam = getTeamWithLeastPlayers(this.registry);
-        } else {
-            existingTeam = this.registry.getEntityById(playerTeamId);
-        }
-
-        if (!isTeamSwitchingAllowed(existingTeam, team)) {
-            return;
-        }
+    if (teamId !== null
+        && !isPlayerValidTeamSwitch(this.registry, player, teamId)) {
+        return;
     }
 
     setPlayerTeamId(this.registry, player, teamId);
