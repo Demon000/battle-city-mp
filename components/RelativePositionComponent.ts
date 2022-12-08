@@ -13,5 +13,5 @@ export class RelativePositionComponent
 
     x = 0;
     y = 0;
-    entityId: EntityId = -1;
+    entityId = 'invalid';
 }

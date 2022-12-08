@@ -12,5 +12,5 @@ export class PickupIgnoreComponent
     static TAG = 'PI';
 
     time = 0;
-    entityId = -1;
+    entityId = 'invalid';
 }

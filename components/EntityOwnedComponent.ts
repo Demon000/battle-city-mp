@@ -10,5 +10,5 @@ export class EntityOwnedComponent
     implements EntityOwnedComponentData {
     static TAG = 'EO';
 
-    id = -1;
+    id = 'invalid';
 }

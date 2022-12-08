@@ -18,7 +18,7 @@ export function unattachRelativeEntities(
 
     for (const childId of
         Object.keys(relativePositionChildrenComponent.ids)) {
-        const child = registry.getEntityById(+childId);
+        const child = registry.getEntityById(childId);
         unattachRelativeEntity(registry, child);
     }
 }
@@ -96,7 +96,7 @@ export function markRelativeChildrenDirtyPosition(
 
     for (const childId of
         Object.keys(relativePositionChildrenComponent.ids)) {
-        const child = registry.getEntityById(+childId);
+        const child = registry.getEntityById(childId);
         markDirtyRelativePosition(child);
     }
 }

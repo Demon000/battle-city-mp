@@ -10,5 +10,5 @@ export class FlagComponent
     implements FlagComponentData {
     static TAG = 'F';
 
-    sourceId = -1;
+    sourceId = 'invalid';
 }
