@@ -37,7 +37,6 @@ import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { ColorComponent } from '@/components/ColorComponent';
 import { PlayerRequestedSpawnStatusComponent } from '@/components/PlayerRequestedSpawnStatusComponent';
 import { EntitiesOwnerComponent } from '@/components/EntitiesOwnerComponent';
-import { NameComponent } from '@/components/NameComponent';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
