@@ -14,7 +14,6 @@ export interface PlayerComponentData {
     kills: number;
     points: number;
     requestedTankTier: TankTier;
-    respawnTimeout: number;
 }
 
 export class PlayerComponent
@@ -28,5 +27,4 @@ export class PlayerComponent
     kills = 0;
     points = 0;
     requestedTankTier = TankTier.NORMAL;
-    respawnTimeout = 0;
 }

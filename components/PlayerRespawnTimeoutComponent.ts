@@ -9,5 +9,5 @@ export class PlayerRespawnTimeoutComponent
     implements PlayerRespawnTimeoutComponentData {
     static TAG = 'PRT';
 
-    value = 5;
+    value = 0;
 }

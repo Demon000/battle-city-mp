@@ -41,9 +41,15 @@
             PlayerComponent: {},
             ColorComponent: {},
             EntitiesOwnerComponent: {},
+            PlayerRespawnTimeoutComponent: {},
         },
         serverComponents: {
             PlayerInputComponent: {},
+        },
+        sharedServerComponents: {
+            PlayerRespawnTimeoutConfigComponent: {
+                value: 5,
+            },
         },
     },
     'team': {

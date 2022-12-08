@@ -30,6 +30,7 @@ import { PlayerInputComponent } from '@/components/PlayerInputComponent';
 import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { NameComponent } from '@/components/NameComponent';
 import { PlayerRequestedDisconnectComponent } from '@/components/PlayerRequestedDisconnect';
+import { PlayerRespawnTimeoutConfigComponent } from '@/components/PlayerRespawnTimeoutConfigComponent';
 
 export function createPlayer(
     entityFactory: EntityFactory,
@@ -130,6 +131,7 @@ export function setPlayerTank(
     if (tankId === null) {
         assert(playerTankId !== null);
         delete ids[playerTankId];
+        resetPlayerRespawnTimeout(player);
     } else {
         ids[tankId] = true;
     }
@@ -270,20 +272,19 @@ export function addPlayerDeath(player: Entity): void {
     setPlayerDeaths(player, playerComponent.deaths + 1);
 }
 
-export function setPlayerRespawnTimeout(
-    player: Entity,
-    respawnTimeout: number,
-): void {
-    const playerComponent = player.getComponent(PlayerComponent);
-
-    playerComponent.update({
-        respawnTimeout,
+export function setPlayerRespawnTimeout(player: Entity, value: number): void {
+    player.updateComponent(PlayerRespawnTimeoutComponent, {
+        value,
     });
+}
+
+export function getPlayerRespawnTimeout(player: Entity): number {
+    return player.getComponent(PlayerRespawnTimeoutComponent).value;
 }
 
 export function resetPlayerRespawnTimeout(player: Entity): void {
     const respawnTimeout = player
-        .getComponent(PlayerRespawnTimeoutComponent).value;
+        .getComponent(PlayerRespawnTimeoutConfigComponent).value;
     setPlayerRespawnTimeout(player, respawnTimeout);
 }
 
@@ -291,18 +292,18 @@ export function processPlayerRespawnTimeout(
     player: Entity,
     deltaSeconds: number,
 ): void {
-    const playerComponent = player.getComponent(PlayerComponent);
-    const playerTankId = getPlayerTankId(player);
+    const respawnTimeout = getPlayerRespawnTimeout(player);
 
+    const playerTankId = getPlayerTankId(player);
     if (playerTankId !== null) {
         return;
     }
 
-    if (playerComponent.respawnTimeout == 0) {
+    if (respawnTimeout == 0) {
         return;
     }
 
-    let newRespawnTimeout = playerComponent.respawnTimeout - deltaSeconds;
+    let newRespawnTimeout = respawnTimeout - deltaSeconds;
     if (newRespawnTimeout < 0) {
         newRespawnTimeout = 0;
     }
@@ -322,12 +323,12 @@ export function processPlayerSpawnStatus(
 
     const status = spawnStatusComponent.value;
     const playerTankId = getPlayerTankId(player);
-    const playerComponent = player.getComponent(PlayerComponent);
+    const respawnTimeout = getPlayerRespawnTimeout(player);
     let handleRequestedSpawnStatus = false;
 
     if (status === PlayerSpawnStatus.SPAWN
         && playerTankId === null
-        && playerComponent.respawnTimeout == 0) {
+        && respawnTimeout == 0) {
         handleRequestedSpawnStatus = true;
     }
 
