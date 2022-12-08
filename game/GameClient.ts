@@ -137,9 +137,9 @@ export class GameClient {
                     return;
                 }
 
+                const entity = component.entity;
                 this.gameGraphicsService
-                    .processGraphicsDependencies(component.entity,
-                        component.clazz.tag);
+                    .processGraphicsDependencies(entity, component.clazz.tag);
             });
         this.registry.componentEmitter(DestroyedComponent, true)
             .on(RegistryComponentEvent.COMPONENT_ADDED,
