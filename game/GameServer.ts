@@ -30,16 +30,15 @@ import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
 import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
 import { RelativePositionComponent } from '@/components/RelativePositionComponent';
-import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { ComponentRegistry } from '@/ecs/ComponentRegistry';
 import { handleSpawnedEntityDestroyed, handleSpawnedEntityRegistered, processActiveEntitySpawners, updateHealthBasedSmokeSpawner } from '@/logic/entity-spawner';
 import { processDirection, processMovement, updateIsMoving } from '@/logic/entity-movement';
-import { markAllWorldEntitiesDestroyed, processAutomaticDestroy, processDestroyed } from '@/logic/entity-destroy';
+import { destroyAllWorldEntities, processAutomaticDestroy } from '@/logic/entity-destroy';
 import { unattachRelativeEntities, unattachRelativeEntity, updateRelativePosition, markRelativeChildrenDirtyPosition, processDirtyRelativePosition } from '@/logic/entity-relative-position';
 import { updateCenterPosition } from '@/logic/entity-position';
 import { onBulletHitBrickWall, onBulletHitBullet, onBulletHitLevelBorder, onBulletHitSteelWall, onBulletHitTank } from '@/logic/bullet';
 import { onEntityCollideTeleporter } from '@/logic/entity-teleporter';
-import { addPlayerButtonPressAction, cancelPlayersActions, createPlayer, onPlayerRequestedTeam, processPlayerDisconnectStatus, processPlayerDroppingFlag, processPlayerMovement, processPlayerRespawnTimeout, processPlayerShooting, processPlayerSpawnStatus, resetPlayers, setPlayerName, setPlayerRequestedDisconnect, setPlayerRequestedServerStatus, setPlayerRequestedSpawnStatus, setPlayerRequestedTankColor, setPlayerRequestedTankTier, setPlayerTank } from '@/logic/player';
+import { addPlayerButtonPressAction, cancelPlayersActions, createPlayer, onPlayerBeforeDestroy, onPlayerRequestedTeam, processPlayerDisconnectStatus, processPlayerDroppingFlag, processPlayerMovement, processPlayerRespawnTimeout, processPlayerShooting, processPlayerSpawnStatus, resetPlayers, setPlayerName, setPlayerRequestedDisconnect, setPlayerRequestedServerStatus, setPlayerRequestedSpawnStatus, setPlayerRequestedTankColor, setPlayerRequestedTankTier, setPlayerTank } from '@/logic/player';
 import { onTankCollideFlag, onTankCollideFlagBase } from '@/logic/tank';
 import { PlayerComponent } from '@/components/PlayerComponent';
 import { EntityId } from '@/ecs/EntityId';
@@ -144,12 +143,15 @@ export class GameServer {
                         setPlayerTank(player, null);
                         break;
                     }
-                    case EntityType.TEAM: {
+                    case EntityType.PLAYER:
+                        onPlayerBeforeDestroy(this.registry, entity);
+                        break;
+                    case EntityType.TEAM:
                         onTeamBeforeDestroy(this.registry, entity);
                         break;
-                    }
                 }
 
+                this.collisionService.removeCollisions(entity);
                 handleSpawnedEntityDestroyed(this.registry, entity);
                 unattachRelativeEntities(this.registry, entity);
                 unattachRelativeEntity(this.registry, entity);
@@ -166,13 +168,6 @@ export class GameServer {
                     options,
                 );
             });
-        this.registry.componentEmitter(DestroyedComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_ADDED,
-                (component) => {
-                    const entity = component.entity;
-                    this.collisionService.markDirtyCollisions(entity,
-                        DirtyCollisionType.REMOVE);
-                });
         this.registry.componentEmitter(CenterPositionComponent, true)
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
@@ -215,11 +210,7 @@ export class GameServer {
                 });
         this.registry.componentEmitter(BoundingBoxComponent, true)
             .on(RegistryComponentEvent.COMPONENT_BEFORE_REMOVE,
-                (component, options) => {
-                    if (options?.destroy) {
-                        return;
-                    }
-
+                (component) => {
                     const entity = component.entity;
                     this.collisionService.markDirtyCollisions(entity,
                         DirtyCollisionType.REMOVE);
@@ -310,7 +301,6 @@ export class GameServer {
                 processDirtyRelativePosition(this.registry);
                 processAutomaticDestroy(this.registry);
                 this.collisionService.processDirtyCollisions();
-                processDestroyed(this.registry);
                 this.gameEventBatcher.flush();
             });
 
@@ -324,7 +314,11 @@ export class GameServer {
             this.registry.getEntitiesWithComponent(PlayerComponent)) {
             processPlayerRespawnTimeout(player, deltaSeconds);
             processPlayerSpawnStatus.call(this.pluginContext, player);
-            processPlayerDisconnectStatus(this.registry, player);
+            const disconnected = processPlayerDisconnectStatus(player);
+            if (disconnected) {
+                continue;
+            }
+
             processPlayerMovement(this.registry, player);
             processPlayerShooting(this.registry, player);
             processPlayerDroppingFlag.call(this.pluginContext, player);
@@ -483,9 +477,8 @@ export class GameServer {
     reload(): void {
         this.ticker.stop();
 
-        markAllWorldEntitiesDestroyed(this.registry);
+        destroyAllWorldEntities(this.registry);
         this.collisionService.processDirtyCollisions();
-        processDestroyed(this.registry);
         resetPlayers(this.registry);
         this.gameEventBatcher.flush();
 

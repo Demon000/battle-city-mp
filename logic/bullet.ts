@@ -10,7 +10,6 @@ import { SameTeamBulletHitMode } from '@/services/GameModeService';
 import { BulletPower } from '@/subtypes/BulletPower';
 import { ExplosionType } from '@/subtypes/ExplosionType';
 import { getBrickWallDestroyBox } from './brick-wall';
-import { markDestroyed } from './entity-destroy';
 import { createExplosion } from './explosion';
 import { addPlayerDeath, addPlayerKill, getPlayerTeamId } from './player';
 import { decreaseTankHealth } from './tank';
@@ -24,7 +23,8 @@ export function onBulletHitLevelBorder(
 
     createExplosion(entityFactory, bullet,
         ExplosionType.SMALL, EntityType.NONE);
-    markDestroyed(bullet);
+
+    bullet.destroy();
 }
 
 export function onBulletHitSteelWall(
@@ -32,16 +32,16 @@ export function onBulletHitSteelWall(
     bullet: Entity, 
     steelWall: Entity,
 ): void {
-    markDestroyed(bullet);
     const bulletPower = bullet.getComponent(BulletComponent).power;
     if (bulletPower === BulletPower.HEAVY) {
         createExplosion(this.entityFactory, bullet,
             ExplosionType.SMALL);
-        markDestroyed(steelWall);
+        steelWall.destroy();
     } else {
         createExplosion(this.entityFactory, bullet,
             ExplosionType.SMALL, EntityType.NONE);
     }
+    bullet.destroy();
 }
 
 export function onBulletHitBrickWall(
@@ -50,18 +50,19 @@ export function onBulletHitBrickWall(
     brickWall: Entity,
 ): void {
     const destroyBox = getBrickWallDestroyBox(brickWall, bullet);
-    markDestroyed(bullet);
 
     const destroyedBullets = this.collisionService
         .findMultipleOverlappingWithType(destroyBox,
             EntityType.BRICK_WALL);
-    for (const bullet of destroyedBullets) {
-        markDestroyed(bullet);
+    for (const destroyedBullet of destroyedBullets) {
+        destroyedBullet.destroy();
     }
 
     const destroyBoxCenter = BoundingBoxUtils.center(destroyBox);
     createExplosion(this.entityFactory, destroyBoxCenter,
         ExplosionType.SMALL);
+
+    bullet.destroy();
 }
 
 export function onBulletHitTank(
@@ -121,7 +122,7 @@ export function onBulletHitTank(
     if (tankHealth.value <= 0) {
         createExplosion(this.entityFactory, tank,
             ExplosionType.BIG, EntityType.TANK);
-        markDestroyed(tank);
+        tank.destroy();
         addPlayerDeath(tankPlayer);
         addPlayerKill(bulletPlayer);
     } else {
@@ -131,7 +132,7 @@ export function onBulletHitTank(
 
     if (destroyBullet || bulletDamage <= 0) {
         createExplosion(this.entityFactory, bullet, ExplosionType.SMALL);
-        markDestroyed(bullet);
+        bullet.destroy();
     }
 }
 
@@ -150,6 +151,7 @@ export function onBulletHitBullet(
 
     createExplosion(this.entityFactory, movingBullet,
         ExplosionType.SMALL);
-    markDestroyed(movingBullet);
-    markDestroyed(staticBullet);
+
+    movingBullet.destroy();
+    staticBullet.destroy();
 }

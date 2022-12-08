@@ -2,8 +2,8 @@ import { Action } from '@/actions/Action';
 import { Color } from '@/drawable/Color';
 import { TankTier } from '@/subtypes/TankTier';
 import { Socket } from 'socket.io-client';
-import { GameClient, GameClientEvent } from './GameClient';
-import { BatchGameEvent, GameEvent } from './GameEvent';
+import { GameClient } from './GameClient';
+import { BatchGameEvent } from './GameEvent';
 import { GameSocketEvent, GameSocketEvents } from './GameSocketEvent';
 
 export class GameClientSocket {

@@ -1,4 +1,3 @@
-import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { DirectionAxisSnappingComponent } from '@/components/DirectionAxisSnappingComponent';
 import { MovementMultipliersComponent } from '@/components/MovementMultipliersComponent';
 import { Entity } from '@/ecs/Entity';
@@ -242,10 +241,6 @@ export class CollisionService {
                 continue;
             }
 
-            if (overlappingEntity.hasComponent(DestroyedComponent)) {
-                continue;
-            }
-
             const rules = this.getRules(movingEntity, overlappingEntity.type);
             if (rules === undefined) {
                 continue;
@@ -354,8 +349,14 @@ export class CollisionService {
                         continue;
                     }
 
-                    const staticEntity = this.registry.getEntityById(entityId);
+                    const staticEntity = this.registry.findEntityById(entityId);
+                    if (staticEntity === undefined) {
+                        continue;
+                    }
                     this.emitter.emit(rule.entryEvent, movingEntity, staticEntity);
+                    if (this.registry.findEntityById(movingEntity.id) === undefined) {
+                        return;
+                    }
                 }
             }
 
@@ -365,8 +366,14 @@ export class CollisionService {
                         continue;
                     }
 
-                    const staticEntity = this.registry.getEntityById(entityId);
+                    const staticEntity = this.registry.findEntityById(entityId);
+                    if (staticEntity === undefined) {
+                        continue;
+                    }
                     this.emitter.emit(rule.exitEvent, movingEntity, staticEntity);
+                    if (this.registry.findEntityById(movingEntity.id) === undefined) {
+                        return;
+                    }
                 }
             }
         }
@@ -386,8 +393,16 @@ export class CollisionService {
 
     processRequestedPosition(): void {
         for (const component of this.registry.getComponents(RequestedPositionComponent)) {
+            if (component.detached) {
+                continue;
+            }
+
             const entity = component.entity;
             this._validateEntityMovement(entity, component, undefined, true);
+
+            if (component.detached) {
+                continue;
+            }
 
             component.remove();
         }
@@ -480,13 +495,6 @@ export class CollisionService {
         return this.findMultipleOverlappingWithType(boundingBox, type)[0];
     }
 
-    private isOverlappingWithType(
-        boundingBox: BoundingBox,
-        type: string,
-    ): boolean {
-        return this.findOverlappingWithType(boundingBox, type) !== undefined;
-    }
-
     updateBoundingBox(entity: Entity, silent = false): void {
         const size = entity.getComponent(SizeComponent);
         const position = entity.getComponent(PositionComponent);
@@ -534,6 +542,12 @@ export class CollisionService {
         });
     }
 
+    removeCollisions(entity: Entity): void {
+        if (this.boundingBoxRepository.hasNode(entity.id)) {
+            this.boundingBoxRepository.removeValue(entity.id);
+        }
+    }
+
     processDirtyCollisions(): void {
         for (const entity of
             this.registry.getEntitiesWithComponent(DirtyCollisionsAddComponent)) {
@@ -557,9 +571,7 @@ export class CollisionService {
         for (const entity of
             this.registry.getEntitiesWithComponent(DirtyCollisionsRemoveComponent)) {
 
-            if (this.boundingBoxRepository.hasNode(entity.id)) {
-                this.boundingBoxRepository.removeValue(entity.id);
-            }
+            this.removeCollisions(entity);
 
             entity.removeComponent(DirtyCollisionsRemoveComponent);
         }

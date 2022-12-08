@@ -5,7 +5,6 @@ import { PluginContext } from './plugin';
 import { pickRandomSpawnPosition } from './spawn';
 import { createTankForPlayer } from './tank';
 import { createSpawnEffect } from './spawn-effect';
-import { markDestroyed } from './entity-destroy';
 import { Direction } from '@/physics/Direction';
 import { setMovementDirection } from './entity-movement';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
@@ -107,9 +106,9 @@ export function getPlayerColor(registry: Registry, player: Entity): Color {
 
     let entity;
     if (playerTankId !== null) {
-        entity = registry.getEntityById(playerTankId);;
+        entity = registry.getEntityById(playerTankId);
     } else if (playerTeamId !== null) {
-        entity = registry.getEntityById(playerTeamId);;
+        entity = registry.getEntityById(playerTeamId);
     } else {
         entity = player;
     }
@@ -364,23 +363,14 @@ export function processPlayerSpawnStatus(
     createSpawnEffect(this.entityFactory, position);
 }
 
-export function processPlayerDisconnectStatus(
-    registry: Registry,
-    player: Entity,
-): void {
+export function processPlayerDisconnectStatus(player: Entity): boolean {
     if (!player.hasComponent(PlayerRequestedDisconnectComponent)) {
-        return;
+        return false;
     }
 
-    markDestroyed(player);
+    player.destroy();
 
-    const teamId = getPlayerTeamId(player);
-    if (teamId === null) {
-        return;
-    }
-
-    const team = registry.getEntityById(teamId);
-    removeTeamPlayer(team, player);
+    return true;
 }
 
 function getPlayerDominantMovementDirection(
@@ -506,4 +496,17 @@ export function getSortedPlayers(registry: Registry): Entity[] {
 
         return secondPlayerComponent.points - firstPlayerComponent.points;
     });
+}
+
+export function onPlayerBeforeDestroy(
+    registry: Registry,
+    player: Entity,
+): void {
+    const teamId = getPlayerTeamId(player);
+    if (teamId === null) {
+        return;
+    }
+
+    const team = registry.getEntityById(teamId);
+    removeTeamPlayer(team, player);
 }

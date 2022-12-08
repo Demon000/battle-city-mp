@@ -13,7 +13,7 @@ import { Color } from '@/drawable/Color';
 import { Config, ConfigEvent } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
-import { Registry, RegistryComponentEvent } from '@/ecs/Registry';
+import { Registry, RegistryComponentEvent, RegistryEvent } from '@/ecs/Registry';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
@@ -22,12 +22,10 @@ import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
 import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
-import { DestroyedComponent } from '@/components/DestroyedComponent';
 import { Entity } from '@/ecs/Entity';
 import { ClientComponentRegistry } from '@/ecs/ClientComponentRegistry';
 import { EntityGraphicsRenderer } from '@/entity/EntityGraphicsRenderer';
 import { updateIsMoving } from '@/logic/entity-movement';
-import { markDestroyed, processDestroyed } from '@/logic/entity-destroy';
 import { updateCenterPosition } from '@/logic/entity-position';
 import { PlayerComponent } from '@/components/PlayerComponent';
 import { getPlayerColor, getPlayerName, getPlayerTankId, getRoundedRespawnTimeout, getSortedPlayers } from '@/logic/player';
@@ -154,13 +152,10 @@ export class GameClient {
                 this.gameGraphicsService
                     .processGraphicsDependencies(entity, component.clazz.tag);
             });
-        this.registry.componentEmitter(DestroyedComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_ADDED,
-                (component) => {
-                    const entity = component.entity;
-                    this.collisionService.markDirtyCollisions(entity,
-                        DirtyCollisionType.REMOVE);
-                });
+        this.registry.emitter.on(RegistryEvent.ENTITY_BEFORE_DESTROY,
+            (entity: Entity) => {
+                this.collisionService.removeCollisions(entity);
+            });
         this.registry.componentEmitter(CenterPositionComponent, true)
             .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
                 (component) => {
@@ -412,7 +407,7 @@ export class GameClient {
 
     onEntityUnregistered(entityId: EntityId): void {
         const entity = this.registry.getEntityById(entityId);
-        markDestroyed(entity);
+        entity.destroy();
     }
 
     onEntityComponentAdded(entityId: EntityId, tag: string, data: any): void {
@@ -447,7 +442,6 @@ export class GameClient {
         this.gameEventBatcher.flush();
         this.collisionService.processDirtyCollisions();
         this.gameGraphicsService.processDirtyGraphics();
-        processDestroyed(this.registry);
 
         if (this.ownPlayerId === null) {
             return;

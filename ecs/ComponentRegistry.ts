@@ -5,7 +5,6 @@ import { SizeComponent, SizeComponentData } from '@/components/SizeComponent';
 import { AutomaticDestroyComponent, AutomaticDestroyComponentData } from '../components/AutomaticDestroyComponent';
 import { assert } from '@/utils/assert';
 import { assert as assertEquals } from 'typescript-json';
-import { DestroyedComponent, DestroyedComponentData } from '@/components/DestroyedComponent';
 import { GraphicDependenciesComponent, GraphicDependenciesComponentData } from '@/components/GraphicDependenciesComponent';
 import { IsMovingComponent, IsMovingComponentData } from '@/components/IsMovingComponent';
 import { DirectionAxisSnappingComponent, DirectionAxisSnappingComponentData } from '@/components/DirectionAxisSnappingComponent';
@@ -81,10 +80,6 @@ export class ComponentRegistry {
             case AutomaticDestroyComponent.name:
                 assertEquals<Partial<AutomaticDestroyComponentData>>(data);
                 return AutomaticDestroyComponent;
-            case DestroyedComponent.tag:
-            case DestroyedComponent.name:
-                assertEquals<Partial<DestroyedComponentData>>(data);
-                return DestroyedComponent;
             case GraphicDependenciesComponent.tag:
             case GraphicDependenciesComponent.name:
                 assertEquals<Partial<GraphicDependenciesComponentData>>(data);
