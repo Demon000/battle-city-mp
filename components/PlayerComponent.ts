@@ -15,7 +15,6 @@ export interface PlayerComponentData {
     points: number;
     requestedTankTier: TankTier;
     respawnTimeout: number;
-    disconnected: boolean;
 }
 
 export class PlayerComponent
@@ -30,5 +29,4 @@ export class PlayerComponent
     points = 0;
     requestedTankTier = TankTier.NORMAL;
     respawnTimeout = 0;
-    disconnected = false;
 }

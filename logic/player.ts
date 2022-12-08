@@ -29,6 +29,7 @@ import { PlayerRespawnTimeoutComponent } from '@/components/PlayerRespawnTimeout
 import { PlayerInputComponent } from '@/components/PlayerInputComponent';
 import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { NameComponent } from '@/components/NameComponent';
+import { PlayerRequestedDisconnectComponent } from '@/components/PlayerRequestedDisconnect';
 
 export function createPlayer(
     entityFactory: EntityFactory,
@@ -73,11 +74,7 @@ export function setPlayerName(player: Entity, value: string) {
 }
 
 export function setPlayerRequestedDisconnect(player: Entity) {
-    const playerComponent = player.getComponent(PlayerComponent);
-
-    playerComponent.update({
-        disconnected: true,
-    });
+    player.upsertComponent(PlayerRequestedDisconnectComponent);
 }
 
 export function setPlayerRequestedTankColor(player: Entity, value: Color) {
@@ -363,20 +360,12 @@ export function processPlayerSpawnStatus(
     }
 }
 
-function removePlayer(player: Entity): void {
-    markDestroyed(player);
-}
-
-export function processPlayerDisconnectStatus(player: Entity): boolean {
-    const playerComponent = player.getComponent(PlayerComponent);
-
-    if (!playerComponent.disconnected) {
-        return false;
+export function processPlayerDisconnectStatus(player: Entity): void {
+    if (!player.hasComponent(PlayerRequestedDisconnectComponent)) {
+        return;
     }
 
-    removePlayer(player);
-
-    return true;
+    markDestroyed(player);
 }
 
 function getPlayerDominantMovementDirection(

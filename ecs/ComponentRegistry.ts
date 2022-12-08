@@ -56,6 +56,7 @@ import { PlayerComponent, PlayerComponentData } from '@/components/PlayerCompone
 import { EntitiesOwnerComponent, EntitiesOwnerComponentData } from '@/components/EntitiesOwnerComponent';
 import { PlayerInputComponent, PlayerInputComponentData } from '@/components/PlayerInputComponent';
 import { NameComponent, NameComponentData } from '@/components/NameComponent';
+import { PlayerRequestedDisconnectComponent, PlayerRequestedDisconnectComponentData } from '@/components/PlayerRequestedDisconnect';
 
 export class ComponentRegistry {
     protected lookupAndValidate(
@@ -283,6 +284,10 @@ export class ComponentRegistry {
             case NameComponent.name:
                 assertEquals<Partial<NameComponentData>>(data);
                 return NameComponent;
+            case PlayerRequestedDisconnectComponent.tag:
+            case PlayerRequestedDisconnectComponent.name:
+                assertEquals<Partial<PlayerRequestedDisconnectComponentData>>(data);
+                return PlayerRequestedDisconnectComponent;
         }
     }
 
