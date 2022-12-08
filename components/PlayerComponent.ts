@@ -8,7 +8,8 @@ export enum PlayerSpawnStatus {
 }
 
 export interface PlayerComponentData {
-    name: string;
+    lastRequestedDirection: Direction | undefined;
+    isShooting: boolean;
     deaths: number;
     kills: number;
     points: number;
@@ -22,7 +23,7 @@ export class PlayerComponent
     implements PlayerComponentData {
     static TAG = 'PL';
 
-    lastRequestedDirection: Direction | undefined;
+    lastRequestedDirection = undefined;
     isShooting = false;
     name = '';
     deaths = 0;
