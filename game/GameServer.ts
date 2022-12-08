@@ -76,12 +76,10 @@ export class GameServer {
 
         const componentRegistry = new ComponentRegistry();
         const registryIdGenerator = new RegistryNumberIdGenerator();
-        const entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.SERVER);
+        const entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.SERVER, true);
 
         this.registry = new Registry(componentRegistry, registryIdGenerator);
         this.entityFactory = new EntityFactory(this.registry, entityBlueprint);
-
-        entityBlueprint.reloadBlueprintData();
 
         const boundingBoxRepository = new BoundingBoxRepository<string>();
 

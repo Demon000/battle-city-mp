@@ -38,6 +38,7 @@ export class EntityBlueprint {
     constructor(
         private config: Config,
         private env: BlueprintEnv,
+        load?: boolean,
     ) {
         if (this.env === BlueprintEnv.CLIENT) {
             this.blueprintComponentsKeys.push('clientComponents');
@@ -49,6 +50,10 @@ export class EntityBlueprint {
             this.blueprintComponentsKeys.push('sharedServerComponents');
             this.ignoredKeys.push('clientComponents');
             this.ignoredKeys.push('sharedClientComponents');
+        }
+
+        if (load) {
+            this.reloadBlueprintData();
         }
     }
 
