@@ -59,7 +59,10 @@
                         </div>
                     </div>
 
-                    <div class="tank-stats-group">
+                    <div
+                        class="tank-stats-group"
+                        v-if="tankMaxBullets !== null"
+                    >
                         <label>Bullets</label>
                         <div class="tank-bullet">
                             <template
@@ -96,7 +99,9 @@
                         id="stats"
                         class="controls"
                     >
-                        <table>
+                        <table
+                            v-if="ownPlayer !== null"
+                        >
                             <tr class="header">
                                 <td>Player name</td>
                                 <td>Kills</td>
