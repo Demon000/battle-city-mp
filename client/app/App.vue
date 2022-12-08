@@ -257,10 +257,6 @@ export default class App extends Vue {
             (roundTimeSeconds: number) => {
                 this.roundTimeSeconds = roundTimeSeconds;
             });
-        gameClient.emitter.on(GameClientEvent.ROUND_TIME_RESTART,
-            () => {
-                this.hasTankDiedOnce = false;
-            });
         gameClient.emitter.on(GameClientEvent.PLAYERS_CHANGED,
             () => {
                 this.updateScoreboard();
@@ -277,10 +273,6 @@ export default class App extends Vue {
         gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID,
             (tankId: EntityId | null): void => {
                 this.isPlayerDead = tankId === null;
-
-                if (tankId === null && !this.hasTankDiedOnce) {
-                    this.hasTankDiedOnce = true;
-                }
             });
         gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TEAM_ID,
             (teamId: string | null) => {

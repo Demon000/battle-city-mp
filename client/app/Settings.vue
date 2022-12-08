@@ -139,9 +139,6 @@ export default class Settings extends Vue {
     ColorUtils = ColorUtils;
 
     @Prop()
-        hasTankDiedOnce = false;
-
-    @Prop()
         isPlayerDead = false;
 
     @Prop()
@@ -241,23 +238,17 @@ export default class Settings extends Vue {
     }
 
     get respawnString(): string {
-        let str = '';
-
-        if (this.hasTankDiedOnce) {
-            str += 'Respawn';
-        } else {
-            str += 'Spawn';
-        }
+        let str = 'Respawn';
 
         if (this.playerRequestedSpawnStatus === PlayerSpawnStatus.SPAWN) {
-            str += 'ing ';
+            str += 'ing';
         }
 
         if (this.playerRespawnTimeout !== null) {
             if (this.playerRespawnTimeout === 0) {
-                str += 'now';
+                str += ' now';
             } else {
-                str += `in ${this.playerRespawnTimeout} seconds`;
+                str += ` in ${this.playerRespawnTimeout} seconds`;
             }
         }
 
