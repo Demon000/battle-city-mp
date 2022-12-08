@@ -2,11 +2,6 @@ import { Component } from '@/ecs/Component';
 import { Direction } from '@/physics/Direction';
 import { TankTier } from '@/subtypes/TankTier';
 
-export enum PlayerSpawnStatus {
-    SPAWN = 'spawn',
-    DESPAWN = 'despawn',
-}
-
 export interface PlayerComponentData {
     lastRequestedDirection: Direction | undefined;
     isShooting: boolean;

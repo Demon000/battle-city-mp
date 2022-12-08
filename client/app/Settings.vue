@@ -117,7 +117,6 @@ import { Color } from '@/drawable/Color';
 import { ColorUtils } from '@/utils/ColorUtils';
 import { TankTier } from '@/subtypes/TankTier';
 import { Vue, Prop, Watch, Component } from 'vue-facing-decorator';
-import { PlayerSpawnStatus } from '@/components/PlayerComponent';
 import { Entity } from '@/ecs/Entity';
 import { EntityId } from '@/ecs/EntityId';
 import { ColorComponent } from '@/components/ColorComponent';
@@ -157,7 +156,7 @@ export default class Settings extends Vue {
         playerTeamId: string | null = null;
 
     @Prop()
-        playerRequestedSpawnStatus: PlayerSpawnStatus | null = null;
+        playerRequestedSpawnStatus = false;
 
     @Prop()
         playerRespawnTimeout: number | null = null;
@@ -247,7 +246,7 @@ export default class Settings extends Vue {
     get respawnString(): string {
         let str = 'Respawn';
 
-        if (this.playerRequestedSpawnStatus === PlayerSpawnStatus.SPAWN) {
+        if (this.playerRequestedSpawnStatus) {
             str += 'ing';
         }
 

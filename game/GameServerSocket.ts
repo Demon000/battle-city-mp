@@ -1,6 +1,5 @@
 import { ActionOptions } from '@/actions/Action';
 import { ActionFactory } from '@/actions/ActionFactory';
-import { PlayerSpawnStatus } from '@/components/PlayerComponent';
 import { Color } from '@/drawable/Color';
 import { EntityId } from '@/ecs/EntityId';
 import { Server, Socket } from 'socket.io';
@@ -45,7 +44,7 @@ export class GameServerSocket {
         });
 
         socket.on(GameSocketEvent.PLAYER_REQUEST_TANK_SPAWN, () => {
-            this.gameServer.onPlayerRequestSpawnStatus(socket.id, PlayerSpawnStatus.SPAWN);
+            this.gameServer.onPlayerRequestSpawnStatus(socket.id);
         });
 
         socket.on(GameSocketEvent.PLAYER_REQUEST_TANK_COLOR, (color: Color) => {

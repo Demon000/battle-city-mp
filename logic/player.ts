@@ -10,7 +10,7 @@ import { Direction } from '@/physics/Direction';
 import { setMovementDirection } from './entity-movement';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { setEntitySpawnerStatus } from './entity-spawner';
-import { PlayerComponent, PlayerSpawnStatus } from '@/components/PlayerComponent';
+import { PlayerComponent } from '@/components/PlayerComponent';
 import { PlayerPoints, PlayerPointsEvent } from '@/player/PlayerPoints';
 import { Entity } from '@/ecs/Entity';
 import { EntityId } from '@/ecs/EntityId';
@@ -19,7 +19,7 @@ import { EntitiesOwnerComponent } from '@/components/EntitiesOwnerComponent';
 import { ColorComponent } from '@/components/ColorComponent';
 import { PlayerRequestedServerStatusComponent } from '@/components/PlayerRequestedServerStatusComponent';
 import { ButtonPressAction, ButtonState, ButtonType, BUTTON_TYPE_DIRECTION, MOVE_BUTTON_TYPES } from '@/actions/ButtonPressAction';
-import { PlayerRequestedSpawnStatusComponent } from '@/components/PlayerRequestedSpawnStatusComponent';
+import { PlayerRequestedSpawnComponent } from '@/components/PlayerRequestedSpawnComponent';
 import { EntityFactory } from '@/entity/EntityFactory';
 import { Color } from '@/drawable/Color';
 import { TankTier } from '@/subtypes/TankTier';
@@ -185,13 +185,8 @@ export function setPlayerTeamId(
     });
 }
 
-export function setPlayerRequestedSpawnStatus(
-    player: Entity,
-    value: PlayerSpawnStatus,
-): void {
-    player.upsertComponent(PlayerRequestedSpawnStatusComponent, {
-        value,
-    });
+export function setPlayerRequestedSpawnStatus(player: Entity): void {
+    player.upsertComponent(PlayerRequestedSpawnComponent);
 }
 
 export function setPlayerRequestedServerStatus(player: Entity): void {
@@ -340,57 +335,52 @@ export function processPlayerSpawnStatus(
     player: Entity,
 ): void {
     const spawnStatusComponent = player
-        .findComponent(PlayerRequestedSpawnStatusComponent);
+        .findComponent(PlayerRequestedSpawnComponent);
     if (spawnStatusComponent === undefined) {
         return;
     }
 
-    const status = spawnStatusComponent.value;
     const playerTankId = getPlayerTankId(player);
     const respawnTimeout = getPlayerRespawnTimeout(player);
-    let handleRequestedSpawnStatus = false;
 
-    if (status === PlayerSpawnStatus.SPAWN
-        && playerTankId === null
-        && respawnTimeout == 0) {
-        handleRequestedSpawnStatus = true;
-    }
-
-    if (status === PlayerSpawnStatus.DESPAWN
-        && playerTankId !== null) {
-        handleRequestedSpawnStatus = true;
-    }
-
-    if (!handleRequestedSpawnStatus) {
+    if (spawnStatusComponent === undefined
+        || playerTankId !== null
+        || respawnTimeout !== 0) {
         return;
     }
 
     spawnStatusComponent.remove();
 
-    if (status === PlayerSpawnStatus.SPAWN && playerTankId === null) {
-        let playerTeamId = getPlayerTeamId(player);
-        if (playerTeamId === null) {
-            const team = getTeamWithLeastPlayers(this.registry);
-            setPlayerTeamId(this.registry, player, team.id);
-        }
-        playerTeamId = getPlayerTeamId(player);
-
-        const entities = this.registry.getEntitiesWithComponent(SpawnComponent);
-        const position = pickRandomSpawnPosition(entities, playerTeamId);
-        createTankForPlayer.call(this, player, position);
-        createSpawnEffect(this.entityFactory, position);
-    } else if (status === PlayerSpawnStatus.DESPAWN && playerTankId !== null) {
-        const tank = this.registry.getEntityById(playerTankId);
-        markDestroyed(tank);
+    let playerTeamId = getPlayerTeamId(player);
+    if (playerTeamId === null) {
+        const team = getTeamWithLeastPlayers(this.registry);
+        setPlayerTeamId(this.registry, player, team.id);
     }
+    playerTeamId = getPlayerTeamId(player);
+
+    const entities = this.registry.getEntitiesWithComponent(SpawnComponent);
+    const position = pickRandomSpawnPosition(entities, playerTeamId);
+    createTankForPlayer.call(this, player, position);
+    createSpawnEffect(this.entityFactory, position);
 }
 
-export function processPlayerDisconnectStatus(player: Entity): void {
+export function processPlayerDisconnectStatus(
+    registry: Registry,
+    player: Entity,
+): void {
     if (!player.hasComponent(PlayerRequestedDisconnectComponent)) {
         return;
     }
 
     markDestroyed(player);
+
+    const teamId = getPlayerTeamId(player);
+    if (teamId === null) {
+        return;
+    }
+
+    const team = registry.getEntityById(teamId);
+    removeTeamPlayer(team, player);
 }
 
 function getPlayerDominantMovementDirection(

@@ -197,7 +197,6 @@ import { ColorUtils } from '@/utils/ColorUtils';
 import { EntityId } from '@/ecs/EntityId';
 import { Component, Vue, Watch } from 'vue-facing-decorator';
 import { Entity } from '@/ecs/Entity';
-import { PlayerSpawnStatus } from '@/components/PlayerComponent';
 
 @Component({
     options: {
@@ -223,6 +222,7 @@ export default class App extends Vue {
     canvases: HTMLCanvasElement[] = [];
 
     teams: Entity[] | null = null;
+    tankId: EntityId | null = null;
     tankTier: TankTier | null = null;
     tankColor: Color | null = null;
     tankMaxHealth: number | null = null;
@@ -232,8 +232,7 @@ export default class App extends Vue {
     playerName: string | null = null;
     playerTeamId: string | null = null;
     playerRespawnTimeout: number | null = null;
-    playerRequestedSpawnStatus: PlayerSpawnStatus | null = null;
-    isPlayerDead = true;
+    playerRequestedSpawnStatus = false;
     isUserShowingSettings = false;
     roundTimeSeconds = 0;
     isScoreboardWatchTime = false;
@@ -276,7 +275,7 @@ export default class App extends Vue {
             });
         gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID,
             (tankId: EntityId | null) => {
-                this.isPlayerDead = tankId === null;
+                this.tankId = tankId;
             });
         gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TEAM_ID,
             (teamId: string | null) => {
@@ -295,8 +294,8 @@ export default class App extends Vue {
                 this.playerRespawnTimeout = respawnTimeout;
             });
         gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS,
-            (requestedSpawnStatus: PlayerSpawnStatus) => {
-                this.playerRequestedSpawnStatus = requestedSpawnStatus;
+            (value: boolean) => {
+                this.playerRequestedSpawnStatus = value;
             });
 
         gameClient.emitter.on(GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
@@ -343,6 +342,10 @@ export default class App extends Vue {
         if (screenfull.isEnabled) {
             screenfull.on('change', this.onFullscreenChanged);
         }
+    }
+
+    get isPlayerDead(): boolean {
+        return this.tankId === null;
     }
 
     get hasTeams(): boolean {

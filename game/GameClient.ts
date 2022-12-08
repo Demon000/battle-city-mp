@@ -29,13 +29,13 @@ import { EntityGraphicsRenderer } from '@/entity/EntityGraphicsRenderer';
 import { updateIsMoving } from '@/logic/entity-movement';
 import { markDestroyed, processDestroyed } from '@/logic/entity-destroy';
 import { updateCenterPosition } from '@/logic/entity-position';
-import { PlayerComponent, PlayerSpawnStatus } from '@/components/PlayerComponent';
-import { getPlayerColor, getPlayerName, getPlayerTankId, getPlayerTeamId, getRoundedRespawnTimeout, getSortedPlayers } from '@/logic/player';
+import { PlayerComponent } from '@/components/PlayerComponent';
+import { getPlayerColor, getPlayerName, getPlayerTankId, getRoundedRespawnTimeout, getSortedPlayers } from '@/logic/player';
 import { TeamComponent } from '@/components/TeamComponent';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { ColorComponent } from '@/components/ColorComponent';
-import { PlayerRequestedSpawnStatusComponent } from '@/components/PlayerRequestedSpawnStatusComponent';
+import { PlayerRequestedSpawnComponent } from '@/components/PlayerRequestedSpawnComponent';
 import { EntitiesOwnerComponent } from '@/components/EntitiesOwnerComponent';
 import { PlayerRespawnTimeoutComponent } from '@/components/PlayerRespawnTimeoutComponent';
 import { NameComponent } from '@/components/NameComponent';
@@ -84,7 +84,7 @@ export interface GameClientEvents {
     [GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_BULLETS]: (maxBullets: number) => void;
     [GameClientEvent.OWN_PLAYER_TANK_CHANGED_BULLETS]: (bullets: number) => void;
     [GameClientEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT]: (respawnTimeout: number) => void;
-    [GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS]: (requestedSpawnStatus: PlayerSpawnStatus) => void;
+    [GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS]: (value: boolean) => void;
 
     [GameClientEvent.FLUSH_EVENTS]: () => void;
     [GameClientEvent.TICK]: () => void;
@@ -334,16 +334,16 @@ export class GameClient {
                     this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_TEAM_ID,
                         component.teamId);
                 });
-        this.registry.componentEmitter(PlayerRequestedSpawnStatusComponent, true)
+        this.registry.componentEmitter(PlayerRequestedSpawnComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
-                (_event, component) => {
+                (event, component) => {
                     const entity = component.entity;
                     if (!isOwnPlayer(entity)) {
                         return;
                     }
 
                     this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS,
-                        component.value);
+                        event === RegistryComponentEvent.COMPONENT_ADDED);
                 });
         this.registry.componentEmitter(TeamComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,

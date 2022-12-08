@@ -41,7 +41,7 @@ import { onBulletHitBrickWall, onBulletHitBullet, onBulletHitLevelBorder, onBull
 import { onEntityCollideTeleporter } from '@/logic/entity-teleporter';
 import { addPlayerButtonPressAction, cancelPlayersActions, createPlayer, onPlayerRequestedTeam, processPlayerDisconnectStatus, processPlayerDroppingFlag, processPlayerMovement, processPlayerRespawnTimeout, processPlayerShooting, processPlayerSpawnStatus, resetPlayers, setPlayerName, setPlayerRequestedDisconnect, setPlayerRequestedServerStatus, setPlayerRequestedSpawnStatus, setPlayerRequestedTankColor, setPlayerRequestedTankTier, setPlayerTank } from '@/logic/player';
 import { onTankCollideFlag, onTankCollideFlagBase } from '@/logic/tank';
-import { PlayerComponent, PlayerSpawnStatus } from '@/components/PlayerComponent';
+import { PlayerComponent } from '@/components/PlayerComponent';
 import { EntityId } from '@/ecs/EntityId';
 import { onTeamBeforeDestroy } from '@/logic/team';
 
@@ -320,7 +320,7 @@ export class GameServer {
             this.registry.getEntitiesWithComponent(PlayerComponent)) {
             processPlayerRespawnTimeout(player, deltaSeconds);
             processPlayerSpawnStatus.call(this.pluginContext, player);
-            processPlayerDisconnectStatus(player);
+            processPlayerDisconnectStatus(this.registry, player);
             processPlayerMovement(this.registry, player);
             processPlayerShooting(this.registry, player);
             processPlayerDroppingFlag.call(this.pluginContext, player);
@@ -439,9 +439,9 @@ export class GameServer {
         setPlayerName(player, name);
     }
 
-    onPlayerRequestSpawnStatus(playerId: string, spawnStatus: PlayerSpawnStatus): void {
+    onPlayerRequestSpawnStatus(playerId: string): void {
         const player = this.registry.getEntityById(playerId);
-        setPlayerRequestedSpawnStatus(player, spawnStatus);
+        setPlayerRequestedSpawnStatus(player);
     }
 
     onPlayerRequestTeam(playerId: string, teamId: string | null): void {
@@ -451,7 +451,6 @@ export class GameServer {
 
     onPlayerDisconnected(playerId: string): void {
         const player = this.registry.getEntityById(playerId);
-        setPlayerRequestedSpawnStatus(player, PlayerSpawnStatus.DESPAWN);
         setPlayerRequestedDisconnect(player);
     }
 

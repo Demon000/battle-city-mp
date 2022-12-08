@@ -1,7 +1,6 @@
 import { BulletComponent } from '@/components/BulletComponent';
 import { EntityOwnedComponent } from '@/components/EntityOwnedComponent';
 import { HealthComponent } from '@/components/HealthComponent';
-import { PlayerSpawnStatus } from '@/components/PlayerComponent';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { Entity } from '@/ecs/Entity';
 import { EntityType } from '@/entity/EntityType';
@@ -13,7 +12,7 @@ import { ExplosionType } from '@/subtypes/ExplosionType';
 import { getBrickWallDestroyBox } from './brick-wall';
 import { markDestroyed } from './entity-destroy';
 import { createExplosion } from './explosion';
-import { addPlayerDeath, addPlayerKill, getPlayerTeamId, setPlayerRequestedSpawnStatus } from './player';
+import { addPlayerDeath, addPlayerKill, getPlayerTeamId } from './player';
 import { decreaseTankHealth } from './tank';
 
 export function onBulletHitLevelBorder(
@@ -122,7 +121,7 @@ export function onBulletHitTank(
     if (tankHealth.value <= 0) {
         createExplosion(this.entityFactory, tank,
             ExplosionType.BIG, EntityType.TANK);
-        setPlayerRequestedSpawnStatus(tankPlayer, PlayerSpawnStatus.DESPAWN);
+        markDestroyed(tank);
         addPlayerDeath(tankPlayer);
         addPlayerKill(bulletPlayer);
     } else {

@@ -49,7 +49,7 @@ import { MovementConfigComponent, MovementConfigComponentData } from '@/componen
 import { FatBoundingBoxComponent, FatBoundingBoxComponentData } from '@/components/FatBoundingBoxComponent';
 import { PickupIgnoreTimeComponent, PickupIgnoreTimeComponentData } from '@/components/PickupIgnoreTimeComponent';
 import { TeamComponent, TeamComponentData } from '@/components/TeamComponent';
-import { PlayerRequestedSpawnStatusComponent, PlayerRequestedSpawnStatusComponentData } from '@/components/PlayerRequestedSpawnStatusComponent';
+import { PlayerRequestedSpawnComponent, PlayerRequestedSpawnComponentData } from '@/components/PlayerRequestedSpawnComponent';
 import { PlayerRequestedServerStatusComponent, PlayerRequestedServerStatusComponentData } from '@/components/PlayerRequestedServerStatusComponent';
 import { PlayerRespawnTimeoutComponent, PlayerRespawnTimeoutComponentData } from '@/components/PlayerRespawnTimeoutComponent';
 import { PlayerComponent, PlayerComponentData } from '@/components/PlayerComponent';
@@ -257,10 +257,10 @@ export class ComponentRegistry {
             case TeamComponent.name:
                 assertEquals<Partial<TeamComponentData>>(data);
                 return TeamComponent;
-            case PlayerRequestedSpawnStatusComponent.tag:
-            case PlayerRequestedSpawnStatusComponent.name:
-                assertEquals<Partial<PlayerRequestedSpawnStatusComponentData>>(data);
-                return PlayerRequestedSpawnStatusComponent;
+            case PlayerRequestedSpawnComponent.tag:
+            case PlayerRequestedSpawnComponent.name:
+                assertEquals<Partial<PlayerRequestedSpawnComponentData>>(data);
+                return PlayerRequestedSpawnComponent;
             case PlayerRequestedServerStatusComponent.tag:
             case PlayerRequestedServerStatusComponent.name:
                 assertEquals<Partial<PlayerRequestedServerStatusComponentData>>(data);
