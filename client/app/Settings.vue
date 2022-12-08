@@ -218,8 +218,11 @@ export default class Settings extends Vue {
         this.$emit('spawn-click');
     }
 
-    rgbTeamColor(team: Entity): string {
-        const color = team.getComponent(ColorComponent).value;
+    rgbTeamColor(team: Entity): string | undefined {
+        const color = team.findComponent(ColorComponent)?.value;
+        if (color === undefined) {
+            return color;
+        }
 
         return ColorUtils.getRgbFromColor(color);
     }
