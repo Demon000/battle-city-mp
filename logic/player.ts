@@ -97,6 +97,19 @@ export function setPlayerRequestedTankTier(
     });
 }
 
+export function getPlayerDisplayName(player: Entity): string {
+    const playerNameComponent = player.findComponent(NameComponent);
+    let name;
+
+    if (playerNameComponent === undefined) {
+        name = player.id;
+    } else {
+        name = playerNameComponent.value;
+    }
+
+    return name;
+}
+
 export function getPlayerTeamId(player: Entity): EntityId | null {
     const teamComponent = player.findComponent(TeamOwnedComponent);
     if (teamComponent === undefined) {

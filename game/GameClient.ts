@@ -30,13 +30,14 @@ import { updateIsMoving } from '@/logic/entity-movement';
 import { markDestroyed, processDestroyed } from '@/logic/entity-destroy';
 import { updateCenterPosition } from '@/logic/entity-position';
 import { PlayerComponent, PlayerSpawnStatus } from '@/components/PlayerComponent';
-import { getPlayerTankId, getPlayerTeamId, getSortedPlayers } from '@/logic/player';
+import { getPlayerDisplayName, getPlayerTankId, getPlayerTeamId, getSortedPlayers } from '@/logic/player';
 import { TeamComponent } from '@/components/TeamComponent';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { ColorComponent } from '@/components/ColorComponent';
 import { PlayerRequestedSpawnStatusComponent } from '@/components/PlayerRequestedSpawnStatusComponent';
 import { EntitiesOwnerComponent } from '@/components/EntitiesOwnerComponent';
+import { NameComponent } from '@/components/NameComponent';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -466,9 +467,10 @@ export class GameClient {
                 }
 
                 const color = colorSourceEntity.getComponent(ColorComponent).value;
+                const name = getPlayerDisplayName(player);
                 return {
                     id: player.id,
-                    name: playerComponent.name,
+                    name: name,
                     kills: playerComponent.kills,
                     deaths: playerComponent.deaths,
                     points: playerComponent.points,
