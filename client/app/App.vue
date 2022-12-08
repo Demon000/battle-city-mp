@@ -160,7 +160,6 @@
             :tankTier="tankTier"
             :tankColor="tankColor"
             :playerTeamId="playerTeamId"
-            :hasTankDiedOnce="hasTankDiedOnce"
             :isPlayerDead="isPlayerDead"
             :teams="teams"
             :hasTeams="hasTeams"
@@ -232,7 +231,6 @@ export default class App extends Vue {
     playerTeamId: string | null = null;
     playerRespawnTimeout: number | null = null;
     playerRequestedSpawnStatus: PlayerSpawnStatus | null = null;
-    hasTankDiedOnce = false;
     isPlayerDead = true;
     isUserShowingSettings = false;
     roundTimeSeconds = 0;
