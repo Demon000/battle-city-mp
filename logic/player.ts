@@ -311,6 +311,10 @@ export function getPlayerRespawnTimeout(player: Entity): number {
     return player.getComponent(PlayerRespawnTimeoutComponent).value;
 }
 
+export function getRoundedRespawnTimeout(player: Entity): number {
+    return Math.ceil(getPlayerRespawnTimeout(player));
+}
+
 export function resetPlayerRespawnTimeout(player: Entity): void {
     const respawnTimeout = player
         .getComponent(PlayerRespawnTimeoutConfigComponent).value;

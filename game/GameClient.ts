@@ -30,13 +30,14 @@ import { updateIsMoving } from '@/logic/entity-movement';
 import { markDestroyed, processDestroyed } from '@/logic/entity-destroy';
 import { updateCenterPosition } from '@/logic/entity-position';
 import { PlayerComponent, PlayerSpawnStatus } from '@/components/PlayerComponent';
-import { getPlayerColor, getPlayerDisplayName, getPlayerRespawnTimeout, getPlayerTankId, getPlayerTeamId, getSortedPlayers } from '@/logic/player';
+import { getPlayerColor, getPlayerDisplayName, getPlayerTankId, getPlayerTeamId, getRoundedRespawnTimeout, getSortedPlayers } from '@/logic/player';
 import { TeamComponent } from '@/components/TeamComponent';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { ColorComponent } from '@/components/ColorComponent';
 import { PlayerRequestedSpawnStatusComponent } from '@/components/PlayerRequestedSpawnStatusComponent';
 import { EntitiesOwnerComponent } from '@/components/EntitiesOwnerComponent';
+import { PlayerRespawnTimeoutComponent } from '@/components/PlayerRespawnTimeoutComponent';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -272,10 +273,17 @@ export class GameClient {
 
                     this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_TANK_TIER,
                         component.requestedTankTier);
+                });
+        this.registry.componentEmitter(PlayerRespawnTimeoutComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+                (_event, component) => {
+                    const entity = component.entity;
+                    if (!isOwnPlayer(entity)) {
+                        return;
+                    }
 
-                    const respawnTimeout = getPlayerRespawnTimeout(entity);
                     this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT,
-                        respawnTimeout);
+                        getRoundedRespawnTimeout(entity));
                 });
         this.registry.componentEmitter(EntitiesOwnerComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
