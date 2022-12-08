@@ -1,7 +1,6 @@
 import { Action } from '@/actions/Action';
 import { Color } from '@/drawable/Color';
 import { TankTier } from '@/subtypes/TankTier';
-import { assert } from '@/utils/assert';
 import { Socket } from 'socket.io-client';
 import { GameClient, GameClientEvent } from './GameClient';
 import { BatchGameEvent, GameEvent } from './GameEvent';
@@ -11,14 +10,15 @@ export class GameClientSocket {
     socket;
     gameClient;
     initialized = false;
-    events: BatchGameEvent[] = [];
 
     constructor(socket: Socket<GameSocketEvents>, gameClient: GameClient) {
         this.socket = socket;
         this.gameClient = gameClient;
 
         this.socket.on(GameSocketEvent.BATCH, (events: BatchGameEvent[]) => {
-            events.forEach(this.onEvent, this);
+            for (const batch of events) {
+                this.gameClient.gameEventBatcher.addBroadcastEvent(batch);
+            }
         });
 
         this.socket.on('connect', () => {
@@ -31,51 +31,7 @@ export class GameClientSocket {
             this.gameClient.ticker.stop();
         });
 
-        this.gameClient.emitter.on(GameClientEvent.FLUSH_EVENTS, () => {
-            this.flushEvents();
-        });
-
         this.socket.connect();
-    }
-
-    flushEvent(batch: BatchGameEvent) {
-        switch (batch[0]) {
-            case GameEvent.SERVER_STATUS:
-                this.gameClient.onServerStatus(batch[1]);
-                break;
-            case GameEvent.ENTITY_REGISTERED:
-                this.gameClient.onEntityRegistered(batch[1]);
-                break;
-            case GameEvent.ENTITY_UNREGISTERED:
-                this.gameClient.onEntityUnregistered(batch[1]);
-                break;
-            case GameEvent.ENTITY_COMPONENT_ADDED:
-                this.gameClient.onEntityComponentAdded(batch[1], batch[2], batch[3]);
-                break;
-            case GameEvent.ENTITY_COMPONENT_UPDATED:
-                this.gameClient.onEntityComponentUpdated(batch[1], batch[2], batch[3]);
-                break;
-            case GameEvent.ENTITY_COMPONENT_REMOVED:
-                this.gameClient.onEntityComponentRemoved(batch[1], batch[2]);
-                break;
-            case GameEvent.ROUND_TIME_UPDATED:
-                this.gameClient.onRoundTimeUpdated(batch[1]);
-                break;
-            default:
-                assert(false, `Invalid event '${batch[0]}'`);
-        }
-    }
-
-    flushEvents(): void {
-        for (const event of this.events) {
-            this.flushEvent(event);
-        }
-
-        this.events = [];
-    }
-
-    onEvent(batch: BatchGameEvent): void {
-        this.events.push(batch);
     }
 
     requestPlayerTankSpawn(): void {

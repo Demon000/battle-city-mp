@@ -39,6 +39,9 @@ import { PlayerRequestedSpawnComponent } from '@/components/PlayerRequestedSpawn
 import { EntitiesOwnerComponent } from '@/components/EntitiesOwnerComponent';
 import { PlayerRespawnTimeoutComponent } from '@/components/PlayerRespawnTimeoutComponent';
 import { NameComponent } from '@/components/NameComponent';
+import { GameEventBatcher, GameEventBatcherEvent } from './GameEventBatcher';
+import { BatchGameEvent, GameEvent } from './GameEvent';
+import { assert } from '@/utils/assert';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -61,7 +64,6 @@ export enum GameClientEvent {
     OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT = 'own-player-changed-respawn-timeout',
     OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS = 'own-player-changed-requested-spawn-status',
 
-    FLUSH_EVENTS = 'flush-events',
     TICK = 'tick',
 }
 
@@ -86,7 +88,6 @@ export interface GameClientEvents {
     [GameClientEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT]: (respawnTimeout: number) => void;
     [GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS]: (value: boolean) => void;
 
-    [GameClientEvent.FLUSH_EVENTS]: () => void;
     [GameClientEvent.TICK]: () => void;
 }
 
@@ -101,11 +102,13 @@ export class GameClient {
     private gameGraphicsService;
     private timeService;
     private ownPlayerId: string | null = null;
+    gameEventBatcher;
     emitter;
     ticker;
 
     constructor(canvases: HTMLCanvasElement[]) {
         this.config = new Config();
+        this.gameEventBatcher = new GameEventBatcher();
 
         const componentRegistry = new ClientComponentRegistry();
         const registryIdGenerator = new RegistryNumberIdGenerator();
@@ -135,6 +138,8 @@ export class GameClient {
             return playerOwnedComponent.playerId === this.ownPlayerId;
         };
 
+        this.gameEventBatcher.emitter.on(GameEventBatcherEvent.BROADCAST_BATCH,
+            this.onBroadcastEvents, this);
         this.config.emitter.on(ConfigEvent.CONFIG_SET,
             () => {
                 entityBlueprint.reloadBlueprintData();
@@ -367,6 +372,40 @@ export class GameClient {
         this.ticker.emitter.on(TickerEvent.TICK, this.onTick, this);
     }
 
+    onBroadcastEvent(batch: BatchGameEvent) {
+        switch (batch[0]) {
+            case GameEvent.SERVER_STATUS:
+                this.onServerStatus(batch[1]);
+                break;
+            case GameEvent.ENTITY_REGISTERED:
+                this.onEntityRegistered(batch[1]);
+                break;
+            case GameEvent.ENTITY_UNREGISTERED:
+                this.onEntityUnregistered(batch[1]);
+                break;
+            case GameEvent.ENTITY_COMPONENT_ADDED:
+                this.onEntityComponentAdded(batch[1], batch[2], batch[3]);
+                break;
+            case GameEvent.ENTITY_COMPONENT_UPDATED:
+                this.onEntityComponentUpdated(batch[1], batch[2], batch[3]);
+                break;
+            case GameEvent.ENTITY_COMPONENT_REMOVED:
+                this.onEntityComponentRemoved(batch[1], batch[2]);
+                break;
+            case GameEvent.ROUND_TIME_UPDATED:
+                this.onRoundTimeUpdated(batch[1]);
+                break;
+            default:
+                assert(false, `Invalid event '${batch[0]}'`);
+        }
+    }
+
+    onBroadcastEvents(events: BatchGameEvent[]) {
+        for (const batch of events) {
+            this.onBroadcastEvent(batch);
+        }
+    }
+
     onEntityRegistered(buildOptions: EntityBuildOptions): void {
         this.entityFactory.buildFromOptions(buildOptions);
     }
@@ -405,8 +444,7 @@ export class GameClient {
     }
 
     onTick(): void {
-        this.emitter.emit(GameClientEvent.FLUSH_EVENTS);
-
+        this.gameEventBatcher.flush();
         this.collisionService.processDirtyCollisions();
         this.gameGraphicsService.processDirtyGraphics();
         processDestroyed(this.registry);
