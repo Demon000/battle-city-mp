@@ -136,7 +136,11 @@ export class GameServer {
                     case EntityType.TANK: {
                         const playerId = entity
                             .getComponent(PlayerOwnedComponent).playerId;
-                        const player = this.registry.getEntityById(playerId);
+                        const player = this.registry.findEntityById(playerId);
+                        if (player === undefined) {
+                            return;
+                        }
+
                         setPlayerTank(player, null);
                         break;
                     }
