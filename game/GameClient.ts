@@ -120,6 +120,17 @@ export class GameClient {
         this.emitter = new EventEmitter<GameClientEvents>();
         this.ticker = new Ticker();
 
+        const isOwnPlayer = (player: Entity) => player.id === this.ownPlayerId;
+        const isOwnTank = (tank: Entity) => {
+            const playerOwnedComponent = tank
+                .findComponent(PlayerOwnedComponent);
+            if (playerOwnedComponent === undefined) {
+                return;
+            }
+
+            return playerOwnedComponent.playerId === this.ownPlayerId;
+        };
+
         this.config.emitter.on(ConfigEvent.CONFIG_SET,
             () => {
                 entityBlueprint.reloadBlueprintData();
@@ -195,13 +206,7 @@ export class GameClient {
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
                 (_event, component) => {
                     const entity = component.entity;
-                    const playerOwnedComponent = entity
-                        .findComponent(PlayerOwnedComponent);
-                    if (playerOwnedComponent === undefined) {
-                        return;
-                    }
-
-                    if (playerOwnedComponent.playerId !== this.ownPlayerId) {
+                    if (!isOwnTank(entity)) {
                         return;
                     }
 
@@ -219,13 +224,7 @@ export class GameClient {
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
                 (_event, component) => {
                     const entity = component.entity;
-                    const playerOwnedComponent = entity
-                        .findComponent(PlayerOwnedComponent);
-                    if (playerOwnedComponent === undefined) {
-                        return;
-                    }
-
-                    if (playerOwnedComponent.playerId !== this.ownPlayerId) {
+                    if (!isOwnTank(entity)) {
                         return;
                     }
 
@@ -243,13 +242,7 @@ export class GameClient {
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
                 (_event, component) => {
                     const entity = component.entity;
-                    const playerOwnedComponent = entity
-                        .findComponent(PlayerOwnedComponent);
-                    if (playerOwnedComponent === undefined) {
-                        return;
-                    }
-
-                    if (playerOwnedComponent.playerId !== this.ownPlayerId) {
+                    if (!isOwnTank(entity)) {
                         return;
                     }
 
@@ -266,11 +259,10 @@ export class GameClient {
         this.registry.componentEmitter(PlayerComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
                 (_event, component, _data, options) => {
-                    const entity = component.entity;
-
                     this.emitter.emit(GameClientEvent.PLAYERS_CHANGED);
 
-                    if (entity.id !== this.ownPlayerId) {
+                    const entity = component.entity;
+                    if (!isOwnPlayer(entity)) {
                         return;
                     }
 
@@ -281,15 +273,15 @@ export class GameClient {
                     this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_TANK_TIER,
                         component.requestedTankTier);
 
+                    const respawnTimeout = getPlayerRespawnTimeout(entity);
                     this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_RESPAWN_TIMEOUT,
-                        component.respawnTimeout);
+                        respawnTimeout);
                 });
         this.registry.componentEmitter(EntitiesOwnerComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
                 (_event, component) => {
                     const entity = component.entity;
-
-                    if (entity.id !== this.ownPlayerId) {
+                    if (!isOwnPlayer(entity)) {
                         return;
                     }
 
@@ -300,8 +292,7 @@ export class GameClient {
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
                 (_event, component) => {
                     const entity = component.entity;
-
-                    if (entity.id !== this.ownPlayerId) {
+                    if (!isOwnPlayer(entity)) {
                         return;
                     }
 
@@ -312,8 +303,7 @@ export class GameClient {
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
                 (_event, component) => {
                     const entity = component.entity;
-
-                    if (entity.id !== this.ownPlayerId) {
+                    if (!isOwnPlayer(entity)) {
                         return;
                     }
 
@@ -324,8 +314,7 @@ export class GameClient {
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
                 (_event, component) => {
                     const entity = component.entity;
-
-                    if (entity.id !== this.ownPlayerId) {
+                    if (!isOwnPlayer(entity)) {
                         return;
                     }
 
