@@ -17,9 +17,9 @@ import { SizeComponent } from '@/components/SizeComponent';
 import { TankTier } from '@/subtypes/TankTier';
 import { EntityType } from './EntityType';
 import { RenderPass } from './RenderPass';
-import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { RelativePositionComponent } from '@/components/RelativePositionComponent';
 import { CollisionTrackingComponent } from '@/components/CollisionTrackingComponent';
+import { NameComponent } from '@/components/NameComponent';
 
 const directionTest = (targetDirection: Direction): DrawableTestFunction => {
     return (entity: Entity): boolean => {
@@ -297,12 +297,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             processor(this: IDrawable, entity: Entity): IDrawable | undefined {
                 let drawable: TextDrawable | undefined = this as TextDrawable;
 
-                const playerName = entity
-                    .getComponent(PlayerOwnedComponent).playerName;
-                if (playerName === undefined) {
-                    return drawable;
-                }
-
+                const playerName = entity.getComponent(NameComponent).value;
                 drawable = drawable.withText(playerName);
                 if (drawable === undefined) {
                     return drawable;

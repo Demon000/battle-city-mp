@@ -25,7 +25,6 @@ export class PlayerComponent
 
     lastRequestedDirection = undefined;
     isShooting = false;
-    name = '';
     deaths = 0;
     kills = 0;
     points = 0;

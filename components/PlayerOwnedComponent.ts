@@ -2,7 +2,6 @@ import { Component } from '@/ecs/Component';
 
 export interface PlayerOwnedComponentData {
     playerId: string;
-    playerName?: string;
 }
 
 export class PlayerOwnedComponent
@@ -11,5 +10,4 @@ export class PlayerOwnedComponent
     static TAG = 'PO';
 
     playerId = 'invalid';
-    playerName?: string;
 }

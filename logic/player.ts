@@ -28,6 +28,7 @@ import { assert } from '@/utils/assert';
 import { PlayerRespawnTimeoutComponent } from '@/components/PlayerRespawnTimeoutComponent';
 import { PlayerInputComponent } from '@/components/PlayerInputComponent';
 import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
+import { NameComponent } from '@/components/NameComponent';
 
 export function createPlayer(
     entityFactory: EntityFactory,
@@ -65,11 +66,9 @@ export function cancelPlayersActions(registry: Registry): void {
     }
 }
 
-export function setPlayerName(player: Entity, name: string) {
-    const playerComponent = player.getComponent(PlayerComponent);
-
-    playerComponent.update({
-        name,
+export function setPlayerName(player: Entity, value: string) {
+    player.upsertComponent(NameComponent, {
+        value,
     });
 }
 

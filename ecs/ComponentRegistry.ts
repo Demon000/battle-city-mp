@@ -55,6 +55,7 @@ import { PlayerRespawnTimeoutComponent, PlayerRespawnTimeoutComponentData } from
 import { PlayerComponent, PlayerComponentData } from '@/components/PlayerComponent';
 import { EntitiesOwnerComponent, EntitiesOwnerComponentData } from '@/components/EntitiesOwnerComponent';
 import { PlayerInputComponent, PlayerInputComponentData } from '@/components/PlayerInputComponent';
+import { NameComponent, NameComponentData } from '@/components/NameComponent';
 
 export class ComponentRegistry {
     protected lookupAndValidate(
@@ -278,6 +279,10 @@ export class ComponentRegistry {
             case PlayerInputComponent.name:
                 assertEquals<Partial<PlayerInputComponentData>>(data);
                 return PlayerInputComponent;
+            case NameComponent.tag:
+            case NameComponent.name:
+                assertEquals<Partial<NameComponentData>>(data);
+                return NameComponent;
         }
     }
 

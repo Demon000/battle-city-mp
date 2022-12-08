@@ -1,6 +1,7 @@
 import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
 import { ColorComponent } from '@/components/ColorComponent';
 import { HealthComponent } from '@/components/HealthComponent';
+import { NameComponent } from '@/components/NameComponent';
 import { PlayerComponent } from '@/components/PlayerComponent';
 import { Entity } from '@/ecs/Entity';
 import { EntityType } from '@/entity/EntityType';
@@ -16,6 +17,7 @@ export function createTankForPlayer(
 ): Entity {
     const playerTeamId = getPlayerTeamId(player);
     const playerComponent = player.getComponent(PlayerComponent);
+    const playerNameComponent = player.findComponent(NameComponent);
 
     let colorSourceEntity;
     if (playerTeamId === null) {
@@ -26,6 +28,13 @@ export function createTankForPlayer(
     }
     const color = colorSourceEntity.getComponent(ColorComponent).value;
 
+    let name;
+    if (playerNameComponent === undefined) {
+        name = player.id;
+    } else {
+        name = playerNameComponent.value;
+    }
+
     return this.entityFactory.buildFromOptions({
         type: EntityType.TANK,
         subtypes: [playerComponent.requestedTankTier],
@@ -35,7 +44,9 @@ export function createTankForPlayer(
             },
             PlayerOwnedComponent: {
                 playerId: player.id,
-                playerName: playerComponent.name,
+            },
+            NameComponent: {
+                value: name,
             },
             PositionComponent: position,
             ColorComponent: {
