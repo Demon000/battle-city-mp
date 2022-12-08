@@ -43,6 +43,7 @@ import { addPlayerButtonPressAction, cancelPlayersActions, createPlayer, onPlaye
 import { onTankCollideFlag, onTankCollideFlagBase } from '@/logic/tank';
 import { PlayerComponent, PlayerSpawnStatus } from '@/components/PlayerComponent';
 import { EntityId } from '@/ecs/EntityId';
+import { onTeamBeforeDestroy } from '@/logic/team';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'p',
@@ -139,6 +140,10 @@ export class GameServer {
                             .getComponent(PlayerOwnedComponent).playerId;
                         const player = this.registry.getEntityById(playerId);
                         setPlayerTank(player, null);
+                        break;
+                    }
+                    case EntityType.TEAM: {
+                        onTeamBeforeDestroy(this.registry, entity);
                         break;
                     }
                 }

@@ -161,7 +161,7 @@ export function setPlayerTank(
     });
 }
 
-function setPlayerTeamId(
+export function setPlayerTeamId(
     registry: Registry,
     player: Entity,
     teamId: EntityId | null,

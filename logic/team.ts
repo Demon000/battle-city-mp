@@ -3,6 +3,7 @@ import { TeamComponent } from '@/components/TeamComponent';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 import { assert } from '@/utils/assert';
+import { setPlayerTeamId } from './player';
 
 export function removeTeamPlayer(team: Entity, player: Entity): void {
     const entitiesComponent = team.getComponent(EntitiesOwnerComponent);
@@ -57,4 +58,16 @@ export function isTeamSwitchingAllowed(
     toTeam: Entity,
 ): boolean {
     return getTeamNumberOfPlayers(toTeam) <= getTeamNumberOfPlayers(fromTeam);
+}
+
+export function onTeamBeforeDestroy(
+    registry: Registry,
+    team: Entity,
+): void {
+    const entitiesComponent = team.getComponent(EntitiesOwnerComponent);
+
+    for (const playerId of Object.keys(entitiesComponent.ids)) {
+        const player = registry.getEntityById(playerId);
+        setPlayerTeamId(registry, player, null);
+    }
 }
