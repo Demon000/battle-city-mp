@@ -30,7 +30,7 @@ import { updateIsMoving } from '@/logic/entity-movement';
 import { markDestroyed, processDestroyed } from '@/logic/entity-destroy';
 import { updateCenterPosition } from '@/logic/entity-position';
 import { PlayerComponent, PlayerSpawnStatus } from '@/components/PlayerComponent';
-import { getPlayerDisplayName, getPlayerRespawnTimeout, getPlayerTankId, getPlayerTeamId, getSortedPlayers } from '@/logic/player';
+import { getPlayerColor, getPlayerDisplayName, getPlayerRespawnTimeout, getPlayerTankId, getPlayerTeamId, getSortedPlayers } from '@/logic/player';
 import { TeamComponent } from '@/components/TeamComponent';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
@@ -456,16 +456,7 @@ export class GameClient {
                     tier = playerComponent.requestedTankTier;
                 }
 
-                let colorSourceEntity;
-                if (tank !== undefined) {
-                    colorSourceEntity = tank;
-                } else if (team !== undefined) {
-                    colorSourceEntity = team;
-                } else {
-                    colorSourceEntity = player;
-                }
-
-                const color = colorSourceEntity.getComponent(ColorComponent).value;
+                const color = getPlayerColor(this.registry, player);
                 const name = getPlayerDisplayName(player);
                 return {
                     id: player.id,

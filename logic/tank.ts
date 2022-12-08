@@ -8,7 +8,7 @@ import { EntityType } from '@/entity/EntityType';
 import { PluginContext } from '@/logic/plugin';
 import { Point } from '@/physics/point/Point';
 import { handleFlagInteraction } from './flag';
-import { getPlayerDisplayName, getPlayerTeamId } from './player';
+import { getPlayerColor, getPlayerDisplayName, getPlayerTeamId } from './player';
 
 export function createTankForPlayer(
     this: PluginContext,
@@ -16,17 +16,10 @@ export function createTankForPlayer(
     position: Point,
 ): Entity {
     const playerTeamId = getPlayerTeamId(player);
+    const color = getPlayerColor(this.registry, player);
+    const name = getPlayerDisplayName(player);
     const playerComponent = player.getComponent(PlayerComponent);
 
-    let colorSourceEntity;
-    if (playerTeamId === null) {
-        colorSourceEntity = player;
-    } else {
-        const team = this.registry.getEntityById(playerTeamId);
-        colorSourceEntity = team;
-    }
-    const color = colorSourceEntity.getComponent(ColorComponent).value;
-    const name = getPlayerDisplayName(player);
     return this.entityFactory.buildFromOptions({
         type: EntityType.TANK,
         subtypes: [playerComponent.requestedTankTier],

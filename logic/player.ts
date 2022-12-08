@@ -110,6 +110,22 @@ export function getPlayerDisplayName(player: Entity): string {
     return name;
 }
 
+export function getPlayerColor(registry: Registry, player: Entity): Color {
+    const playerTankId = getPlayerTankId(player);
+    const playerTeamId = getPlayerTeamId(player);
+
+    let entity;
+    if (playerTankId !== null) {
+        entity = registry.getEntityById(playerTankId);;
+    } else if (playerTeamId !== null) {
+        entity = registry.getEntityById(playerTeamId);;
+    } else {
+        entity = player;
+    }
+
+    return entity.getComponent(ColorComponent).value;
+}
+
 export function getPlayerTeamId(player: Entity): EntityId | null {
     const teamComponent = player.findComponent(TeamOwnedComponent);
     if (teamComponent === undefined) {
