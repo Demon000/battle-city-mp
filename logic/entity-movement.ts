@@ -35,8 +35,6 @@ function processEntityDirection(entity: Entity): void {
     if (movement.direction !== null && direction !== movement.direction) {
         entity.upsertComponent(RequestedDirectionComponent, {
             value: movement.direction,
-        }, {
-            flags: ComponentFlags.LOCAL_ONLY,
         });
     }
 }
@@ -95,9 +93,7 @@ function processEntityMovement(entity: Entity, delta: number): void {
         position.x -= distance;
     }
 
-    entity.upsertComponent(RequestedPositionComponent, position, {
-        flags: ComponentFlags.LOCAL_ONLY,
-    });
+    entity.upsertComponent(RequestedPositionComponent, position);
 }
 
 export function updateIsMoving(entity: Entity, silent = false): void {
@@ -111,7 +107,6 @@ export function updateIsMoving(entity: Entity, silent = false): void {
 
     if (isMoving) {
         entity.addComponent(IsMovingComponent, undefined, {
-            flags: ComponentFlags.LOCAL_ONLY,
             silent,
         });
     } else {

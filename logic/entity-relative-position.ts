@@ -79,7 +79,6 @@ function markDirtyRelativePosition(entity: Entity): void {
     }
 
     entity.upsertComponent(DirtyPositionComponent, undefined, {
-        flags: ComponentFlags.LOCAL_ONLY,
         silent: true,
     });
 }

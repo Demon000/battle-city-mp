@@ -1,4 +1,4 @@
-import { Component } from '@/ecs/Component';
+import { Component, ComponentFlags } from '@/ecs/Component';
 import { Direction } from '@/physics/Direction';
 
 export interface RequestedDirectionComponentData {
@@ -9,6 +9,7 @@ export class RequestedDirectionComponent
     extends Component<RequestedDirectionComponent>
     implements RequestedDirectionComponentData {
     static TAG = 'RD';
+    static BASE_FLAGS = ComponentFlags.LOCAL_ONLY;
 
     value = Direction.UP;
 }
