@@ -39,6 +39,7 @@
     'player': {
         components: {
             PlayerComponent: {},
+            NameComponent: {},
             ColorComponent: {},
             EntitiesOwnerComponent: {},
             PlayerRespawnTimeoutComponent: {},
@@ -476,6 +477,7 @@
             DirectionComponent: {},
             MovementComponent: {},
             ColorComponent: {},
+            NameComponent: {},
         },
         localComponents: {
             CenterPositionComponent: {},

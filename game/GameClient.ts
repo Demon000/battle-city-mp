@@ -30,7 +30,7 @@ import { updateIsMoving } from '@/logic/entity-movement';
 import { markDestroyed, processDestroyed } from '@/logic/entity-destroy';
 import { updateCenterPosition } from '@/logic/entity-position';
 import { PlayerComponent, PlayerSpawnStatus } from '@/components/PlayerComponent';
-import { getPlayerColor, getPlayerDisplayName, getPlayerTankId, getPlayerTeamId, getRoundedRespawnTimeout, getSortedPlayers } from '@/logic/player';
+import { getPlayerColor, getPlayerName, getPlayerTankId, getPlayerTeamId, getRoundedRespawnTimeout, getSortedPlayers } from '@/logic/player';
 import { TeamComponent } from '@/components/TeamComponent';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
@@ -38,6 +38,7 @@ import { ColorComponent } from '@/components/ColorComponent';
 import { PlayerRequestedSpawnStatusComponent } from '@/components/PlayerRequestedSpawnStatusComponent';
 import { EntitiesOwnerComponent } from '@/components/EntitiesOwnerComponent';
 import { PlayerRespawnTimeoutComponent } from '@/components/PlayerRespawnTimeoutComponent';
+import { NameComponent } from '@/components/NameComponent';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -47,6 +48,7 @@ export enum GameClientEvent {
     SCOREBOARD_WATCH_TIME = 'scoreboard-watch-time',
 
     OWN_PLAYER_ADDED = 'own-player-added',
+    OWN_PLAYER_CHANGED_NAME = 'own-player-changed-name',
     OWN_PLAYER_CHANGED_TANK_ID = 'own-player-changed-tank-id',
     OWN_PLAYER_CHANGED_TEAM_ID = 'own-player-changed-team-id',
     OWN_PLAYER_CHANGED_TANK_TIER = 'own-player-changed-tank-tier',
@@ -71,6 +73,7 @@ export interface GameClientEvents {
     [GameClientEvent.SCOREBOARD_WATCH_TIME]: (value: boolean) => void;
 
     [GameClientEvent.OWN_PLAYER_ADDED]: () => void;
+    [GameClientEvent.OWN_PLAYER_CHANGED_NAME]: (name: string) => void;
     [GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID]: (tankId: EntityId | null) => void;
     [GameClientEvent.OWN_PLAYER_CHANGED_TEAM_ID]: (teamId: string | null) => void;
     [GameClientEvent.OWN_PLAYER_CHANGED_TANK_TIER]: (tier: TankTier) => void;
@@ -274,6 +277,19 @@ export class GameClient {
                     this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_TANK_TIER,
                         component.requestedTankTier);
                 });
+        this.registry.componentEmitter(NameComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+                (_event, component, _data) => {
+                    this.emitter.emit(GameClientEvent.PLAYERS_CHANGED);
+
+                    const entity = component.entity;
+                    if (!isOwnPlayer(entity)) {
+                        return;
+                    }
+
+                    this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_NAME,
+                        getPlayerName(entity));
+                });
         this.registry.componentEmitter(PlayerRespawnTimeoutComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
                 (_event, component) => {
@@ -465,7 +481,7 @@ export class GameClient {
                 }
 
                 const color = getPlayerColor(this.registry, player);
-                const name = getPlayerDisplayName(player);
+                const name = getPlayerName(player);
                 return {
                     id: player.id,
                     name: name,

@@ -1,14 +1,12 @@
 import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
-import { ColorComponent } from '@/components/ColorComponent';
 import { HealthComponent } from '@/components/HealthComponent';
-import { NameComponent } from '@/components/NameComponent';
 import { PlayerComponent } from '@/components/PlayerComponent';
 import { Entity } from '@/ecs/Entity';
 import { EntityType } from '@/entity/EntityType';
 import { PluginContext } from '@/logic/plugin';
 import { Point } from '@/physics/point/Point';
 import { handleFlagInteraction } from './flag';
-import { getPlayerColor, getPlayerDisplayName, getPlayerTeamId } from './player';
+import { getPlayerColor, getPlayerName, getPlayerTeamId } from './player';
 
 export function createTankForPlayer(
     this: PluginContext,
@@ -17,7 +15,7 @@ export function createTankForPlayer(
 ): Entity {
     const playerTeamId = getPlayerTeamId(player);
     const color = getPlayerColor(this.registry, player);
-    const name = getPlayerDisplayName(player);
+    const name = getPlayerName(player);
     const playerComponent = player.getComponent(PlayerComponent);
 
     return this.entityFactory.buildFromOptions({

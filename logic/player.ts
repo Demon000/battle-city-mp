@@ -40,8 +40,8 @@ export function createPlayer(
         type: EntityType.PLAYER,
         id: playerId,
         components: {
-            PlayerComponent: {
-                name: playerId,
+            NameComponent: {
+                value: playerId,
             },
         },
     });
@@ -69,7 +69,7 @@ export function cancelPlayersActions(registry: Registry): void {
 }
 
 export function setPlayerName(player: Entity, value: string) {
-    player.upsertComponent(NameComponent, {
+    player.updateComponent(NameComponent, {
         value,
     });
 }
@@ -97,17 +97,8 @@ export function setPlayerRequestedTankTier(
     });
 }
 
-export function getPlayerDisplayName(player: Entity): string {
-    const playerNameComponent = player.findComponent(NameComponent);
-    let name;
-
-    if (playerNameComponent === undefined) {
-        name = player.id;
-    } else {
-        name = playerNameComponent.value;
-    }
-
-    return name;
+export function getPlayerName(player: Entity): string {
+    return player.getComponent(NameComponent).value;
 }
 
 export function getPlayerColor(registry: Registry, player: Entity): Color {

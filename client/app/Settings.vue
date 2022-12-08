@@ -11,7 +11,7 @@
                     <input
                         type="text"
                         maxlength="16"
-                        v-model.lazy="playerName"
+                        v-model.lazy="internalPlayerName"
                     >
                 </div>
 
@@ -162,9 +162,13 @@ export default class Settings extends Vue {
     @Prop()
         playerRespawnTimeout: number | null = null;
 
-    playerName: string | null = null;
+    @Prop()
+        playerName: string | null = null;
+
+    internalPlayerName: string | null = null;
 
     mounted(): void {
+        this.internalPlayerName = this.playerName;
         this.$el.addEventListener('keydown', this.onKeyboardEvent);
         this.$el.addEventListener('keyup', this.onKeyboardEvent);
     }
@@ -257,7 +261,12 @@ export default class Settings extends Vue {
 
     @Watch('playerName')
     onPlayerNameChanged(): void {
-        this.$emit('player-name-change', this.playerName);
+        this.internalPlayerName = this.playerName;
+    }
+
+    @Watch('internalPlayerName')
+    onInternalPlayerNameChanged(): void {
+        this.$emit('player-name-change', this.internalPlayerName);
     }
 }
 </script>

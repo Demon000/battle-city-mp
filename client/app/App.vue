@@ -157,6 +157,7 @@
             tabindex="2"
             id="game-settings"
             v-if="isShowingSettings"
+            :playerName="playerName"
             :tankTier="tankTier"
             :tankColor="tankColor"
             :playerTeamId="playerTeamId"
@@ -228,6 +229,7 @@ export default class App extends Vue {
     tankHealth: number | null = null;
     tankMaxBullets: number | null = null;
     tankBullets: number | null = null;
+    playerName: string | null = null;
     playerTeamId: string | null = null;
     playerRespawnTimeout: number | null = null;
     playerRequestedSpawnStatus: PlayerSpawnStatus | null = null;
@@ -268,8 +270,12 @@ export default class App extends Vue {
                 this.isScoreboardWatchTime = value;
             });
 
+        gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_NAME,
+            (name: string) => {
+                this.playerName = name;
+            });
         gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TANK_ID,
-            (tankId: EntityId | null): void => {
+            (tankId: EntityId | null) => {
                 this.isPlayerDead = tankId === null;
             });
         gameClient.emitter.on(GameClientEvent.OWN_PLAYER_CHANGED_TEAM_ID,
