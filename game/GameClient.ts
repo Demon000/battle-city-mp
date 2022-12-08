@@ -461,15 +461,9 @@ export class GameClient {
         return getSortedPlayers(this.registry)
             .map(player => {
                 const playerTankId = getPlayerTankId(player);
-                const playerTeamId = getPlayerTeamId(player);
                 let tank;
                 if (playerTankId !== null) {
                     tank = this.registry.getEntityById(playerTankId);
-                }
-
-                let team;
-                if (playerTeamId !== null) {
-                    team = this.registry.getEntityById(playerTeamId);
                 }
 
                 const playerComponent = player.getComponent(PlayerComponent);
