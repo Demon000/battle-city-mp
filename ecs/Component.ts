@@ -40,11 +40,23 @@ export class Component<C extends Component<C>> {
     static readonly TAG?: string;
 
     get entity(): Entity {
-        assert(this.entities.size === 1,
-            'Cannot access entity of component attached to multiple',
-            this.clazz);
+        if (this.entities.size !== 1) {
+            let status;
+            if (this.detached) {
+                status = 'detached';
+            } else if (this.entities.size !== 1) {
+                status = 'shared';
+            }
+
+            assert(false,
+                `Cannot access entity of ${status} component`, this.clazz);
+        }
 
         return this.firstEntity!;
+    }
+
+    get detached(): boolean {
+        return this.entities.size === 0;
     }
 
     get firstEntity(): Entity | undefined {
