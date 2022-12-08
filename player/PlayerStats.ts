@@ -1,8 +1,11 @@
-import { Team } from '@/team/Team';
-import { Player } from './Player';
+import { Color } from '@/drawable/Color';
 
 export interface PlayerStats {
-    player: Player,
-    team: Team | undefined,
+    id: string;
+    name: string,
+    kills: number,
+    deaths: number,
+    points: number;
+    color: Color;
     tier: string,
 }

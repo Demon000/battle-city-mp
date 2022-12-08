@@ -1,18 +1,19 @@
 import { BulletComponent } from '@/components/BulletComponent';
 import { EntityOwnedComponent } from '@/components/EntityOwnedComponent';
 import { HealthComponent } from '@/components/HealthComponent';
+import { PlayerSpawnStatus } from '@/components/PlayerComponent';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { Entity } from '@/ecs/Entity';
 import { EntityType } from '@/entity/EntityType';
 import { PluginContext } from '@/logic/plugin';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
-import { PlayerSpawnStatus } from '@/player/Player';
 import { SameTeamBulletHitMode } from '@/services/GameModeService';
 import { BulletPower } from '@/subtypes/BulletPower';
 import { ExplosionType } from '@/subtypes/ExplosionType';
 import { getBrickWallDestroyBox } from './brick-wall';
 import { markDestroyed } from './entity-destroy';
 import { createExplosion } from './explosion';
+import { addPlayerDeath, addPlayerKill, getPlayerTeamId, setPlayerRequestedSpawnStatus } from './player';
 import { decreaseTankHealth } from './tank';
 
 export function onBulletHitLevelBorder(
@@ -80,9 +81,11 @@ export function onBulletHitTank(
         bullet.getComponent(PlayerOwnedComponent).playerId;
     const tankOwnerPlayerId =
         tank.getComponent(PlayerOwnedComponent).playerId;
-    const tankPlayer = this.playerService.findPlayer(tankOwnerPlayerId);
-    const bulletPlayer = this.playerService.findPlayer(bulletOwnerPlayerId);
-    const isSameTeamShot = tankPlayer?.teamId === bulletPlayer?.teamId;
+    const tankPlayer = this.registry.getEntityById(tankOwnerPlayerId);
+    const bulletPlayer = this.registry.getEntityById(bulletOwnerPlayerId);
+    const tankPlayerTeamId = getPlayerTeamId(tankPlayer);
+    const bulletPlayerTeamId = getPlayerTeamId(bulletPlayer);
+    const isSameTeamShot = tankPlayerTeamId === bulletPlayerTeamId;
 
     const gameModeProperties = this.gameModeService.getGameModeProperties();
     let destroyBullet = false;
@@ -117,23 +120,18 @@ export function onBulletHitTank(
     }
 
     if (tankHealth.value <= 0) {
-        const playerId =
-            tank.getComponent(PlayerOwnedComponent).playerId;
         createExplosion(this.entityFactory, tank,
             ExplosionType.BIG, EntityType.TANK);
-        this.playerService.setPlayerRequestedSpawnStatus(playerId, PlayerSpawnStatus.DESPAWN);
-        this.playerService.addPlayerDeath(playerId);
-        if (bulletPlayer !== undefined) {
-            this.playerService.addPlayerKill(bulletPlayer.id);
-        }
+        setPlayerRequestedSpawnStatus(tankPlayer, PlayerSpawnStatus.DESPAWN);
+        addPlayerDeath(tankPlayer);
+        addPlayerKill(bulletPlayer);
     } else {
         createExplosion(this.entityFactory, bullet,
             ExplosionType.SMALL, EntityType.NONE);
     }
 
     if (destroyBullet || bulletDamage <= 0) {
-        createExplosion(this.entityFactory, bullet,
-            ExplosionType.SMALL);
+        createExplosion(this.entityFactory, bullet, ExplosionType.SMALL);
         markDestroyed(bullet);
     }
 }

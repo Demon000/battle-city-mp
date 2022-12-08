@@ -7,10 +7,10 @@ import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 import { PlayerPointsEvent } from '@/player/PlayerPoints';
-import { PlayerService } from '@/player/PlayerService';
 import { assert } from '@/utils/assert';
 import { setEntityPosition } from './entity-position';
 import { attachRelativeEntity, isAttachedRelativeEntity, unattachRelativeEntity } from './entity-relative-position';
+import { addPlayerPoints } from './player';
 
 export enum FlagTankInteraction {
     PICK,
@@ -25,7 +25,7 @@ function setFlagSource(
 ): void {
     const flagComponent = flag.getComponent(FlagComponent);
 
-    if (flagBase === undefined || flagComponent.sourceId !== -1) {
+    if (flagBase === undefined || flagComponent.sourceId !== 'invalid') {
         return;
     }
 
@@ -130,7 +130,6 @@ function handleFlagPick(
 
 export function handleFlagDrop(
     registry: Registry,
-    playerService: PlayerService,
     tank: Entity,
     flag: Entity | undefined,
     carriedFlag: Entity,
@@ -138,6 +137,7 @@ export function handleFlagDrop(
     interaction: FlagTankInteraction,
 ): void {
     const playerId = tank.getComponent(PlayerOwnedComponent).playerId;
+    const player = registry.getEntityById(playerId);
     let position;
 
     if (interaction === FlagTankInteraction.DROP) {
@@ -162,17 +162,14 @@ export function handleFlagDrop(
     setFlagDropper(carriedFlag, tank);
 
     if (interaction === FlagTankInteraction.RETURN) {
-        playerService.addPlayerPoints(playerId,
-            PlayerPointsEvent.RETURN_FLAG);
+        addPlayerPoints(player, PlayerPointsEvent.RETURN_FLAG);
     } else if (interaction === FlagTankInteraction.CAPTURE) {
-        playerService.addPlayerPoints(playerId,
-            PlayerPointsEvent.CAPTURE_FLAG);
+        addPlayerPoints(player, PlayerPointsEvent.CAPTURE_FLAG);
     }
 }
 
 export function handleFlagInteraction(
     registry: Registry,
-    playerService: PlayerService,
     tank: Entity,
     flag: Entity | undefined,
     carriedFlag: Entity | undefined,
@@ -191,7 +188,6 @@ export function handleFlagInteraction(
         || interaction === FlagTankInteraction.RETURN
         || interaction === FlagTankInteraction.CAPTURE) {
         assert(carriedFlag !== undefined);
-        handleFlagDrop(registry, playerService,
-            tank, flag, carriedFlag, flagBase, interaction);
+        handleFlagDrop(registry, tank, flag, carriedFlag, flagBase, interaction);
     }
 }

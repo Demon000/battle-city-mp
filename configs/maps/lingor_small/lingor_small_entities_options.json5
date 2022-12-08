@@ -1,4 +1,43 @@
 [
+    {
+        type: 'team',
+        id: 'Red',
+        components: {
+            ColorComponent: {
+                value: [
+                    220,
+                    20,
+                    60,
+                ],
+            },
+        },
+    },
+    {
+        type: 'team',
+        id: 'Blue',
+        components: {
+            ColorComponent: {
+                value: [
+                    65,
+                    105,
+                    255,
+                ],
+            },
+        },
+    },
+    {
+        type: 'team',
+        id: 'Yellow',
+        components: {
+            ColorComponent: {
+                value: [
+                    249,
+                    166,
+                    2,
+                ],
+            },
+        },
+    },
     // Red team
     {
         type: 'flag-base',

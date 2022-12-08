@@ -95,7 +95,8 @@ export class Registry {
     @nonenumerable
     private componentRegistry;
 
-    emitter = new EventEmitter<RegistryEvents & RegistryComponentEvents>();
+    @nonenumerable
+        emitter = new EventEmitter<RegistryEvents & RegistryComponentEvents>();
 
     constructor(
         componentRegistry: ComponentRegistry,

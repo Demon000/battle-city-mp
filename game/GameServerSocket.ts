@@ -1,7 +1,8 @@
 import { ActionOptions } from '@/actions/Action';
 import { ActionFactory } from '@/actions/ActionFactory';
+import { PlayerSpawnStatus } from '@/components/PlayerComponent';
 import { Color } from '@/drawable/Color';
-import { PlayerSpawnStatus } from '@/player/Player';
+import { EntityId } from '@/ecs/EntityId';
 import { Server, Socket } from 'socket.io';
 import { BatchGameEvent, UnicastBatchGameEvent } from './GameEvent';
 import { GameServer, GameServerEvent } from './GameServer';
@@ -21,7 +22,7 @@ export class GameServerSocket {
             });
 
         gameServer.emitter.on(GameServerEvent.PLAYER_BATCH,
-            (playerId: string, events: UnicastBatchGameEvent[]) => {
+            (playerId: EntityId, events: UnicastBatchGameEvent[]) => {
                 this.socketServer.to(playerId).emit(GameSocketEvent.BATCH, events);
             });
 
@@ -41,10 +42,6 @@ export class GameServerSocket {
         socket.on(GameSocketEvent.PLAYER_ACTION, (options: ActionOptions) => {
             const action = ActionFactory.buildFromOptions(options);
             this.gameServer.onPlayerAction(socket.id, action);
-        });
-
-        socket.on(GameSocketEvent.PLAYER_REQUEST_SERVER_STATUS, () => {
-            this.gameServer.onPlayerRequestedServerStatus(socket.id);
         });
 
         socket.on(GameSocketEvent.PLAYER_REQUEST_TANK_SPAWN, () => {

@@ -48,6 +48,13 @@ import { DirtyCollisionsRemoveComponent, DirtyCollisionsRemoveComponentData } fr
 import { MovementConfigComponent, MovementConfigComponentData } from '@/components/MovementConfigComponent';
 import { FatBoundingBoxComponent, FatBoundingBoxComponentData } from '@/components/FatBoundingBoxComponent';
 import { PickupIgnoreTimeComponent, PickupIgnoreTimeComponentData } from '@/components/PickupIgnoreTimeComponent';
+import { TeamComponent, TeamComponentData } from '@/components/TeamComponent';
+import { PlayerRequestedSpawnStatusComponent, PlayerRequestedSpawnStatusComponentData } from '@/components/PlayerRequestedSpawnStatusComponent';
+import { PlayerRequestedServerStatusComponent, PlayerRequestedServerStatusComponentData } from '@/components/PlayerRequestedServerStatusComponent';
+import { PlayerRespawnTimeoutComponent, PlayerRespawnTimeoutComponentData } from '@/components/PlayerRespawnTimeoutComponent';
+import { PlayerComponent, PlayerComponentData } from '@/components/PlayerComponent';
+import { EntitiesOwnerComponent, EntitiesOwnerComponentData } from '@/components/EntitiesOwnerComponent';
+import { PlayerInputComponent, PlayerInputComponentData } from '@/components/PlayerInputComponent';
 
 export class ComponentRegistry {
     protected lookupAndValidate(
@@ -243,6 +250,34 @@ export class ComponentRegistry {
             case PickupIgnoreTimeComponent.name:
                 assertEquals<Partial<PickupIgnoreTimeComponentData>>(data);
                 return PickupIgnoreTimeComponent;
+            case TeamComponent.tag:
+            case TeamComponent.name:
+                assertEquals<Partial<TeamComponentData>>(data);
+                return TeamComponent;
+            case PlayerRequestedSpawnStatusComponent.tag:
+            case PlayerRequestedSpawnStatusComponent.name:
+                assertEquals<Partial<PlayerRequestedSpawnStatusComponentData>>(data);
+                return PlayerRequestedSpawnStatusComponent;
+            case PlayerRequestedServerStatusComponent.tag:
+            case PlayerRequestedServerStatusComponent.name:
+                assertEquals<Partial<PlayerRequestedServerStatusComponentData>>(data);
+                return PlayerRequestedServerStatusComponent;
+            case PlayerRespawnTimeoutComponent.tag:
+            case PlayerRespawnTimeoutComponent.name:
+                assertEquals<Partial<PlayerRespawnTimeoutComponentData>>(data);
+                return PlayerRespawnTimeoutComponent;
+            case PlayerComponent.tag:
+            case PlayerComponent.name:
+                assertEquals<Partial<PlayerComponentData>>(data);
+                return PlayerComponent;
+            case EntitiesOwnerComponent.tag:
+            case EntitiesOwnerComponent.name:
+                assertEquals<Partial<EntitiesOwnerComponentData>>(data);
+                return EntitiesOwnerComponent;
+            case PlayerInputComponent.tag:
+            case PlayerInputComponent.name:
+                assertEquals<Partial<PlayerInputComponentData>>(data);
+                return PlayerInputComponent;
         }
     }
 

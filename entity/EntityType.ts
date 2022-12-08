@@ -18,4 +18,6 @@ export enum EntityType {
     FLAG_BASE = 'flag-base',
     TELEPORTER = 'teleporter',
     SPAWN_EFFECT = 'spawn-effect',
+    PLAYER = 'player',
+    TEAM = 'team',
 }

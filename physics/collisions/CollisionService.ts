@@ -354,7 +354,7 @@ export class CollisionService {
                         continue;
                     }
 
-                    const staticEntity = this.registry.getEntityById(+entityId);
+                    const staticEntity = this.registry.getEntityById(entityId);
                     this.emitter.emit(rule.entryEvent, movingEntity, staticEntity);
                 }
             }
@@ -365,7 +365,7 @@ export class CollisionService {
                         continue;
                     }
 
-                    const staticEntity = this.registry.getEntityById(+entityId);
+                    const staticEntity = this.registry.getEntityById(entityId);
                     this.emitter.emit(rule.exitEvent, movingEntity, staticEntity);
                 }
             }
@@ -452,7 +452,7 @@ export class CollisionService {
 
         for (const childId of
             Object.keys(relativePositionChildrenComponent.ids)) {
-            const child = this.registry.getEntityById(+childId);
+            const child = this.registry.getEntityById(childId);
             if (child.type === type) {
                 return child;
             }
@@ -557,7 +557,9 @@ export class CollisionService {
         for (const entity of
             this.registry.getEntitiesWithComponent(DirtyCollisionsRemoveComponent)) {
 
-            this.boundingBoxRepository.removeValue(entity.id);
+            if (this.boundingBoxRepository.hasNode(entity.id)) {
+                this.boundingBoxRepository.removeValue(entity.id);
+            }
 
             entity.removeComponent(DirtyCollisionsRemoveComponent);
         }

@@ -23,7 +23,7 @@ export class Component<C extends Component<C>> {
     readonly clazz: ComponentClassType<C>;
 
     @nonenumerable
-    flags = 0;
+        flags = 0;
 
     constructor(
         registry: Registry,

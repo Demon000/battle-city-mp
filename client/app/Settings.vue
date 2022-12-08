@@ -70,7 +70,7 @@
                         <div
                             class="team-color retro-border retro-border-black"
                             :style="{
-                                background: ColorUtils.getRgbFromColor(team.color),
+                                background: rgbTeamColor(team),
                             }"
                         >
                         </div>
@@ -117,8 +117,10 @@ import { Color } from '@/drawable/Color';
 import { ColorUtils } from '@/utils/ColorUtils';
 import { TankTier } from '@/subtypes/TankTier';
 import { Vue, Prop, Watch, Component } from 'vue-facing-decorator';
-import { Team } from '@/team/Team';
-import { PlayerSpawnStatus } from '@/player/Player';
+import { PlayerSpawnStatus } from '@/components/PlayerComponent';
+import { Entity } from '@/ecs/Entity';
+import { EntityId } from '@/ecs/EntityId';
+import { ColorComponent } from '@/components/ColorComponent';
 
 @Component({
     options: {
@@ -149,7 +151,7 @@ export default class Settings extends Vue {
         tankColor: Color | null = null;
 
     @Prop()
-        teams: Team[] | null = [];
+        teams: Entity[] | null = [];
 
     @Prop()
         hasTeams = false;
@@ -207,12 +209,18 @@ export default class Settings extends Vue {
         this.$emit('tank-tier-change', tier);
     }
 
-    onPlayerTeamChanged(teamId: string | null): void {
+    onPlayerTeamChanged(teamId: EntityId | null): void {
         this.$emit('player-team-change', teamId);
     }
 
     onSpawnButtonClick(): void {
         this.$emit('spawn-click');
+    }
+
+    rgbTeamColor(team: Entity): string {
+        const color = team.getComponent(ColorComponent).value;
+
+        return ColorUtils.getRgbFromColor(color);
     }
 
     get rgbTankColor(): string | null {

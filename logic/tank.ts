@@ -1,30 +1,41 @@
 import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
+import { ColorComponent } from '@/components/ColorComponent';
 import { HealthComponent } from '@/components/HealthComponent';
-import { Color } from '@/drawable/Color';
+import { PlayerComponent } from '@/components/PlayerComponent';
 import { Entity } from '@/ecs/Entity';
-import { EntityFactory } from '@/entity/EntityFactory';
 import { EntityType } from '@/entity/EntityType';
 import { PluginContext } from '@/logic/plugin';
 import { Point } from '@/physics/point/Point';
-import { Player } from '@/player/Player';
 import { handleFlagInteraction } from './flag';
+import { getPlayerTeamId } from './player';
 
 export function createTankForPlayer(
-    entityFactory: EntityFactory,
-    player: Player,
+    this: PluginContext,
+    player: Entity,
     position: Point,
-    color: Color,
 ): Entity {
-    return entityFactory.buildFromOptions({
+    const playerTeamId = getPlayerTeamId(player);
+    const playerComponent = player.getComponent(PlayerComponent);
+
+    let colorSourceEntity;
+    if (playerTeamId === null) {
+        colorSourceEntity = player;
+    } else {
+        const team = this.registry.getEntityById(playerTeamId);
+        colorSourceEntity = team;
+    }
+    const color = colorSourceEntity.getComponent(ColorComponent).value;
+
+    return this.entityFactory.buildFromOptions({
         type: EntityType.TANK,
-        subtypes: [player.requestedTankTier],
+        subtypes: [playerComponent.requestedTankTier],
         components: {
             TeamOwnedComponent: {
-                teamId: player.teamId,
+                teamId: playerTeamId,
             },
             PlayerOwnedComponent: {
                 playerId: player.id,
-                playerName: player.displayName,
+                playerName: playerComponent.name,
             },
             PositionComponent: position,
             ColorComponent: {
@@ -54,8 +65,7 @@ export function onTankCollideFlag(
     const flagBase = this.collisionService
         .findOverlappingWithType(boundingBox, EntityType.FLAG_BASE);
     if (flag !== carriedFlag) {
-        handleFlagInteraction(this.registry, this.playerService,
-            tank, flag, carriedFlag, flagBase);
+        handleFlagInteraction(this.registry, tank, flag, carriedFlag, flagBase);
     }
 }
 
@@ -67,6 +77,5 @@ export function onTankCollideFlagBase(
     const carriedFlag = this.collisionService
         .findRelativePositionEntityWithType(tank,
             EntityType.FLAG);
-    handleFlagInteraction(this.registry, this.playerService,
-        tank, undefined, carriedFlag, flagBase);
+    handleFlagInteraction(this.registry, tank, undefined, carriedFlag, flagBase);
 }

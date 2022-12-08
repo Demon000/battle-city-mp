@@ -10,7 +10,6 @@ export enum GameSocketEvent {
     PLAYER_REQUEST_TANK_TIER = 'player-request-tank-tier',
     PLAYER_REQUEST_TANK_SPAWN = 'player-request-tank-spawn',
     PLAYER_REQUEST_TEAM = 'player-request-team',
-    PLAYER_REQUEST_SERVER_STATUS = 'player-request-server-status',
 
     PLAYER_SET_NAME = 'player-set-name',
 
@@ -23,7 +22,6 @@ export interface GameSocketEvents {
     [GameSocketEvent.PLAYER_REQUEST_TANK_TIER]: (tier: TankTier) => void;
     [GameSocketEvent.PLAYER_REQUEST_TANK_SPAWN]: () => void;
     [GameSocketEvent.PLAYER_REQUEST_TEAM]: (teamId: string | null) => void,
-    [GameSocketEvent.PLAYER_REQUEST_SERVER_STATUS]: () => void;
     [GameSocketEvent.PLAYER_SET_NAME]: (name: string) => void;
     [GameSocketEvent.BATCH]: (events: BatchGameEvent[]) => void;
 }

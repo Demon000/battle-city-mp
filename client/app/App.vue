@@ -107,42 +107,31 @@
                                 <td>Kills</td>
                                 <td>Deaths</td>
                                 <td>Points</td>
-                                <td
-                                    v-if="hasTeams"
-                                >
-                                    Team
-                                </td>
+                                <td>Color</td>
                                 <td>Tank</td>
                             </tr>
                             <tr
-                                v-for="{player, team, tier} of playersStats"
-                                :key="player.id"
+                                v-for="playerStats of playersStats"
+                                :key="playerStats.id"
                                 :class="{
-                                    'is-own-player': player.id === ownPlayer.id,
+                                    'is-own-player': playerStats.id === ownPlayer.id,
                                 }"
                             >
-                                <td>{{ player.displayName }}</td>
-                                <td>{{ player.kills }}</td>
-                                <td>{{ player.deaths }}</td>
-                                <td>{{ player.points }}</td>
-                                <td
-                                    class="team-cell"
-                                    v-if="hasTeams"
-                                >
-                                    <template
-                                        v-if="team"
+                                <td>{{ playerStats.name }}</td>
+                                <td>{{ playerStats.kills }}</td>
+                                <td>{{ playerStats.deaths }}</td>
+                                <td>{{ playerStats.points }}</td>
+                                <td class="color-cell">
+                                    <span
+                                        class="color"
+                                        :style="{
+                                            background: ColorUtils.getRgbFromColor(playerStats.color),
+                                        }"
                                     >
-                                        <span
-                                            class="team-color"
-                                            :style="{
-                                                background: ColorUtils.getRgbFromColor(team.color),
-                                            }"
-                                        >
-                                        </span>
-                                    </template>
+                                    </span>
                                 </td>
                                 <td>
-                                    {{ tier }}
+                                    {{ playerStats.tier }}
                                 </td>
                             </tr>
                         </table>
@@ -196,10 +185,8 @@ import { GameClient, GameClientEvent } from '@/game/GameClient';
 import { GameClientSocket } from '@/game/GameClientSocket';
 import { GameSocketEvents } from '@/game/GameSocketEvent';
 import { RenderPass } from '@/entity/RenderPass';
-import { Player, PlayerSpawnStatus } from '@/player/Player';
 import { PlayerStats } from '@/player/PlayerStats';
 import { TankTier } from '@/subtypes/TankTier';
-import { Team } from '@/team/Team';
 import screenfull from 'screenfull';
 import { io, Socket } from 'socket.io-client';
 import { markRaw } from 'vue';
@@ -209,6 +196,8 @@ import { GamepadWrapper, GamepadWrapperEvent, GamepadWrapperEventData } from '..
 import { ColorUtils } from '@/utils/ColorUtils';
 import { EntityId } from '@/ecs/EntityId';
 import { Component, Vue, Watch } from 'vue-facing-decorator';
+import { Entity } from '@/ecs/Entity';
+import { PlayerSpawnStatus } from '@/components/PlayerComponent';
 
 @Component({
     options: {
@@ -229,11 +218,11 @@ export default class App extends Vue {
     TankTier = TankTier;
     RenderPass = RenderPass;
     isUserShowingScoreboard = false;
-    ownPlayer: Player | null = null;
+    ownPlayer: Entity | null = null;
     playersStats: PlayerStats[] | null = null;
     canvases: HTMLCanvasElement[] = [];
 
-    teams: Team[] | null = null;
+    teams: Entity[] | null = null;
     tankTier: TankTier | null = null;
     tankColor: Color | null = null;
     tankMaxHealth: number | null = null;
@@ -660,7 +649,7 @@ export default class App extends Vue {
     left: 0;
 }
 
-#game-controls .team-color {
+#game-controls .color {
     display: inline-block;
     height: 16px;
     width: 16px;
@@ -707,13 +696,13 @@ export default class App extends Vue {
   border: 2px solid #ffffff;
 }
 
-#stats table td.team-cell {
+#stats table td.color-cell {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-#stats table td .team-color {
+#stats table td .color {
     height: 16px;
     width: 16px;
 }

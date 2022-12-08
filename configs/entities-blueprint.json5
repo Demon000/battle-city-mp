@@ -36,6 +36,26 @@
             PatternFillGraphicsComponent: {},
         },
     },
+    'player': {
+        components: {
+            PlayerComponent: {},
+            ColorComponent: {},
+            EntitiesOwnerComponent: {},
+        },
+        serverComponents: {
+            PlayerInputComponent: {},
+        },
+    },
+    'team': {
+        serverComponents: {
+            WorldEntityComponent: {},
+        },
+        components: {
+            TeamComponent: {},
+            ColorComponent: {},
+            EntitiesOwnerComponent: {},
+        },
+    },
     'brick-wall': {
         extends: [
             'positioned-entity',

@@ -1,13 +1,14 @@
 import { PositionComponent } from '@/components/PositionComponent';
 import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { Entity } from '@/ecs/Entity';
+import { EntityId } from '@/ecs/EntityId';
 import { Point } from '@/physics/point/Point';
 import { assert } from '@/utils/assert';
 import { Random } from '@/utils/Random';
 
 export function pickRandomSpawnPosition(
     entities: Iterable<Entity>,
-    teamId: string | null,
+    teamId: EntityId | null,
 ): Point {
     const playerSpawnEntities = new Array<Entity>();
 

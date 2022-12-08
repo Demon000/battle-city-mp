@@ -1,16 +1,11 @@
 import { BoundingBox } from './BoundingBox';
 import { BoundingBoxNode } from '../bounding-box-tree/BoundingBoxNode';
 import { BoundingBoxTree } from '../bounding-box-tree/BoundingBoxTree';
-import { Config } from '@/config/Config';
 import { assert } from '@/utils/assert';
 
 export class BoundingBoxRepository<V> {
     tree = new BoundingBoxTree<V>();
     map = new Map<V, BoundingBoxNode<V>>();
-
-    constructor(
-        private config: Config,
-    ) {}
 
     getBoxOverlappingValues(box: BoundingBox): Iterable<V> {
         return this.tree.getOverlappingNodeValues(box);

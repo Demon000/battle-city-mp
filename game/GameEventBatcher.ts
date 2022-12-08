@@ -1,3 +1,4 @@
+import { EntityId } from '@/ecs/EntityId';
 import EventEmitter from 'eventemitter3';
 import { BroadcastBatchGameEvent, UnicastBatchGameEvent } from './GameEvent';
 
@@ -7,16 +8,16 @@ export enum GameEventBatcherEvent {
 }
 
 export interface GameEventBatcherEvents {
-    [GameEventBatcherEvent.PLAYER_BATCH]: (playerId: string, events: UnicastBatchGameEvent[]) => void;
+    [GameEventBatcherEvent.PLAYER_BATCH]: (playerId: EntityId, events: UnicastBatchGameEvent[]) => void;
     [GameEventBatcherEvent.BROADCAST_BATCH]: (events: BroadcastBatchGameEvent[]) => void;
 }
 
 export class GameEventBatcher {
     broadcastEvents = new Array<BroadcastBatchGameEvent>();
-    playersEvents = new Map<string, UnicastBatchGameEvent[]>();
+    playersEvents = new Map<EntityId, UnicastBatchGameEvent[]>();
     emitter = new EventEmitter<GameEventBatcherEvents>();
 
-    addPlayerEvent(playerId: string, event: UnicastBatchGameEvent): void {
+    addPlayerEvent(playerId: EntityId, event: UnicastBatchGameEvent): void {
         let playerEvents = this.playersEvents.get(playerId);
         if (playerEvents === undefined) {
             playerEvents = new Array<UnicastBatchGameEvent>();
@@ -30,7 +31,7 @@ export class GameEventBatcher {
         this.broadcastEvents.push(event);
     }
 
-    flushPlayerEvents(events: UnicastBatchGameEvent[], playerId: string): void {
+    flushPlayerEvents(events: UnicastBatchGameEvent[], playerId: EntityId): void {
         if (events.length === 0) {
             return;
         }

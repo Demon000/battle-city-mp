@@ -1,5 +1,4 @@
 import fs from 'fs';
-import { Team, TeamOptions } from '@/team/Team';
 import { Color } from '@/drawable/Color';
 import { PNG } from 'pngjs';
 import { EntityBlueprint } from '@/ecs/EntityBlueprint';
@@ -19,11 +18,10 @@ export interface GameMapOptions {
     entitiesFromOptionsFile?: string;
     colorsEntityTypesMap?: Record<string, Color>;
     entityTypesColorsMap?: Map<number, string>;
-    teamsOptions?: TeamOptions[];
 }
 
 export interface LegacyEntityOptions extends EntityBuildOptions {
-    position: Point;
+    position?: Point;
     components?: ComponentsInitialization;
 }
 
@@ -73,9 +71,11 @@ export class GameMap {
         const filePath = this.getMapFilePath(this.options.entitiesFromOptionsFile);
         const data = FileUtils.readJSON5(filePath).map(
             (options: LegacyEntityOptions) => {
-                const components: ComponentsInitialization = {
-                    PositionComponent: options.position,
-                };
+                const components: ComponentsInitialization = {};
+
+                if (options.position) {
+                    components['PositionComponent'] = options.position;
+                }
 
                 if (options.components !== undefined) {
                     Object.assign(components, options.components);
@@ -83,6 +83,7 @@ export class GameMap {
 
                 return {
                     type: options.type,
+                    id: options.id,
                     subtypes: options.subtypes,
                     options,
                     components,
@@ -209,18 +210,5 @@ export class GameMap {
         options = options.concat(entitiesOptionsFromLayers);
 
         return options;
-    }
-
-    getTeamsOptions(): Team[] {
-        if (this.options.teamsOptions === undefined) {
-            return [];
-        }
-
-        const teams = new Array<Team>();
-        for (const teamOptions of this.options.teamsOptions) {
-            teams.push(new Team(teamOptions));
-        }
-
-        return teams;
     }
 }

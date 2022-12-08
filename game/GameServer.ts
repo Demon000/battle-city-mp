@@ -2,10 +2,7 @@ import { Color } from '@/drawable/Color';
 import { EntityFactory, EntityBuildOptions } from '@/entity/EntityFactory';
 import { EntityType } from '@/entity/EntityType';
 import { TankTier } from '@/subtypes/TankTier';
-import { Team } from '@/team/Team';
-import { TeamService, TeamServiceEvent } from '@/team/TeamService';
 import { LazyIterable } from '@/utils/LazyIterable';
-import { MapRepository } from '@/utils/MapRepository';
 import { Ticker, TickerEvent } from '@/utils/Ticker';
 import EventEmitter from 'eventemitter3';
 import { Action, ActionType } from '../actions/Action';
@@ -14,8 +11,6 @@ import { GameMapService } from '../maps/GameMapService';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
 import { CollisionService, DirtyCollisionType } from '../physics/collisions/CollisionService';
 import { CollisionEvent } from '../physics/collisions/CollisionRule';
-import { Player, PartialPlayerOptions, PlayerSpawnStatus } from '../player/Player';
-import { PlayerService, PlayerServiceEvent } from '@/player/PlayerService';
 import { BroadcastBatchGameEvent, CommonBatchGameEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
 import { GameEventBatcher, GameEventBatcherEvent } from './GameEventBatcher';
 import { GameModeService } from '@/services/GameModeService';
@@ -44,8 +39,10 @@ import { unattachRelativeEntities, unattachRelativeEntity, updateRelativePositio
 import { updateCenterPosition } from '@/logic/entity-position';
 import { onBulletHitBrickWall, onBulletHitBullet, onBulletHitLevelBorder, onBulletHitSteelWall, onBulletHitTank } from '@/logic/bullet';
 import { onEntityCollideTeleporter } from '@/logic/entity-teleporter';
-import { onPlayerRequestedDropFlag, onPlayerRequestedMove, onPlayerRequestedShoot, onPlayerRequestedSpawnStatus, onPlayerRequestedTeam } from '@/logic/player';
+import { addPlayerButtonPressAction, cancelPlayersActions, createPlayer, onPlayerRequestedTeam, processPlayerDisconnectStatus, processPlayerDroppingFlag, processPlayerMovement, processPlayerRespawnTimeout, processPlayerShooting, processPlayerSpawnStatus, resetPlayers, setPlayerName, setPlayerRequestedDisconnect, setPlayerRequestedServerStatus, setPlayerRequestedSpawnStatus, setPlayerRequestedTankColor, setPlayerRequestedTankTier, setPlayerTank } from '@/logic/player';
 import { onTankCollideFlag, onTankCollideFlagBase } from '@/logic/tank';
+import { PlayerComponent, PlayerSpawnStatus } from '@/components/PlayerComponent';
+import { EntityId } from '@/ecs/EntityId';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'p',
@@ -54,7 +51,7 @@ export enum GameServerEvent {
 
 export interface GameServerEvents {
     [GameServerEvent.BROADCAST_BATCH]: (events: BroadcastBatchGameEvent[]) => void;
-    [GameServerEvent.PLAYER_BATCH]: (playerId: string, events: UnicastBatchGameEvent[]) => void;
+    [GameServerEvent.PLAYER_BATCH]: (playerId: EntityId, events: UnicastBatchGameEvent[]) => void;
 }
 
 export class GameServer {
@@ -64,12 +61,8 @@ export class GameServer {
     private gameModeService;
     private entityFactory;
     private gameMapService;
-    private playerRepository;
-    private playerService;
     private collisionService;
     private gameEventBatcher;
-    private teamRepository;
-    private teamService;
     private timeService;
     private pluginContext;
     ticker;
@@ -89,15 +82,11 @@ export class GameServer {
 
         entityBlueprint.reloadBlueprintData();
 
-        const boundingBoxRepository = new BoundingBoxRepository<number>(this.config);
+        const boundingBoxRepository = new BoundingBoxRepository<string>();
 
         this.gameModeService = new GameModeService(this.config);
         this.collisionService = new CollisionService(boundingBoxRepository, this.registry);
         this.gameMapService = new GameMapService(entityBlueprint);
-        this.playerRepository = new MapRepository<string, Player>();
-        this.playerService = new PlayerService(this.config, this.playerRepository);
-        this.teamRepository = new MapRepository<string, Team>();
-        this.teamService = new TeamService(this.teamRepository);
         this.timeService = new TimeService(this.config);
         this.gameEventBatcher = new GameEventBatcher();
 
@@ -109,8 +98,6 @@ export class GameServer {
             entityFactory: this.entityFactory,
             collisionService: this.collisionService,
             gameModeService: this.gameModeService,
-            playerService: this.playerService,
-            teamService: this.teamService,
         };
 
         const bindContext = (fn: Function) => fn.bind(this.pluginContext);
@@ -136,7 +123,8 @@ export class GameServer {
                     case EntityType.TANK: {
                         const playerId = entity
                             .getComponent(PlayerOwnedComponent).playerId;
-                        this.playerService.setPlayerTank(playerId, entity);
+                        const player = this.registry.getEntityById(playerId);
+                        setPlayerTank(player, entity);
                         break;
                     }
                 }
@@ -149,7 +137,8 @@ export class GameServer {
                     case EntityType.TANK: {
                         const playerId = entity
                             .getComponent(PlayerOwnedComponent).playerId;
-                        this.playerService.setPlayerTank(playerId, null);
+                        const player = this.registry.getEntityById(playerId);
+                        setPlayerTank(player, null);
                         break;
                     }
                 }
@@ -242,64 +231,6 @@ export class GameServer {
                 });
 
         /**
-         * PlayerService event handlers
-         */
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_SERVER_STATUS,
-            (playerId: string) => {
-                this.sendRequestedServerStatus(playerId);
-            });
-
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_ADDED,
-            (player: Player) => {
-                this.gameEventBatcher.addBroadcastEvent([GameEvent.PLAYER_ADDED, player.toOptions()]);
-            });
-
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_CHANGED,
-            (playerId: string, playerOptions: PartialPlayerOptions) => {
-                this.gameEventBatcher.addBroadcastEvent([GameEvent.PLAYER_CHANGED, playerId, playerOptions]);
-            });
-
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_BEFORE_REMOVE,
-            (playerId: string) => {
-                const player = this.playerService.getPlayer(playerId);
-                if (player.teamId === null) {
-                    return;
-                }
-
-                this.teamService.removeTeamPlayer(player.teamId, playerId);
-            });
-
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REMOVED,
-            (playerId: string) => {
-                this.gameEventBatcher.addBroadcastEvent([GameEvent.PLAYER_REMOVED, playerId]);
-            });
-
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_SHOOT,
-            bindContext(onPlayerRequestedShoot));
-
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_MOVE,
-            bindContext(onPlayerRequestedMove));
-
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_SPAWN_STATUS,
-            bindContext(onPlayerRequestedSpawnStatus));
-
-        this.playerService.emitter.on(PlayerServiceEvent.PLAYER_REQUESTED_DROP_FLAG,
-            bindContext(onPlayerRequestedDropFlag));
-
-        /**
-         * TeamService event handlers
-         */
-        this.teamService.emitter.on(TeamServiceEvent.TEAM_PLAYER_ADDED,
-            (teamId: string, playerId: string) => {
-                this.gameEventBatcher.addBroadcastEvent([GameEvent.TEAM_PLAYER_ADDED, teamId, playerId]);
-            });
-
-        this.teamService.emitter.on(TeamServiceEvent.TEAM_PLAYER_REMOVED,
-            (teamId: string, playerId: string) => {
-                this.gameEventBatcher.addBroadcastEvent([GameEvent.TEAM_PLAYER_REMOVED, teamId, playerId]);
-            });
-
-        /**
          * CollisionService event handlers
          */
         this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_LEVEL_BORDER,
@@ -336,7 +267,7 @@ export class GameServer {
         this.timeService.emitter.on(TimeServiceEvent.SCOREBOARD_WATCH_TIME,
             (value: boolean) => {
                 if (value) {
-                    this.playerService.cancelPlayersActions();
+                    cancelPlayersActions(this.registry);
                 }
             });
 
@@ -349,7 +280,7 @@ export class GameServer {
             });
 
         this.gameEventBatcher.emitter.on(GameEventBatcherEvent.PLAYER_BATCH,
-            (playerId: string, events: UnicastBatchGameEvent[]) => {
+            (playerId: EntityId, events: UnicastBatchGameEvent[]) => {
                 this.emitter.emit(GameServerEvent.PLAYER_BATCH, playerId, events);
             });
 
@@ -363,7 +294,7 @@ export class GameServer {
                     this.reload();
                 }
 
-                this.playerService.processPlayersStatus(deltaSeconds);
+                this.processPlayersStatus(deltaSeconds);
                 processActiveEntitySpawners(this.registry, this.entityFactory);
                 processDirection(this.registry);
                 this.collisionService.processRequestedDirection();
@@ -379,6 +310,22 @@ export class GameServer {
         this.gameModeService.setGameMode(gameMode);
         this.gameMapService.loadByName(mapName);
         this.reload();
+    }
+
+    processPlayersStatus(deltaSeconds: number) {
+        for (const player of
+            this.registry.getEntitiesWithComponent(PlayerComponent)) {
+            processPlayerRespawnTimeout(player, deltaSeconds);
+            processPlayerSpawnStatus.call(this.pluginContext, player);
+            const disconnected = processPlayerDisconnectStatus(player);
+            if (disconnected) {
+                continue;
+            }
+
+            processPlayerMovement(this.registry, player);
+            processPlayerShooting(this.registry, player);
+            processPlayerDroppingFlag.call(this.pluginContext, player);
+        }
     }
 
     onRegistryComponentEvent<
@@ -435,7 +382,7 @@ export class GameServer {
         }
     }
 
-    sendRequestedServerStatus(playerId?: string): void {
+    sendRequestedServerStatus(playerId?: EntityId): void {
         const entities = this.registry.getEntities() as Iterable<Entity>;
         const entitiesOptions =
             LazyIterable.from(entities)
@@ -451,21 +398,6 @@ export class GameServer {
                 })
                 .toArray() as Iterable<EntityBuildOptions>;
 
-        const players = this.playerService.getPlayers();
-        const playersOptions =
-            LazyIterable.from(players)
-                .map(player => player.toOptions())
-                .toArray();
-
-        const teams = this.teamService.getTeams();
-        let teamsOptions;
-        if (teams !== undefined) {
-            teamsOptions =
-                LazyIterable.from(teams)
-                    .map(team => team.toOptions())
-                    .toArray();
-        }
-
         const configsData = this.config.getDataMultiple([
             'entities-blueprint',
             'game-client',
@@ -474,8 +406,6 @@ export class GameServer {
 
         const event: CommonBatchGameEvent = [GameEvent.SERVER_STATUS, {
             entitiesOptions,
-            playersOptions,
-            teamsOptions,
             configsData,
         }];
 
@@ -486,40 +416,44 @@ export class GameServer {
         }
     }
 
-    onPlayerRequestedServerStatus(playerId: string): void {
-        this.playerService.setPlayerRequestedServerStatus(playerId);
-    }
-
     onPlayerAction(playerId: string, action: Action): void {
+        const player = this.registry.getEntityById(playerId);
+
         if (this.timeService.isScoreboardWatchTime()) {
             return;
         }
 
         if (action.type === ActionType.BUTTON_PRESS) {
-            this.playerService.addPlayerButtonPressAction(playerId, action as ButtonPressAction);
+            addPlayerButtonPressAction(player, action as ButtonPressAction);
         }
     }
 
     onPlayerConnected(playerId: string): void {
-        this.playerService.createPlayer(playerId);
-        this.playerService.setPlayerRequestedServerStatus(playerId);
+        this.sendRequestedServerStatus(playerId);
+
+        const player = createPlayer(this.entityFactory, playerId);
+        setPlayerRequestedServerStatus(player);
     }
 
     onPlayerSetName(playerId: string, name: string): void {
-        this.playerService.setPlayerName(playerId, name);
+        const player = this.registry.getEntityById(playerId);
+        setPlayerName(player, name);
     }
 
     onPlayerRequestSpawnStatus(playerId: string, spawnStatus: PlayerSpawnStatus): void {
-        this.playerService.setPlayerRequestedSpawnStatus(playerId, spawnStatus);
+        const player = this.registry.getEntityById(playerId);
+        setPlayerRequestedSpawnStatus(player, spawnStatus);
     }
 
     onPlayerRequestTeam(playerId: string, teamId: string | null): void {
-        onPlayerRequestedTeam.call(this.pluginContext, playerId, teamId);
+        const player = this.registry.getEntityById(playerId);
+        onPlayerRequestedTeam.call(this.pluginContext, player, teamId);
     }
 
     onPlayerDisconnected(playerId: string): void {
-        this.playerService.setPlayerRequestedSpawnStatus(playerId, PlayerSpawnStatus.DESPAWN);
-        this.playerService.setPlayerRequestedDisconnect(playerId);
+        const player = this.registry.getEntityById(playerId);
+        setPlayerRequestedSpawnStatus(player, PlayerSpawnStatus.DESPAWN);
+        setPlayerRequestedDisconnect(player);
     }
 
     onPlayerRequestTankColor(playerId: string, color: Color): void {
@@ -528,11 +462,13 @@ export class GameServer {
             return;
         }
 
-        this.playerService.setPlayerRequestedTankColor(playerId, color);
+        const player = this.registry.getEntityById(playerId);
+        setPlayerRequestedTankColor(player, color);
     }
 
     onPlayerRequestTankTier(playerId: string, tier: TankTier): void {
-        this.playerService.setPlayerRequestedTankTier(playerId, tier);
+        const player = this.registry.getEntityById(playerId);
+        setPlayerRequestedTankTier(player, tier);
     }
 
     loadMap(gameMap: GameMap): void {
@@ -540,15 +476,6 @@ export class GameServer {
         entitiesOptions
             .filter(o => this.gameModeService.isIgnoredEntityType(o.type))
             .forEach(o => this.entityFactory.buildFromOptions(o));
-
-        const teamsOptions = gameMap.getTeamsOptions();
-        const gameModeProperties = this.gameModeService.getGameModeProperties();
-        if (!gameModeProperties.hasTeams) {
-            return;
-        }
-
-        const teams = teamsOptions.map(o => new Team(o));
-        this.teamService.addTeams(teams);
     }
 
     reload(): void {
@@ -557,7 +484,7 @@ export class GameServer {
         markAllWorldEntitiesDestroyed(this.registry);
         this.collisionService.processDirtyCollisions();
         processDestroyed(this.registry);
-        this.playerService.resetFields();
+        resetPlayers(this.registry);
         this.gameEventBatcher.flush();
 
         const gameMap = this.gameMapService.getLoadedMap();
