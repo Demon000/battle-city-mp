@@ -134,7 +134,8 @@ export class Registry {
         options?: RegistryOperationOptions,
     ): void {
         const entityIdExists = this.idsEntityMap.has(entity.id);
-        assert(!entityIdExists);
+        assert(!entityIdExists,
+            `Entity with id ${entity.id} is already registered`);
         this.idsEntityMap.set(entity.id, entity);
 
         if (!options?.silent) {
@@ -166,7 +167,7 @@ export class Registry {
         options?: RegistryOperationOptions,
     ): void {
         const entityIdExists = this.idsEntityMap.has(entity.id);
-        assert(entityIdExists);
+        assert(entityIdExists, `Entity with id ${entity.id} is not registered`);
 
         if (!options?.silent) {
             const components = entity.getComponents();
