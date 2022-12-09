@@ -1,12 +1,14 @@
 import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
 import { HealthComponent } from '@/components/HealthComponent';
 import { PlayerComponent } from '@/components/PlayerComponent';
+import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { Entity } from '@/ecs/Entity';
+import { Registry } from '@/ecs/Registry';
 import { EntityType } from '@/entity/EntityType';
 import { PluginContext } from '@/logic/plugin';
 import { Point } from '@/physics/point/Point';
 import { handleFlagInteraction } from './flag';
-import { getPlayerColor, getPlayerName, getPlayerTeamId } from './player';
+import { getPlayerColor, getPlayerName, getPlayerTeamId, setPlayerTank } from './player';
 
 export function createTankForPlayer(
     this: PluginContext,
@@ -72,4 +74,31 @@ export function onTankCollideFlagBase(
         .findRelativePositionEntityWithType(tank,
             EntityType.FLAG);
     handleFlagInteraction(this.registry, tank, undefined, carriedFlag, flagBase);
+}
+
+function setUnsetTankPlayer(
+    registry: Registry,
+    entity: Entity,
+    unset = false,
+) {
+    if (entity.type !== EntityType.TANK) {
+        return;
+    }
+
+    const playerId = entity
+        .getComponent(PlayerOwnedComponent).playerId;
+    const player = registry.findEntityById(playerId);
+    if (player === undefined) {
+        return;
+    }
+
+    setPlayerTank(player, unset ? null : entity);
+}
+
+export function setTankOnPlayer(registry: Registry, entity: Entity): void {
+    setUnsetTankPlayer(registry, entity);
+}
+
+export function removeTankFromPlayer(registry: Registry, entity: Entity): void {
+    setUnsetTankPlayer(registry, entity, true);
 }

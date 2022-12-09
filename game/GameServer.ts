@@ -1,6 +1,5 @@
 import { Color } from '@/drawable/Color';
 import { EntityFactory, EntityBuildOptions } from '@/entity/EntityFactory';
-import { EntityType } from '@/entity/EntityType';
 import { TankTier } from '@/subtypes/TankTier';
 import { LazyIterable } from '@/utils/LazyIterable';
 import { Ticker, TickerEvent } from '@/utils/Ticker';
@@ -14,18 +13,17 @@ import { CollisionEvent } from '../physics/collisions/CollisionRule';
 import { BroadcastBatchGameEvent, CommonBatchGameEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
 import { GameEventBatcher, GameEventBatcherEvent } from './GameEventBatcher';
 import { GameModeService } from '@/services/GameModeService';
-import { ComponentEmitOptions, Registry, RegistryComponentEvent, RegistryEvent } from '@/ecs/Registry';
+import { Registry, RegistryComponentEvent, RegistryEvent } from '@/ecs/Registry';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { Config } from '@/config/Config';
 import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { GameMap } from '@/maps/GameMap';
 import { assert } from '@/utils/assert';
-import { Component, ComponentFlags } from '@/ecs/Component';
+import { ComponentFlags } from '@/ecs/Component';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { Entity } from '@/ecs/Entity';
-import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
 import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
@@ -38,11 +36,12 @@ import { unattachRelativeEntities, unattachRelativeEntity, updateRelativePositio
 import { updateCenterPosition } from '@/logic/entity-position';
 import { onBulletHitBrickWall, onBulletHitBullet, onBulletHitLevelBorder, onBulletHitSteelWall, onBulletHitTank } from '@/logic/bullet';
 import { onEntityCollideTeleporter } from '@/logic/entity-teleporter';
-import { addPlayerButtonPressAction, cancelPlayersActions, createPlayer, onPlayerBeforeDestroy, onPlayerRequestedTeam, processPlayerDisconnectStatus, processPlayerDroppingFlag, processPlayerMovement, processPlayerRespawnTimeout, processPlayerShooting, processPlayerSpawnStatus, resetPlayers, setPlayerName, setPlayerRequestedDisconnect, setPlayerRequestedServerStatus, setPlayerRequestedSpawnStatus, setPlayerRequestedTankColor, setPlayerRequestedTankTier, setPlayerTank } from '@/logic/player';
-import { onTankCollideFlag, onTankCollideFlagBase } from '@/logic/tank';
+import { addPlayerButtonPressAction, cancelPlayersActions, createPlayer, removePlayerFromTeam, onPlayerRequestedTeam, processPlayerDisconnectStatus, processPlayerDroppingFlag, processPlayerMovement, processPlayerRespawnTimeout, processPlayerShooting, processPlayerSpawnStatus, resetPlayers, setPlayerName, setPlayerRequestedDisconnect, setPlayerRequestedServerStatus, setPlayerRequestedSpawnStatus, setPlayerRequestedTankColor, setPlayerRequestedTankTier, setPlayerTank } from '@/logic/player';
+import { onTankCollideFlag, onTankCollideFlagBase, removeTankFromPlayer, setTankOnPlayer } from '@/logic/tank';
 import { PlayerComponent } from '@/components/PlayerComponent';
 import { EntityId } from '@/ecs/EntityId';
-import { onTeamBeforeDestroy } from '@/logic/team';
+import { removeTeamPlayers } from '@/logic/team';
+import { batchComponentChanged, batchEntityDestroyed, batchEntityRegistered } from '@/logic/batch-events';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'p',
@@ -106,63 +105,26 @@ export class GameServer {
          */
         this.registry.emitter.on(RegistryEvent.ENTITY_REGISTERED,
             (entity: Entity) => {
-                this.gameEventBatcher.addBroadcastEvent([
-                    GameEvent.ENTITY_REGISTERED,
-                    {
-                        id: entity.id,
-                        type: entity.type,
-                        subtypes: entity.subtypes,
-                        components: entity.getComponentsData({
-                            withoutFlags: ComponentFlags.LOCAL_ONLY,
-                        }),
-                    },
-                ]);
-
-                switch (entity.type) {
-                    case EntityType.TANK: {
-                        const playerId = entity
-                            .getComponent(PlayerOwnedComponent).playerId;
-                        const player = this.registry.getEntityById(playerId);
-                        setPlayerTank(player, entity);
-                        break;
-                    }
-                }
-
+                batchEntityRegistered(this.gameEventBatcher, entity);
+                setTankOnPlayer(this.registry, entity);
                 handleSpawnedEntityRegistered(this.registry, entity);
             });
         this.registry.emitter.on(RegistryEvent.ENTITY_BEFORE_DESTROY,
             (entity: Entity) => {
-                switch (entity.type) {
-                    case EntityType.TANK: {
-                        const playerId = entity
-                            .getComponent(PlayerOwnedComponent).playerId;
-                        const player = this.registry.findEntityById(playerId);
-                        if (player === undefined) {
-                            return;
-                        }
-
-                        setPlayerTank(player, null);
-                        break;
-                    }
-                    case EntityType.PLAYER:
-                        onPlayerBeforeDestroy(this.registry, entity);
-                        break;
-                    case EntityType.TEAM:
-                        onTeamBeforeDestroy(this.registry, entity);
-                        break;
-                }
-
+                removeTankFromPlayer(this.registry, entity);
+                removePlayerFromTeam(this.registry, entity);
+                removeTeamPlayers(this.registry, entity);
                 this.collisionService.removeCollisions(entity);
                 handleSpawnedEntityDestroyed(this.registry, entity);
                 unattachRelativeEntities(this.registry, entity);
                 unattachRelativeEntity(this.registry, entity);
-
-                this.gameEventBatcher.addBroadcastEvent([GameEvent.ENTITY_UNREGISTERED, entity.id]);
+                batchEntityDestroyed(this.gameEventBatcher, entity)
             });
 
         this.registry.emitter.on(RegistryComponentEvent.COMPONENT_CHANGED,
             (event, component, data, options) => {
-                this.onRegistryComponentEvent(
+                batchComponentChanged(
+                    this.gameEventBatcher,
                     event,
                     component,
                     data,
@@ -323,60 +285,6 @@ export class GameServer {
             processPlayerMovement(this.registry, player);
             processPlayerShooting(this.registry, player);
             processPlayerDroppingFlag.call(this.pluginContext, player);
-        }
-    }
-
-    onRegistryComponentEvent<
-        C extends Component<C>,
-    >(
-        event: RegistryComponentEvent,
-        component: C,
-        data?: any,
-        options?: ComponentEmitOptions,
-    ): void {
-        if (component.flags & ComponentFlags.LOCAL_ONLY
-            || event === RegistryComponentEvent.COMPONENT_ADDED
-                && options?.register
-            || event === RegistryComponentEvent.COMPONENT_BEFORE_REMOVE
-                && options?.destroy) {
-            return;
-        }
-
-        let gameEvent;
-        switch (event) {
-            case RegistryComponentEvent.COMPONENT_ADDED:
-                gameEvent = GameEvent.ENTITY_COMPONENT_ADDED;
-                break;
-            case RegistryComponentEvent.COMPONENT_UPDATED:
-                gameEvent = GameEvent.ENTITY_COMPONENT_UPDATED;
-                break;
-            case RegistryComponentEvent.COMPONENT_BEFORE_REMOVE:
-                gameEvent = GameEvent.ENTITY_COMPONENT_REMOVED;
-                break;
-            default:
-                assert(false);
-        }
-
-        if (gameEvent === GameEvent.ENTITY_COMPONENT_REMOVED) {
-            this.gameEventBatcher.addBroadcastEvent([
-                gameEvent,
-                component.entity.id,
-                component.clazz.tag,
-            ]);
-        } else if (gameEvent === GameEvent.ENTITY_COMPONENT_ADDED) {
-            this.gameEventBatcher.addBroadcastEvent([
-                gameEvent,
-                component.entity.id,
-                component.clazz.tag,
-                component.getData(),
-            ]);
-        } else if (gameEvent === GameEvent.ENTITY_COMPONENT_UPDATED) {
-            this.gameEventBatcher.addBroadcastEvent([
-                gameEvent,
-                component.entity.id,
-                component.clazz.tag,
-                data,
-            ]);
         }
     }
 

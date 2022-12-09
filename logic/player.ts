@@ -498,15 +498,19 @@ export function getSortedPlayers(registry: Registry): Entity[] {
     });
 }
 
-export function onPlayerBeforeDestroy(
+export function removePlayerFromTeam(
     registry: Registry,
-    player: Entity,
+    entity: Entity,
 ): void {
-    const teamId = getPlayerTeamId(player);
+    if (entity.type !== EntityType.PLAYER) {
+        return;
+    }
+
+    const teamId = getPlayerTeamId(entity);
     if (teamId === null) {
         return;
     }
 
     const team = registry.getEntityById(teamId);
-    removeTeamPlayer(team, player);
+    removeTeamPlayer(team, entity);
 }

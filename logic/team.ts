@@ -2,6 +2,7 @@ import { EntitiesOwnerComponent } from '@/components/EntitiesOwnerComponent';
 import { TeamComponent } from '@/components/TeamComponent';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
+import { EntityType } from '@/entity/EntityType';
 import { assert } from '@/utils/assert';
 import { setPlayerTeamId } from './player';
 
@@ -60,11 +61,15 @@ export function isTeamSwitchingAllowed(
     return getTeamNumberOfPlayers(toTeam) <= getTeamNumberOfPlayers(fromTeam);
 }
 
-export function onTeamBeforeDestroy(
+export function removeTeamPlayers(
     registry: Registry,
-    team: Entity,
+    entity: Entity,
 ): void {
-    const entitiesComponent = team.getComponent(EntitiesOwnerComponent);
+    if (entity.type !== EntityType.TEAM) {
+        return;
+    }
+
+    const entitiesComponent = entity.getComponent(EntitiesOwnerComponent);
 
     for (const playerId of Object.keys(entitiesComponent.ids)) {
         const player = registry.getEntityById(playerId);

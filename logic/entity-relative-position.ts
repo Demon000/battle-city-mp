@@ -2,7 +2,7 @@ import { DirtyPositionComponent } from '@/components/DirtyPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { RelativePositionChildrenComponent } from '@/components/RelativePositionChildrenComponent';
 import { RelativePositionComponent } from '@/components/RelativePositionComponent';
-import { ComponentFlags } from '@/ecs/Component';
+import { Component, ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 
