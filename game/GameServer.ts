@@ -55,6 +55,7 @@ export interface GameServerEvents {
 }
 
 export class GameServer {
+    private registryIdGenerator;
     private registry;
 
     private config;
@@ -74,10 +75,10 @@ export class GameServer {
         this.config.loadDir('./configs');
 
         const componentRegistry = new ComponentRegistry();
-        const registryIdGenerator = new RegistryNumberIdGenerator();
         const entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.SERVER, true);
 
-        this.registry = new Registry(componentRegistry, registryIdGenerator);
+        this.registryIdGenerator = new RegistryNumberIdGenerator();
+        this.registry = new Registry(componentRegistry, this.registryIdGenerator);
         this.entityFactory = new EntityFactory(this.registry, entityBlueprint);
 
         const boundingBoxRepository = new BoundingBoxRepository<string>();
@@ -478,8 +479,8 @@ export class GameServer {
         this.ticker.stop();
 
         destroyAllWorldEntities(this.registry);
-        this.collisionService.processDirtyCollisions();
         resetPlayers(this.registry);
+        this.registryIdGenerator.reset();
         this.gameEventBatcher.flush();
 
         const gameMap = this.gameMapService.getLoadedMap();

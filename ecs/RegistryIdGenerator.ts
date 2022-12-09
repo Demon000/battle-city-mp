@@ -1,5 +1,6 @@
 import { EntityId } from './EntityId';
 
-export abstract class RegistryIdGenerator {
-    abstract generate(): EntityId;
+export interface RegistryIdGenerator {
+    generate(): EntityId;
+    reset(): void;
 }
