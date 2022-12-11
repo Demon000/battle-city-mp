@@ -224,24 +224,6 @@ export class GameClient {
                         component.max,
                     );
                 });
-        this.registry.componentEmitter(HealthComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_CHANGED,
-                (_event, component) => {
-                    const entity = component.entity;
-                    if (!isOwnTank(entity)) {
-                        return;
-                    }
-
-                    this.emitter.emit(
-                        GameClientEvent.OWN_PLAYER_TANK_CHANGED_HEALTH,
-                        component.value,
-                    );
-
-                    this.emitter.emit(
-                        GameClientEvent.OWN_PLAYER_TANK_CHANGED_MAX_HEALTH,
-                        component.max,
-                    );
-                });
         this.registry.componentEmitter(BulletSpawnerComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
                 (_event, component) => {
