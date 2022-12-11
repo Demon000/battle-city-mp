@@ -1,4 +1,4 @@
-import { ComponentRegistry } from './ComponentRegistry';
+import { ComponentLookupTable } from './ComponentLookupTable';
 import { assert } from '@/utils/assert';
 import EventEmitter from 'eventemitter3';
 import { ClazzOrTag, Component, ComponentClassType, ComponentFlags, ComponentsInitialization } from './Component';
@@ -86,20 +86,20 @@ export class Registry {
     private idsEntityMap = new Map<EntityId, Entity>();
 
     @nonenumerable
-    private componentRegistry;
+    private componentLookupTable;
 
     @nonenumerable
         emitter = new EventEmitter<RegistryEvents & RegistryComponentEvents>();
 
     constructor(
-        componentRegistry: ComponentRegistry,
+        componentLookupTable: ComponentLookupTable,
         private idGenerator: RegistryIdGenerator,
     ) {
         this.addComponent = this.addComponent.bind(this);
         this.updateComponent = this.updateComponent.bind(this);
         this.upsertComponent = this.upsertComponent.bind(this);
 
-        this.componentRegistry = componentRegistry;
+        this.componentLookupTable = componentLookupTable;
     }
 
     componentEmitter<C extends Component<C>>(
@@ -657,6 +657,6 @@ export class Registry {
     }
 
     lookup(clazzOrTag: ClazzOrTag, data?: any): ComponentClassType<any> {
-        return this.componentRegistry.lookup(clazzOrTag, data);
+        return this.componentLookupTable.lookup(clazzOrTag, data);
     }
 }

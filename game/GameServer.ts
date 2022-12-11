@@ -22,7 +22,7 @@ import { GameMap } from '@/maps/GameMap';
 import { assert } from '@/utils/assert';
 import { ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
-import { ComponentRegistry } from '@/ecs/ComponentRegistry';
+import { ComponentLookupTable } from '@/ecs/ComponentLookupTable';
 import { processActiveEntitySpawners } from '@/logic/entity-spawner';
 import { processDirection, processMovement } from '@/logic/entity-movement';
 import { destroyAllWorldEntities, processAutomaticDestroy } from '@/logic/entity-destroy';
@@ -66,7 +66,7 @@ export class GameServer {
         this.config = new Config();
         this.config.loadDir('./configs');
 
-        const componentRegistry = new ComponentRegistry();
+        const componentRegistry = new ComponentLookupTable();
         const entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.SERVER, true);
 
         this.registryIdGenerator = new RegistryNumberIdGenerator();

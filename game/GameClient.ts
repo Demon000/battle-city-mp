@@ -23,7 +23,7 @@ import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { Entity } from '@/ecs/Entity';
-import { ClientComponentRegistry } from '@/ecs/ClientComponentRegistry';
+import { ClientComponentLookupTable } from '@/ecs/ClientComponentLookupTable';
 import { EntityGraphicsRenderer } from '@/entity/EntityGraphicsRenderer';
 import { updateIsMoving } from '@/logic/entity-movement';
 import { updateCenterPosition } from '@/logic/entity-position';
@@ -108,7 +108,7 @@ export class GameClient {
         this.config = new Config();
         this.gameEventBatcher = new GameEventBatcher();
 
-        const componentRegistry = new ClientComponentRegistry();
+        const componentRegistry = new ClientComponentLookupTable();
         const registryIdGenerator = new RegistryNumberIdGenerator();
         const entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.CLIENT);
         this.registry = new Registry(componentRegistry, registryIdGenerator);

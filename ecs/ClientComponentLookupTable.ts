@@ -1,9 +1,9 @@
 import { GraphicsRendererComponent, GraphicsRendererComponentData } from '@/components/GraphicsRendererComponent';
 import { assert as assertEquals } from 'typescript-json';
 import { ComponentClassType } from './Component';
-import { ComponentRegistry } from './ComponentRegistry';
+import { ComponentLookupTable } from './ComponentLookupTable';
 
-export class ClientComponentRegistry extends ComponentRegistry {
+export class ClientComponentLookupTable extends ComponentLookupTable {
     protected lookupAndValidate(
         tag: string,
         data: any,
