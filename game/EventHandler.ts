@@ -3,18 +3,10 @@ import { RegistryComponentCommonEventWithDataFn as RegistryComponentCommonEventD
 import { PluginContext } from '@/logic/plugin';
 
 type PluginContextFn<
-    F extends (...args: any[]) => any
+    F extends (...args: any[]) => any,
 > = (
     this: PluginContext,
     ...args: Parameters<F>
-) => ReturnType<F>;
-
-type AddArgFn<
-    F extends (...args: any[]) => any,
-    FN extends (...args: any[]) => any,
-> = (
-    this: PluginContext,
-    ...args: [FN, ...Parameters<F>]
 ) => ReturnType<F>;
 
 type ToEntityOr<T> = T | {
@@ -29,14 +21,14 @@ export type EventHandler<
 =
 {
     event: RegistryEvent.ENTITY_REGISTERED
-            | RegistryEvent.ENTITY_BEFORE_DESTROY;
+    | RegistryEvent.ENTITY_BEFORE_DESTROY;
     fns: PluginContextFn<RegistryEventFn>[];
 }
 |
 ({
     event: RegistryComponentEvent.COMPONENT_INITIALIZED
-            | RegistryComponentEvent.COMPONENT_ADDED
-            | RegistryComponentEvent.COMPONENT_BEFORE_REMOVE;
+    | RegistryComponentEvent.COMPONENT_ADDED
+    | RegistryComponentEvent.COMPONENT_BEFORE_REMOVE;
     component?: CT,
 } & ToEntityOr<{
     fns: PluginContextFn<RegistryComponentEventFn<C>>[];

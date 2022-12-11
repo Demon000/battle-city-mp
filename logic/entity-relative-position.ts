@@ -3,7 +3,6 @@ import { PositionComponent } from '@/components/PositionComponent';
 import { RelativePositionChildrenComponent } from '@/components/RelativePositionChildrenComponent';
 import { RelativePositionComponent } from '@/components/RelativePositionComponent';
 import { Entity } from '@/ecs/Entity';
-import { Registry } from '@/ecs/Registry';
 import { PluginContext } from './plugin';
 
 export function unattachRelativeEntities(

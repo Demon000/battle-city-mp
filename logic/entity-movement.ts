@@ -6,7 +6,6 @@ import { MovementMultipliersComponent } from '@/components/MovementMultipliersCo
 import { PositionComponent } from '@/components/PositionComponent';
 import { RequestedDirectionComponent } from '@/components/RequestedDirectionComponent';
 import { RequestedPositionComponent } from '@/components/RequestedPositionComponent';
-import { ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 import { Direction } from '@/physics/Direction';

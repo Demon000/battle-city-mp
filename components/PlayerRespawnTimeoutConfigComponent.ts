@@ -1,4 +1,4 @@
-import { Component, ComponentFlags } from '@/ecs/Component';
+import { Component } from '@/ecs/Component';
 
 export interface PlayerRespawnTimeoutConfigComponentData {
     value: number;
