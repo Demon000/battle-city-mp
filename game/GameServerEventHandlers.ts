@@ -28,7 +28,6 @@ export const gameServerEventHandlers: EventHandler<any>[] = [
     {
         event: RegistryEvent.ENTITY_BEFORE_DESTROY,
         fns: [
-            batchEntityDestroyed,
             removeTankFromPlayer,
             removePlayerFromTeam,
             removeTeamPlayers,
@@ -36,6 +35,7 @@ export const gameServerEventHandlers: EventHandler<any>[] = [
             handleSpawnedEntityDestroyed,
             unattachRelativeEntities,
             unattachRelativeEntity,
+            batchEntityDestroyed,
         ],
     },
     {
