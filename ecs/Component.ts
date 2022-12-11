@@ -34,6 +34,7 @@ export class Component<C extends Component<C>> {
         this.flags = (this.constructor as ComponentClassType<any>).BASE_FLAGS;
     }
 
+    @nonenumerable
     static readonly BASE_FLAGS: number = 0;
 
     @nonenumerable
