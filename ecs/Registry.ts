@@ -33,40 +33,40 @@ export interface ComponentEmitOptions {
     destroy?: boolean;
 }
 
+export type RegistryEventFn = (entity: Entity) => void;
+export type RegistryComponentEventFn<C extends Component<C>> = (
+    component: C,
+    options?: ComponentEmitOptions,
+) => void;
+export type RegistryComponentEventWithDataFn<C extends Component<C>> = (
+    component: C,
+    data?: any,
+    options?: ComponentEmitOptions,
+) => void;
+export type RegistryComponentCommonEventFn<C extends Component<C>> = (
+    event: RegistryComponentEvent,
+    component: C,
+    options?: ComponentEmitOptions,
+) => void;
+export type RegistryComponentCommonEventWithDataFn<C extends Component<C>> = (
+    event: RegistryComponentEvent,
+    component: C,
+    data?: any,
+    options?: ComponentEmitOptions,
+) => void;
+
 export interface RegistryEvents {
-    [RegistryEvent.ENTITY_REGISTERED]: (entity: Entity) => void;
-    [RegistryEvent.ENTITY_BEFORE_DESTROY]: (entity: Entity) => void;
+    [RegistryEvent.ENTITY_REGISTERED]: RegistryEventFn;
+    [RegistryEvent.ENTITY_BEFORE_DESTROY]: RegistryEventFn;
 }
 
 export interface RegistryComponentEvents<C extends Component<C> = any> {
-    [RegistryComponentEvent.COMPONENT_INITIALIZED]: (
-        component: C,
-        options?: ComponentEmitOptions,
-    ) => void;
-    [RegistryComponentEvent.COMPONENT_ADDED]: (
-        component: C,
-        options?: ComponentEmitOptions,
-    ) => void;
-    [RegistryComponentEvent.COMPONENT_UPDATED]: (
-        component: C,
-        data?: any,
-        options?: ComponentEmitOptions,
-    ) => void;
-    [RegistryComponentEvent.COMPONENT_BEFORE_REMOVE]: (
-        component: C,
-        options?: ComponentEmitOptions,
-    ) => void;
-    [RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE]: (
-        event: RegistryComponentEvent,
-        component: C,
-        options?: ComponentEmitOptions,
-    ) => void;
-    [RegistryComponentEvent.COMPONENT_CHANGED]: (
-        event: RegistryComponentEvent,
-        component: C,
-        data?: any,
-        options?: ComponentEmitOptions,
-    ) => void;
+    [RegistryComponentEvent.COMPONENT_INITIALIZED]: RegistryComponentEventFn<C>;
+    [RegistryComponentEvent.COMPONENT_ADDED]: RegistryComponentEventFn<C>;
+    [RegistryComponentEvent.COMPONENT_UPDATED]: RegistryComponentEventWithDataFn<C>;
+    [RegistryComponentEvent.COMPONENT_BEFORE_REMOVE]: RegistryComponentEventFn<C>;
+    [RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE]: RegistryComponentCommonEventFn<C>;
+    [RegistryComponentEvent.COMPONENT_CHANGED]: RegistryComponentCommonEventWithDataFn<C>;
 }
 
 export type DataHandlingFn = <C extends Component<C>>(
