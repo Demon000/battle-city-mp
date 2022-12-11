@@ -93,7 +93,15 @@ export const gameServerEventHandlers: EventHandler<any>[] = [
         ],
     },
     {
-        event: RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE,
+        event: RegistryComponentEvent.COMPONENT_ADDED,
+        toEntity: true,
+        component: MovementComponent,
+        fns: [
+            updateIsMoving,
+        ],
+    },
+    {
+        event: RegistryComponentEvent.COMPONENT_UPDATED,
         toEntity: true,
         component: MovementComponent,
         fns: [

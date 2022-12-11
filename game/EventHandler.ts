@@ -1,5 +1,5 @@
 import { Component, ComponentClassType } from '@/ecs/Component';
-import { RegistryComponentCommonEventFn, RegistryComponentCommonEventWithDataFn as RegistryComponentCommonEventDataFn, RegistryComponentEvent, RegistryComponentEventFn, RegistryComponentEventWithDataFn, RegistryEvent, RegistryEventFn } from '@/ecs/Registry';
+import { RegistryComponentCommonEventWithDataFn as RegistryComponentCommonEventDataFn, RegistryComponentEvent, RegistryComponentEventFn, RegistryComponentEventWithDataFn, RegistryEvent, RegistryEventFn } from '@/ecs/Registry';
 import { PluginContext } from '@/logic/plugin';
 
 type PluginContextFn<
@@ -50,13 +50,6 @@ export type EventHandler<
 }>)
 |
 ({
-    event: RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE;
-    component?: CT,
-} & ToEntityOr<{
-    fns: PluginContextFn<RegistryComponentCommonEventFn<C>>[];
-}>)
-|
-({
     event: RegistryComponentEvent.COMPONENT_CHANGED;
     component?: CT,
 } & ToEntityOr<{
@@ -93,8 +86,6 @@ export function registerEventHandler<
         if ('component' in handler && handler.component !== undefined) {
             if ('toEntity' in handler && handler.toEntity !== undefined) {
                 if (handler.event
-                    === RegistryComponentEvent.COMPONENT_ADD_OR_UPDATE
-                    || handler.event
                     === RegistryComponentEvent.COMPONENT_CHANGED) {
                     context.registry.componentEmitter(handler.component, true).on(
                         handler.event,
