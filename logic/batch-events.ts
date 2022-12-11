@@ -33,8 +33,8 @@ export function batchComponentChanged<C extends Component<C>>(
     this: PluginContext,
     event: RegistryComponentEvent,
     component: C,
-    data?: any,
-    options?: ComponentEmitOptions,
+    options: ComponentEmitOptions,
+    data: any,
 ): void {
     if (component.flags & ComponentFlags.LOCAL_ONLY
         || event === RegistryComponentEvent.COMPONENT_ADDED

@@ -39,14 +39,14 @@ export type RegistryComponentEventFn<C extends Component<C>> = (
 ) => void;
 export type RegistryComponentEventWithDataFn<C extends Component<C>> = (
     component: C,
-    data: any,
     options: ComponentEmitOptions,
+    data: any,
 ) => void;
 export type RegistryComponentCommonEventWithDataFn<C extends Component<C>> = (
     event: RegistryComponentEvent,
     component: C,
-    data: any,
     options: ComponentEmitOptions,
+    data: any,
 ) => void;
 
 export interface RegistryEvents {
@@ -213,26 +213,26 @@ export class Registry {
 
         if (componentEmitter !== undefined) {
             if (event === RegistryComponentEvent.COMPONENT_UPDATED) {
-                componentEmitter.emit(event, component, data, options);
+                componentEmitter.emit(event, component, options, data);
             } else {
                 componentEmitter.emit(event, component, options);
             }
 
             if (event !== RegistryComponentEvent.COMPONENT_INITIALIZED) {
                 componentEmitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
-                    event, component, data, options);
+                    event, component, options, data);
             }
         }
 
         if (event === RegistryComponentEvent.COMPONENT_UPDATED) {
-            this.emitter.emit(event, component, data, options);
+            this.emitter.emit(event, component, options, data);
         } else {
             this.emitter.emit(event, component, options);
         }
 
         if (event !== RegistryComponentEvent.COMPONENT_INITIALIZED) {
             this.emitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
-                event, component, data, options);
+                event, component, options, data);
         }
     }
 
