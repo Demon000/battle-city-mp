@@ -2,7 +2,6 @@ import { Component, ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { ComponentEmitOptions, RegistryComponentEvent } from '@/ecs/Registry';
 import { GameEvent } from '@/game/GameEvent';
-import { GameEventBatcher } from '@/game/GameEventBatcher';
 import { assert } from '@/utils/assert';
 import { PluginContext } from './plugin';
 
