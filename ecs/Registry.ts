@@ -236,7 +236,6 @@ export class Registry {
         }
     }
 
-
     emitForEachComponent(
         event: RegistryComponentEvent,
         components: Iterable<Component<any>>,
