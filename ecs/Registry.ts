@@ -35,18 +35,18 @@ export interface ComponentEmitOptions {
 export type RegistryEventFn = (entity: Entity) => void;
 export type RegistryComponentEventFn<C extends Component<C>> = (
     component: C,
-    options?: ComponentEmitOptions,
+    options: ComponentEmitOptions,
 ) => void;
 export type RegistryComponentEventWithDataFn<C extends Component<C>> = (
     component: C,
-    data?: any,
-    options?: ComponentEmitOptions,
+    data: any,
+    options: ComponentEmitOptions,
 ) => void;
 export type RegistryComponentCommonEventWithDataFn<C extends Component<C>> = (
     event: RegistryComponentEvent,
     component: C,
-    data?: any,
-    options?: ComponentEmitOptions,
+    data: any,
+    options: ComponentEmitOptions,
 ) => void;
 
 export interface RegistryEvents {
@@ -65,8 +65,8 @@ export interface RegistryComponentEvents<C extends Component<C> = any> {
 export type DataHandlingFn = <C extends Component<C>>(
     entity: Entity,
     clazzOrTag: ClazzOrTag<C>,
-    data?: any,
-    options?: RegistryOperationOptions,
+    data: any,
+    options: RegistryOperationOptions,
 ) => C;
 
 export class Registry {
@@ -207,6 +207,10 @@ export class Registry {
         options?: ComponentEmitOptions,
     ): void {
         const componentEmitter = this.componentEmitter(component.clazz);
+        if (options === undefined) {
+            options = {};
+        }
+
         if (componentEmitter !== undefined) {
             if (event === RegistryComponentEvent.COMPONENT_UPDATED) {
                 componentEmitter.emit(event, component, data, options);
@@ -236,7 +240,7 @@ export class Registry {
     emitForEachComponent(
         event: RegistryComponentEvent,
         components: Iterable<Component<any>>,
-        options?: ComponentEmitOptions,
+        options: ComponentEmitOptions,
     ): void {
         assert(event !== RegistryComponentEvent.COMPONENT_UPDATED);
 
@@ -251,6 +255,10 @@ export class Registry {
         fn: DataHandlingFn,
         options?: RegistryOperationOptions,
     ): void {
+        if (options === undefined) {
+            options = {};
+        }
+
         for (const [clazzOrTag, data] of Object.entries(components)) {
             fn(entity, clazzOrTag, data, options);
         }
