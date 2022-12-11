@@ -5,6 +5,7 @@ import { Registry } from '@/ecs/Registry';
 import { EntityType } from '@/entity/EntityType';
 import { assert } from '@/utils/assert';
 import { setPlayerTeamId } from './player';
+import { PluginContext } from './plugin';
 
 export function removeTeamPlayer(team: Entity, player: Entity): void {
     const entitiesComponent = team.getComponent(EntitiesOwnerComponent);
@@ -62,7 +63,7 @@ export function isTeamSwitchingAllowed(
 }
 
 export function removeTeamPlayers(
-    registry: Registry,
+    this: PluginContext,
     entity: Entity,
 ): void {
     if (entity.type !== EntityType.TEAM) {
@@ -72,7 +73,7 @@ export function removeTeamPlayers(
     const entitiesComponent = entity.getComponent(EntitiesOwnerComponent);
 
     for (const playerId of Object.keys(entitiesComponent.ids)) {
-        const player = registry.getEntityById(playerId);
-        setPlayerTeamId(registry, player, null);
+        const player = this.registry.getEntityById(playerId);
+        setPlayerTeamId(this.registry, player, null);
     }
 }

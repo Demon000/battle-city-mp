@@ -26,3 +26,7 @@ export function updateCenterPosition(entity: Entity, silent = false): void {
         silent,
     });
 }
+
+export function initializeCenterPosition(entity: Entity): void {
+    updateCenterPosition(entity, true);
+}

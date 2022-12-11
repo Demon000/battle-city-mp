@@ -61,7 +61,7 @@ export function onTankCollideFlag(
     const flagBase = this.collisionService
         .findOverlappingWithType(boundingBox, EntityType.FLAG_BASE);
     if (flag !== carriedFlag) {
-        handleFlagInteraction(this.registry, tank, flag, carriedFlag, flagBase);
+        handleFlagInteraction.call(this, tank, flag, carriedFlag, flagBase);
     }
 }
 
@@ -73,7 +73,7 @@ export function onTankCollideFlagBase(
     const carriedFlag = this.collisionService
         .findRelativePositionEntityWithType(tank,
             EntityType.FLAG);
-    handleFlagInteraction(this.registry, tank, undefined, carriedFlag, flagBase);
+    handleFlagInteraction.call(this, tank, undefined, carriedFlag, flagBase);
 }
 
 function setUnsetTankPlayer(
@@ -95,10 +95,10 @@ function setUnsetTankPlayer(
     setPlayerTank(player, unset ? null : entity);
 }
 
-export function setTankOnPlayer(registry: Registry, entity: Entity): void {
-    setUnsetTankPlayer(registry, entity);
+export function setTankOnPlayer(this: PluginContext, entity: Entity): void {
+    setUnsetTankPlayer(this.registry, entity);
 }
 
-export function removeTankFromPlayer(registry: Registry, entity: Entity): void {
-    setUnsetTankPlayer(registry, entity, true);
+export function removeTankFromPlayer(this: PluginContext, entity: Entity): void {
+    setUnsetTankPlayer(this.registry, entity, true);
 }

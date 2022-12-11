@@ -4,12 +4,13 @@ import { ComponentEmitOptions, RegistryComponentEvent } from '@/ecs/Registry';
 import { GameEvent } from '@/game/GameEvent';
 import { GameEventBatcher } from '@/game/GameEventBatcher';
 import { assert } from '@/utils/assert';
+import { PluginContext } from './plugin';
 
 export function batchEntityRegistered(
-    batcher: GameEventBatcher,
+    this: PluginContext,
     entity: Entity,
 ) {
-    batcher.addBroadcastEvent([
+    this.batcher.addBroadcastEvent([
         GameEvent.ENTITY_REGISTERED,
         {
             id: entity.id,
@@ -23,14 +24,14 @@ export function batchEntityRegistered(
 }
 
 export function batchEntityDestroyed(
-    batcher: GameEventBatcher,
+    this: PluginContext,
     entity: Entity,
 ): void {
-    batcher.addBroadcastEvent([GameEvent.ENTITY_UNREGISTERED, entity.id]);
+    this.batcher.addBroadcastEvent([GameEvent.ENTITY_UNREGISTERED, entity.id]);
 }
 
 export function batchComponentChanged<C extends Component<C>>(
-    batcher: GameEventBatcher,
+    this: PluginContext,
     event: RegistryComponentEvent,
     component: C,
     data?: any,
@@ -60,20 +61,20 @@ export function batchComponentChanged<C extends Component<C>>(
     }
 
     if (gameEvent === GameEvent.ENTITY_COMPONENT_REMOVED) {
-        batcher.addBroadcastEvent([
+        this.batcher.addBroadcastEvent([
             gameEvent,
             component.entity.id,
             component.clazz.tag,
         ]);
     } else if (gameEvent === GameEvent.ENTITY_COMPONENT_ADDED) {
-        batcher.addBroadcastEvent([
+        this.batcher.addBroadcastEvent([
             gameEvent,
             component.entity.id,
             component.clazz.tag,
             component.getData(),
         ]);
     } else if (gameEvent === GameEvent.ENTITY_COMPONENT_UPDATED) {
-        batcher.addBroadcastEvent([
+        this.batcher.addBroadcastEvent([
             gameEvent,
             component.entity.id,
             component.clazz.tag,

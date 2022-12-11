@@ -2,12 +2,12 @@ import { DirtyPositionComponent } from '@/components/DirtyPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { RelativePositionChildrenComponent } from '@/components/RelativePositionChildrenComponent';
 import { RelativePositionComponent } from '@/components/RelativePositionComponent';
-import { Component, ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
+import { PluginContext } from './plugin';
 
 export function unattachRelativeEntities(
-    registry: Registry,
+    this: PluginContext,
     entity: Entity,
 ): void {
     const relativePositionChildrenComponent = entity
@@ -18,20 +18,20 @@ export function unattachRelativeEntities(
 
     for (const childId of
         Object.keys(relativePositionChildrenComponent.ids)) {
-        const child = registry.getEntityById(childId);
-        unattachRelativeEntity(registry, child);
+        const child = this.registry.getEntityById(childId);
+        unattachRelativeEntity.call(this, child);
     }
 }
 
 export function attachRelativeEntity(
-    registry: Registry,
+    this: PluginContext,
     parent: Entity,
     child: Entity,
 ): void {
     const relativePositionComponent = child
         .findComponent(RelativePositionComponent);
     if (relativePositionComponent !== undefined) {
-        unattachRelativeEntity(registry, child);
+        unattachRelativeEntity.call(this, child);
     }
 
     child.upsertComponent(RelativePositionComponent, {
@@ -47,7 +47,7 @@ export function attachRelativeEntity(
 }
 
 export function unattachRelativeEntity(
-    registry: Registry,
+    this: PluginContext,
     child: Entity,
 ): void {
     const relativePositionComponent = child
@@ -57,7 +57,7 @@ export function unattachRelativeEntity(
     }
 
     const parentId = relativePositionComponent.entityId;
-    const parent = registry.getEntityById(parentId);
+    const parent = this.registry.getEntityById(parentId);
 
     const relativePositionChildrenComponent = parent
         .getComponent(RelativePositionChildrenComponent);
@@ -84,7 +84,7 @@ function markDirtyRelativePosition(entity: Entity): void {
 }
 
 export function markRelativeChildrenDirtyPosition(
-    registry: Registry,
+    this: PluginContext,
     entity: Entity,
 ): void {
     const relativePositionChildrenComponent = entity
@@ -95,13 +95,13 @@ export function markRelativeChildrenDirtyPosition(
 
     for (const childId of
         Object.keys(relativePositionChildrenComponent.ids)) {
-        const child = registry.getEntityById(childId);
+        const child = this.registry.getEntityById(childId);
         markDirtyRelativePosition(child);
     }
 }
 
 export function updateRelativePosition(
-    registry: Registry,
+    this: PluginContext,
     entity: Entity,
     silent = false,
 ): void {
@@ -111,7 +111,7 @@ export function updateRelativePosition(
         return;
     }
 
-    const parentEntity = registry
+    const parentEntity = this.registry
         .getEntityById(relativePositionComponent.entityId);
     const parentPosition = parentEntity.getComponent(PositionComponent);
 
@@ -123,11 +123,20 @@ export function updateRelativePosition(
     });
 }
 
-export function processDirtyRelativePosition(registry: Registry): void {
-    for (const entity of registry
+export function initializeRelativePosition(
+    this: PluginContext,
+    entity: Entity,
+): void {
+    updateRelativePosition.call(this, entity, true);
+}
+
+export function processDirtyRelativePosition(
+    this: PluginContext,
+): void {
+    for (const entity of this.registry
         .getEntitiesWithComponent(DirtyPositionComponent)) {
 
-        updateRelativePosition(registry, entity);
+        updateRelativePosition.call(this, entity);
 
         entity.removeComponent(DirtyPositionComponent, {
             silent: true,

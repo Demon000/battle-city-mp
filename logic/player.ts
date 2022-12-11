@@ -482,7 +482,7 @@ export function processPlayerDroppingFlag(
         .findRelativePositionEntityWithType(tank,
             EntityType.FLAG);
     if (carriedFlag !== undefined) {
-        handleFlagDrop(this.registry, tank, undefined, carriedFlag, undefined,
+        handleFlagDrop.call(this, tank, undefined, carriedFlag, undefined,
             FlagTankInteraction.DROP);
     }
 }
@@ -499,7 +499,7 @@ export function getSortedPlayers(registry: Registry): Entity[] {
 }
 
 export function removePlayerFromTeam(
-    registry: Registry,
+    this: PluginContext,
     entity: Entity,
 ): void {
     if (entity.type !== EntityType.PLAYER) {
@@ -511,6 +511,6 @@ export function removePlayerFromTeam(
         return;
     }
 
-    const team = registry.getEntityById(teamId);
+    const team = this.registry.getEntityById(teamId);
     removeTeamPlayer(team, entity);
 }

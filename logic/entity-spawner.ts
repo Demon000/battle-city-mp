@@ -16,6 +16,7 @@ import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
 import { ComponentClassType } from '@/ecs/Component';
+import { PluginContext } from './plugin';
 
 function handleEntityRegisteredDestroyed(
     registry: Registry,
@@ -63,12 +64,12 @@ function handleEntityRegisteredDestroyed(
     });
 }
 
-export function handleSpawnedEntityRegistered(registry: Registry, entity: Entity): void {
-    handleEntityRegisteredDestroyed(registry, entity, true);
+export function handleSpawnedEntityRegistered(this: PluginContext, entity: Entity): void {
+    handleEntityRegisteredDestroyed(this.registry, entity, true);
 }
 
-export function handleSpawnedEntityDestroyed(registry: Registry, entity: Entity): void {
-    handleEntityRegisteredDestroyed(registry, entity, false);
+export function handleSpawnedEntityDestroyed(this: PluginContext, entity: Entity): void {
+    handleEntityRegisteredDestroyed(this.registry, entity, false);
 }
 
 export function setEntitySpawnerStatus<C>(

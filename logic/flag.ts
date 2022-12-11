@@ -5,12 +5,12 @@ import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { Entity } from '@/ecs/Entity';
-import { Registry } from '@/ecs/Registry';
 import { PlayerPointsEvent } from '@/player/PlayerPoints';
 import { assert } from '@/utils/assert';
 import { setEntityPosition } from './entity-position';
 import { attachRelativeEntity, isAttachedRelativeEntity, unattachRelativeEntity } from './entity-relative-position';
 import { addPlayerPoints } from './player';
+import { PluginContext } from './plugin';
 
 export enum FlagTankInteraction {
     PICK,
@@ -115,7 +115,7 @@ function findFlagTankInteractionType(
 }
 
 function handleFlagPick(
-    registry: Registry,
+    this: PluginContext,
     tank: Entity,
     flag: Entity,
     flagBase: Entity | undefined,
@@ -124,12 +124,12 @@ function handleFlagPick(
         return;
     }
 
-    attachRelativeEntity(registry, tank, flag);
+    attachRelativeEntity.call(this, tank, flag);
     setFlagSource(flag, flagBase);
 }
 
 export function handleFlagDrop(
-    registry: Registry,
+    this: PluginContext,
     tank: Entity,
     flag: Entity | undefined,
     carriedFlag: Entity,
@@ -137,7 +137,7 @@ export function handleFlagDrop(
     interaction: FlagTankInteraction,
 ): void {
     const playerId = tank.getComponent(PlayerOwnedComponent).playerId;
-    const player = registry.getEntityById(playerId);
+    const player = this.registry.getEntityById(playerId);
     let position;
 
     if (interaction === FlagTankInteraction.DROP) {
@@ -151,13 +151,13 @@ export function handleFlagDrop(
         assert(carriedFlag !== undefined);
 
         const flagComponent = carriedFlag.getComponent(FlagComponent);
-        const carriedFlagBase = registry.getEntityById(flagComponent.sourceId);
+        const carriedFlagBase = this.registry.getEntityById(flagComponent.sourceId);
         position = carriedFlagBase.getComponent(PositionComponent);
     } else {
         assert(false);
     }
 
-    unattachRelativeEntity(registry, carriedFlag);
+    unattachRelativeEntity.call(this, carriedFlag);
     setEntityPosition(carriedFlag, position);
     setFlagDropper(carriedFlag, tank);
 
@@ -169,7 +169,7 @@ export function handleFlagDrop(
 }
 
 export function handleFlagInteraction(
-    registry: Registry,
+    this: PluginContext,
     tank: Entity,
     flag: Entity | undefined,
     carriedFlag: Entity | undefined,
@@ -183,11 +183,11 @@ export function handleFlagInteraction(
 
     if (interaction === FlagTankInteraction.PICK) {
         assert(flag !== undefined);
-        handleFlagPick(registry, tank, flag, flagBase);
+        handleFlagPick.call(this, tank, flag, flagBase);
     } else if (interaction === FlagTankInteraction.DROP
         || interaction === FlagTankInteraction.RETURN
         || interaction === FlagTankInteraction.CAPTURE) {
         assert(carriedFlag !== undefined);
-        handleFlagDrop(registry, tank, flag, carriedFlag, flagBase, interaction);
+        handleFlagDrop.call(this, tank, flag, carriedFlag, flagBase, interaction);
     }
 }

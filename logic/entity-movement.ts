@@ -96,7 +96,7 @@ function processEntityMovement(entity: Entity, delta: number): void {
     entity.upsertComponent(RequestedPositionComponent, position);
 }
 
-export function updateIsMoving(entity: Entity, silent = false): void {
+export function updateIsMoving(entity: Entity): void {
     const hasIsMovingComponent = entity.hasComponent(IsMovingComponent);
     const movement = entity.getComponent(MovementComponent);
     const isMoving = movement.speed > 0 || movement.direction !== null;
@@ -106,13 +106,9 @@ export function updateIsMoving(entity: Entity, silent = false): void {
     }
 
     if (isMoving) {
-        entity.addComponent(IsMovingComponent, undefined, {
-            silent,
-        });
+        entity.addComponent(IsMovingComponent);
     } else {
-        entity.removeComponent(IsMovingComponent, {
-            silent,
-        });
+        entity.removeComponent(IsMovingComponent);
     }
 }
 
