@@ -31,10 +31,10 @@ export function batchEntityDestroyed(
 
 export function batchComponentChanged<C extends Component<C>>(
     this: PluginContext,
-    event: RegistryComponentEvent,
     component: C,
     options: ComponentEmitOptions,
     data: any,
+    event: RegistryComponentEvent,
 ): void {
     if (component.flags & ComponentFlags.LOCAL_ONLY
         || event === RegistryComponentEvent.COMPONENT_ADDED

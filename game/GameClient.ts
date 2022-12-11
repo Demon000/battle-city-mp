@@ -143,7 +143,7 @@ export class GameClient {
                 entityBlueprint.reloadBlueprintData();
             });
         this.registry.emitter.on(RegistryComponentEvent.COMPONENT_CHANGED,
-            (_event, component) => {
+            (component) => {
                 if (component.entities.size !== 1) {
                     return;
                 }
@@ -208,7 +208,7 @@ export class GameClient {
                 });
         this.registry.componentEmitter(HealthComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
-                (_event, component) => {
+                (component) => {
                     const entity = component.entity;
                     if (!isOwnTank(entity)) {
                         return;
@@ -226,7 +226,7 @@ export class GameClient {
                 });
         this.registry.componentEmitter(BulletSpawnerComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
-                (_event, component) => {
+                (component) => {
                     const entity = component.entity;
                     if (!isOwnTank(entity)) {
                         return;
@@ -244,7 +244,7 @@ export class GameClient {
                 });
         this.registry.componentEmitter(PlayerComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
-                (_event, component, _data, options) => {
+                (component, options) => {
                     this.emitter.emit(GameClientEvent.PLAYERS_CHANGED);
 
                     const entity = component.entity;
@@ -261,7 +261,7 @@ export class GameClient {
                 });
         this.registry.componentEmitter(NameComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
-                (_event, component, _data) => {
+                (component) => {
                     this.emitter.emit(GameClientEvent.PLAYERS_CHANGED);
 
                     const entity = component.entity;
@@ -274,7 +274,7 @@ export class GameClient {
                 });
         this.registry.componentEmitter(PlayerRespawnTimeoutComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
-                (_event, component) => {
+                (component) => {
                     const entity = component.entity;
                     if (!isOwnPlayer(entity)) {
                         return;
@@ -285,7 +285,7 @@ export class GameClient {
                 });
         this.registry.componentEmitter(EntitiesOwnerComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
-                (_event, component) => {
+                (component) => {
                     const entity = component.entity;
                     if (!isOwnPlayer(entity)) {
                         return;
@@ -296,7 +296,7 @@ export class GameClient {
                 });
         this.registry.componentEmitter(ColorComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
-                (_event, component) => {
+                (component) => {
                     const entity = component.entity;
                     if (!isOwnPlayer(entity)) {
                         return;
@@ -307,7 +307,7 @@ export class GameClient {
                 });
         this.registry.componentEmitter(TeamOwnedComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
-                (_event, component) => {
+                (component) => {
                     const entity = component.entity;
                     if (!isOwnPlayer(entity)) {
                         return;
@@ -318,7 +318,7 @@ export class GameClient {
                 });
         this.registry.componentEmitter(PlayerRequestedSpawnComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
-                (event, component) => {
+                (component, _options, _data, event) => {
                     const entity = component.entity;
                     if (!isOwnPlayer(entity)) {
                         return;

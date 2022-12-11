@@ -1,5 +1,5 @@
 import { Component, ComponentClassType } from '@/ecs/Component';
-import { RegistryComponentCommonEventWithDataFn as RegistryComponentCommonEventDataFn, RegistryComponentEvent, RegistryComponentEventFn, RegistryComponentEventWithDataFn, RegistryEvent, RegistryEventFn } from '@/ecs/Registry';
+import { ComponentEmitOptions, RegistryComponentCommonEventWithDataFn as RegistryComponentCommonEventDataFn, RegistryComponentEvent, RegistryComponentEventFn, RegistryComponentEventWithDataFn, RegistryEvent, RegistryEventFn } from '@/ecs/Registry';
 import { PluginContext } from '@/logic/plugin';
 
 type PluginContextFn<
@@ -64,9 +64,10 @@ function eventComponentToEntity<
 >(
     this: PluginContext,
     fn: any,
-    _event: RegistryComponentEvent,
     component: C,
-    ..._args: any[]
+    _options: ComponentEmitOptions,
+    _data: any,
+    _event: RegistryComponentEvent,
 ): void {
     fn.call(this, component.entity);
 }
