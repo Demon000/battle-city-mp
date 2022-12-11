@@ -318,12 +318,13 @@ export class GameClient {
                 });
         this.registry.componentEmitter(PlayerRequestedSpawnComponent, true)
             .on(RegistryComponentEvent.COMPONENT_CHANGED,
-                (component, _options, _data, event) => {
+                (component, options) => {
                     const entity = component.entity;
                     if (!isOwnPlayer(entity)) {
                         return;
                     }
 
+                    let event = options.event;
                     this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS,
                         event === RegistryComponentEvent.COMPONENT_ADDED);
                 });

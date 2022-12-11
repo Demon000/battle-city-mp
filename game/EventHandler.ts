@@ -59,38 +59,16 @@ function componentToEntity<
     fn.call(this, component.entity);
 }
 
-function eventComponentToEntity<
-    C extends Component<C> = any,
->(
-    this: PluginContext,
-    fn: any,
-    component: C,
-    _options: ComponentEmitOptions,
-    _data: any,
-    _event: RegistryComponentEvent,
-): void {
-    fn.call(this, component.entity);
-}
-
 export function registerEventHandler<
     C extends Component<C> = any,
 >(context: PluginContext, handler: EventHandler<C>): void {
     for (const fn of handler.fns) {
         if ('component' in handler && handler.component !== undefined) {
             if ('toEntity' in handler && handler.toEntity !== undefined) {
-                if (handler.event
-                    === RegistryComponentEvent.COMPONENT_CHANGED) {
-                    context.registry.componentEmitter(handler.component, true).on(
-                        handler.event,
-                        eventComponentToEntity.bind(context, fn),
-                        context);
-                } else {
-                    context.registry.componentEmitter(handler.component, true).on(
-                        handler.event,
-                        componentToEntity.bind(context, fn),
-                        context);
-                }
-
+                context.registry.componentEmitter(handler.component, true).on(
+                    handler.event,
+                    componentToEntity.bind(context, fn),
+                    context);
             } else {
                 context.registry.componentEmitter(handler.component, true).on(
                     handler.event, fn as any, context);

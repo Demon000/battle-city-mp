@@ -30,6 +30,7 @@ export interface RegistryOperationOptions {
 export interface ComponentEmitOptions {
     register?: boolean;
     destroy?: boolean;
+    event: RegistryComponentEvent,
 }
 
 export type RegistryEventFn = (entity: Entity) => void;
@@ -46,7 +47,6 @@ export type RegistryComponentCommonEventWithDataFn<C extends Component<C>> = (
     component: C,
     options: ComponentEmitOptions,
     data: any,
-    event: RegistryComponentEvent,
 ) => void;
 
 export interface RegistryEvents {
@@ -135,18 +135,18 @@ export class Registry {
         if (!options?.silent) {
             const components = entity.getComponents();
             this.emitForEachComponent(
-                RegistryComponentEvent.COMPONENT_INITIALIZED,
                 components,
                 {
                     register: true,
+                    event: RegistryComponentEvent.COMPONENT_INITIALIZED,
                 },
             );
             this.emitter.emit(RegistryEvent.ENTITY_REGISTERED, entity);
             this.emitForEachComponent(
-                RegistryComponentEvent.COMPONENT_ADDED,
                 components,
                 {
                     register: true,
+                    event: RegistryComponentEvent.COMPONENT_ADDED,
                 },
             );
         }
@@ -166,10 +166,10 @@ export class Registry {
         if (!options?.silent) {
             const components = entity.getComponents();
             this.emitForEachComponent(
-                RegistryComponentEvent.COMPONENT_BEFORE_REMOVE,
                 components,
                 {
                     destroy: true,
+                    event: RegistryComponentEvent.COMPONENT_BEFORE_REMOVE,
                 },
             );
             this.emitter.emit(RegistryEvent.ENTITY_BEFORE_DESTROY, entity);
@@ -201,15 +201,12 @@ export class Registry {
     emit<
         C extends Component<C>,
     >(
-        event: RegistryComponentEvent,
         component: C,
-        data?: any,
-        options?: ComponentEmitOptions,
+        data: any | undefined,
+        options: ComponentEmitOptions,
     ): void {
         const componentEmitter = this.componentEmitter(component.clazz);
-        if (options === undefined) {
-            options = {};
-        }
+        let event = options.event;
 
         if (componentEmitter !== undefined) {
             if (event === RegistryComponentEvent.COMPONENT_UPDATED) {
@@ -220,7 +217,7 @@ export class Registry {
 
             if (event !== RegistryComponentEvent.COMPONENT_INITIALIZED) {
                 componentEmitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
-                    component, options, data, event);
+                    component, options, data);
             }
         }
 
@@ -232,19 +229,18 @@ export class Registry {
 
         if (event !== RegistryComponentEvent.COMPONENT_INITIALIZED) {
             this.emitter.emit(RegistryComponentEvent.COMPONENT_CHANGED,
-                component, options, data, event);
+                component, options, data);
         }
     }
 
     emitForEachComponent(
-        event: RegistryComponentEvent,
         components: Iterable<Component<any>>,
         options: ComponentEmitOptions,
     ): void {
-        assert(event !== RegistryComponentEvent.COMPONENT_UPDATED);
+        assert(options.event !== RegistryComponentEvent.COMPONENT_UPDATED);
 
         for (const component of components) {
-            this.emit(event, component, undefined, options);
+            this.emit(component, undefined, options);
         }
     }
 
@@ -403,8 +399,12 @@ export class Registry {
         component.attachToEntity(entity);
 
         if (!options?.silent) {
-            this.emit(RegistryComponentEvent.COMPONENT_INITIALIZED, component);
-            this.emit(RegistryComponentEvent.COMPONENT_ADDED, component);
+            this.emit(component, undefined, {
+                event: RegistryComponentEvent.COMPONENT_INITIALIZED,
+            });
+            this.emit(component, undefined, {
+                event: RegistryComponentEvent.COMPONENT_ADDED,
+            });
         }
     }
 
@@ -487,7 +487,9 @@ export class Registry {
         }
 
         if (!options?.silent) {
-            this.emit(RegistryComponentEvent.COMPONENT_UPDATED, component, data);
+            this.emit(component, data, {
+                event: RegistryComponentEvent.COMPONENT_UPDATED,
+            });
         }
 
         return component;
@@ -557,7 +559,9 @@ export class Registry {
         assert(component !== undefined);
 
         if (!options?.silent) {
-            this.emit(RegistryComponentEvent.COMPONENT_BEFORE_REMOVE, component);
+            this.emit(component, undefined, {
+                event: RegistryComponentEvent.COMPONENT_BEFORE_REMOVE,
+            });
         }
 
         component.detachFromEntity(entity);

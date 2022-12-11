@@ -34,8 +34,9 @@ export function batchComponentChanged<C extends Component<C>>(
     component: C,
     options: ComponentEmitOptions,
     data: any,
-    event: RegistryComponentEvent,
 ): void {
+    let event = options.event;
+
     if (component.flags & ComponentFlags.LOCAL_ONLY
         || event === RegistryComponentEvent.COMPONENT_ADDED
             && options?.register
