@@ -27,11 +27,10 @@ export class Component<C extends Component<C>> {
 
     constructor(
         registry: Registry,
-        clazz: ComponentClassType<C>,
     ) {
         this.registry = registry;
-        this.clazz = clazz;
-        this.flags = (this.constructor as ComponentClassType<any>).BASE_FLAGS;
+        this.clazz = this.constructor as ComponentClassType<C>;
+        this.flags = this.clazz.BASE_FLAGS;
     }
 
     @nonenumerable
@@ -100,6 +99,5 @@ export type ComponentClassType<C = any> = {
 
     new (
         registry: Registry,
-        clazz: ComponentClassType<C>,
     ): C;
 };

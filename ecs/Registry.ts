@@ -420,7 +420,7 @@ export class Registry {
         }
 
         const clazz = this.lookup(clazzOrTag, data);
-        const component = new clazz(this, clazz);
+        const component = new clazz(this);
 
         if (data !== undefined) {
             component.setData(data);
