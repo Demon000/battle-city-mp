@@ -52,27 +52,15 @@ export class Component {
                 `Cannot access entity of ${status} component`, this.clazz);
         }
 
-        return this.firstEntity!;
+        return this.entities.values().next().value!;
     }
 
     get detached(): boolean {
         return this.entities.size === 0;
     }
 
-    get firstEntity(): Entity | undefined {
-        return this.entities.values().next().value;
-    }
-
     static get tag(): string {
         return this.TAG ?? this.name;
-    }
-
-    attachToEntity(entity: Entity): void {
-        this.entities.add(entity);
-    }
-
-    detachFromEntity(entity: Entity): void {
-        this.entities.delete(entity);
     }
 
     getData(): Partial<this> {

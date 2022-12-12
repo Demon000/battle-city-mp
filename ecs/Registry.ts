@@ -396,7 +396,7 @@ export class Registry {
         const tagComponents = this.getOrCreateComponentTypeSet(component.clazz);
         tagComponents.add(component);
 
-        component.attachToEntity(entity);
+        component.entities.add(entity);
 
         if (!options?.silent) {
             this.emit(component, undefined, {
@@ -564,7 +564,7 @@ export class Registry {
             });
         }
 
-        component.detachFromEntity(entity);
+        component.entities.delete(entity);
 
         component = entity.removeLocalComponent(clazz);
         if (options?.optional && component === undefined) {
