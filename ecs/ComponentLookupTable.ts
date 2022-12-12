@@ -57,7 +57,6 @@ import { PlayerInputComponent, PlayerInputComponentData } from '@/components/Pla
 import { NameComponent, NameComponentData } from '@/components/NameComponent';
 import { PlayerRequestedDisconnectComponent, PlayerRequestedDisconnectComponentData } from '@/components/PlayerRequestedDisconnect';
 import { PlayerRespawnTimeoutConfigComponent, PlayerRespawnTimeoutConfigComponentData } from '@/components/PlayerRespawnTimeoutConfigComponent';
-import { IsCollidingComponent, IsCollidingComponentData } from '@/components/IsCollidingComponent';
 
 export class ComponentLookupTable {
     protected lookupAndValidate(
@@ -289,10 +288,6 @@ export class ComponentLookupTable {
             case PlayerRespawnTimeoutConfigComponent.name:
                 assertEquals<Partial<PlayerRespawnTimeoutConfigComponentData>>(data);
                 return PlayerRespawnTimeoutConfigComponent;
-            case IsCollidingComponent.tag:
-            case IsCollidingComponent.name:
-                assertEquals<Partial<IsCollidingComponentData>>(data);
-                return IsCollidingComponent;
         }
     }
 
