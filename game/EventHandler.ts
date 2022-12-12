@@ -1,5 +1,5 @@
 import { Component, ComponentClassType } from '@/ecs/Component';
-import { ComponentEmitOptions, RegistryComponentCommonEventWithDataFn as RegistryComponentCommonEventDataFn, RegistryComponentEvent, RegistryComponentEventFn, RegistryComponentEventWithDataFn, RegistryEvent, RegistryEventFn } from '@/ecs/Registry';
+import { RegistryComponentCommonEventWithDataFn, RegistryComponentEvent, RegistryComponentEventFn, RegistryComponentEventWithDataFn, RegistryEvent, RegistryEventFn } from '@/ecs/Registry';
 import { PluginContext } from '@/logic/plugin';
 
 type PluginContextFn<
@@ -45,7 +45,7 @@ export type EventHandler<
     event: RegistryComponentEvent.COMPONENT_CHANGED;
     component?: CT,
 } & ToEntityOr<{
-    fns: PluginContextFn<RegistryComponentCommonEventDataFn<C>>[];
+    fns: PluginContextFn<RegistryComponentCommonEventWithDataFn<C>>[];
 }>);
 
 function componentToEntity<

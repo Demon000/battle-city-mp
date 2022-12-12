@@ -324,7 +324,7 @@ export class GameClient {
                         return;
                     }
 
-                    let event = options.event;
+                    const event = options.event;
                     this.emitter.emit(GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS,
                         event === RegistryComponentEvent.COMPONENT_ADDED);
                 });

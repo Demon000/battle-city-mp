@@ -206,7 +206,7 @@ export class Registry {
         options: ComponentEmitOptions,
     ): void {
         const componentEmitter = this.componentEmitter(component.clazz);
-        let event = options.event;
+        const event = options.event;
 
         if (componentEmitter !== undefined) {
             if (event === RegistryComponentEvent.COMPONENT_UPDATED) {
