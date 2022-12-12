@@ -184,7 +184,8 @@ export class GameServer {
             this.registry.getEntitiesWithComponent(PlayerComponent)) {
             processPlayerRespawnTimeout(player, deltaSeconds);
             processPlayerSpawnStatus.call(this.pluginContext, player);
-            const disconnected = processPlayerDisconnectStatus(player);
+            const disconnected = processPlayerDisconnectStatus(this.registry,
+                player);
             if (disconnected) {
                 continue;
             }

@@ -363,9 +363,18 @@ export function processPlayerSpawnStatus(
     createSpawnEffect(this.entityFactory, position);
 }
 
-export function processPlayerDisconnectStatus(player: Entity): boolean {
+export function processPlayerDisconnectStatus(
+    registry: Registry,
+    player: Entity,
+): boolean {
     if (!player.hasComponent(PlayerRequestedDisconnectComponent)) {
         return false;
+    }
+
+    const playerTankId = getPlayerTankId(player);
+    if (playerTankId !== null) {
+        const tank = registry.getEntityById(playerTankId);
+        tank.destroy();
     }
 
     player.destroy();
