@@ -29,7 +29,7 @@ export function batchEntityDestroyed(
     this.batcher.addBroadcastEvent([GameEvent.ENTITY_UNREGISTERED, entity.id]);
 }
 
-export function batchComponentChanged<C extends Component<C>>(
+export function batchComponentChanged<C extends Component>(
     this: PluginContext,
     component: C,
     options: ComponentEmitOptions,

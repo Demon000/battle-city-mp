@@ -15,7 +15,7 @@ import { DirectionComponent } from '@/components/DirectionComponent';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
-import { ComponentClassType } from '@/ecs/Component';
+import { Component, ComponentClassType } from '@/ecs/Component';
 import { PluginContext } from './plugin';
 
 function handleEntityRegisteredDestroyed(
@@ -72,7 +72,7 @@ export function handleSpawnedEntityDestroyed(this: PluginContext, entity: Entity
     handleEntityRegisteredDestroyed(this.registry, entity, false);
 }
 
-export function setEntitySpawnerStatus<C>(
+export function setEntitySpawnerStatus<C extends Component>(
     entity: Entity,
     clazz: ComponentClassType<C>,
     status: boolean,

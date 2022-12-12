@@ -6,8 +6,7 @@ export interface BulletComponentData {
     power: BulletPower;
 }
 
-export class BulletComponent
-    extends Component<BulletComponent>
+export class BulletComponent extends Component
     implements BulletComponentData {
     damage = 0;
     static TAG = 'BC';

@@ -4,8 +4,7 @@ export interface PlayerRespawnTimeoutComponentData {
     value: number;
 }
 
-export class PlayerRespawnTimeoutComponent
-    extends Component<PlayerRespawnTimeoutComponent>
+export class PlayerRespawnTimeoutComponent extends Component
     implements PlayerRespawnTimeoutComponentData {
     static TAG = 'PRT';
 

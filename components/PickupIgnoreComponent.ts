@@ -6,8 +6,7 @@ export interface PickupIgnoreComponentData {
     entityId: EntityId;
 }
 
-export class PickupIgnoreComponent
-    extends Component<PickupIgnoreComponent>
+export class PickupIgnoreComponent extends Component
     implements PickupIgnoreComponentData {
     static TAG = 'PI';
 

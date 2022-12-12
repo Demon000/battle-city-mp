@@ -4,8 +4,7 @@ export interface NameComponentData {
     value: string;
 }
 
-export class NameComponent
-    extends Component<NameComponent>
+export class NameComponent extends Component
     implements NameComponentData {
     static TAG = 'N';
 

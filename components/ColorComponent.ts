@@ -5,8 +5,7 @@ export interface ColorComponentData {
     value: Color;
 }
 
-export class ColorComponent
-    extends Component<ColorComponent>
+export class ColorComponent extends Component
     implements ColorComponentData {
     static TAG = 'C';
 

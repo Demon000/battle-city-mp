@@ -3,8 +3,7 @@ import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
 
 export interface BoundingBoxComponentData extends BoundingBox {}
 
-export class BoundingBoxComponent
-    extends Component<BoundingBoxComponent>
+export class BoundingBoxComponent extends Component
     implements BoundingBoxComponentData {
     static TAG = 'BB';
 

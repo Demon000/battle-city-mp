@@ -34,16 +34,16 @@ export interface ComponentEmitOptions {
 }
 
 export type RegistryEventFn = (entity: Entity) => void;
-export type RegistryComponentEventFn<C extends Component<C>> = (
+export type RegistryComponentEventFn<C extends Component> = (
     component: C,
     options: ComponentEmitOptions,
 ) => void;
-export type RegistryComponentEventWithDataFn<C extends Component<C>> = (
+export type RegistryComponentEventWithDataFn<C extends Component> = (
     component: C,
     options: ComponentEmitOptions,
     data: any,
 ) => void;
-export type RegistryComponentCommonEventWithDataFn<C extends Component<C>> = (
+export type RegistryComponentCommonEventWithDataFn<C extends Component> = (
     component: C,
     options: ComponentEmitOptions,
     data: any,
@@ -54,7 +54,7 @@ export interface RegistryEvents {
     [RegistryEvent.ENTITY_BEFORE_DESTROY]: RegistryEventFn;
 }
 
-export interface RegistryComponentEvents<C extends Component<C> = any> {
+export interface RegistryComponentEvents<C extends Component = any> {
     [RegistryComponentEvent.COMPONENT_INITIALIZED]: RegistryComponentEventFn<C>;
     [RegistryComponentEvent.COMPONENT_ADDED]: RegistryComponentEventFn<C>;
     [RegistryComponentEvent.COMPONENT_UPDATED]: RegistryComponentEventWithDataFn<C>;
@@ -62,7 +62,7 @@ export interface RegistryComponentEvents<C extends Component<C> = any> {
     [RegistryComponentEvent.COMPONENT_CHANGED]: RegistryComponentCommonEventWithDataFn<C>;
 }
 
-export type DataHandlingFn = <C extends Component<C>>(
+export type DataHandlingFn = <C extends Component>(
     entity: Entity,
     clazzOrTag: ClazzOrTag<C>,
     data: any,
@@ -71,16 +71,16 @@ export type DataHandlingFn = <C extends Component<C>>(
 
 export class Registry {
     @nonenumerable
-    private tagsComponentsMap = new Map<string, Set<Component<any>>>();
+    private tagsComponentsMap = new Map<string, Set<Component>>();
 
     @nonenumerable
     private componentsEmitterMap = new Map<string, EventEmitter<RegistryComponentEvents>>();
 
     @nonenumerable
-    private sharedComponents: Map<ComponentClassType<any>, Component<any>> = new Map();
+    private sharedComponents: Map<ComponentClassType<any>, Component> = new Map();
 
     @nonenumerable
-    private sharedByTypeComponents: Map<string, Map<ComponentClassType<any>, Component<any>>> = new Map();
+    private sharedByTypeComponents: Map<string, Map<ComponentClassType<any>, Component>> = new Map();
 
     @nonenumerable
     private idsEntityMap = new Map<EntityId, Entity>();
@@ -102,15 +102,15 @@ export class Registry {
         this.componentLookupTable = componentLookupTable;
     }
 
-    componentEmitter<C extends Component<C>>(
+    componentEmitter<C extends Component>(
         clazz: ComponentClassType<C>,
         create?: false,
-    ): EventEmitter<RegistryComponentEvents<C>> | undefined;
-    componentEmitter<C extends Component<C>>(
+    ): EventEmitter<RegistryComponentEvents> | undefined;
+    componentEmitter<C extends Component>(
         clazz: ComponentClassType<C>,
         create: true,
-    ): EventEmitter<RegistryComponentEvents<C>>;
-    componentEmitter<C extends Component<C>>(
+    ): EventEmitter<RegistryComponentEvents>;
+    componentEmitter<C extends Component>(
         clazz: ComponentClassType<C>,
         create?: boolean,
     ): EventEmitter<RegistryComponentEvents<C>> | undefined {
@@ -185,21 +185,21 @@ export class Registry {
     }
 
     private getOrCreateComponentTypeSet<
-        C extends Component<C>,
+        C extends Component,
     >(
-        clazz: ComponentClassType<C>,
-    ): Set<Component<C>> {
+        clazz: ComponentClassType<any>,
+    ): Set<C> {
         let tagComponents = this.tagsComponentsMap.get(clazz.tag);
         if (tagComponents === undefined) {
-            tagComponents = new Set<Component<C>>();
+            tagComponents = new Set<C>();
             this.tagsComponentsMap.set(clazz.tag, tagComponents);
         }
 
-        return tagComponents;
+        return tagComponents as  Set<C>;
     }
 
     emit<
-        C extends Component<C>,
+        C extends Component,
     >(
         component: C,
         data: any | undefined,
@@ -234,7 +234,7 @@ export class Registry {
     }
 
     emitForEachComponent(
-        components: Iterable<Component<any>>,
+        components: Iterable<Component>,
         options: ComponentEmitOptions,
     ): void {
         assert(options.event !== RegistryComponentEvent.COMPONENT_UPDATED);
@@ -260,9 +260,9 @@ export class Registry {
     }
 
     private _addSharedComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
-        componentsMap: Map<ComponentClassType<any>, Component<any>>,
+        componentsMap: Map<ComponentClassType<any>, Component>,
         component: C,
     ): void {
         assert(!componentsMap.has(component.clazz));
@@ -271,7 +271,7 @@ export class Registry {
     }
 
     addSharedComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
         component: C,
     ): void {
@@ -283,7 +283,7 @@ export class Registry {
     }
 
     addSharedByTypeComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
         type: string,
         component: C,
@@ -308,7 +308,7 @@ export class Registry {
     ): void {
         for (const [tag, data] of Object.entries(components)) {
             const clazz = this.lookup(tag);
-            let component: Component<any>;
+            let component: Component | undefined;
 
             if (clazz.BASE_FLAGS & ComponentFlags.SHARED) {
                 component = this.findSharedComponent(clazz);
@@ -335,9 +335,9 @@ export class Registry {
     }
 
     private _findSharedComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
-        componentsMap: Map<ComponentClassType<any>, Component<any>>,
+        componentsMap: Map<ComponentClassType<any>, Component>,
         clazzOrTag: ClazzOrTag<C>,
     ): C | undefined {
         const clazz = this.lookup(clazzOrTag);
@@ -346,7 +346,7 @@ export class Registry {
     }
 
     findSharedComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
         clazzOrTag: ClazzOrTag<C>,
     ): C | undefined {
@@ -354,7 +354,7 @@ export class Registry {
     }
 
     findSharedByTypeComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
         type: string,
         clazzOrTag: ClazzOrTag<C>,
@@ -368,7 +368,7 @@ export class Registry {
     }
 
     findOrCreateSharedComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
         clazzOrTag: ClazzOrTag<C>,
         options?: RegistryOperationOptions,
@@ -381,11 +381,11 @@ export class Registry {
             this.addSharedComponent(component);
         }
 
-        return component;
+        return component as C;
     }
 
     attachComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
         entity: Entity,
         component: C,
@@ -409,7 +409,7 @@ export class Registry {
     }
 
     createComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
         clazzOrTag: ClazzOrTag<C>,
         data?: any,
@@ -431,11 +431,11 @@ export class Registry {
             component.flags |= options.flags;
         }
 
-        return component;
+        return component as C;
     }
 
     createDetachedComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
         clazzOrTag: ClazzOrTag<C>,
         data?: any,
@@ -445,7 +445,7 @@ export class Registry {
     }
 
     addComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
         entity: Entity,
         clazzOrTag: ClazzOrTag<C>,
@@ -455,7 +455,7 @@ export class Registry {
         const component = this.createComponent(clazzOrTag, data, options);
         this.attachComponent(entity, component, options);
 
-        return component;
+        return component as C;
     }
 
     addComponents(
@@ -468,7 +468,7 @@ export class Registry {
     }
 
     updateComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
         entity: Entity,
         clazzOrTag: ClazzOrTag<C>,
@@ -492,7 +492,7 @@ export class Registry {
             });
         }
 
-        return component;
+        return component as C;
     }
 
     updateComponents(
@@ -505,7 +505,7 @@ export class Registry {
     }
 
     upsertComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
         entity: Entity,
         clazzOrTag: ClazzOrTag<C>,
@@ -521,7 +521,7 @@ export class Registry {
     }
 
     upsertSharedComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
         entity: Entity,
         clazzOrTag: ClazzOrTag<C>,
@@ -529,13 +529,13 @@ export class Registry {
     ): C {
         const existingComponent = entity.findComponent(clazzOrTag);
         if (existingComponent !== undefined) {
-            return existingComponent;
+            return existingComponent as C;
         }
 
         const component = this.findOrCreateSharedComponent(clazzOrTag, options);
         this.attachComponent(entity, component, options);
 
-        return component;
+        return component as C;
     }
 
     upsertComponents(
@@ -547,7 +547,7 @@ export class Registry {
             this.upsertComponent, options);
     }
 
-    detachEntityComponent<C extends Component<C>>(
+    detachEntityComponent<C extends Component>(
         entity: Entity,
         clazz: ComponentClassType<C>,
         options?: RegistryOperationOptions,
@@ -572,10 +572,10 @@ export class Registry {
         }
         assert(component !== undefined);
 
-        return component;
+        return component as C;
     }
 
-    removeEntityComponent<C extends Component<C>>(
+    removeEntityComponent<C extends Component>(
         entity: Entity,
         clazz: ComponentClassType<C>,
         options?: RegistryOperationOptions,
@@ -588,7 +588,7 @@ export class Registry {
 
         if (component.flags & (ComponentFlags.SHARED
                 | ComponentFlags.SHARED_BY_TYPE)) {
-            return component;
+            return component as C;
         }
 
         const tagComponents = this.tagsComponentsMap.get(clazz.tag);
@@ -606,12 +606,12 @@ export class Registry {
         const tagsHadComponent = tagComponents.delete(component);
         assert(tagsHadComponent);
 
-        return component;
+        return component as C;
     }
 
-    removeComponentIfExists<C extends Component<C>>(
+    removeComponentIfExists<C extends Component>(
         entity: Entity,
-        clazzOrTag: ClazzOrTag,
+        clazzOrTag: ClazzOrTag<C>,
         options?: RegistryOperationOptions,
     ): C | undefined {
         const component = entity.findComponent(clazzOrTag);
@@ -641,13 +641,13 @@ export class Registry {
         return this.idsEntityMap.values();
     }
 
-    getComponents<C extends Component<C>>(
+    getComponents<C extends Component>(
         clazz: ComponentClassType<C>,
     ): Iterable<C> {
         return this.getOrCreateComponentTypeSet(clazz).keys() as Iterable<C>;
     }
 
-    getEntitiesWithComponent<C extends Component<C>>(
+    getEntitiesWithComponent<C extends Component>(
         clazz: ComponentClassType<C>,
     ): Iterable<Entity> {
         const components = this.getComponents(clazz);
@@ -656,7 +656,10 @@ export class Registry {
             .flatten();
     }
 
-    lookup(clazzOrTag: ClazzOrTag, data?: any): ComponentClassType<any> {
+    lookup<C extends Component>(
+        clazzOrTag: ClazzOrTag<C>,
+        data?: any,
+    ): ComponentClassType<C> {
         return this.componentLookupTable.lookup(clazzOrTag, data);
     }
 }

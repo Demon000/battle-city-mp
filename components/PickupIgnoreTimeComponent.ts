@@ -4,8 +4,7 @@ export interface PickupIgnoreTimeComponentData {
     value: number;
 }
 
-export class PickupIgnoreTimeComponent
-    extends Component<PickupIgnoreTimeComponent>
+export class PickupIgnoreTimeComponent extends Component
     implements PickupIgnoreTimeComponentData {
     static TAG = 'PIT';
 

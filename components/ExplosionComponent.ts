@@ -5,8 +5,7 @@ export interface ExplosionComponentData {
     destroyedType: EntityType;
 }
 
-export class ExplosionComponent
-    extends Component<ExplosionComponent>
+export class ExplosionComponent extends Component
     implements ExplosionComponentData {
     static TAG = 'EC';
 

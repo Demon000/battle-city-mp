@@ -15,7 +15,7 @@ type ToEntityOr<T> = T | {
 };
 
 export type EventHandler<
-    C extends Component<C>,
+    C extends Component,
     CT = ComponentClassType<C>,
 >
 =
@@ -49,7 +49,7 @@ export type EventHandler<
 }>);
 
 function componentToEntity<
-    C extends Component<C> = any,
+    C extends Component,
 >(
     this: PluginContext,
     fn: any,
@@ -60,7 +60,7 @@ function componentToEntity<
 }
 
 export function registerEventHandler<
-    C extends Component<C> = any,
+    C extends Component,
 >(context: PluginContext, handler: EventHandler<C>): void {
     for (const fn of handler.fns) {
         if ('component' in handler && handler.component !== undefined) {

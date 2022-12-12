@@ -3,7 +3,7 @@ import { nonenumerable } from '@/utils/enumerable';
 import { Entity } from './Entity';
 import { Registry, RegistryOperationOptions } from './Registry';
 
-export type ClazzOrTag<C = any> = ComponentClassType<C> | string;
+export type ClazzOrTag<C extends Component> = ComponentClassType<C> | string;
 export type ComponentsInitialization = Record<string, any>;
 
 export enum ComponentFlags {
@@ -12,7 +12,7 @@ export enum ComponentFlags {
     SHARED = 1 << 2,
 }
 
-export class Component<C extends Component<C>> {
+export class Component {
     @nonenumerable
     readonly registry: Registry;
 
@@ -20,7 +20,7 @@ export class Component<C extends Component<C>> {
     readonly entities: Set<Entity> = new Set();
 
     @nonenumerable
-    readonly clazz: ComponentClassType<C>;
+    readonly clazz: ComponentClassType<this>;
 
     @nonenumerable
         flags = 0;
@@ -29,7 +29,7 @@ export class Component<C extends Component<C>> {
         registry: Registry,
     ) {
         this.registry = registry;
-        this.clazz = this.constructor as ComponentClassType<C>;
+        this.clazz = this.constructor as ComponentClassType<this>;
         this.flags = this.clazz.BASE_FLAGS;
     }
 
@@ -83,16 +83,16 @@ export class Component<C extends Component<C>> {
         Object.assign(this, encoding);
     }
 
-    update(data?: any, options?: RegistryOperationOptions): C {
+    update(data?: any, options?: RegistryOperationOptions): this {
         return this.entity.updateComponent(this.clazz, data, options);
     }
 
-    remove(options?: RegistryOperationOptions): C | undefined {
+    remove(options?: RegistryOperationOptions): this | undefined {
         return this.entity.removeComponent(this.clazz, options);
     }
 }
 
-export type ComponentClassType<C = any> = {
+export type ComponentClassType<C extends Component> = {
     readonly TAG?: string;
     readonly BASE_FLAGS: number;
     readonly tag: string;

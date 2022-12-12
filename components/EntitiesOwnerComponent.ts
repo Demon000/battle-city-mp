@@ -4,8 +4,7 @@ export interface EntitiesOwnerComponentData {
     ids: Record<string, boolean>;
 }
 
-export class EntitiesOwnerComponent
-    extends Component<EntitiesOwnerComponent>
+export class EntitiesOwnerComponent extends Component
     implements EntitiesOwnerComponentData {
     static TAG = 'EOR';
 

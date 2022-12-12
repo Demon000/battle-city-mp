@@ -4,8 +4,7 @@ export interface PlayerOwnedComponentData {
     playerId: string;
 }
 
-export class PlayerOwnedComponent
-    extends Component<PlayerOwnedComponent>
+export class PlayerOwnedComponent extends Component
     implements PlayerOwnedComponentData {
     static TAG = 'PO';
 

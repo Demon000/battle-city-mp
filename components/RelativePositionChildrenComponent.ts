@@ -4,8 +4,7 @@ export interface RelativePositionChildrenComponentData {
     ids: Record<string, boolean>;
 }
 
-export class RelativePositionChildrenComponent
-    extends Component<RelativePositionChildrenComponent>
+export class RelativePositionChildrenComponent extends Component
     implements RelativePositionChildrenComponentData {
     static TAG = 'RPC';
 

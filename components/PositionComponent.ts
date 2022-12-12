@@ -3,8 +3,7 @@ import { Point } from '@/physics/point/Point';
 
 export interface PositionComponentData extends Point {}
 
-export class PositionComponent
-    extends Component<PositionComponent>
+export class PositionComponent extends Component
     implements PositionComponentData {
     static TAG = 'P';
 

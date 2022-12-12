@@ -5,8 +5,7 @@ export interface SpawnTimeComponentData {
     readonly value: number;
 }
 
-export class SpawnTimeComponent
-    extends Component<SpawnTimeComponent>
+export class SpawnTimeComponent extends Component
     implements SpawnTimeComponentData {
     static TAG = 'ST';
 

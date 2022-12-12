@@ -12,8 +12,7 @@ export interface EntitySpawnerComponentData {
     inheritSpeed: boolean;
 }
 
-export class EntitySpawnerComponent
-    extends Component<EntitySpawnerComponent>
+export class EntitySpawnerComponent extends Component
     implements EntitySpawnerComponentData {
     static TAG = 'ES';
 

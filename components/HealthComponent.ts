@@ -5,8 +5,7 @@ export interface HealthComponentData {
     value: number;
 }
 
-export class HealthComponent
-    extends Component<HealthComponent>
+export class HealthComponent extends Component
     implements HealthComponentData {
     static TAG = 'H';
 

@@ -7,8 +7,7 @@ export interface CollisionTrackingComponentData {
     values: CollisionTrackingData;
 }
 
-export class CollisionTrackingComponent
-    extends Component<CollisionTrackingComponent>
+export class CollisionTrackingComponent extends Component
     implements CollisionTrackingComponentData {
     static TAG = 'CT';
 

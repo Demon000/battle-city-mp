@@ -5,8 +5,7 @@ export interface PlayerInputComponentData {
     map: Map<ButtonType, ButtonPressAction>;
 }
 
-export class PlayerInputComponent
-    extends Component<PlayerInputComponent>
+export class PlayerInputComponent extends Component
     implements PlayerInputComponentData {
     static TAG = 'PLI';
 

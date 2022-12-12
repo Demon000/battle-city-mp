@@ -14,8 +14,7 @@ export interface MovementMultipliersComponentData {
     typeMultipliersMarkedMap: Record<string, boolean>;
 }
 
-export class MovementMultipliersComponent
-    extends Component<MovementMultipliersComponent>
+export class MovementMultipliersComponent extends Component
     implements MovementMultipliersComponentData {
     static TAG = 'MM';
 

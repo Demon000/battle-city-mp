@@ -6,8 +6,7 @@ export interface MovementConfigComponentData {
     decelerationFactor: number;
 }
 
-export class MovementConfigComponent
-    extends Component<MovementConfigComponent>
+export class MovementConfigComponent extends Component
     implements MovementConfigComponentData {
     static TAG = 'MC';
 

@@ -6,8 +6,7 @@ export interface RelativePositionComponentData extends Point {
     entityId: EntityId;
 }
 
-export class RelativePositionComponent
-    extends Component<RelativePositionComponent>
+export class RelativePositionComponent extends Component
     implements RelativePositionComponentData {
     static TAG = 'REP';
 

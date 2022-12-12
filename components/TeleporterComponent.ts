@@ -5,8 +5,7 @@ export interface TeleporterComponentData {
     target: Point;
 }
 
-export class TeleporterComponent
-    extends Component<TeleporterComponent>
+export class TeleporterComponent extends Component
     implements TeleporterComponentData {
     static TAG = 'TE';
 

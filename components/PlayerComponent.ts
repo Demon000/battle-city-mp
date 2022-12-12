@@ -11,8 +11,7 @@ export interface PlayerComponentData {
     requestedTankTier: TankTier;
 }
 
-export class PlayerComponent
-    extends Component<PlayerComponent>
+export class PlayerComponent extends Component
     implements PlayerComponentData {
     static TAG = 'PL';
 

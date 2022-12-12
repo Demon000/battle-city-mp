@@ -6,8 +6,7 @@ export interface MovementComponentData {
     direction: Direction | null;
 }
 
-export class MovementComponent
-    extends Component<MovementComponent>
+export class MovementComponent extends Component
     implements MovementComponentData {
     static TAG = 'M';
 

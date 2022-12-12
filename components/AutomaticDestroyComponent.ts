@@ -4,8 +4,7 @@ export interface AutomaticDestroyComponentData {
     timeMs: number;
 }
 
-export class AutomaticDestroyComponent
-    extends Component<AutomaticDestroyComponent>
+export class AutomaticDestroyComponent extends Component
     implements AutomaticDestroyComponentData {
     static TAG = 'AD';
 

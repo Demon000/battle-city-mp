@@ -4,8 +4,7 @@ export default interface HealthBasedSmokeSpawnerComponentData {
     map: Record<string, number>;
 }
 
-export class HealthBasedSmokeSpawnerComponent
-    extends Component<HealthBasedSmokeSpawnerComponent>
+export class HealthBasedSmokeSpawnerComponent extends Component
     implements HealthBasedSmokeSpawnerComponentData {
     static TAG = 'HBSS';
 

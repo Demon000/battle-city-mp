@@ -5,8 +5,7 @@ export interface DirectionComponentData {
     value: Direction;
 }
 
-export class DirectionComponent
-    extends Component<DirectionComponent>
+export class DirectionComponent extends Component
     implements DirectionComponentData {
     static TAG = 'DI';
 

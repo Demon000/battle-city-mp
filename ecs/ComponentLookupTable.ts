@@ -1,4 +1,4 @@
-import { ClazzOrTag, ComponentClassType } from '@/ecs/Component';
+import { ClazzOrTag, Component, ComponentClassType } from '@/ecs/Component';
 import { BoundingBoxComponent, BoundingBoxComponentData } from '@/components/BoundingBoxComponent';
 import { PositionComponent, PositionComponentData } from '@/components/PositionComponent';
 import { SizeComponent, SizeComponentData } from '@/components/SizeComponent';
@@ -296,7 +296,10 @@ export class ComponentLookupTable {
         }
     }
 
-    lookup(clazzOrTag: ClazzOrTag, data?: any): ComponentClassType<any> {
+    lookup<C extends Component>(
+        clazzOrTag: ClazzOrTag<C>,
+        data?: any,
+    ): ComponentClassType<C> {
         let clazz;
         let tag;
         if (typeof clazzOrTag === 'string') {

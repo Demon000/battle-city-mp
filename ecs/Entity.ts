@@ -9,7 +9,7 @@ export interface EntityComponentsOptions {
 }
 
 export class Entity {
-    private tagComponentMap = new Map<string, Component<any>>();
+    private tagComponentMap = new Map<string, Component>();
 
     constructor(
         private registry: Registry,
@@ -18,7 +18,7 @@ export class Entity {
         public subtypes: string[] = [],
     ) {}
 
-    setTagComponent<C extends Component<C>>(
+    setTagComponent<C extends Component>(
         component: C,
     ): void {
         const existingComponent = this.findComponent(component.clazz);
@@ -28,7 +28,7 @@ export class Entity {
         this.tagComponentMap.set(component.clazz.tag, component);
     }
 
-    removeLocalComponent<C extends Component<C>>(
+    removeLocalComponent<C extends Component>(
         clazz: ComponentClassType<C>,
         optional = false,
     ): C | undefined {
@@ -48,9 +48,9 @@ export class Entity {
     }
 
     addComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
-        clazzOrTag: ClazzOrTag,
+        clazzOrTag: ClazzOrTag<C>,
         data?: any,
         options?: RegistryOperationOptions,
     ): C {
@@ -58,7 +58,7 @@ export class Entity {
     }
 
     attachComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
         component: C,
         options?: RegistryOperationOptions,
@@ -67,9 +67,9 @@ export class Entity {
     }
 
     updateComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
-        clazzOrTag: ClazzOrTag,
+        clazzOrTag: ClazzOrTag<C>,
         data?: any,
         options?: RegistryOperationOptions,
     ): C {
@@ -77,9 +77,9 @@ export class Entity {
     }
 
     upsertComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
-        clazzOrTag: ClazzOrTag,
+        clazzOrTag: ClazzOrTag<C>,
         data?: any,
         options?: RegistryOperationOptions,
     ): C {
@@ -87,7 +87,7 @@ export class Entity {
     }
 
     upsertSharedComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
         clazzOrTag: ClazzOrTag<C>,
         options?: RegistryOperationOptions,
@@ -143,7 +143,7 @@ export class Entity {
     }
 
     removeComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
         clazzOrTag: ClazzOrTag<C>,
         options?: RegistryOperationOptions,
@@ -164,30 +164,30 @@ export class Entity {
     }
 
     findComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
         clazzOrTag: ClazzOrTag<C>,
     ): C | undefined {
         const tag = this.registry.lookup(clazzOrTag).tag;
-        return this.tagComponentMap.get(tag) as C;
+        return this.tagComponentMap.get(tag) as C | undefined;
     }
 
     getComponent<
-        C extends Component<C>,
+        C extends Component,
     >(
         clazzOrTag: ClazzOrTag<C>,
     ): C {
         const component = this.findComponent(clazzOrTag);
         assert(component !== undefined,
             'Component does not exist on entity', clazzOrTag, this);
-        return component;
+        return component as C;
     }
 
-    getComponents(): Iterable<Component<any>> {
+    getComponents(): Iterable<Component> {
         return Array.from(this.tagComponentMap.values());
     }
 
-    hasComponent<C extends Component<C>>(clazz: ComponentClassType<C>): boolean {
+    hasComponent<C extends Component>(clazz: ComponentClassType<C>): boolean {
         const component = this.findComponent(clazz);
         return component !== undefined;
     }

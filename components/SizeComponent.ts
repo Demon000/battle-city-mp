@@ -3,8 +3,7 @@ import { Size } from '@/physics/size/Size';
 
 export interface SizeComponentData extends Size {}
 
-export class SizeComponent
-    extends Component<SizeComponent>
+export class SizeComponent extends Component
     implements SizeComponentData {
     static TAG = 'S';
 
