@@ -7,7 +7,7 @@ import { Point } from '@/physics/point/Point';
 import { PositionComponent } from '@/components/PositionComponent';
 import { CanvasUtils, Context2D } from '@/utils/CanvasUtils';
 import { RatioUtils } from '@/utils/RatioUtils';
-import { ClazzOrTag } from '@/ecs/Component';
+import { ClazzOrTag, Component } from '@/ecs/Component';
 import { GraphicsRendererComponent } from '@/components/GraphicsRendererComponent';
 import { Entity } from '@/ecs/Entity';
 import { EntityGraphicsRenderer } from '@/entity/EntityGraphicsRenderer';
@@ -147,9 +147,9 @@ export class GameGraphicsService {
         }
     }
 
-    processGraphicsDependencies(
+    processGraphicsDependencies<C extends Component>(
         entity: Entity,
-        clazzOrTag: ClazzOrTag,
+        clazzOrTag: ClazzOrTag<C>,
     ): void {
         const component = entity.findComponent(GraphicDependenciesComponent);
         if (component === undefined) {
