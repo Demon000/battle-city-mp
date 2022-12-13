@@ -1,5 +1,5 @@
 import { GraphicsRendererComponent, GraphicsRendererComponentData } from '@/components/GraphicsRendererComponent';
-import { assert as assertEquals } from 'typescript-json';
+import { assert as assertEquals } from 'typia';
 import { ComponentClassType } from './Component';
 import { ComponentLookupTable } from './ComponentLookupTable';
 

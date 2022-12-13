@@ -38,7 +38,7 @@
         "transform": "typescript-transform-paths"
       },
       {
-        "transform": "typescript-json/lib/transform",
+        "transform": "typia/lib/transform",
       }
     ]
   },
