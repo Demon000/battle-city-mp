@@ -1,5 +1,10 @@
 export class IterableUtils {
-    static equals<T>(first: Iterable<T>, second: Iterable<T>): boolean {
+    static equals<
+        T extends (string | number | symbol)
+    >(
+        first: Iterable<T>,
+        second: Iterable<T>,
+    ): boolean {
         if (first === second) {
             return true;
         }
