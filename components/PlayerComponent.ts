@@ -1,6 +1,8 @@
 import { Component } from '@/ecs/Component';
 import { Direction } from '@/physics/Direction';
 import { TankTier } from '@/subtypes/TankTier';
+import { registerComponent } from '@/ecs/ComponentLookupTable';
+import { createAssert } from 'typia';
 
 export interface PlayerComponentData {
     lastRequestedDirection: Direction | undefined;
@@ -22,3 +24,6 @@ export class PlayerComponent extends Component
     points = 0;
     requestedTankTier = TankTier.NORMAL;
 }
+
+registerComponent(PlayerComponent,
+	createAssert<Partial<PlayerComponentData>>());

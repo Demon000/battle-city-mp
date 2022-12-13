@@ -1,4 +1,6 @@
 import { Component } from '@/ecs/Component';
+import { registerComponent } from '@/ecs/ComponentLookupTable';
+import { createAssert } from 'typia';
 
 export interface HealthComponentData {
     max: number;
@@ -12,3 +14,6 @@ export class HealthComponent extends Component
     value = 0;
     max = 0;
 }
+
+registerComponent(HealthComponent,
+	createAssert<Partial<HealthComponentData>>());

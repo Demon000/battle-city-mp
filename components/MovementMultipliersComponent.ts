@@ -5,6 +5,8 @@ export interface MovementTypeMultipliers {
     accelerationFactor: number;
     decelerationFactor: number;
 }
+import { registerComponent } from '@/ecs/ComponentLookupTable';
+import { createAssert } from 'typia';
 
 export interface MovementMultipliersComponentData {
     accelerationFactorMultiplier: number;
@@ -24,3 +26,6 @@ export class MovementMultipliersComponent extends Component
     typeMultipliersMap: Record<string, MovementTypeMultipliers> = {};
     typeMultipliersMarkedMap: Record<string, boolean> = {};
 }
+
+registerComponent(MovementMultipliersComponent,
+	createAssert<Partial<MovementMultipliersComponentData>>());

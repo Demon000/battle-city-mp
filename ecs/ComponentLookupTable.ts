@@ -1,294 +1,56 @@
-import { ClazzOrTag, Component, ComponentClassType } from '@/ecs/Component';
-import { BoundingBoxComponent, BoundingBoxComponentData } from '@/components/BoundingBoxComponent';
-import { PositionComponent, PositionComponentData } from '@/components/PositionComponent';
-import { SizeComponent, SizeComponentData } from '@/components/SizeComponent';
-import { AutomaticDestroyComponent, AutomaticDestroyComponentData } from '../components/AutomaticDestroyComponent';
+import { ClazzOrTag, Component, ComponentClassType, ComponentValidator } from '@/ecs/Component';
 import { assert } from '@/utils/assert';
-import { assert as assertEquals } from 'typia';
-import { GraphicDependenciesComponent, GraphicDependenciesComponentData } from '@/components/GraphicDependenciesComponent';
-import { IsMovingComponent, IsMovingComponentData } from '@/components/IsMovingComponent';
-import { DirectionAxisSnappingComponent, DirectionAxisSnappingComponentData } from '@/components/DirectionAxisSnappingComponent';
-import { SpawnTimeComponent, SpawnTimeComponentData } from '@/components/SpawnTimeComponent';
-import { CenterPositionComponent, CenterPositionComponentData } from '@/components/CenterPositionComponent';
-import { RequestedPositionComponent, RequestedPositionComponentData } from '@/components/RequestedPositionComponent';
-import { DirectionComponent, DirectionComponentData } from '@/components/DirectionComponent';
-import { RequestedDirectionComponent, RequestedDirectionComponentData } from '@/components/RequestedDirectionComponent';
-import { TankComponent, TankComponentData } from '@/components/TankComponent';
-import { SpawnComponent, SpawnComponentData } from '@/components/SpawnComponent';
-import { PlayerOwnedComponent, PlayerOwnedComponentData } from '@/components/PlayerOwnedComponent';
-import { EntityOwnedComponent, EntityOwnedComponentData } from '@/components/EntityOwnedComponent';
-import { BulletComponent, BulletComponentData } from '@/components/BulletComponent';
-import { ColorComponent, ColorComponentData } from '@/components/ColorComponent';
-import { WorldEntityComponent, WorldEntityComponentData } from '@/components/WorldEntityComponent';
-import { MovementComponent, MovementComponentData } from '@/components/MovementComponent';
-import { MovementMultipliersComponent, MovementMultipliersComponentData } from '@/components/MovementMultipliersComponent';
-import { HealthComponent, HealthComponentData } from '@/components/HealthComponent';
-import { EntitySpawnerComponent, EntitySpawnerComponentData } from '@/components/EntitySpawnerComponent';
-import { BulletSpawnerComponent, BulletSpawnerComponentData } from '@/components/BulletSpawnerComponent';
-import { EntitySpawnerActiveComponent, EntitySpawnerActiveComponentData } from '@/components/EntitySpawnerActiveComponent';
-import { SmokeSpawnerComponent, SmokeSpawnerComponentData } from '@/components/SmokeSpawnerComponent';
-import HealthBasedSmokeSpawnerComponentData, { HealthBasedSmokeSpawnerComponent } from '@/components/HealthBasedSmokeSpawnerComponent';
-import { TeamOwnedComponent, TeamOwnedComponentData } from '@/components/TeamOwnedComponent';
-import { FlagComponent, FlagComponentData } from '@/components/FlagComponent';
-import { DirtyGraphicsComponent, DirtyGraphicsComponentData } from '@/components/DirtyGraphicsComponent';
-import { RelativePositionChildrenComponent, RelativePositionChildrenComponentData } from '@/components/RelativePositionChildrenComponent';
-import { RelativePositionComponent, RelativePositionComponentData } from '@/components/RelativePositionComponent';
-import { DirtyPositionComponent, DirtyPositionComponentData } from '@/components/DirtyPositionComponent';
-import { PickupIgnoreComponent, PickupIgnoreComponentData } from '@/components/PickupIgnoreComponent';
-import { DynamicSizeComponent, DynamicSizeComponentData } from '@/components/DynamicSizeComponent';
-import { ExplosionComponent, ExplosionComponentData } from '@/components/ExplosionComponent';
-import { TeleporterComponent, TeleporterComponentData } from '@/components/TeleporterComponent';
-import { PatternFillGraphicsComponent, PatternFillGraphicsComponentData } from '@/components/PatternFillGraphicsComponent';
-import { CollisionTrackingComponent, CollisionTrackingComponentData } from '@/components/CollisionTrackingComponent';
-import { CollisionRulesComponent, CollisionRulesComponentData } from '@/components/CollisionRulesComponent';
-import { DirtyCollisionsAddComponent, DirtyCollisionsAddComponentData } from '@/components/DirtyCollisionsAddComponent';
-import { DirtyCollisionsUpdateComponent, DirtyCollisionsUpdateComponentData } from '@/components/DirtyCollisionsUpdateComponent';
-import { DirtyCollisionsRemoveComponent, DirtyCollisionsRemoveComponentData } from '@/components/DirtyCollisionsRemoveComponent';
-import { MovementConfigComponent, MovementConfigComponentData } from '@/components/MovementConfigComponent';
-import { FatBoundingBoxComponent, FatBoundingBoxComponentData } from '@/components/FatBoundingBoxComponent';
-import { PickupIgnoreTimeComponent, PickupIgnoreTimeComponentData } from '@/components/PickupIgnoreTimeComponent';
-import { TeamComponent, TeamComponentData } from '@/components/TeamComponent';
-import { PlayerRequestedSpawnComponent, PlayerRequestedSpawnComponentData } from '@/components/PlayerRequestedSpawnComponent';
-import { PlayerRequestedServerStatusComponent, PlayerRequestedServerStatusComponentData } from '@/components/PlayerRequestedServerStatusComponent';
-import { PlayerRespawnTimeoutComponent, PlayerRespawnTimeoutComponentData } from '@/components/PlayerRespawnTimeoutComponent';
-import { PlayerComponent, PlayerComponentData } from '@/components/PlayerComponent';
-import { EntitiesOwnerComponent, EntitiesOwnerComponentData } from '@/components/EntitiesOwnerComponent';
-import { PlayerInputComponent, PlayerInputComponentData } from '@/components/PlayerInputComponent';
-import { NameComponent, NameComponentData } from '@/components/NameComponent';
-import { PlayerRequestedDisconnectComponent, PlayerRequestedDisconnectComponentData } from '@/components/PlayerRequestedDisconnect';
-import { PlayerRespawnTimeoutConfigComponent, PlayerRespawnTimeoutConfigComponentData } from '@/components/PlayerRespawnTimeoutConfigComponent';
+
+const tagComponentLookupTable = new Map<string, ComponentClassType<any>>;
+const tagValidatorLookupTable = new Map<string, ComponentValidator<any>>;
+
+export function registerComponent<V, C extends Component>(
+    clazz: ComponentClassType<C>,
+    validator: ComponentValidator<V>,
+): void {
+    let existingClazz;
+
+    existingClazz = tagComponentLookupTable.get(clazz.name);
+    assert(existingClazz === undefined || existingClazz === clazz);
+    tagComponentLookupTable.set(clazz.name, clazz);
+
+    existingClazz = tagComponentLookupTable.get(clazz.tag);
+    assert(existingClazz === undefined || existingClazz === clazz);
+    tagComponentLookupTable.set(clazz.tag, clazz);
+
+    let existingValidator;
+
+    existingValidator = tagValidatorLookupTable.get(clazz.name);
+    assert(existingValidator === undefined || existingValidator === validator);
+    tagValidatorLookupTable.set(clazz.name, validator);
+
+    existingValidator = tagValidatorLookupTable.get(clazz.tag);
+    assert(existingValidator === undefined || existingValidator === validator);
+    tagValidatorLookupTable.set(clazz.tag, validator);
+}
 
 export class ComponentLookupTable {
     protected lookupAndValidate(
         tag: string,
         data: any,
     ): ComponentClassType<any> | undefined {
-        switch(tag) {
-            case BoundingBoxComponent.tag:
-            case BoundingBoxComponent.name:
-                assertEquals<Partial<BoundingBoxComponentData>>(data);
-                return BoundingBoxComponent;
-            case PositionComponent.tag:
-            case PositionComponent.name:
-                assertEquals<Partial<PositionComponentData>>(data);
-                return PositionComponent;
-            case SizeComponent.tag:
-            case SizeComponent.name:
-                assertEquals<Partial<SizeComponentData>>(data);
-                return SizeComponent;
-            case AutomaticDestroyComponent.tag:
-            case AutomaticDestroyComponent.name:
-                assertEquals<Partial<AutomaticDestroyComponentData>>(data);
-                return AutomaticDestroyComponent;
-            case GraphicDependenciesComponent.tag:
-            case GraphicDependenciesComponent.name:
-                assertEquals<Partial<GraphicDependenciesComponentData>>(data);
-                return GraphicDependenciesComponent;
-            case IsMovingComponent.tag:
-            case IsMovingComponent.name:
-                assertEquals<Partial<IsMovingComponentData>>(data);
-                return IsMovingComponent;
-            case DirectionAxisSnappingComponent.tag:
-            case DirectionAxisSnappingComponent.name:
-                assertEquals<Partial<DirectionAxisSnappingComponentData>>(data);
-                return DirectionAxisSnappingComponent;
-            case SpawnTimeComponent.tag:
-            case SpawnTimeComponent.name:
-                assertEquals<Partial<SpawnTimeComponentData>>(data);
-                return SpawnTimeComponent;
-            case CenterPositionComponent.tag:
-            case CenterPositionComponent.name:
-                assertEquals<Partial<CenterPositionComponentData>>(data);
-                return CenterPositionComponent;
-            case RequestedPositionComponent.tag:
-            case RequestedPositionComponent.name:
-                assertEquals<Partial<RequestedPositionComponentData>>(data);
-                return RequestedPositionComponent;
-            case DirectionComponent.tag:
-            case DirectionComponent.name:
-                assertEquals<Partial<DirectionComponentData>>(data);
-                return DirectionComponent;
-            case RequestedDirectionComponent.tag:
-            case RequestedDirectionComponent.name:
-                assertEquals<Partial<RequestedDirectionComponentData>>(data);
-                return RequestedDirectionComponent;
-            case TankComponent.tag:
-            case TankComponent.name:
-                assertEquals<Partial<TankComponentData>>(data);
-                return TankComponent;
-            case SpawnComponent.tag:
-            case SpawnComponent.name:
-                assertEquals<Partial<SpawnComponentData>>(data);
-                return SpawnComponent;
-            case PlayerOwnedComponent.tag:
-            case PlayerOwnedComponent.name:
-                assertEquals<Partial<PlayerOwnedComponentData>>(data);
-                return PlayerOwnedComponent;
-            case EntityOwnedComponent.tag:
-            case EntityOwnedComponent.name:
-                assertEquals<Partial<EntityOwnedComponentData>>(data);
-                return EntityOwnedComponent;
-            case BulletComponent.tag:
-            case BulletComponent.name:
-                assertEquals<Partial<BulletComponentData>>(data);
-                return BulletComponent;
-            case ColorComponent.tag:
-            case ColorComponent.name:
-                assertEquals<Partial<ColorComponentData>>(data);
-                return ColorComponent;
-            case WorldEntityComponent.tag:
-            case WorldEntityComponent.name:
-                assertEquals<Partial<WorldEntityComponentData>>(data);
-                return WorldEntityComponent;
-            case MovementComponent.tag:
-            case MovementComponent.name:
-                assertEquals<Partial<MovementComponentData>>(data);
-                return MovementComponent;
-            case MovementMultipliersComponent.tag:
-            case MovementMultipliersComponent.name:
-                assertEquals<Partial<MovementMultipliersComponentData>>(data);
-                return MovementMultipliersComponent;
-            case HealthComponent.tag:
-            case HealthComponent.name:
-                assertEquals<Partial<HealthComponentData>>(data);
-                return HealthComponent;
-            case EntitySpawnerComponent.tag:
-            case EntitySpawnerComponent.name:
-                assertEquals<Partial<EntitySpawnerComponentData>>(data);
-                return EntitySpawnerComponent;
-            case EntitySpawnerActiveComponent.tag:
-            case EntitySpawnerActiveComponent.name:
-                assertEquals<Partial<EntitySpawnerActiveComponentData>>(data);
-                return EntitySpawnerActiveComponent;
-            case BulletSpawnerComponent.tag:
-            case BulletSpawnerComponent.name:
-                assertEquals<Partial<BulletSpawnerComponentData>>(data);
-                return BulletSpawnerComponent;
-            case SmokeSpawnerComponent.tag:
-            case SmokeSpawnerComponent.name:
-                assertEquals<Partial<SmokeSpawnerComponentData>>(data);
-                return SmokeSpawnerComponent;
-            case HealthBasedSmokeSpawnerComponent.tag:
-            case HealthBasedSmokeSpawnerComponent.name:
-                assertEquals<Partial<HealthBasedSmokeSpawnerComponentData>>(data);
-                return HealthBasedSmokeSpawnerComponent;
-            case TeamOwnedComponent.tag:
-            case TeamOwnedComponent.name:
-                assertEquals<Partial<TeamOwnedComponentData>>(data);
-                return TeamOwnedComponent;
-            case FlagComponent.tag:
-            case FlagComponent.name:
-                assertEquals<Partial<FlagComponentData>>(data);
-                return FlagComponent;
-            case DirtyGraphicsComponent.tag:
-            case DirtyGraphicsComponent.name:
-                assertEquals<Partial<DirtyGraphicsComponentData>>(data);
-                return DirtyGraphicsComponent;
-            case RelativePositionChildrenComponent.tag:
-            case RelativePositionChildrenComponent.name:
-                assertEquals<Partial<RelativePositionChildrenComponentData>>(data);
-                return RelativePositionChildrenComponent;
-            case RelativePositionComponent.tag:
-            case RelativePositionComponent.name:
-                assertEquals<Partial<RelativePositionComponentData>>(data);
-                return RelativePositionComponent;
-            case DirtyPositionComponent.tag:
-            case DirtyPositionComponent.name:
-                assertEquals<Partial<DirtyPositionComponentData>>(data);
-                return DirtyPositionComponent;
-            case PickupIgnoreComponent.tag:
-            case PickupIgnoreComponent.name:
-                assertEquals<Partial<PickupIgnoreComponentData>>(data);
-                return PickupIgnoreComponent;
-            case DynamicSizeComponent.tag:
-            case DynamicSizeComponent.name:
-                assertEquals<Partial<DynamicSizeComponentData>>(data);
-                return DynamicSizeComponent;
-            case ExplosionComponent.tag:
-            case ExplosionComponent.name:
-                assertEquals<Partial<ExplosionComponentData>>(data);
-                return ExplosionComponent;
-            case TeleporterComponent.tag:
-            case TeleporterComponent.name:
-                assertEquals<Partial<TeleporterComponentData>>(data);
-                return TeleporterComponent;
-            case PatternFillGraphicsComponent.tag:
-            case PatternFillGraphicsComponent.name:
-                assertEquals<Partial<PatternFillGraphicsComponentData>>(data);
-                return PatternFillGraphicsComponent;
-            case CollisionTrackingComponent.tag:
-            case CollisionTrackingComponent.name:
-                assertEquals<Partial<CollisionTrackingComponentData>>(data);
-                return CollisionTrackingComponent;
-            case CollisionRulesComponent.tag:
-            case CollisionRulesComponent.name:
-                assertEquals<Partial<CollisionRulesComponentData>>(data);
-                return CollisionRulesComponent;
-            case DirtyCollisionsAddComponent.tag:
-            case DirtyCollisionsAddComponent.name:
-                assertEquals<Partial<DirtyCollisionsAddComponentData>>(data);
-                return DirtyCollisionsAddComponent;
-            case DirtyCollisionsUpdateComponent.tag:
-            case DirtyCollisionsUpdateComponent.name:
-                assertEquals<Partial<DirtyCollisionsUpdateComponentData>>(data);
-                return DirtyCollisionsUpdateComponent;
-            case DirtyCollisionsRemoveComponent.tag:
-            case DirtyCollisionsRemoveComponent.name:
-                assertEquals<Partial<DirtyCollisionsRemoveComponentData>>(data);
-                return DirtyCollisionsRemoveComponent;
-            case MovementConfigComponent.tag:
-            case MovementConfigComponent.name:
-                assertEquals<Partial<MovementConfigComponentData>>(data);
-                return MovementConfigComponent;
-            case FatBoundingBoxComponent.tag:
-            case FatBoundingBoxComponent.name:
-                assertEquals<Partial<FatBoundingBoxComponentData>>(data);
-                return FatBoundingBoxComponent;
-            case PickupIgnoreTimeComponent.tag:
-            case PickupIgnoreTimeComponent.name:
-                assertEquals<Partial<PickupIgnoreTimeComponentData>>(data);
-                return PickupIgnoreTimeComponent;
-            case TeamComponent.tag:
-            case TeamComponent.name:
-                assertEquals<Partial<TeamComponentData>>(data);
-                return TeamComponent;
-            case PlayerRequestedSpawnComponent.tag:
-            case PlayerRequestedSpawnComponent.name:
-                assertEquals<Partial<PlayerRequestedSpawnComponentData>>(data);
-                return PlayerRequestedSpawnComponent;
-            case PlayerRequestedServerStatusComponent.tag:
-            case PlayerRequestedServerStatusComponent.name:
-                assertEquals<Partial<PlayerRequestedServerStatusComponentData>>(data);
-                return PlayerRequestedServerStatusComponent;
-            case PlayerRespawnTimeoutComponent.tag:
-            case PlayerRespawnTimeoutComponent.name:
-                assertEquals<Partial<PlayerRespawnTimeoutComponentData>>(data);
-                return PlayerRespawnTimeoutComponent;
-            case PlayerComponent.tag:
-            case PlayerComponent.name:
-                assertEquals<Partial<PlayerComponentData>>(data);
-                return PlayerComponent;
-            case EntitiesOwnerComponent.tag:
-            case EntitiesOwnerComponent.name:
-                assertEquals<Partial<EntitiesOwnerComponentData>>(data);
-                return EntitiesOwnerComponent;
-            case PlayerInputComponent.tag:
-            case PlayerInputComponent.name:
-                assertEquals<Partial<PlayerInputComponentData>>(data);
-                return PlayerInputComponent;
-            case NameComponent.tag:
-            case NameComponent.name:
-                assertEquals<Partial<NameComponentData>>(data);
-                return NameComponent;
-            case PlayerRequestedDisconnectComponent.tag:
-            case PlayerRequestedDisconnectComponent.name:
-                assertEquals<Partial<PlayerRequestedDisconnectComponentData>>(data);
-                return PlayerRequestedDisconnectComponent;
-            case PlayerRespawnTimeoutConfigComponent.tag:
-            case PlayerRespawnTimeoutConfigComponent.name:
-                assertEquals<Partial<PlayerRespawnTimeoutConfigComponentData>>(data);
-                return PlayerRespawnTimeoutConfigComponent;
+        const clazz = tagComponentLookupTable.get(tag);
+        if (clazz === undefined) {
+            return clazz;
         }
+
+        if (data !== undefined) {
+            const validator = tagValidatorLookupTable.get(tag);
+            assert(validator !== undefined);
+            try {
+                validator(data);
+            } catch (err) {
+                console.log(`Failed to validate data for component '${tag}'`, data);
+                throw err;
+            }
+        }
+
+        return clazz;
     }
 
     lookup<C extends Component>(

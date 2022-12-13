@@ -1,4 +1,6 @@
 import { Component } from '@/ecs/Component';
+import { registerComponent } from '@/ecs/ComponentLookupTable';
+import { createAssert } from 'typia';
 
 export interface FatBoundingBoxComponentData {
     factor: number;
@@ -10,3 +12,6 @@ export class FatBoundingBoxComponent extends Component
 
     factor = 0;
 }
+
+registerComponent(FatBoundingBoxComponent,
+	createAssert<Partial<FatBoundingBoxComponentData>>());

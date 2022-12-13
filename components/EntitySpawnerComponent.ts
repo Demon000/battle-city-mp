@@ -1,4 +1,6 @@
 import { Component, ComponentsInitialization } from '@/ecs/Component';
+import { registerComponent } from '@/ecs/ComponentLookupTable';
+import { createAssert } from 'typia';
 
 export interface EntitySpawnerComponentData {
     type: string;
@@ -26,3 +28,6 @@ export class EntitySpawnerComponent extends Component
     lastSpawnTime = 0;
     inheritSpeed = false;
 }
+
+registerComponent(EntitySpawnerComponent,
+	createAssert<Partial<EntitySpawnerComponentData>>());

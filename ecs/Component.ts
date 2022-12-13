@@ -4,6 +4,7 @@ import { Entity } from './Entity';
 import { Registry, RegistryOperationOptions } from './Registry';
 
 export type ClazzOrTag<C extends Component> = ComponentClassType<C> | string;
+export type ComponentValidator<C> = (data: unknown) => C;
 export type ComponentsInitialization = Record<string, any>;
 
 export enum ComponentFlags {
@@ -23,7 +24,7 @@ export class Component {
     readonly clazz: ComponentClassType<this>;
 
     @nonenumerable
-        flags = 0;
+    flags = 0;
 
     constructor(
         registry: Registry,

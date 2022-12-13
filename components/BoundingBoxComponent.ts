@@ -1,5 +1,7 @@
 import { Component } from '@/ecs/Component';
 import { BoundingBox } from '@/physics/bounding-box/BoundingBox';
+import { registerComponent } from '@/ecs/ComponentLookupTable';
+import { createAssert } from 'typia';
 
 export interface BoundingBoxComponentData extends BoundingBox {}
 
@@ -17,3 +19,6 @@ export class BoundingBoxComponent extends Component
         y: 0,
     };
 }
+
+registerComponent(BoundingBoxComponent,
+	createAssert<Partial<BoundingBoxComponentData>>());

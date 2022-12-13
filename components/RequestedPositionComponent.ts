@@ -1,5 +1,7 @@
 import { Component, ComponentFlags } from '@/ecs/Component';
 import { Point } from '@/physics/point/Point';
+import { registerComponent } from '@/ecs/ComponentLookupTable';
+import { createAssert } from 'typia';
 
 export interface RequestedPositionComponentData extends Point {}
 
@@ -11,3 +13,6 @@ export class RequestedPositionComponent extends Component
     x = 0;
     y = 0;
 }
+
+registerComponent(RequestedPositionComponent,
+	createAssert<Partial<RequestedPositionComponentData>>());

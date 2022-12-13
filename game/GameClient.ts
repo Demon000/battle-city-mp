@@ -1,3 +1,6 @@
+import { ComponentLookupTable } from '@/ecs/ComponentLookupTable';
+import '../components/client-index';
+
 import { GameCamera } from '@/renderer/GameCamera';
 import { GameGraphicsService } from '@/renderer/GameGraphicsService';
 import { Ticker, TickerEvent } from '@/utils/Ticker';
@@ -23,7 +26,6 @@ import { MovementComponent } from '@/components/MovementComponent';
 import { HealthComponent } from '@/components/HealthComponent';
 import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { Entity } from '@/ecs/Entity';
-import { ClientComponentLookupTable } from '@/ecs/ClientComponentLookupTable';
 import { EntityGraphicsRenderer } from '@/entity/EntityGraphicsRenderer';
 import { updateIsMoving } from '@/logic/entity-movement';
 import { updateCenterPosition } from '@/logic/entity-position';
@@ -108,7 +110,7 @@ export class GameClient {
         this.config = new Config();
         this.gameEventBatcher = new GameEventBatcher();
 
-        const componentRegistry = new ClientComponentLookupTable();
+        const componentRegistry = new ComponentLookupTable();
         const registryIdGenerator = new RegistryNumberIdGenerator();
         const entityBlueprint = new EntityBlueprint(this.config, BlueprintEnv.CLIENT);
         this.registry = new Registry(componentRegistry, registryIdGenerator);

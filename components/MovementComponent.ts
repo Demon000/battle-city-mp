@@ -1,5 +1,7 @@
 import { Component } from '@/ecs/Component';
 import { Direction } from '@/physics/Direction';
+import { registerComponent } from '@/ecs/ComponentLookupTable';
+import { createAssert } from 'typia';
 
 export interface MovementComponentData {
     speed: number;
@@ -13,3 +15,6 @@ export class MovementComponent extends Component
     speed = 0;
     direction = null;
 }
+
+registerComponent(MovementComponent,
+	createAssert<Partial<MovementComponentData>>());

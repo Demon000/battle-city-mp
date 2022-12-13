@@ -1,3 +1,6 @@
+import { ComponentLookupTable } from '@/ecs/ComponentLookupTable';
+import '../components/index';
+
 import { Color } from '@/drawable/Color';
 import { EntityFactory, EntityBuildOptions } from '@/entity/EntityFactory';
 import { TankTier } from '@/subtypes/TankTier';
@@ -22,7 +25,6 @@ import { GameMap } from '@/maps/GameMap';
 import { assert } from '@/utils/assert';
 import { ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
-import { ComponentLookupTable } from '@/ecs/ComponentLookupTable';
 import { processActiveEntitySpawners } from '@/logic/entity-spawner';
 import { processDirection, processMovement } from '@/logic/entity-movement';
 import { destroyAllWorldEntities, processAutomaticDestroy } from '@/logic/entity-destroy';
