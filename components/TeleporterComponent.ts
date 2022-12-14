@@ -18,4 +18,4 @@ export class TeleporterComponent extends Component
 }
 
 registerComponent(TeleporterComponent,
-	createAssert<Partial<TeleporterComponentData>>());
+    createAssert<Partial<TeleporterComponentData>>());

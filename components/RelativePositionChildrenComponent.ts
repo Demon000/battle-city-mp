@@ -14,4 +14,4 @@ export class RelativePositionChildrenComponent extends Component
 }
 
 registerComponent(RelativePositionChildrenComponent,
-	createAssert<Partial<RelativePositionChildrenComponentData>>());
+    createAssert<Partial<RelativePositionChildrenComponentData>>());

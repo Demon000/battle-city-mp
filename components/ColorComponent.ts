@@ -15,4 +15,4 @@ export class ColorComponent extends Component
 }
 
 registerComponent(ColorComponent,
-	createAssert<Partial<ColorComponentData>>());
+    createAssert<Partial<ColorComponentData>>());

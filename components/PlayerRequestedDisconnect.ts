@@ -11,4 +11,4 @@ export class PlayerRequestedDisconnectComponent extends Component
 }
 
 registerComponent(PlayerRequestedDisconnectComponent,
-	createAssert<Partial<PlayerRequestedDisconnectComponentData>>());
+    createAssert<Partial<PlayerRequestedDisconnectComponentData>>());

@@ -14,4 +14,4 @@ export class PickupIgnoreTimeComponent extends Component
 }
 
 registerComponent(PickupIgnoreTimeComponent,
-	createAssert<Partial<PickupIgnoreTimeComponentData>>());
+    createAssert<Partial<PickupIgnoreTimeComponentData>>());

@@ -11,4 +11,4 @@ export class SpawnComponent extends Component
 }
 
 registerComponent(SpawnComponent,
-	createAssert<Partial<SpawnComponentData>>());
+    createAssert<Partial<SpawnComponentData>>());

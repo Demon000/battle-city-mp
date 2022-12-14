@@ -21,4 +21,4 @@ export class BoundingBoxComponent extends Component
 }
 
 registerComponent(BoundingBoxComponent,
-	createAssert<Partial<BoundingBoxComponentData>>());
+    createAssert<Partial<BoundingBoxComponentData>>());

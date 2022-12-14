@@ -14,4 +14,4 @@ export class FatBoundingBoxComponent extends Component
 }
 
 registerComponent(FatBoundingBoxComponent,
-	createAssert<Partial<FatBoundingBoxComponentData>>());
+    createAssert<Partial<FatBoundingBoxComponentData>>());

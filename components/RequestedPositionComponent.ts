@@ -15,4 +15,4 @@ export class RequestedPositionComponent extends Component
 }
 
 registerComponent(RequestedPositionComponent,
-	createAssert<Partial<RequestedPositionComponentData>>());
+    createAssert<Partial<RequestedPositionComponentData>>());

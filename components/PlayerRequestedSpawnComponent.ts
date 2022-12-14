@@ -11,4 +11,4 @@ export class PlayerRequestedSpawnComponent extends Component
 }
 
 registerComponent(PlayerRequestedSpawnComponent,
-	createAssert<Partial<PlayerRequestedSpawnComponentData>>());
+    createAssert<Partial<PlayerRequestedSpawnComponentData>>());

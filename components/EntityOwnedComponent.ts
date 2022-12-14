@@ -15,4 +15,4 @@ export class EntityOwnedComponent extends Component
 }
 
 registerComponent(EntityOwnedComponent,
-	createAssert<Partial<EntityOwnedComponentData>>());
+    createAssert<Partial<EntityOwnedComponentData>>());

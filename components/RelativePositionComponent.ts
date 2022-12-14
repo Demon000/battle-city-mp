@@ -18,4 +18,4 @@ export class RelativePositionComponent extends Component
 }
 
 registerComponent(RelativePositionComponent,
-	createAssert<Partial<RelativePositionComponentData>>());
+    createAssert<Partial<RelativePositionComponentData>>());

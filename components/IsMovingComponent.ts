@@ -11,4 +11,4 @@ export class IsMovingComponent extends Component
 }
 
 registerComponent(IsMovingComponent,
-	createAssert<Partial<IsMovingComponentData>>());
+    createAssert<Partial<IsMovingComponentData>>());

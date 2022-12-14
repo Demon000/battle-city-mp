@@ -17,4 +17,4 @@ export class MovementComponent extends Component
 }
 
 registerComponent(MovementComponent,
-	createAssert<Partial<MovementComponentData>>());
+    createAssert<Partial<MovementComponentData>>());

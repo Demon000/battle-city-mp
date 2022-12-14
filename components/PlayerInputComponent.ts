@@ -15,4 +15,4 @@ export class PlayerInputComponent extends Component
 }
 
 registerComponent(PlayerInputComponent,
-	createAssert<Partial<PlayerInputComponentData>>());
+    createAssert<Partial<PlayerInputComponentData>>());

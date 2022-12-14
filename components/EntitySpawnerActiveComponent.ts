@@ -13,4 +13,4 @@ export class EntitySpawnerActiveComponent extends Component
 }
 
 registerComponent(EntitySpawnerActiveComponent,
-	createAssert<Partial<EntitySpawnerActiveComponentData>>());
+    createAssert<Partial<EntitySpawnerActiveComponentData>>());

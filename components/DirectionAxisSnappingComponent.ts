@@ -14,4 +14,4 @@ export class DirectionAxisSnappingComponent extends Component
 }
 
 registerComponent(DirectionAxisSnappingComponent,
-	createAssert<Partial<DirectionAxisSnappingComponentData>>());
+    createAssert<Partial<DirectionAxisSnappingComponentData>>());

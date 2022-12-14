@@ -11,4 +11,4 @@ export class DirtyCollisionsUpdateComponent extends Component
 }
 
 registerComponent(DirtyCollisionsUpdateComponent,
-	createAssert<Partial<DirtyCollisionsUpdateComponentData>>());
+    createAssert<Partial<DirtyCollisionsUpdateComponentData>>());

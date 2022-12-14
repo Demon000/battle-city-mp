@@ -14,4 +14,4 @@ export class NameComponent extends Component
 }
 
 registerComponent(NameComponent,
-	createAssert<Partial<NameComponentData>>());
+    createAssert<Partial<NameComponentData>>());

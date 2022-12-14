@@ -11,4 +11,4 @@ export class BulletSpawnerComponent extends EntitySpawnerComponent {
 }
 
 registerComponent(BulletSpawnerComponent,
-	createAssert<Partial<BulletSpawnerComponentData>>());
+    createAssert<Partial<BulletSpawnerComponentData>>());

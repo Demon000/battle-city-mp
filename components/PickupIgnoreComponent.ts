@@ -17,4 +17,4 @@ export class PickupIgnoreComponent extends Component
 }
 
 registerComponent(PickupIgnoreComponent,
-	createAssert<Partial<PickupIgnoreComponentData>>());
+    createAssert<Partial<PickupIgnoreComponentData>>());

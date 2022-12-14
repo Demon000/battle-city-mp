@@ -15,4 +15,4 @@ export class ExplosionComponent extends Component
 }
 
 registerComponent(ExplosionComponent,
-	createAssert<Partial<ExplosionComponentData>>());
+    createAssert<Partial<ExplosionComponentData>>());

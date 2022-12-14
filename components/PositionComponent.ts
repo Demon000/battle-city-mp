@@ -14,4 +14,4 @@ export class PositionComponent extends Component
 }
 
 registerComponent(PositionComponent,
-	createAssert<Partial<PositionComponentData>>());
+    createAssert<Partial<PositionComponentData>>());

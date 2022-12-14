@@ -11,4 +11,4 @@ export class WorldEntityComponent extends Component
 }
 
 registerComponent(WorldEntityComponent,
-	createAssert<Partial<WorldEntityComponentData>>());
+    createAssert<Partial<WorldEntityComponentData>>());

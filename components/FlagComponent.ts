@@ -15,4 +15,4 @@ export class FlagComponent extends Component
 }
 
 registerComponent(FlagComponent,
-	createAssert<Partial<FlagComponentData>>());
+    createAssert<Partial<FlagComponentData>>());

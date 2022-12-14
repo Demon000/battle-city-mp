@@ -14,4 +14,4 @@ export class AutomaticDestroyComponent extends Component
 }
 
 registerComponent(AutomaticDestroyComponent,
-	createAssert<Partial<AutomaticDestroyComponentData>>());
+    createAssert<Partial<AutomaticDestroyComponentData>>());

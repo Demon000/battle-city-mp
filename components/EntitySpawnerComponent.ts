@@ -30,4 +30,4 @@ export class EntitySpawnerComponent extends Component
 }
 
 registerComponent(EntitySpawnerComponent,
-	createAssert<Partial<EntitySpawnerComponentData>>());
+    createAssert<Partial<EntitySpawnerComponentData>>());

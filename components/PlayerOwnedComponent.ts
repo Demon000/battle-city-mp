@@ -14,4 +14,4 @@ export class PlayerOwnedComponent extends Component
 }
 
 registerComponent(PlayerOwnedComponent,
-	createAssert<Partial<PlayerOwnedComponentData>>());
+    createAssert<Partial<PlayerOwnedComponentData>>());

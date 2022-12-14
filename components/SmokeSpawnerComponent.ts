@@ -11,4 +11,4 @@ export class SmokeSpawnerComponent extends EntitySpawnerComponent {
 }
 
 registerComponent(SmokeSpawnerComponent,
-	createAssert<Partial<SmokeSpawnerComponentData>>());
+    createAssert<Partial<SmokeSpawnerComponentData>>());

@@ -15,4 +15,4 @@ export class DirectionComponent extends Component
 }
 
 registerComponent(DirectionComponent,
-	createAssert<Partial<DirectionComponentData>>());
+    createAssert<Partial<DirectionComponentData>>());

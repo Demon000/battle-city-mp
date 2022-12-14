@@ -11,4 +11,4 @@ export class DirtyPositionComponent extends Component
 }
 
 registerComponent(DirtyPositionComponent,
-	createAssert<Partial<DirtyPositionComponentData>>());
+    createAssert<Partial<DirtyPositionComponentData>>());

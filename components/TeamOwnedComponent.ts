@@ -14,4 +14,4 @@ export class TeamOwnedComponent extends Component
 }
 
 registerComponent(TeamOwnedComponent,
-	createAssert<Partial<TeamOwnedComponentData>>());
+    createAssert<Partial<TeamOwnedComponentData>>());

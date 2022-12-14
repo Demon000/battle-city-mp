@@ -24,7 +24,7 @@ export class Component {
     readonly clazz: ComponentClassType<this>;
 
     @nonenumerable
-    flags = 0;
+        flags = 0;
 
     constructor(
         registry: Registry,

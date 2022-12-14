@@ -11,4 +11,4 @@ export class PlayerRequestedServerStatusComponent extends Component
 }
 
 registerComponent(PlayerRequestedServerStatusComponent,
-	createAssert<Partial<PlayerRequestedServerStatusComponentData>>());
+    createAssert<Partial<PlayerRequestedServerStatusComponentData>>());

@@ -12,7 +12,7 @@ export enum GameModeTypes {
     DEATHMATCH = 'deathmatch',
     TEAM_DEATHMATCH = 'team-deathmatch',
     CAPTURE_THE_FLAG = 'capture-the-flag',
-};
+}
 
 export interface GameModeComponentData {
     hasTeams: boolean;
@@ -30,4 +30,4 @@ export class GameModeComponent extends Component
 }
 
 registerComponent(GameModeComponent,
-	createAssert<Partial<GameModeComponentData>>());
+    createAssert<Partial<GameModeComponentData>>());

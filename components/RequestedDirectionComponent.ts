@@ -16,4 +16,4 @@ export class RequestedDirectionComponent extends Component
 }
 
 registerComponent(RequestedDirectionComponent,
-	createAssert<Partial<RequestedDirectionComponentData>>());
+    createAssert<Partial<RequestedDirectionComponentData>>());

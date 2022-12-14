@@ -17,4 +17,4 @@ export class BulletComponent extends Component
 }
 
 registerComponent(BulletComponent,
-	createAssert<Partial<BulletComponentData>>());
+    createAssert<Partial<BulletComponentData>>());

@@ -14,4 +14,4 @@ export class HealthBasedSmokeSpawnerComponent extends Component
 }
 
 registerComponent(HealthBasedSmokeSpawnerComponent,
-	createAssert<Partial<HealthBasedSmokeSpawnerComponentData>>());
+    createAssert<Partial<HealthBasedSmokeSpawnerComponentData>>());

@@ -1,6 +1,6 @@
 export class IterableUtils {
     static equals<
-        T extends (string | number | symbol)
+        T extends (string | number | symbol),
     >(
         first: Iterable<T>,
         second: Iterable<T>,

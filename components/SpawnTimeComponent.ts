@@ -23,4 +23,4 @@ export class SpawnTimeComponent extends Component
 }
 
 registerComponent(SpawnTimeComponent,
-	createAssert<Partial<SpawnTimeComponentData>>());
+    createAssert<Partial<SpawnTimeComponentData>>());

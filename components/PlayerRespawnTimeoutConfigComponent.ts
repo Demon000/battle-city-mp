@@ -14,4 +14,4 @@ export class PlayerRespawnTimeoutConfigComponent extends Component
 }
 
 registerComponent(PlayerRespawnTimeoutConfigComponent,
-	createAssert<Partial<PlayerRespawnTimeoutConfigComponentData>>());
+    createAssert<Partial<PlayerRespawnTimeoutConfigComponentData>>());

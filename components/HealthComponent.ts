@@ -16,4 +16,4 @@ export class HealthComponent extends Component
 }
 
 registerComponent(HealthComponent,
-	createAssert<Partial<HealthComponentData>>());
+    createAssert<Partial<HealthComponentData>>());

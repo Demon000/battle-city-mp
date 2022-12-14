@@ -14,4 +14,4 @@ export class SizeComponent extends Component
 }
 
 registerComponent(SizeComponent,
-	createAssert<Partial<SizeComponentData>>());
+    createAssert<Partial<SizeComponentData>>());

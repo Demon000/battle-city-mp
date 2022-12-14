@@ -14,4 +14,4 @@ export class EntitiesOwnerComponent extends Component
 }
 
 registerComponent(EntitiesOwnerComponent,
-	createAssert<Partial<EntitiesOwnerComponentData>>());
+    createAssert<Partial<EntitiesOwnerComponentData>>());

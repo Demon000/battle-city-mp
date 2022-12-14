@@ -11,4 +11,4 @@ export class PatternFillGraphicsComponent extends Component
 }
 
 registerComponent(PatternFillGraphicsComponent,
-	createAssert<Partial<PatternFillGraphicsComponentData>>());
+    createAssert<Partial<PatternFillGraphicsComponentData>>());

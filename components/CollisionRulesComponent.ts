@@ -15,4 +15,4 @@ export class CollisionRulesComponent extends Component
 }
 
 registerComponent(CollisionRulesComponent,
-	createAssert<Partial<CollisionRulesComponentData>>());
+    createAssert<Partial<CollisionRulesComponentData>>());

@@ -11,4 +11,4 @@ export class DynamicSizeComponent extends Component
 }
 
 registerComponent(DynamicSizeComponent,
-	createAssert<Partial<DynamicSizeComponentData>>());
+    createAssert<Partial<DynamicSizeComponentData>>());

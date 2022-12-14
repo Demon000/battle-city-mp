@@ -11,4 +11,4 @@ export class DirtyGraphicsComponent extends Component
 }
 
 registerComponent(DirtyGraphicsComponent,
-	createAssert<Partial<DirtyGraphicsComponentData>>());
+    createAssert<Partial<DirtyGraphicsComponentData>>());

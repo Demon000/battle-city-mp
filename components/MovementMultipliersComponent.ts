@@ -28,4 +28,4 @@ export class MovementMultipliersComponent extends Component
 }
 
 registerComponent(MovementMultipliersComponent,
-	createAssert<Partial<MovementMultipliersComponentData>>());
+    createAssert<Partial<MovementMultipliersComponentData>>());

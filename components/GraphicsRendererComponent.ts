@@ -13,4 +13,4 @@ export class GraphicsRendererComponent extends Component
 }
 
 registerComponent(GraphicsRendererComponent,
-	createAssert<Partial<GraphicsRendererComponentData>>());
+    createAssert<Partial<GraphicsRendererComponentData>>());

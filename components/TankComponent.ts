@@ -10,4 +10,4 @@ export class TankComponent extends Component
 }
 
 registerComponent(TankComponent,
-	createAssert<Partial<TankComponentData>>());
+    createAssert<Partial<TankComponentData>>());

@@ -16,4 +16,4 @@ export class TimeConfigComponent extends Component
 }
 
 registerComponent(TimeConfigComponent,
-	createAssert<Partial<TimeConfigComponentData>>());
+    createAssert<Partial<TimeConfigComponentData>>());

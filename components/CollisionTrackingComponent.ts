@@ -17,4 +17,4 @@ export class CollisionTrackingComponent extends Component
 }
 
 registerComponent(CollisionTrackingComponent,
-	createAssert<Partial<CollisionTrackingComponentData>>());
+    createAssert<Partial<CollisionTrackingComponentData>>());

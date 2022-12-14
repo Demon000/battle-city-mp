@@ -14,4 +14,4 @@ export class RoundTimeComponent extends Component
 }
 
 registerComponent(RoundTimeComponent,
-	createAssert<Partial<RoundTimeComponentData>>());
+    createAssert<Partial<RoundTimeComponentData>>());
