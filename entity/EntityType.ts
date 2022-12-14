@@ -21,4 +21,5 @@ export enum EntityType {
     PLAYER = 'player',
     TEAM = 'team',
     GAME_MODE = 'game-mode',
+    TIME = 'time',
 }

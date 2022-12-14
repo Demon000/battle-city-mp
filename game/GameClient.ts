@@ -14,7 +14,6 @@ import { LazyIterable } from '@/utils/LazyIterable';
 import { TankTier } from '@/subtypes/TankTier';
 import { Color } from '@/drawable/Color';
 import { Config, ConfigEvent } from '@/config/Config';
-import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { Registry, RegistryComponentEvent, RegistryEvent } from '@/ecs/Registry';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
@@ -42,12 +41,13 @@ import { NameComponent } from '@/components/NameComponent';
 import { GameEventBatcher, GameEventBatcherEvent } from './GameEventBatcher';
 import { BatchGameEvent, GameEvent } from './GameEvent';
 import { assert } from '@/utils/assert';
+import { RoundTimeComponent } from '../components/client-index';
+import { getTimeValue, isScoreboardWatchTime } from '@/logic/time';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
     TEAMS_CHANGED = 'teams-changed',
     ROUND_TIME_UPDATED = 'round-time-updated',
-    ROUND_TIME_RESTART = 'round-time-restart',
     SCOREBOARD_WATCH_TIME = 'scoreboard-watch-time',
 
     OWN_PLAYER_ADDED = 'own-player-added',
@@ -71,7 +71,6 @@ export interface GameClientEvents {
     [GameClientEvent.PLAYERS_CHANGED]: () => void;
     [GameClientEvent.TEAMS_CHANGED]: () => void;
     [GameClientEvent.ROUND_TIME_UPDATED]: (roundTimeSeconds: number) => void;
-    [GameClientEvent.ROUND_TIME_RESTART]: () => void;
     [GameClientEvent.SCOREBOARD_WATCH_TIME]: (value: boolean) => void;
 
     [GameClientEvent.OWN_PLAYER_ADDED]: () => void;
@@ -100,7 +99,6 @@ export class GameClient {
     private collisionService;
     private gameCamera;
     private gameGraphicsService;
-    private timeService;
     private ownPlayerId: string | null = null;
     gameEventBatcher;
     emitter;
@@ -123,7 +121,6 @@ export class GameClient {
         this.gameCamera = new GameCamera();
         this.gameGraphicsService = new GameGraphicsService(this.registry,
             entityGraphicsRenderer, canvases);
-        this.timeService = new TimeService(this.config);
         this.emitter = new EventEmitter<GameClientEvents>();
         this.ticker = new Ticker();
 
@@ -335,19 +332,16 @@ export class GameClient {
                 () => {
                     this.emitter.emit(GameClientEvent.TEAMS_CHANGED);
                 });
+        this.registry.componentEmitter(RoundTimeComponent, true)
+            .on(RegistryComponentEvent.COMPONENT_CHANGED,
+                (component) => {
+                    const entity = component.entity;
+                    this.emitter.emit(GameClientEvent.ROUND_TIME_UPDATED,
+                        getTimeValue(entity));
 
-        this.timeService.emitter.on(TimeServiceEvent.ROUND_TIME_UPDATED,
-            (roundTimeSeconds: number) => {
-                this.emitter.emit(GameClientEvent.ROUND_TIME_UPDATED, roundTimeSeconds);
-            });
-        this.timeService.emitter.on(TimeServiceEvent.ROUND_TIME_RESTART,
-            () => {
-                this.emitter.emit(GameClientEvent.ROUND_TIME_RESTART);
-            });
-        this.timeService.emitter.on(TimeServiceEvent.SCOREBOARD_WATCH_TIME,
-            (value: boolean) => {
-                this.emitter.emit(GameClientEvent.SCOREBOARD_WATCH_TIME, value);
-            });
+                    this.emitter.emit(GameClientEvent.SCOREBOARD_WATCH_TIME,
+                        isScoreboardWatchTime(this.registry));
+                });
 
         this.ticker.emitter.on(TickerEvent.TICK, this.onTick, this);
     }
@@ -371,9 +365,6 @@ export class GameClient {
                 break;
             case GameEvent.ENTITY_COMPONENT_REMOVED:
                 this.onEntityComponentRemoved(batch[1], batch[2]);
-                break;
-            case GameEvent.ROUND_TIME_UPDATED:
-                this.onRoundTimeUpdated(batch[1]);
                 break;
             default:
                 assert(false, `Invalid event '${batch[0]}'`);
@@ -517,9 +508,5 @@ export class GameClient {
         }
 
         return this.registry.getEntityById(this.ownPlayerId);
-    }
-
-    onRoundTimeUpdated(roundSeconds: number): void {
-        this.timeService.setRoundTime(roundSeconds);
     }
 }

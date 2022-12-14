@@ -1,3 +1,4 @@
+import { TimeComponent } from '@/components';
 import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { HealthComponent } from '@/components/HealthComponent';
@@ -14,6 +15,7 @@ import { handleSpawnedEntityDestroyed, handleSpawnedEntityRegistered, updateHeal
 import { removePlayerFromTeam } from '@/logic/player';
 import { removeTankFromPlayer, setTankOnPlayer } from '@/logic/tank';
 import { removeTeamPlayers } from '@/logic/team';
+import { cancelPlayerActionsOnScoredboardWatchTime } from '@/logic/time';
 import { EventHandler } from './EventHandler';
 
 export const gameServerEventHandlers: EventHandler<any>[] = [
@@ -124,6 +126,14 @@ export const gameServerEventHandlers: EventHandler<any>[] = [
             updateCenterPosition,
             updateBoundingBox,
             markRelativeChildrenDirtyPosition,
+        ],
+    },
+    {
+        event: RegistryComponentEvent.COMPONENT_CHANGED,
+        toEntity: true,
+        component: TimeComponent,
+        fns: [
+            cancelPlayerActionsOnScoredboardWatchTime,
         ],
     },
 ];

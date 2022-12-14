@@ -36,6 +36,21 @@
             PatternFillGraphicsComponent: {},
         },
     },
+    'time': {
+        'extends': [
+            'world-entity',
+        ],
+        components: {
+            TimeConfigComponent: {
+                roundTime: 200,
+                scoreboardWatchTime: 10,
+            },
+            RoundTimeComponent: {},
+        },
+        serverComponents: {
+            TimeComponent: {},
+        },
+    },
     'game-mode': {
         'extends': [
             'world-entity',

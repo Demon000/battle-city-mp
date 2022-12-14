@@ -18,7 +18,6 @@ import { Registry } from '@/ecs/Registry';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
 import { Config } from '@/config/Config';
-import { TimeService, TimeServiceEvent } from '@/time/TimeService';
 import { ComponentFlags } from '@/ecs/Component';
 import { Entity } from '@/ecs/Entity';
 import { processActiveEntitySpawners } from '@/logic/entity-spawner';
@@ -37,6 +36,7 @@ import { isIgnoredEntityType, setGameMode } from '@/logic/game-mode';
 import { GameModeTypes } from '@/components/GameModeComponent';
 import { getMapEntitiesOptions } from '@/logic/map';
 import { EntityType } from '@/entity/EntityType';
+import { createTime, isRoundEnded, isScoreboardWatchTime, processTime } from '@/logic/time';
 
 export enum GameServerEvent {
     PLAYER_BATCH = 'p',
@@ -57,7 +57,6 @@ export class GameServer {
     private entityFactory;
     private collisionService;
     private gameEventBatcher;
-    private timeService;
     private pluginContext;
     private gameMode;
     private mapName;
@@ -82,7 +81,6 @@ export class GameServer {
         const boundingBoxRepository = new BoundingBoxRepository<string>();
 
         this.collisionService = new CollisionService(boundingBoxRepository, this.registry);
-        this.timeService = new TimeService(this.config);
         this.gameEventBatcher = new GameEventBatcher();
 
         const ticksPerSecond = this.config.get<number>('game-server', 'ticksPerSecond');
@@ -128,20 +126,6 @@ export class GameServer {
         this.collisionService.emitter.on(CollisionEvent.ENTITY_COLLIDE_TELEPORTER,
             bindContext(onEntityCollideTeleporter));
 
-        /*
-         * Time Service event handlers
-         */
-        this.timeService.emitter.on(TimeServiceEvent.ROUND_TIME_UPDATED,
-            (roundTime: number) => {
-                this.gameEventBatcher.addBroadcastEvent([GameEvent.ROUND_TIME_UPDATED, roundTime]);
-            });
-        this.timeService.emitter.on(TimeServiceEvent.SCOREBOARD_WATCH_TIME,
-            (value: boolean) => {
-                if (value) {
-                    cancelPlayersActions(this.registry);
-                }
-            });
-
         /**
          * Game Event Batcher event handlers
          */
@@ -160,9 +144,14 @@ export class GameServer {
          */
         this.ticker.emitter.on(TickerEvent.TICK,
             (deltaSeconds: number) => {
-                this.timeService.decreaseRoundTime(deltaSeconds);
-                if (this.timeService.isRoundEnded()) {
+                processTime(this.registry, deltaSeconds);
+                if (isRoundEnded(this.registry)) {
                     this.reload();
+                }
+
+                if (isScoreboardWatchTime(this.registry)) {
+                    this.gameEventBatcher.flush();
+                    return;
                 }
 
                 this.processPlayersStatus(deltaSeconds);
@@ -216,7 +205,6 @@ export class GameServer {
         const configsData = this.config.getDataMultiple([
             'entities-blueprint',
             'game-client',
-            'time',
         ]);
 
         const event: CommonBatchGameEvent = [GameEvent.SERVER_STATUS, {
@@ -233,10 +221,6 @@ export class GameServer {
 
     onPlayerAction(playerId: string, action: Action): void {
         const player = this.registry.getEntityById(playerId);
-
-        if (this.timeService.isScoreboardWatchTime()) {
-            return;
-        }
 
         if (action.type === ActionType.BUTTON_PRESS) {
             addPlayerButtonPressAction(player, action as ButtonPressAction);
@@ -296,7 +280,8 @@ export class GameServer {
             .filter(o => !isIgnoredEntityType(this.registry, o.type as EntityType))
             .forEach(o => this.entityFactory.buildFromOptions(o));
 
-        this.timeService.restartRoundTime();
+        createTime(this.entityFactory);
+
         this.ticker.start();
     }
 }

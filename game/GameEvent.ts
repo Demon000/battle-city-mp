@@ -11,8 +11,6 @@ export enum GameEvent {
     ENTITY_COMPONENT_REMOVED = 'ecr',
 
     SERVER_STATUS = 'ss',
-
-    ROUND_TIME_UPDATED = 'rtu',
 }
 
 export type CommonBatchGameEvent =
@@ -31,7 +29,6 @@ export type BroadcastBatchGameEvent = CommonBatchGameEvent |
 [name: GameEvent.ENTITY_UNREGISTERED, entityId: EntityId] |
 [name: GameEvent.ENTITY_COMPONENT_ADDED, entityId: EntityId, tag: string, data?: any] |
 [name: GameEvent.ENTITY_COMPONENT_UPDATED, entityId: EntityId, tag: string, data?: any] |
-[name: GameEvent.ENTITY_COMPONENT_REMOVED, entityId: EntityId, tag: string] |
-[name: GameEvent.ROUND_TIME_UPDATED, roundTime: number];
+[name: GameEvent.ENTITY_COMPONENT_REMOVED, entityId: EntityId, tag: string];
 
 export type BatchGameEvent = UnicastBatchGameEvent | BroadcastBatchGameEvent;
