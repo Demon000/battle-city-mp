@@ -171,7 +171,7 @@ export class GameServer {
                 this.collisionService.processRequestedDirection();
                 processMovement(this.registry, deltaSeconds);
                 this.collisionService.processRequestedPosition();
-                processDirtyRelativePosition.call(this.pluginContext);
+                processDirtyRelativePosition(this.registry);
                 processAutomaticDestroy(this.registry);
                 this.collisionService.processDirtyCollisions();
                 this.gameEventBatcher.flush();
@@ -262,7 +262,7 @@ export class GameServer {
 
     onPlayerRequestTeam(playerId: string, teamId: string | null): void {
         const player = this.registry.getEntityById(playerId);
-        onPlayerRequestedTeam.call(this.pluginContext, player, teamId);
+        onPlayerRequestedTeam(this.registry, player, teamId);
     }
 
     onPlayerDisconnected(playerId: string): void {

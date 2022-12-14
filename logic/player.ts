@@ -226,21 +226,21 @@ function isPlayerValidTeamSwitch(
 }
 
 export function onPlayerRequestedTeam(
-    this: PluginContext,
+    registry: Registry,
     player: Entity,
     teamId: EntityId | null,
 ): void {
-    const gameModeProperties = getGameModeProperties(this.registry);
+    const gameModeProperties = getGameModeProperties(registry);
     if (!gameModeProperties.hasTeams) {
         return;
     }
 
     if (teamId !== null
-        && !isPlayerValidTeamSwitch(this.registry, player, teamId)) {
+        && !isPlayerValidTeamSwitch(registry, player, teamId)) {
         return;
     }
 
-    setPlayerTeamId(this.registry, player, teamId);
+    setPlayerTeamId(registry, player, teamId);
 }
 
 export function setPlayerPoints(player: Entity, points: number): void {
