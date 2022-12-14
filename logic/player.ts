@@ -30,6 +30,7 @@ import { TeamOwnedComponent } from '@/components/TeamOwnedComponent';
 import { NameComponent } from '@/components/NameComponent';
 import { PlayerRequestedDisconnectComponent } from '@/components/PlayerRequestedDisconnect';
 import { PlayerRespawnTimeoutConfigComponent } from '@/components/PlayerRespawnTimeoutConfigComponent';
+import { getGameModeProperties } from './game-mode';
 
 export function createPlayer(
     entityFactory: EntityFactory,
@@ -229,7 +230,7 @@ export function onPlayerRequestedTeam(
     player: Entity,
     teamId: EntityId | null,
 ): void {
-    const gameModeProperties = this.gameModeService.getGameModeProperties();
+    const gameModeProperties = getGameModeProperties(this.registry);
     if (!gameModeProperties.hasTeams) {
         return;
     }

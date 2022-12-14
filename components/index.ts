@@ -21,6 +21,7 @@ export * from './EntitySpawnerComponent';
 export * from './ExplosionComponent';
 export * from './FatBoundingBoxComponent';
 export * from './FlagComponent';
+export * from './GameModeComponent';
 export * from './GraphicDependenciesComponent';
 export * from './HealthBasedSmokeSpawnerComponent';
 export * from './HealthComponent';

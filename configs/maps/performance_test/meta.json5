@@ -1,5 +1,6 @@
 {
-    name: 'Performance Test',
+    name: 'performance_test',
+    displayName: 'Performance Test',
     resolution: 16,
     layerFiles: [
         'performance_test_walls.png',

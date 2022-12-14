@@ -1,5 +1,6 @@
 {
-    name: 'Simple',
+    name: 'simple',
+    displayName: 'Simple',
     resolution: 16,
     entitiesFromOptionsFile: 'simple_entities_options.json',
     teamsOptions: [

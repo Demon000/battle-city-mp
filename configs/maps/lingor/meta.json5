@@ -1,5 +1,6 @@
 {
-    name: 'Lingor Islands',
+    name: 'lingor',
+    displayName: 'Lingor Islands',
     resolution: 16,
     layerFiles: [
         'lingor_ground.png',

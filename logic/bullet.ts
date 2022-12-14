@@ -1,16 +1,17 @@
 import { BulletComponent } from '@/components/BulletComponent';
 import { EntityOwnedComponent } from '@/components/EntityOwnedComponent';
+import { SameTeamBulletHitMode } from '@/components/GameModeComponent';
 import { HealthComponent } from '@/components/HealthComponent';
 import { PlayerOwnedComponent } from '@/components/PlayerOwnedComponent';
 import { Entity } from '@/ecs/Entity';
 import { EntityType } from '@/entity/EntityType';
 import { PluginContext } from '@/logic/plugin';
 import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
-import { SameTeamBulletHitMode } from '@/services/GameModeService';
 import { BulletPower } from '@/subtypes/BulletPower';
 import { ExplosionType } from '@/subtypes/ExplosionType';
 import { getBrickWallDestroyBox } from './brick-wall';
 import { createExplosion } from './explosion';
+import { getGameModeProperties } from './game-mode';
 import { addPlayerDeath, addPlayerKill, getPlayerTeamId } from './player';
 import { decreaseTankHealth } from './tank';
 
@@ -87,7 +88,7 @@ export function onBulletHitTank(
     const bulletPlayerTeamId = getPlayerTeamId(bulletPlayer);
     const isSameTeamShot = tankPlayerTeamId === bulletPlayerTeamId;
 
-    const gameModeProperties = this.gameModeService.getGameModeProperties();
+    const gameModeProperties = getGameModeProperties(this.registry);
     let destroyBullet = false;
     let ignoreBulletDamage = false;
 

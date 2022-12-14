@@ -36,6 +36,55 @@
             PatternFillGraphicsComponent: {},
         },
     },
+    'game-mode': {
+        'extends': [
+            'world-entity',
+        ],
+        localComponents: {
+            GameModeComponent: {},
+        },
+    },
+    'game-mode-deathmatch': {
+        'extends': [
+            'game-mode',
+        ],
+        localComponents: {
+            GameModeComponent: {
+                hasTeams: false,
+                sameTeamBulletHitMode: 'allow',
+                ignoredEntityTypes: [
+                    'flag',
+                    'flag-base',
+                ],
+            },
+        },
+    },
+    'game-mode-team-deathmatch': {
+        'extends': [
+            'game-mode',
+        ],
+        localComponents: {
+            GameModeComponent: {
+                hasTeams: true,
+                sameTeamBulletHitMode: 'destroy',
+                ignoredEntityTypes: [
+                    'flag',
+                    'flag-base',
+                ],
+            },
+        },
+    },
+    'game-mode-capture-the-flag': {
+        'extends': [
+            'game-mode',
+        ],
+        localComponents: {
+            GameModeComponent: {
+                hasTeams: true,
+                sameTeamBulletHitMode: 'destroy',
+            },
+        },
+    },
     'player': {
         components: {
             PlayerComponent: {},

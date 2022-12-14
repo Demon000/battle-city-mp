@@ -20,4 +20,5 @@ export enum EntityType {
     SPAWN_EFFECT = 'spawn-effect',
     PLAYER = 'player',
     TEAM = 'team',
+    GAME_MODE = 'game-mode',
 }

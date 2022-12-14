@@ -1,5 +1,6 @@
 {
-    name: 'Lingor Islands Small',
+    name: 'lingor_small',
+    displayName: 'Lingor Islands Small',
     resolution: 16,
     entitiesFromOptionsFile: 'lingor_small_entities_options.json5',
     layerFiles: [
