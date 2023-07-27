@@ -163,7 +163,6 @@ export class GameServer {
                 processDirtyRelativePosition(this.registry);
                 processAutomaticDestroy(this.registry);
                 this.collisionService.processDirtyCollisions();
-                this.collisionService.processDirtyCollisionTracking();
                 this.gameEventBatcher.flush();
             });
 
