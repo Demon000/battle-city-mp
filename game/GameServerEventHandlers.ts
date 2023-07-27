@@ -7,7 +7,7 @@ import { PositionComponent } from '@/components/PositionComponent';
 import { RelativePositionComponent } from '@/components/RelativePositionComponent';
 import { RegistryComponentEvent, RegistryEvent } from '@/ecs/Registry';
 import { batchComponentChanged, batchEntityDestroyed, batchEntityRegistered } from '@/logic/batch-events';
-import { initializeBoundingBox, markDirtyAddCollisions, markDirtyRemoveCollisions, markDirtyUpdateCollisions, removeCollisions, updateBoundingBox } from '@/logic/collisions';
+import { initializeBoundingBox, markDirtyAddCollisions, markDirtyCollisionTracking, markDirtyRemoveCollisions, markDirtyUpdateCollisions, removeCollisions, updateBoundingBox } from '@/logic/collisions';
 import { updateIsMoving } from '@/logic/entity-movement';
 import { initializeCenterPosition, updateCenterPosition } from '@/logic/entity-position';
 import { initializeRelativePosition, markRelativeChildrenDirtyPosition, unattachRelativeEntities, unattachRelativeEntity } from '@/logic/entity-relative-position';
@@ -76,6 +76,7 @@ export const gameServerEventHandlers: EventHandler<any>[] = [
         component: BoundingBoxComponent,
         fns: [
             markDirtyAddCollisions,
+            markDirtyCollisionTracking,
         ],
     },
     {
@@ -84,6 +85,7 @@ export const gameServerEventHandlers: EventHandler<any>[] = [
         component: BoundingBoxComponent,
         fns: [
             markDirtyUpdateCollisions,
+            markDirtyCollisionTracking,
         ],
     },
     {

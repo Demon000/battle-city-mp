@@ -11,6 +11,7 @@ export * from './DirectionComponent';
 export * from './DirtyCollisionsAddComponent';
 export * from './DirtyCollisionsRemoveComponent';
 export * from './DirtyCollisionsUpdateComponent';
+export * from './DirtyCollisionTrackingComponent';
 export * from './DirtyGraphicsComponent';
 export * from './DirtyPositionComponent';
 export * from './DynamicSizeComponent';
