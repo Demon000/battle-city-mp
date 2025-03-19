@@ -34,6 +34,7 @@ export interface CollisionEvents {
 
 export type CollisionRule = {
     type: CollisionRuleType.PREVENT_MOVEMENT;
+    event?: CollisionEvent;
 } | {
     type: CollisionRuleType.TRACK;
     entryEvent?: CollisionEvent;

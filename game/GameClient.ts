@@ -180,6 +180,7 @@ export class GameClient {
                     const entity = component.entity;
                     this.collisionService.markDirtyCollisions(entity,
                         DirtyCollisionType.ADD);
+                    this.collisionService.markDirtyCollisionTracking(entity);
                 });
         this.registry.componentEmitter(BoundingBoxComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
@@ -187,6 +188,7 @@ export class GameClient {
                     const entity = component.entity;
                     this.collisionService.markDirtyCollisions(entity,
                         DirtyCollisionType.UPDATE);
+                    this.collisionService.markDirtyCollisionTracking(entity);
                 });
         this.registry.componentEmitter(BoundingBoxComponent, true)
             .on(RegistryComponentEvent.COMPONENT_BEFORE_REMOVE,
@@ -417,6 +419,7 @@ export class GameClient {
     onTick(): void {
         this.gameEventBatcher.flush();
         this.collisionService.processDirtyCollisions();
+        this.collisionService.processDirtyCollisionTracking();
         this.gameGraphicsService.processDirtyGraphics();
 
         if (this.ownPlayerId === null) {

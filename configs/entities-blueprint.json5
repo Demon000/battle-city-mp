@@ -312,26 +312,36 @@
         sharedServerComponents: {
             CollisionRulesComponent: {
                 rules: {
-                    'level-border': [{
-                        type: 'track',
-                        entryEvent: 'bullet-hit-level-border',
-                    }],
-                    'brick-wall': [{
-                        type: 'track',
-                        entryEvent: 'bullet-hit-brick-wall',
-                    }],
-                    'steel-wall': [{
-                        type: 'track',
-                        entryEvent: 'bullet-hit-steel-wall',
-                    }],
-                    'tank': [{
-                        type: 'track',
-                        entryEvent: 'bullet-hit-tank',
-                    }],
-                    'bullet': [{
-                        type: 'track',
-                        entryEvent: 'bullet-hit-bullet',
-                    }],
+                    'level-border': [
+                        {
+                            type: 'prevent-movement',
+                            event: 'bullet-hit-level-border',
+                        },
+                    ],
+                    'brick-wall': [
+                        {
+                            type: 'prevent-movement',
+                            event: 'bullet-hit-brick-wall',
+                        },
+                    ],
+                    'steel-wall': [
+                        {
+                            type: 'prevent-movement',
+                            event: 'bullet-hit-steel-wall',
+                        },
+                    ],
+                    'tank': [
+                        {
+                            type: 'prevent-movement',
+                            event: 'bullet-hit-tank',
+                        },
+                    ],
+                    'bullet': [
+                        {
+                            type: 'prevent-movement',
+                            event: 'bullet-hit-bullet',
+                        },
+                    ],
                 },
             },
         },

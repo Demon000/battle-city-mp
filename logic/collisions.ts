@@ -47,3 +47,10 @@ export function markDirtyRemoveCollisions(
     this.collisionService.markDirtyCollisions(entity,
         DirtyCollisionType.REMOVE);
 }
+
+export function markDirtyCollisionTracking(
+    this: PluginContext,
+    entity: Entity,
+): void {
+    this.collisionService.markDirtyCollisionTracking(entity);
+}
