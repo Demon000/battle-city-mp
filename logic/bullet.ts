@@ -52,11 +52,11 @@ export function onBulletHitBrickWall(
 ): void {
     const destroyBox = getBrickWallDestroyBox(brickWall, bullet);
 
-    const destroyedBullets = this.collisionService
+    const destroyedWalls = context.collisionService
         .findMultipleOverlappingWithType(destroyBox,
             EntityType.BRICK_WALL);
-    for (const destroyedBullet of destroyedBullets) {
-        destroyedBullet.destroy();
+    for (const destroyedWall of destroyedWalls) {
+        destroyedWall.destroy();
     }
 
     const destroyBoxCenter = BoundingBoxUtils.center(destroyBox);
