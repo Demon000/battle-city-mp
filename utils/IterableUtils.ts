@@ -1,27 +1,17 @@
 export class IterableUtils {
-    static equals<
+    static has<
         T extends (string | number | symbol),
     >(
-        first: Iterable<T>,
-        second: Iterable<T>,
+        iterable: Iterable<T>,
+        value: T,
     ): boolean {
-        if (first === second) {
-            return true;
-        }
-
-        for (const value of first) {
-            if (!(value in second)) {
-                return false;
+        for (const iterableValue of iterable) {
+            if (iterableValue == value) {
+                return true;
             }
         }
 
-        for (const value of second) {
-            if (!(value in first)) {
-                return false;
-            }
-        }
-
-        return true;
+        return false;
     }
 
     static isEmpty<T>(iterable: Iterable<T>): boolean {

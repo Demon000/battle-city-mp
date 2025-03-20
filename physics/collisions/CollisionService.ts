@@ -280,12 +280,6 @@ export class CollisionService {
             const oldEntityIds = this.getCollisionTrackingEntities(collisionTracking.values, type);
             const newEntityIds = this.getCollisionTrackingEntities(newCollisionTrackingValues, type);
 
-            if (IterableUtils.equals(oldEntityIds, newEntityIds)) {
-                continue;
-            }
-
-            collisionTrackingChanged = true;
-
             const rule = this.getRuleWithType(movingEntity, type,
                 CollisionRuleType.TRACK);
             assert(rule !== undefined
@@ -293,9 +287,11 @@ export class CollisionService {
 
             if (rule.entryEvent !== undefined) {
                 for (const entityId of newEntityIds) {
-                    if (entityId in oldEntityIds) {
+                    if (IterableUtils.has(oldEntityIds, entityId)) {
                         continue;
                     }
+
+                    collisionTrackingChanged = true;
 
                     const staticEntity = this.registry.findEntityById(entityId);
                     if (staticEntity === undefined) {
@@ -310,9 +306,11 @@ export class CollisionService {
 
             if (rule.exitEvent !== undefined) {
                 for (const entityId of oldEntityIds) {
-                    if (entityId in newEntityIds) {
+                    if (IterableUtils.has(newEntityIds, entityId)) {
                         continue;
                     }
+
+                    collisionTrackingChanged = true;
 
                     const staticEntity = this.registry.findEntityById(entityId);
                     if (staticEntity === undefined) {
