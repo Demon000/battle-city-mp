@@ -72,20 +72,20 @@
                             </template>
 
                             <template
-                                v-else
+                                v-else-if="tankMissingBullets !== null"
                             >
-                                <img
-                                    class="tank-stats-icon"
-                                    v-for="i in tankMissingBullets"
-                                    :key="i"
-                                    src="/assets/images/bullet_full.png"
-                                >
-                                <img
-                                    class="tank-stats-icon"
-                                    v-for="i in tankBullets"
-                                    :key="i"
-                                    src="/assets/images/bullet_empty.png"
-                                >
+                                <template v-for="i in tankMaxBullets" :key="i">
+                                    <img
+                                        class="tank-stats-icon"
+                                        v-show="i <= tankMissingBullets"
+                                        src="/assets/images/bullet_full.png"
+                                    >
+                                    <img
+                                        class="tank-stats-icon"
+                                        v-show="i > tankMissingBullets"
+                                        src="/assets/images/bullet_empty.png"
+                                    >
+                                </template>
                             </template>
                         </div>
                     </div>
