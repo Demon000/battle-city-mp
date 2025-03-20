@@ -1,4 +1,4 @@
-import { Component } from '@/ecs/Component';
+import { Component, ComponentFlags } from '@/ecs/Component';
 import { EntityId } from '@/ecs/EntityId';
 
 export type CollisionTrackingData = Record<string, Record<EntityId, boolean>>;
@@ -14,6 +14,7 @@ export class CollisionTrackingComponent extends Component
     static TAG = 'CT';
 
     values: CollisionTrackingData = {};
+    static BASE_FLAGS = ComponentFlags.LOCAL_ONLY;
 }
 
 registerComponent(CollisionTrackingComponent,
