@@ -12,11 +12,11 @@ import { Registry } from '@/ecs/Registry';
 import { EntityFactory } from '@/entity/EntityFactory';
 import { EntityType } from '@/entity/EntityType';
 import { DirectionComponent } from '@/components/DirectionComponent';
-import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
 import { Component, ComponentClassType } from '@/ecs/Component';
 import { PluginContext } from './plugin';
+import { entityCenterPosition } from './entity-position';
 
 function handleEntityRegisteredDestroyed(
     registry: Registry,
@@ -122,7 +122,7 @@ function createEntity(
     spawner: EntitySpawnerComponent,
 ): Entity {
     const entity = spawner.entity;
-    const centerPosition = entity.getComponent(CenterPositionComponent);
+    const centerPosition = entityCenterPosition(entity);
 
     const options = {
         silent: true,

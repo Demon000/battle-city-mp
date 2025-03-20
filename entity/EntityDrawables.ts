@@ -11,7 +11,6 @@ import { Entity } from '@/ecs/Entity';
 import { ExplosionType } from '@/subtypes/ExplosionType';
 import { Direction } from '@/physics/Direction';
 import { DirectionComponent } from '@/components/DirectionComponent';
-import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
 import { TankTier } from '@/subtypes/TankTier';
@@ -20,6 +19,7 @@ import { RenderPass } from './RenderPass';
 import { RelativePositionComponent } from '@/components/RelativePositionComponent';
 import { NameComponent } from '@/components/NameComponent';
 import { IsInsideBushComponent } from '@/components';
+import { entityCenterPosition } from '@/logic/entity-position';
 
 const directionTest = (targetDirection: Direction): DrawableTestFunction => {
     return (entity: Entity): boolean => {
@@ -301,10 +301,9 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
 
                 const position = entity
                     .getComponent(PositionComponent);
-                const centerPosition = entity
-                    .getComponent(CenterPositionComponent);
                 const size = entity
                     .getComponent(SizeComponent);
+                const centerPosition = entityCenterPosition(entity);
                 const direction = entity
                     .getComponent(DirectionComponent).value;
 

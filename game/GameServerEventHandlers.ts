@@ -1,6 +1,5 @@
 import { TimeComponent } from '@/components/TimeComponent';
 import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
-import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { HealthComponent } from '@/components/HealthComponent';
 import { MovementComponent } from '@/components/MovementComponent';
 import { PositionComponent } from '@/components/PositionComponent';
@@ -9,7 +8,6 @@ import { RegistryComponentEvent, RegistryEvent } from '@/ecs/Registry';
 import { batchComponentChanged, batchEntityDestroyed, batchEntityRegistered } from '@/logic/batch-events';
 import { initializeBoundingBox, markDirtyAddCollisions, markDirtyCollisionTracking, markDirtyRemoveCollisions, markDirtyUpdateCollisions, removeCollisions, updateBoundingBox } from '@/logic/collisions';
 import { updateIsMoving } from '@/logic/entity-movement';
-import { initializeCenterPosition, updateCenterPosition } from '@/logic/entity-position';
 import { initializeRelativePosition, markRelativeChildrenDirtyPosition, unattachRelativeEntities, unattachRelativeEntity } from '@/logic/entity-relative-position';
 import { handleSpawnedEntityDestroyed, handleSpawnedEntityRegistered, updateHealthBasedSmokeSpawner } from '@/logic/entity-spawner';
 import { removePlayerFromTeam } from '@/logic/player';
@@ -49,14 +47,6 @@ export const gameServerEventHandlers: EventHandler<any>[] = [
         event: RegistryComponentEvent.COMPONENT_CHANGED,
         fns: [
             batchComponentChanged,
-        ],
-    },
-    {
-        event: RegistryComponentEvent.COMPONENT_INITIALIZED,
-        toEntity: true,
-        component: CenterPositionComponent,
-        fns: [
-            initializeCenterPosition,
         ],
     },
     {
@@ -130,7 +120,6 @@ export const gameServerEventHandlers: EventHandler<any>[] = [
         toEntity: true,
         component: PositionComponent,
         fns: [
-            updateCenterPosition,
             updateBoundingBox,
             markRelativeChildrenDirtyPosition,
         ],

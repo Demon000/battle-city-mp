@@ -1,9 +1,9 @@
-import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { Entity } from '@/ecs/Entity';
 import { EntityFactory } from '@/entity/EntityFactory';
 import { EntityType } from '@/entity/EntityType';
 import { Point } from '@/physics/point/Point';
 import { ExplosionType } from '@/subtypes/ExplosionType';
+import { entityCenterPosition } from './entity-position';
 
 export function createExplosion(
     entityFactory: EntityFactory,
@@ -14,7 +14,7 @@ export function createExplosion(
     let position;
 
     if (sourceOrPosition instanceof Entity) {
-        position = sourceOrPosition.getComponent(CenterPositionComponent);
+        position = entityCenterPosition(sourceOrPosition);
     } else {
         position = sourceOrPosition;
     }

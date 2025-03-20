@@ -17,7 +17,6 @@ import { Config, ConfigEvent } from '@/config/Config';
 import { RegistryNumberIdGenerator } from '@/ecs/RegistryNumberIdGenerator';
 import { Registry, RegistryComponentEvent, RegistryEvent } from '@/ecs/Registry';
 import { BlueprintEnv, EntityBlueprint } from '@/ecs/EntityBlueprint';
-import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { PositionComponent } from '@/components/PositionComponent';
 import { EntityId } from '@/ecs/EntityId';
 import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
@@ -27,7 +26,6 @@ import { BulletSpawnerComponent } from '@/components/BulletSpawnerComponent';
 import { Entity } from '@/ecs/Entity';
 import { EntityGraphicsRenderer } from '@/entity/EntityGraphicsRenderer';
 import { updateIsMoving } from '@/logic/entity-movement';
-import { updateCenterPosition } from '@/logic/entity-position';
 import { PlayerComponent } from '@/components/PlayerComponent';
 import { getPlayerColor, getPlayerName, getPlayerTankId, getRoundedRespawnTimeout, getSortedPlayers } from '@/logic/player';
 import { TeamComponent } from '@/components/TeamComponent';
@@ -43,6 +41,7 @@ import { BatchGameEvent, GameEvent } from './GameEvent';
 import { assert } from '@/utils/assert';
 import { RoundTimeComponent } from '../components/client-index';
 import { getTimeValue, isScoreboardWatchTime } from '@/logic/time';
+import { entityCenterPosition } from '@/logic/entity-position';
 
 export enum GameClientEvent {
     PLAYERS_CHANGED = 'players-changed',
@@ -155,17 +154,10 @@ export class GameClient {
             (entity: Entity) => {
                 this.collisionService.removeCollisions(entity);
             });
-        this.registry.componentEmitter(CenterPositionComponent, true)
-            .on(RegistryComponentEvent.COMPONENT_INITIALIZED,
-                (component) => {
-                    const entity = component.entity;
-                    updateCenterPosition(entity, true);
-                });
         this.registry.componentEmitter(PositionComponent, true)
             .on(RegistryComponentEvent.COMPONENT_UPDATED,
                 (component) => {
                     const entity = component.entity;
-                    updateCenterPosition(entity);
                     this.collisionService.updateBoundingBox(entity);
                 });
         this.registry.componentEmitter(BoundingBoxComponent, true)
@@ -432,7 +424,7 @@ export class GameClient {
         if (ownPlayerTankId !== null) {
             const tank = this.registry.findEntityById(ownPlayerTankId);
             if (tank !== undefined) {
-                const centerPosition = tank.getComponent(CenterPositionComponent);
+                const centerPosition = entityCenterPosition(tank);
                 this.gameCamera.setPosition(centerPosition);
             }
         }

@@ -5,10 +5,10 @@ import { BoundingBoxUtils } from '@/physics/bounding-box/BoundingBoxUtils';
 import { DirectionUtils } from '@/physics/collisions/DirectionUtils';
 import { Direction } from '@/physics/Direction';
 import { DirectionComponent } from '@/components/DirectionComponent';
-import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
 import { BulletPower } from '../subtypes/BulletPower';
 import { Entity } from '@/ecs/Entity';
+import { entityCenterPosition } from './entity-position';
 
 export function getBrickWallDestroyBox(
     brickWall: Entity,
@@ -18,10 +18,8 @@ export function getBrickWallDestroyBox(
         brickWall.getComponent(BoundingBoxComponent),
     );
 
-    const bulletCenterPosition =
-        bullet.getComponent(CenterPositionComponent);
-    const brickWallCenterPosition =
-        brickWall.getComponent(CenterPositionComponent);
+    const bulletCenterPosition = entityCenterPosition(bullet);
+    const brickWallCenterPosition = entityCenterPosition(brickWall);
     const bulletDirection =
         bullet.getComponent(DirectionComponent).value;
     const bulletPower =

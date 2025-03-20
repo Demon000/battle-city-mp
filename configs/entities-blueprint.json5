@@ -134,9 +134,6 @@
             'world-entity',
             'uniquely-rendered-entity',
         ],
-        serverComponents: {
-            CenterPositionComponent: {},
-        },
         sharedLocalComponents: {
             SizeComponent: {
                 width: 4,
@@ -154,9 +151,6 @@
             'world-entity',
             'shared-rendered-entity',
         ],
-        serverComponents: {
-            CenterPositionComponent: {},
-        },
         sharedLocalComponents: {
             SizeComponent: {
                 width: 8,
@@ -284,9 +278,6 @@
             DirectionComponent: {},
             MovementComponent: {},
         },
-        localComponents: {
-            CenterPositionComponent: {},
-        },
         serverComponents: {
             PlayerOwnedComponent: {},
             EntityOwnedComponent: {},
@@ -370,9 +361,6 @@
         },
         localComponents: {
             SpawnTimeComponent: {},
-        },
-        clientComponents: {
-            CenterPositionComponent: {},
         },
         sharedLocalComponents: {
             SizeComponent: {},
@@ -482,9 +470,6 @@
         components: {
             ColorComponent: {},
         },
-        localComponents: {
-            CenterPositionComponent: {},
-        },
         serverComponents: {
             PickupIgnoreComponent: {},
             TeamOwnedComponent: {},
@@ -542,9 +527,6 @@
             MovementComponent: {},
             ColorComponent: {},
             NameComponent: {},
-        },
-        localComponents: {
-            CenterPositionComponent: {},
         },
         serverComponents: {
             TankComponent: {},

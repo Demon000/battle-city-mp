@@ -3,7 +3,6 @@ export * from './BoundingBoxComponent';
 export * from './BulletComponent';
 export * from './BulletHitEntityComponent';
 export * from './BulletSpawnerComponent';
-export * from './CenterPositionComponent';
 export * from './CollidedWithComponent';
 export * from './CollisionRulesComponent';
 export * from './CollisionTrackingComponent';
