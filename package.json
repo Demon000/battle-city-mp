@@ -5,6 +5,7 @@
   "license": "GPL-3.0",
   "type": "module",
   "scripts": {
+    "regen-components-index": "ts-node ./regen-components-index.ts",
     "client-dev": "vite serve",
     "lint": "eslint . --ext .ts --ext .vue",
     "lint-fix": "eslint . --fix --ext .ts --ext .vue",
