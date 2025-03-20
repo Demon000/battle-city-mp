@@ -10,9 +10,9 @@ export interface BulletComponentData {
 
 export class BulletComponent extends Component
     implements BulletComponentData {
-    damage = 0;
     static TAG = 'BC';
 
+    damage = 0;
     power = BulletPower.LIGHT;
 }
 
