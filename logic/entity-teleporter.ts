@@ -10,8 +10,8 @@ export function onEntityCollideTeleporter(
     component: EntityCollideTeleporterComponent,
 ): void {
     const entity = component.entity;
+    const entityPosition = entity.getComponent(PositionComponent);
     const teleporter = this.registry.getEntityById(component.entityId);
-    const size = entity.getComponent(SizeComponent);
     const target = teleporter.getComponent(TeleporterComponent).target;
     const teleporterPosition = teleporter.getComponent(PositionComponent);
     const teleporterSize = teleporter.getComponent(SizeComponent);
@@ -20,9 +20,10 @@ export function onEntityCollideTeleporter(
         x: target.x - teleporterSize.width / 2,
         y: target.y - teleporterSize.height / 2,
     };
+
     const position = {
-        x: target.x - size.width / 2,
-        y: target.y - size.height / 2,
+        x: targetPosition.x - teleporterPosition.x + entityPosition.x,
+        y: targetPosition.y - teleporterPosition.y + entityPosition.y,
     };
 
     createSpawnEffect(this.entityFactory, teleporterPosition);
