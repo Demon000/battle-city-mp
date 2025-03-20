@@ -290,15 +290,6 @@
         serverComponents: {
             PlayerOwnedComponent: {},
             EntityOwnedComponent: {},
-            CollisionTrackingComponent: {
-                values: {
-                    'level-border': {},
-                    'brick-wall': {},
-                    'steel-wall': {},
-                    'tank': {},
-                    'bullet': {},
-                },
-            },
         },
         sharedLocalComponents: {
             SizeComponent: {
@@ -312,36 +303,26 @@
         sharedServerComponents: {
             CollisionRulesComponent: {
                 rules: {
-                    'level-border': [
-                        {
-                            type: 'prevent-movement',
-                            event: 'bullet-hit-level-border',
-                        },
-                    ],
-                    'brick-wall': [
-                        {
-                            type: 'prevent-movement',
-                            event: 'bullet-hit-brick-wall',
-                        },
-                    ],
-                    'steel-wall': [
-                        {
-                            type: 'prevent-movement',
-                            event: 'bullet-hit-steel-wall',
-                        },
-                    ],
-                    'tank': [
-                        {
-                            type: 'prevent-movement',
-                            event: 'bullet-hit-tank',
-                        },
-                    ],
-                    'bullet': [
-                        {
-                            type: 'prevent-movement',
-                            event: 'bullet-hit-bullet',
-                        },
-                    ],
+                    'level-border': [{
+                        type: 'prevent-movement',
+                        component: 'BulletHitEntityComponent'
+                    }],
+                    'brick-wall': [{
+                        type: 'prevent-movement',
+                        component: 'BulletHitEntityComponent'
+                    }],
+                    'steel-wall': [{
+                        type: 'prevent-movement',
+                        component: 'BulletHitEntityComponent'
+                    }],
+                    'tank': [{
+                        type: 'prevent-movement',
+                        component: 'BulletHitEntityComponent'
+                    }],
+                    'bullet': [{
+                        type: 'prevent-movement',
+                        component: 'BulletHitEntityComponent'
+                    }],
                 },
             },
         },
@@ -568,16 +549,12 @@
                     'flag-base': {},
                     'flag': {},
                     'teleporter': {},
+                    'bush': {},
                 },
             },
         },
         clientComponents: {
             SpawnTimeComponent: {},
-            CollisionTrackingComponent: {
-                values: {
-                    'bush': {},
-                },
-            },
         },
         sharedLocalComponents: {
             SizeComponent: {
@@ -591,17 +568,9 @@
         sharedClientComponents: {
             GraphicDependenciesComponent: {
                 components: {
-                    'CollisionTrackingComponent': true,
+                    'IsInsideBushComponent': true,
                     'IsMovingComponent': true,
                     'DirectionComponent': true,
-                },
-            },
-            CollisionRulesComponent: {
-                rules: {
-                    'bush': [{
-                        type: 'track',
-                        minimumVolume: 48,
-                    }],
                 },
             },
         },
@@ -623,19 +592,24 @@
                     'water': [{
                         type: 'prevent-movement',
                     }],
+                    'bush': [{
+                        type: 'track',
+                        minimumVolume: 48,
+                        component: 'IsInsideBushComponent',
+                    }],
                     'flag-base': [{
                         type: 'track',
-                        entryEvent: 'tank-collide-flag-base',
+                        component: 'TankCollideFlagComponent',
                     }],
                     'flag': [{
                         type: 'track',
-                        entryEvent: 'tank-collide-flag',
                         minimumVolume: 192,
+                        component: 'TankCollideFlagComponent',
                     }],
                     'teleporter': [{
                         type: 'track',
-                        entryEvent: 'entity-collide-teleporter',
                         minimumVolume: 192,
+                        component: 'EntityCollideTeleporterComponent',
                     }],
                     'ice': [{
                         type: 'track',

@@ -9,6 +9,7 @@ import { PluginContext } from '@/logic/plugin';
 import { Point } from '@/physics/point/Point';
 import { handleFlagInteraction } from './flag';
 import { getPlayerColor, getPlayerName, getPlayerTeamId, setPlayerTank } from './player';
+import { TankCollideFlagComponent } from '@/components/TankCollideFlagComponent';
 
 export function createTankForPlayer(
     this: PluginContext,
@@ -49,31 +50,48 @@ export function decreaseTankHealth(tank: Entity, value: number): void {
 }
 
 export function onTankCollideFlag(
-    this: PluginContext,
+    context: PluginContext,
     tank: Entity,
     flag: Entity,
 ): void {
-    const carriedFlag = this.collisionService
+    const carriedFlag = context.collisionService
         .findRelativePositionEntityWithType(tank,
             EntityType.FLAG);
 
     const boundingBox = flag.getComponent(BoundingBoxComponent);
-    const flagBase = this.collisionService
+    const flagBase = context.collisionService
         .findOverlappingWithType(boundingBox, EntityType.FLAG_BASE);
     if (flag !== carriedFlag) {
-        handleFlagInteraction.call(this, tank, flag, carriedFlag, flagBase);
+        handleFlagInteraction.call(context, tank, flag, carriedFlag, flagBase);
     }
 }
 
 export function onTankCollideFlagBase(
-    this: PluginContext,
+    context: PluginContext,
     tank: Entity,
     flagBase: Entity,
 ): void {
-    const carriedFlag = this.collisionService
+    const carriedFlag = context.collisionService
         .findRelativePositionEntityWithType(tank,
             EntityType.FLAG);
-    handleFlagInteraction.call(this, tank, undefined, carriedFlag, flagBase);
+    handleFlagInteraction.call(context, tank, undefined, carriedFlag, flagBase);
+}
+
+export function onTankCollideFlagOrFlagBase(
+    this: PluginContext,
+    component: TankCollideFlagComponent,
+): void {
+    const entity = component.entity;
+    const collidedEntity = this.registry.getEntityById(component.entityId);
+
+    switch (collidedEntity.type) {
+        case EntityType.FLAG:
+            onTankCollideFlag(this, entity, collidedEntity);
+            break;
+        case EntityType.FLAG_BASE:
+            onTankCollideFlagBase(this, entity, collidedEntity);
+            break;
+    }
 }
 
 function setUnsetTankPlayer(

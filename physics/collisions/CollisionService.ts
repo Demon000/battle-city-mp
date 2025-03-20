@@ -3,7 +3,6 @@ import { MovementMultipliersComponent } from '@/components/MovementMultipliersCo
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';
 import { assert } from '@/utils/assert';
-import EventEmitter from 'eventemitter3';
 import { BoundingBox } from '../bounding-box/BoundingBox';
 import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
 import { BoundingBoxRepository } from '../bounding-box/BoundingBoxRepository';
@@ -18,7 +17,7 @@ import { RequestedPositionComponent } from '@/components/RequestedPositionCompon
 import { RequestedDirectionComponent } from '@/components/RequestedDirectionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
 import { DirectionUtils } from './DirectionUtils';
-import { CollisionEvents, CollisionRule, CollisionRuleType } from './CollisionRule';
+import { CollisionRule, CollisionRuleType } from './CollisionRule';
 import { EntityId } from '@/ecs/EntityId';
 import { LazyIterable } from '@/utils/LazyIterable';
 import { CollisionTrackingComponent, CollisionTrackingData } from '@/components/CollisionTrackingComponent';
@@ -28,7 +27,7 @@ import { DirtyCollisionsUpdateComponent } from '@/components/DirtyCollisionsUpda
 import { DirtyCollisionsRemoveComponent } from '@/components/DirtyCollisionsRemoveComponent';
 import { IterableUtils } from '@/utils/IterableUtils';
 import { FatBoundingBoxComponent } from '@/components/FatBoundingBoxComponent';
-import { DirtyCollisionTrackingComponent } from '@/components';
+import { DirtyCollisionTrackingComponent } from '@/components/DirtyCollisionTrackingComponent';
 
 export enum DirtyCollisionType {
     ADD,
@@ -37,8 +36,6 @@ export enum DirtyCollisionType {
 }
 
 export class CollisionService {
-    emitter = new EventEmitter<CollisionEvents>();
-
     constructor(
         private boundingBoxRepository: BoundingBoxRepository<EntityId>,
         private registry: Registry,
@@ -285,42 +282,38 @@ export class CollisionService {
             assert(rule !== undefined
                 && rule.type === CollisionRuleType.TRACK);
 
-            if (rule.entryEvent !== undefined) {
-                for (const entityId of newEntityIds) {
-                    if (IterableUtils.has(oldEntityIds, entityId)) {
-                        continue;
-                    }
-
-                    collisionTrackingChanged = true;
-
-                    const staticEntity = this.registry.findEntityById(entityId);
-                    if (staticEntity === undefined) {
-                        continue;
-                    }
-                    this.emitter.emit(rule.entryEvent, movingEntity, staticEntity);
-                    if (this.registry.findEntityById(movingEntity.id) === undefined) {
-                        return;
-                    }
+            for (const entityId of newEntityIds) {
+                if (IterableUtils.has(oldEntityIds, entityId)) {
+                    continue;
                 }
+
+                collisionTrackingChanged = true;
+
+                if (rule.component === undefined) {
+                    continue;
+                }
+
+                const staticEntity = this.registry.getEntityById(entityId);
+                movingEntity.upsertComponent(rule.component, {
+                    entityId: staticEntity.id,
+                    type: rule.type,
+                });
             }
 
-            if (rule.exitEvent !== undefined) {
-                for (const entityId of oldEntityIds) {
-                    if (IterableUtils.has(newEntityIds, entityId)) {
-                        continue;
-                    }
-
-                    collisionTrackingChanged = true;
-
-                    const staticEntity = this.registry.findEntityById(entityId);
-                    if (staticEntity === undefined) {
-                        continue;
-                    }
-                    this.emitter.emit(rule.exitEvent, movingEntity, staticEntity);
-                    if (this.registry.findEntityById(movingEntity.id) === undefined) {
-                        return;
-                    }
+            for (const entityId of oldEntityIds) {
+                if (IterableUtils.has(newEntityIds, entityId)) {
+                    continue;
                 }
+
+                collisionTrackingChanged = true;
+
+                if (rule.component === undefined) {
+                    continue;
+                }
+
+                movingEntity.removeComponent(rule.component, {
+                    optional: true,
+                });
             }
         }
 
@@ -411,9 +404,13 @@ export class CollisionService {
         if (movementPreventingEntity !== undefined) {
             const rule = this.getRuleWithType(movingEntity, movementPreventingEntity.type,
                 CollisionRuleType.PREVENT_MOVEMENT);
-            assert(rule !== undefined && rule.type === CollisionRuleType.PREVENT_MOVEMENT);
-            if (rule.event !== undefined) {
-                this.emitter.emit(rule.event, movingEntity, movementPreventingEntity);
+            assert(rule !== undefined
+                && rule.type === CollisionRuleType.PREVENT_MOVEMENT);
+            if (rule.component !== undefined) {
+                movingEntity.upsertComponent(rule.component, {
+                    entityId: movementPreventingEntity.id,
+                    type: rule.type,
+                });
             }
         }
 
@@ -428,10 +425,6 @@ export class CollisionService {
 
         if (position.x === originalPosition.x
             && position.y === originalPosition.y) {
-            return;
-        }
-
-        if (!movingEntity.hasComponent(PositionComponent)) {
             return;
         }
 

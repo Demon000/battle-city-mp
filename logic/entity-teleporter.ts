@@ -1,15 +1,16 @@
 import { PositionComponent } from '@/components/PositionComponent';
 import { SizeComponent } from '@/components/SizeComponent';
 import { TeleporterComponent } from '@/components/TeleporterComponent';
-import { Entity } from '@/ecs/Entity';
 import { PluginContext } from './plugin';
 import { createSpawnEffect } from './spawn-effect';
+import { EntityCollideTeleporterComponent } from '@/components/EntityCollideTeleporterComponent';
 
 export function onEntityCollideTeleporter(
     this: PluginContext,
-    entity: Entity,
-    teleporter: Entity,
+    component: EntityCollideTeleporterComponent,
 ): void {
+    const entity = component.entity;
+    const teleporter = this.registry.getEntityById(component.entityId);
     const size = entity.getComponent(SizeComponent);
     const target = teleporter.getComponent(TeleporterComponent).target;
     const teleporterPosition = teleporter.getComponent(PositionComponent);

@@ -18,8 +18,8 @@ import { TankTier } from '@/subtypes/TankTier';
 import { EntityType } from './EntityType';
 import { RenderPass } from './RenderPass';
 import { RelativePositionComponent } from '@/components/RelativePositionComponent';
-import { CollisionTrackingComponent } from '@/components/CollisionTrackingComponent';
 import { NameComponent } from '@/components/NameComponent';
+import { IsInsideBushComponent } from '@/components';
 
 const directionTest = (targetDirection: Direction): DrawableTestFunction => {
     return (entity: Entity): boolean => {
@@ -287,11 +287,7 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
             positionXReference: 'center',
             tests: [
                 (entity: Entity): boolean => {
-                    const collisionTracking = entity
-                        .getComponent(CollisionTrackingComponent);
-                    const bushEntries = collisionTracking.values[EntityType.BUSH];
-
-                    return !bushEntries.size;
+                    return !entity.hasComponent(IsInsideBushComponent);
                 },
             ],
             processor(this: IDrawable, entity: Entity): IDrawable | undefined {

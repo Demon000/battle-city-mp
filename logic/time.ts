@@ -1,4 +1,5 @@
-import { RoundTimeComponent, TimeComponent } from '@/components';
+import { RoundTimeComponent } from '@/components/RoundTimeComponent';
+import { TimeComponent } from '@/components/TimeComponent';
 import { TimeConfigComponent } from '@/components/TimeConfigComponent';
 import { Entity } from '@/ecs/Entity';
 import { Registry } from '@/ecs/Registry';

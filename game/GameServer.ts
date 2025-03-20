@@ -11,7 +11,6 @@ import { Action, ActionType } from '../actions/Action';
 import { ButtonPressAction } from '../actions/ButtonPressAction';
 import { BoundingBoxRepository } from '../physics/bounding-box/BoundingBoxRepository';
 import { CollisionService } from '../physics/collisions/CollisionService';
-import { CollisionEvent } from '../physics/collisions/CollisionRule';
 import { BroadcastBatchGameEvent, CommonBatchGameEvent, GameEvent, UnicastBatchGameEvent } from './GameEvent';
 import { GameEventBatcher, GameEventBatcherEvent } from './GameEventBatcher';
 import { Registry } from '@/ecs/Registry';
@@ -23,10 +22,7 @@ import { Entity } from '@/ecs/Entity';
 import { processActiveEntitySpawners } from '@/logic/entity-spawner';
 import { processDirection, processMovement } from '@/logic/entity-movement';
 import { destroyAllWorldEntities, processAutomaticDestroy } from '@/logic/entity-destroy';
-import { onBulletHitBrickWall, onBulletHitBullet, onBulletHitLevelBorder, onBulletHitSteelWall, onBulletHitTank } from '@/logic/bullet';
-import { onEntityCollideTeleporter } from '@/logic/entity-teleporter';
 import { addPlayerButtonPressAction, createPlayer, onPlayerRequestedTeam, processPlayerDisconnectStatus, processPlayerDroppingFlag, processPlayerMovement, processPlayerRespawnTimeout, processPlayerShooting, processPlayerSpawnStatus, resetPlayers, setPlayerName, setPlayerRequestedDisconnect, setPlayerRequestedServerStatus, setPlayerRequestedSpawnStatus, setPlayerRequestedTankColor, setPlayerRequestedTankTier } from '@/logic/player';
-import { onTankCollideFlag, onTankCollideFlagBase } from '@/logic/tank';
 import { PlayerComponent } from '@/components/PlayerComponent';
 import { EntityId } from '@/ecs/EntityId';
 import { processDirtyRelativePosition } from '@/logic/entity-relative-position';
@@ -96,35 +92,6 @@ export class GameServer {
         for (const handler of gameServerEventHandlers) {
             registerEventHandler(this.pluginContext, handler);
         }
-
-        const bindContext = (fn: Function) => fn.bind(this.pluginContext);
-
-        /**
-         * CollisionService event handlers
-         */
-        this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_LEVEL_BORDER,
-            bindContext(onBulletHitLevelBorder));
-
-        this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_STEEL_WALL,
-            bindContext(onBulletHitSteelWall));
-
-        this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BRICK_WALL,
-            bindContext(onBulletHitBrickWall));
-
-        this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_TANK,
-            bindContext(onBulletHitTank));
-
-        this.collisionService.emitter.on(CollisionEvent.BULLET_HIT_BULLET,
-            bindContext(onBulletHitBullet));
-
-        this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_FLAG,
-            bindContext(onTankCollideFlag));
-
-        this.collisionService.emitter.on(CollisionEvent.TANK_COLLIDE_FLAG_BASE,
-            bindContext(onTankCollideFlagBase));
-
-        this.collisionService.emitter.on(CollisionEvent.ENTITY_COLLIDE_TELEPORTER,
-            bindContext(onEntityCollideTeleporter));
 
         /**
          * Game Event Batcher event handlers

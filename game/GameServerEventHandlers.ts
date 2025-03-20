@@ -1,4 +1,4 @@
-import { TimeComponent } from '@/components';
+import { TimeComponent } from '@/components/TimeComponent';
 import { BoundingBoxComponent } from '@/components/BoundingBoxComponent';
 import { CenterPositionComponent } from '@/components/CenterPositionComponent';
 import { HealthComponent } from '@/components/HealthComponent';
@@ -13,10 +13,15 @@ import { initializeCenterPosition, updateCenterPosition } from '@/logic/entity-p
 import { initializeRelativePosition, markRelativeChildrenDirtyPosition, unattachRelativeEntities, unattachRelativeEntity } from '@/logic/entity-relative-position';
 import { handleSpawnedEntityDestroyed, handleSpawnedEntityRegistered, updateHealthBasedSmokeSpawner } from '@/logic/entity-spawner';
 import { removePlayerFromTeam } from '@/logic/player';
-import { removeTankFromPlayer, setTankOnPlayer } from '@/logic/tank';
+import { onTankCollideFlagOrFlagBase, removeTankFromPlayer, setTankOnPlayer } from '@/logic/tank';
 import { removeTeamPlayers } from '@/logic/team';
 import { cancelPlayerActionsOnScoredboardWatchTime } from '@/logic/time';
 import { EventHandler } from './EventHandler';
+import { BulletHitEntityComponent } from '@/components/BulletHitEntityComponent';
+import { onBulletHitEntity } from '@/logic/bullet';
+import { TankCollideFlagComponent } from '@/components/TankCollideFlagComponent';
+import { EntityCollideTeleporterComponent } from '@/components/EntityCollideTeleporterComponent';
+import { onEntityCollideTeleporter } from '@/logic/entity-teleporter';
 
 export const gameServerEventHandlers: EventHandler<any>[] = [
     {
@@ -136,6 +141,27 @@ export const gameServerEventHandlers: EventHandler<any>[] = [
         component: TimeComponent,
         fns: [
             cancelPlayerActionsOnScoredboardWatchTime,
+        ],
+    },
+    {
+        event: RegistryComponentEvent.COMPONENT_ADDED,
+        component: BulletHitEntityComponent,
+        fns: [
+            onBulletHitEntity,
+        ],
+    },
+    {
+        event: RegistryComponentEvent.COMPONENT_ADDED,
+        component: TankCollideFlagComponent,
+        fns: [
+            onTankCollideFlagOrFlagBase,
+        ],
+    },
+    {
+        event: RegistryComponentEvent.COMPONENT_ADDED,
+        component: EntityCollideTeleporterComponent,
+        fns: [
+            onEntityCollideTeleporter,
         ],
     },
 ];

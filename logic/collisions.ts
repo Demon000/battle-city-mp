@@ -12,7 +12,6 @@ export function removeCollisions(
 export function updateBoundingBox(
     this: PluginContext,
     entity: Entity,
-
 ): void {
     this.collisionService.updateBoundingBox(entity);
 }

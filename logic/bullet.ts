@@ -14,39 +14,41 @@ import { createExplosion } from './explosion';
 import { getGameModeProperties } from './game-mode';
 import { addPlayerDeath, addPlayerKill, getPlayerTeamId } from './player';
 import { decreaseTankHealth } from './tank';
+import { BulletHitEntityComponent } from '@/components/BulletHitEntityComponent';
+import { addAutomaticDestroy } from './entity-destroy';
 
 export function onBulletHitLevelBorder(
-    this: PluginContext,
+    context: PluginContext,
     bullet: Entity,
     _staticEntity: Entity,
 ): void {
-    const entityFactory = this.entityFactory;
+    const entityFactory = context.entityFactory;
 
     createExplosion(entityFactory, bullet,
         ExplosionType.SMALL, EntityType.NONE);
 
-    bullet.destroy();
+    addAutomaticDestroy(bullet);
 }
 
 export function onBulletHitSteelWall(
-    this: PluginContext,
+    context: PluginContext,
     bullet: Entity, 
     steelWall: Entity,
 ): void {
     const bulletPower = bullet.getComponent(BulletComponent).power;
     if (bulletPower === BulletPower.HEAVY) {
-        createExplosion(this.entityFactory, bullet,
+        createExplosion(context.entityFactory, bullet,
             ExplosionType.SMALL);
-        steelWall.destroy();
+        addAutomaticDestroy(steelWall);
     } else {
-        createExplosion(this.entityFactory, bullet,
+        createExplosion(context.entityFactory, bullet,
             ExplosionType.SMALL, EntityType.NONE);
     }
-    bullet.destroy();
+    addAutomaticDestroy(bullet);
 }
 
 export function onBulletHitBrickWall(
-    this: PluginContext,
+    context: PluginContext,
     bullet: Entity,
     brickWall: Entity,
 ): void {
@@ -56,18 +58,18 @@ export function onBulletHitBrickWall(
         .findMultipleOverlappingWithType(destroyBox,
             EntityType.BRICK_WALL);
     for (const destroyedWall of destroyedWalls) {
-        destroyedWall.destroy();
+        addAutomaticDestroy(destroyedWall);
     }
 
     const destroyBoxCenter = BoundingBoxUtils.center(destroyBox);
-    createExplosion(this.entityFactory, destroyBoxCenter,
+    createExplosion(context.entityFactory, destroyBoxCenter,
         ExplosionType.SMALL);
 
-    bullet.destroy();
+    addAutomaticDestroy(bullet);
 }
 
 export function onBulletHitTank(
-    this: PluginContext,
+    context: PluginContext,
     bullet: Entity,
     tank: Entity,
 ): void {
@@ -82,13 +84,13 @@ export function onBulletHitTank(
         bullet.getComponent(PlayerOwnedComponent).playerId;
     const tankOwnerPlayerId =
         tank.getComponent(PlayerOwnedComponent).playerId;
-    const tankPlayer = this.registry.getEntityById(tankOwnerPlayerId);
-    const bulletPlayer = this.registry.getEntityById(bulletOwnerPlayerId);
+    const tankPlayer = context.registry.getEntityById(tankOwnerPlayerId);
+    const bulletPlayer = context.registry.getEntityById(bulletOwnerPlayerId);
     const tankPlayerTeamId = getPlayerTeamId(tankPlayer);
     const bulletPlayerTeamId = getPlayerTeamId(bulletPlayer);
     const isSameTeamShot = tankPlayerTeamId === bulletPlayerTeamId;
 
-    const gameModeProperties = getGameModeProperties(this.registry);
+    const gameModeProperties = getGameModeProperties(context.registry);
     let destroyBullet = false;
     let ignoreBulletDamage = false;
 
@@ -121,24 +123,24 @@ export function onBulletHitTank(
     }
 
     if (tankHealth.value <= 0) {
-        createExplosion(this.entityFactory, tank,
+        createExplosion(context.entityFactory, tank,
             ExplosionType.BIG, EntityType.TANK);
-        tank.destroy();
+        addAutomaticDestroy(tank);
         addPlayerDeath(tankPlayer);
         addPlayerKill(bulletPlayer);
     } else {
-        createExplosion(this.entityFactory, bullet,
+        createExplosion(context.entityFactory, bullet,
             ExplosionType.SMALL, EntityType.NONE);
     }
 
     if (destroyBullet || bulletDamage <= 0) {
-        createExplosion(this.entityFactory, bullet, ExplosionType.SMALL);
-        bullet.destroy();
+        createExplosion(context.entityFactory, bullet, ExplosionType.SMALL);
+        addAutomaticDestroy(bullet);
     }
 }
 
 export function onBulletHitBullet(
-    this: PluginContext,
+    context: PluginContext,
     movingBullet: Entity,
     staticBullet: Entity,
 ): void {
@@ -150,9 +152,35 @@ export function onBulletHitBullet(
         return;
     }
 
-    createExplosion(this.entityFactory, movingBullet,
+    createExplosion(context.entityFactory, movingBullet,
         ExplosionType.SMALL);
 
-    movingBullet.destroy();
-    staticBullet.destroy();
+    addAutomaticDestroy(movingBullet);
+    addAutomaticDestroy(staticBullet);
+}
+
+export function onBulletHitEntity(
+    this: PluginContext,
+    component: BulletHitEntityComponent,
+): void {
+    const entity = component.entity;
+    const collidedEntity = this.registry.getEntityById(component.entityId);
+
+    switch (collidedEntity.type) {
+        case EntityType.LEVEL_BORDER:
+            onBulletHitLevelBorder(this, entity, collidedEntity);
+            break;
+        case EntityType.STEEL_WALL:
+            onBulletHitSteelWall(this, entity, collidedEntity);
+            break;
+        case EntityType.BRICK_WALL:
+            onBulletHitBrickWall(this, entity, collidedEntity);
+            break;
+        case EntityType.TANK:
+            onBulletHitTank(this, entity, collidedEntity);
+            break;
+        case EntityType.BULLET:
+            onBulletHitBullet(this, entity, collidedEntity);
+            break;
+    }
 }
