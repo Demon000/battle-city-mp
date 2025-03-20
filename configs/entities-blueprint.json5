@@ -284,6 +284,7 @@
             CollisionTrackingComponent: {
                 values: {
                     'teleporter': {},
+                    'bullet': {},
                 },
             },
         },
@@ -303,6 +304,10 @@
                         type: 'track',
                         component: 'EntityCollideTeleporterComponent',
                     },
+                    'bullet': {
+                        type: 'track',
+                        component: 'BulletHitEntityComponent'
+                    },
                     'level-border': {
                         type: 'prevent-movement',
                         component: 'BulletHitEntityComponent'
@@ -316,10 +321,6 @@
                         component: 'BulletHitEntityComponent'
                     },
                     'tank': {
-                        type: 'prevent-movement',
-                        component: 'BulletHitEntityComponent'
-                    },
-                    'bullet': {
                         type: 'prevent-movement',
                         component: 'BulletHitEntityComponent'
                     },
