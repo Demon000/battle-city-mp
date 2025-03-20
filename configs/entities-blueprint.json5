@@ -290,6 +290,11 @@
         serverComponents: {
             PlayerOwnedComponent: {},
             EntityOwnedComponent: {},
+            CollisionTrackingComponent: {
+                values: {
+                    'teleporter': {},
+                },
+            },
         },
         sharedLocalComponents: {
             SizeComponent: {
@@ -303,26 +308,30 @@
         sharedServerComponents: {
             CollisionRulesComponent: {
                 rules: {
-                    'level-border': [{
+                    'teleporter': {
+                        type: 'track',
+                        component: 'EntityCollideTeleporterComponent',
+                    },
+                    'level-border': {
                         type: 'prevent-movement',
                         component: 'BulletHitEntityComponent'
-                    }],
-                    'brick-wall': [{
+                    },
+                    'brick-wall': {
                         type: 'prevent-movement',
                         component: 'BulletHitEntityComponent'
-                    }],
-                    'steel-wall': [{
+                    },
+                    'steel-wall': {
                         type: 'prevent-movement',
                         component: 'BulletHitEntityComponent'
-                    }],
-                    'tank': [{
+                    },
+                    'tank': {
                         type: 'prevent-movement',
                         component: 'BulletHitEntityComponent'
-                    }],
-                    'bullet': [{
+                    },
+                    'bullet': {
                         type: 'prevent-movement',
                         component: 'BulletHitEntityComponent'
-                    }],
+                    },
                 },
             },
         },
@@ -577,48 +586,48 @@
         sharedServerComponents: {
             CollisionRulesComponent: {
                 rules: {
-                    'brick-wall': [{
+                    'brick-wall': {
                         type: 'prevent-movement',
-                    }],
-                    'steel-wall': [{
+                    },
+                    'steel-wall': {
                         type: 'prevent-movement',
-                    }],
-                    'level-border': [{
+                    },
+                    'level-border': {
                         type: 'prevent-movement',
-                    }],
-                    'tank': [{
+                    },
+                    'tank': {
                         type: 'prevent-movement',
-                    }],
-                    'water': [{
+                    },
+                    'water': {
                         type: 'prevent-movement',
-                    }],
-                    'bush': [{
+                    },
+                    'bush': {
                         type: 'track',
                         minimumVolume: 48,
                         component: 'IsInsideBushComponent',
-                    }],
-                    'flag-base': [{
+                    },
+                    'flag-base': {
                         type: 'track',
                         component: 'TankCollideFlagComponent',
-                    }],
-                    'flag': [{
+                    },
+                    'flag': {
                         type: 'track',
                         minimumVolume: 192,
                         component: 'TankCollideFlagComponent',
-                    }],
-                    'teleporter': [{
+                    },
+                    'teleporter': {
                         type: 'track',
                         minimumVolume: 192,
                         component: 'EntityCollideTeleporterComponent',
-                    }],
-                    'ice': [{
+                    },
+                    'ice': {
                         type: 'track',
                         minimumVolume: 48,
-                    }],
-                    'sand': [{
+                    },
+                    'sand': {
                         type: 'track',
                         minimumVolume: 48,
-                    }],
+                    },
                 },
             },
             HealthBasedSmokeSpawnerComponent: {
