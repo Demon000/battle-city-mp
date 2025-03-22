@@ -1,0 +1,359 @@
+[
+    {
+        type: 'team',
+        id: 'Red',
+        components: {
+            ColorComponent: {
+                value: [
+                    220,
+                    20,
+                    60,
+                ],
+            },
+        },
+    },
+    {
+        type: 'team',
+        id: 'Blue',
+        components: {
+            ColorComponent: {
+                value: [
+                    65,
+                    105,
+                    255,
+                ],
+            },
+        },
+    },
+    {
+        type: 'team',
+        id: 'Yellow',
+        components: {
+            ColorComponent: {
+                value: [
+                    249,
+                    166,
+                    2,
+                ],
+            },
+        },
+    },
+    // Red team
+    {
+        type: 'flag-base',
+        position: {
+            x: 272,
+            y: 1024,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Red',
+            },
+        },
+    },
+    {
+        type: 'flag',
+        position: {
+            x: 272,
+            y: 1024,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Red',
+            },
+            ColorComponent: {
+                value: [
+                    220,
+                    20,
+                    60,
+                ],
+            },
+        },
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 112,
+            y: 896,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Red',
+            },
+        },
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 112,
+            y: 992,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Red',
+            },
+        },
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 256,
+            y: 1008,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Red',
+            },
+        },
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 256,
+            y: 768,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Red',
+            },
+        },
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 464,
+            y: 896,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Red',
+            },
+        },
+    },
+
+    // Blue team
+    {
+        type: 'flag-base',
+        position: {
+            x: 848,
+            y: 704,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Blue',
+            },
+        },
+    },
+    {
+        type: 'flag',
+        position: {
+            x: 848,
+            y: 704,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Blue',
+            },
+            ColorComponent: {
+                value: [
+                    65,
+                    105,
+                    255,
+                ],
+            },
+        },
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 736,
+            y: 864,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Blue',
+            },
+        },
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 992,
+            y: 864,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Blue',
+            },
+        },
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 832,
+            y: 720,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Blue',
+            },
+        },
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 720,
+            y: 560,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Blue',
+            },
+        },
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 1008,
+            y: 544,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Blue',
+            },
+        },
+    },
+
+    // Yellow team
+    {
+        type: 'flag-base',
+        position: {
+            x: 688,
+            y: 16,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Yellow',
+            },
+        },
+    },
+    {
+        type: 'flag',
+        position: {
+            x: 688,
+            y: 16,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Yellow',
+            },
+            ColorComponent: {
+                value: [
+                    249,
+                    166,
+                    2,
+                ],
+            },
+        },
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 112,
+            y: 16,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Yellow',
+            },
+        },
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 288,
+            y: 16,
+        },
+        teamId: 'Yellow',
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 480,
+            y: 16,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Yellow',
+            },
+        },
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 688,
+            y: 32,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Yellow',
+            },
+        },
+    },
+    {
+        type: 'player-spawn',
+        position: {
+            x: 720,
+            y: 112,
+        },
+        components: {
+            TeamOwnedComponent: {
+                teamId: 'Yellow',
+            },
+        },
+    },
+    {
+        type: 'teleporter',
+        position: {
+            x: 240,
+            y: 208,
+        },
+        components: {
+            ColorComponent: {
+                value: [
+                    253,
+                    106,
+                    2,
+                ],
+            },
+            TeleporterComponent: {
+                target: {
+                    x: 248,
+                    y: 248,
+                },
+            },
+        },
+    },
+    {
+        type: 'teleporter',
+        position: {
+            x: 240,
+            y: 240,
+        },
+        components: {
+            ColorComponent: {
+                value: [
+                    253,
+                    106,
+                    2,
+                ],
+            },
+            TeleporterComponent: {
+                target: {
+                    x: 248,
+                    y: 216,
+                },
+            },
+        },
+    },
+]

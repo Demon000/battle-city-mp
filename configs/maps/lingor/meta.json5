@@ -2,6 +2,7 @@
     name: 'lingor',
     displayName: 'Lingor Islands',
     resolution: 16,
+    entitiesFromOptionsFile: 'lingor_entities_options.json5',
     layerFiles: [
         'lingor_ground.png',
         'lingor_walls.png',
@@ -18,4 +19,30 @@
         'dirt': [152, 128, 72],
         'player-spawn': [89, 13, 121],
     },
+    teamsOptions: [
+        {
+            id: 'Red',
+            color: [
+                220,
+                20,
+                60,
+            ],
+        },
+        {
+            id: 'Blue',
+            color: [
+                65,
+                105,
+                255,
+            ],
+        },
+        {
+            id: 'Yellow',
+            color: [
+                249,
+                166,
+                2,
+            ],
+        }
+    ],
 }
