@@ -586,7 +586,6 @@
                     },
                     'bush': {
                         type: 'track',
-                        minimumVolume: 48,
                         component: 'IsInsideBushComponent',
                     },
                     'flag-base': {
