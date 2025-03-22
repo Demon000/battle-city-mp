@@ -1,6 +1,10 @@
 <template>
     <div class="settings">
-        <div class="content-container">
+        <div v-if="!loaded" class="content-container loading-text-container">
+            <span>LOADING...</span>
+        </div>
+
+        <div v-if="loaded" class="content-container">
             <div class="logo-container">
                 <img src="/assets/images/logo.png" alt="" class="logo">
             </div>
@@ -163,6 +167,9 @@ export default class Settings extends Vue {
 
     @Prop()
         playerName: string | null = null;
+
+    @Prop()
+        loaded = false;
 
     internalPlayerName: string | null = null;
 
@@ -383,5 +390,12 @@ export default class Settings extends Vue {
 
 .tank-tiers-container .tank-tiers {
     margin-bottom: 16px;
+}
+
+.loading-text-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 100px;
 }
 </style>>

@@ -166,6 +166,7 @@
             :hasTeams="hasTeams"
             :playerRequestedSpawnStatus="playerRequestedSpawnStatus"
             :playerRespawnTimeout="playerRespawnTimeout"
+            :loaded="loaded"
             ref="settingsElement"
             @player-name-change="onPlayerNameChanged"
             @player-team-change="onPlayerTeamChanged"
@@ -237,6 +238,7 @@ export default class App extends Vue {
     isUserShowingSettings = false;
     roundTimeSeconds = 0;
     isScoreboardWatchTime = false;
+    loaded = false;
 
     async mounted(): Promise<void> {
         const canvasContainerElement = this.$refs.canvasContainerElement as HTMLDivElement;
@@ -321,6 +323,11 @@ export default class App extends Vue {
             () => {
                 gamepad.processUpdates();
             });
+        gameClient.emitter.on(GameClientEvent.LOADED,
+            () => {
+                this.loaded = true;
+            },
+        );
 
         const gameClientSocket = new GameClientSocket(this.socket, this.gameClient);
         this.gameClientSocket = markRaw(gameClientSocket);

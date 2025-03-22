@@ -64,6 +64,7 @@ export enum GameClientEvent {
     OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS = 'own-player-changed-requested-spawn-status',
 
     TICK = 'tick',
+    LOADED = 'loaded',
 }
 
 export interface GameClientEvents {
@@ -87,6 +88,7 @@ export interface GameClientEvents {
     [GameClientEvent.OWN_PLAYER_CHANGED_REQUESTED_SPAWN_STATUS]: (value: boolean) => void;
 
     [GameClientEvent.TICK]: () => void;
+    [GameClientEvent.LOADED]: () => void;
 }
 
 export class GameClient {
@@ -404,6 +406,7 @@ export class GameClient {
         const maxVisibleGameSize = this.config.get<number>('game-client',
             'maxVisibleGameSize');
         this.gameGraphicsService.setMaxVisibleGameSize(maxVisibleGameSize);
+        this.emitter.emit(GameClientEvent.LOADED);
     }
 
     onTick(): void {
