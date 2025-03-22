@@ -1,3 +1,8 @@
+@font-face {
+    font-family: "Press Start 2P";
+    src: url(../assets/fonts/press_start_2p.ttf) format("truetype");
+}
+
 .text-button {
     padding: 16px;
 
