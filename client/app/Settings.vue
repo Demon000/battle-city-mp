@@ -322,6 +322,14 @@ export default class Settings extends Vue {
     vertical-align: top;
 }
 
+.inputs-container.inline .input-wrapper {
+    width: 100%;
+}
+
+.inputs-container.inline .input-wrapper input {
+    width: 100%;
+}
+
 .inputs-container.inline > .input-wrapper + .input-wrapper {
     margin-left: 16px;
 }
