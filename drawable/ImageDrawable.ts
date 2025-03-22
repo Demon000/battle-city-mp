@@ -7,6 +7,7 @@ import { ImageUtils, Source } from '../utils/ImageUtils';
 import { Point } from '@/physics/point/Point';
 import { CanvasUtils, Context2D } from '@/utils/CanvasUtils';
 import { PointUtils } from '@/physics/point/PointUtils';
+import { IDrawable } from './IDrawable';
 
 export class ImageDrawable extends BaseImageDrawable {
     readonly type = DrawableType.IMAGE;
@@ -14,6 +15,7 @@ export class ImageDrawable extends BaseImageDrawable {
     private cachedSource?: Source;
     private _isLoaded;
     private source;
+    private sourceString: string | undefined;
     private minPoint: Point | undefined;
     private maxPoint: Point | undefined;
     private totalSize: Point | undefined;
@@ -26,16 +28,39 @@ export class ImageDrawable extends BaseImageDrawable {
 
         if (typeof source === 'string') {
             this._isLoaded = false;
+            this.sourceString = source;
             this.source = new Image();
-            this.source.crossOrigin = 'anonymous';
-            this.source.addEventListener('load', () => {
-                this._isLoaded = true;
-            });
-            this.source.src = `${CLIENT_SPRITES_RELATIVE_URL}/${source}`;
         } else {
             this._isLoaded = true;
             this.source = source;
         }
+    }
+
+    _load(resolve: () => void, reject: (err: Error) => void): void {
+        if (this.sourceString === undefined || this._isLoaded
+            || !(this.source instanceof Image)
+        ) {
+            resolve();
+            return;
+        }
+
+        this.source.crossOrigin = 'anonymous';
+        this.source.addEventListener('load', () => {
+            this._isLoaded = true;
+            resolve();
+        });
+        this.source.addEventListener('error', () => {
+            reject(new Error(`Failed to load image ${this.sourceString}`));
+        });
+        this.source.src = `${CLIENT_SPRITES_RELATIVE_URL}/${this.sourceString}`;
+    }
+
+    getChildDrawables(): IDrawable[] {
+        return this.properties.overlays || [];
+    }
+
+    async load(): Promise<void> {
+        await new Promise<void>(this._load.bind(this));
     }
 
     getMinPoint(): Point {

@@ -28,7 +28,7 @@ const directionTest = (targetDirection: Direction): DrawableTestFunction => {
     };
 };
 
-const drawables: Partial<Record<string, IDrawable[]>> = {
+const drawables: Record<string, IDrawable[]> = {
     [EntityType.STEEL_WALL]: [
         new ImageDrawable('steel_wall.png', {
             renderPass: RenderPass.WALL,
@@ -502,6 +502,67 @@ const drawables: Partial<Record<string, IDrawable[]>> = {
 };
 
 export class EntityDrawables {
+    static getDrawables(drawable: IDrawable, allDrawables: IDrawable[]): void {
+        allDrawables.push(drawable);
+
+        const childDrawables = drawable.getChildDrawables();
+        for (const drawable of childDrawables) {
+            this.getDrawables(drawable, allDrawables);
+        }
+    }
+
+    static getAllDrawables(): IDrawable[] {
+        const allDrawables: IDrawable[] = [];
+
+        for (const typeDrawables of Object.values(drawables)) {
+            for (const typeDrawable of typeDrawables) {
+                this.getDrawables(typeDrawable, allDrawables);
+            }
+        }
+
+        return allDrawables;
+    }
+
+    static _loadDrawableRetry(
+        drawable: IDrawable,
+        resolve: () => void,
+        reject: (err: Error) => void,
+        retryCount = 5,
+    ): void {
+        drawable.load()
+            .then(() => {
+                resolve();
+            }).catch((err) => {
+                if (retryCount === 0) {
+                    reject(err);
+                } else {
+                    console.log(`Retry ${retryCount} loading drawable`, drawable);
+                    setTimeout(() => {
+                        this._loadDrawableRetry(drawable, resolve, reject,
+                            retryCount - 1);
+                    }, 500);
+                }
+            });
+    }
+
+    static loadDrawableRetry(drawable: IDrawable): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this._loadDrawableRetry(drawable, resolve, reject);
+        });
+    }
+
+    static async load(): Promise<PromiseSettledResult<void>[]> {
+        const allDrawables = this.getAllDrawables();
+
+        const promises: Promise<void>[] = [];
+        for (const drawable of allDrawables) {
+            const promise = this.loadDrawableRetry(drawable);
+            promises.push(promise);
+        }
+
+        return Promise.allSettled(promises);
+    }
+
     static getTypeDrawables(type: string): IDrawable[] | undefined {
         return drawables[type];
     }

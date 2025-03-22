@@ -13,6 +13,8 @@ export abstract class BaseDrawable implements IDrawable {
     protected abstract _scale(scaleX: number, scaleY: number): this;
     protected abstract _offset(offsetX: number, offsetY: number): this;
 
+    abstract load(): Promise<void>;
+    abstract getChildDrawables(): Iterable<IDrawable>;
     abstract draw(context: CanvasRenderingContext2D, drawX: number, drawY: number): void;
     abstract isLoaded(): boolean;
 

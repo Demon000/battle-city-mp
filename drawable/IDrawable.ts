@@ -26,6 +26,8 @@ export interface IDrawable {
     getScale(): Point;
     getOffset(): Point;
 
+    load(): Promise<void>;
+    getChildDrawables(): Iterable<IDrawable>;
     draw(context: Context2D, drawX: number, drawY: number): void;
     scale(scaleX: number, scaleY?: number): this | undefined;
     offset(offsetX: number, offsetY: number): this | undefined;

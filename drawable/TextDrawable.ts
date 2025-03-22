@@ -1,7 +1,7 @@
 import { BaseDrawable } from './BaseDrawable';
 import { Color } from './Color';
 import { DrawableType } from './DrawableType';
-import { DrawableProperties } from './IDrawable';
+import { DrawableProperties, IDrawable } from './IDrawable';
 import { ImageUtils, Source } from '../utils/ImageUtils';
 import { CLIENT_FONTS_RELATIVE_URL } from '@/client/config';
 import { CanvasUtils, Canvas } from '@/utils/CanvasUtils';
@@ -33,34 +33,53 @@ export class TextDrawable extends BaseDrawable {
     private positionXReferenceCache = new Map<string, this>();
     private positionYReferenceCache = new Map<string, this>();
     private cachedSource?: Source;
-    private _isLoaded = false;
+    private _isLoaded;
     text;
 
     constructor(
         text: string,
-        public properties: TextDrawableProperties = {},
+        public properties: TextDrawableProperties,
     ) {
         super(properties);
 
         this.text = text;
 
-        if (properties.fontFace === undefined
-            && properties.fontFamily !== undefined
-            && properties.fontUrl !== undefined) {
-            properties.fontFace = new FontFace(properties.fontFamily,
-                `url('${CLIENT_FONTS_RELATIVE_URL}/${properties.fontUrl}')`);
-            properties.fontFace.load()
-                .then((fontFace: FontFace) => {
-                    document.fonts.add(fontFace);
-                }).catch(_err => {
-                    this.properties.fontFamily = undefined;
-                    this.properties.fontUrl = undefined;
-                }).finally(() => {
-                    this._isLoaded = true;
-                });
-        } else {
+        if (properties.fontFace !== undefined
+            || properties.fontUrl === undefined) {
             this._isLoaded = true;
+        } else {
+            this._isLoaded = false;
         }
+    }
+
+    private _load(resolve: () => void, reject: (err: Error) => void): void {
+        if (this._isLoaded
+            || this.properties.fontUrl === undefined
+            || this.properties.fontFamily === undefined
+        ) {
+            resolve();
+            return;
+        }
+
+        this.properties.fontFace = new FontFace(this.properties.fontFamily,
+            `url('${CLIENT_FONTS_RELATIVE_URL}/${this.properties.fontUrl}')`);
+        this.properties.fontFace.load()
+            .then((fontFace: FontFace) => {
+                document.fonts.add(fontFace);
+                this._isLoaded = true;
+                resolve();
+            }).catch(_err => {
+                this.properties.fontFamily = undefined;
+                reject(new Error(`Failed to load font ${this.properties.fontUrl}`));
+            });
+    }
+
+    getChildDrawables(): IDrawable[] {
+        return [];
+    }
+
+    async load(): Promise<void> {
+        return new Promise(this._load.bind(this));
     }
 
     isLoaded(): boolean {

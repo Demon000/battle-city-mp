@@ -53,7 +53,15 @@ export class AnimatedImageDrawable extends BaseImageDrawable {
         return undefined;
     }
 
-    isDrawableLoaded(drawable: IDrawable): boolean {
+    getChildDrawables(): IDrawable[] {
+        return this.drawables;
+    }
+
+    async load(): Promise<void> {
+        // nothing
+    }
+
+    private isDrawableLoaded(drawable: IDrawable): boolean {
         return drawable.isLoaded();
     }
 

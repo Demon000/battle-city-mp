@@ -197,6 +197,7 @@ import { ColorUtils } from '@/utils/ColorUtils';
 import { EntityId } from '@/ecs/EntityId';
 import { Component, Vue, Watch } from 'vue-facing-decorator';
 import { Entity } from '@/ecs/Entity';
+import { EntityDrawables } from '@/entity/EntityDrawables';
 
 @Component({
     options: {
@@ -237,7 +238,7 @@ export default class App extends Vue {
     roundTimeSeconds = 0;
     isScoreboardWatchTime = false;
 
-    mounted(): void {
+    async mounted(): Promise<void> {
         const canvasContainerElement = this.$refs.canvasContainerElement as HTMLDivElement;
 
         const socket = io(CLIENT_CONFIG_SOCKET_BASE_URL, {
@@ -245,6 +246,8 @@ export default class App extends Vue {
             autoConnect: false,
         });
         this.socket = markRaw(socket);
+
+        await EntityDrawables.load();
 
         const gameClient = new GameClient(this.canvases);
         this.gameClient = markRaw(gameClient);
